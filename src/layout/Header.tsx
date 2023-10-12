@@ -1,11 +1,12 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
     return (
         <div className='sticky top-0 bg-white'>
             <div className='bg-[#242021] h-[36px] left-0 right-0'>
                 <div className="container text-white h-full flex justify-between items-center">
-                    <p className='text-[13px]'>Hotline mua hàng:    <strong>0967584597</strong>   (9:00-21:00, Tất cả hàng tuần)      <span className='mx-[10px]'>|</span>       Liên hệ</p>
+                    <p className='text-[13px]'>Hotline mua hàng:    <strong><Link to="">0967584597</Link></strong>   (9:00-21:00, Tất cả hàng tuần)      <span className='mx-[10px]'>|</span>    <Link to="">Liên hệ</Link></p>
                     <div className="flex">
                         <div className="relative mr-[5px]">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
@@ -24,10 +25,10 @@ const Header = () => {
                         <img src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173" className='w-[220px] h-[53px]' alt="" />
                     </div>
                     {/* menu */}
-                    <ul className='flex font-semibold text-[#666666] tracking-wide'>
-                        <li className='mx-[15px] cursor-pointer leading-[73px]'>Sale</li>
-                        <li className='mx-[15px] cursor-pointer flex items-center group leading-[73px] static'>
-                            <a href="">Áo nam</a>
+                    <ul className='flex font-semibold tracking-wide'>
+                        <li className='mx-[15px] leading-[73px]'><Link to="">Sale</Link></li>
+                        <li className='mx-[15px] flex items-center group leading-[73px] static'>
+                            <Link to="">Áo nam</Link>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
@@ -35,46 +36,46 @@ const Header = () => {
                                 <div className="w-[65%] tracking-wide">
                                     <div className="grid grid-cols-4">
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Áo polo</p>
+                                            <Link to="" className='font-bold'>Áo polo</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className='hover:text-black'>Polo trơn</li>
-                                                <li className='hover:text-black'>Polo họa tiết</li>
-                                                <li className='hover:text-black'>Polo bo kẻ</li>
-                                                <li className='hover:text-black'>Polo can phối</li>
+                                                <li className='hover:text-black'><Link to="">Polo trơn</Link></li>
+                                                <li className='hover:text-black'><Link to="">Polo họa tiết</Link></li>
+                                                <li className='hover:text-black'><Link to="">Polo bo kẻ</Link></li>
+                                                <li className='hover:text-black'><Link to="">Polo can phối</Link></li>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Áo thun</p>
+                                            <Link to="" className='font-bold'>Áo thun</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className="hover:text-black">Áo thun in hình</li>
-                                                <li className="hover:text-black">Áo tank top</li>
+                                                <li className="hover:text-black"><Link to="">Áo thun in hình</Link></li>
+                                                <li className="hover:text-black"><Link to="">Áo tank top</Link></li>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Sơ mi ngắn tay</p>
+                                            <Link to="" className='font-bold'>Sơ mi ngắn tay</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className="hover:text-black">Sơ mi tay trơn</li>
-                                                <li className="hover:text-black">Sơ mi họa tiết</li>
-                                                <li className="hover:text-black">Sơ mi tay kẻ</li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi tay trơn</Link></li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi họa tiết</Link></li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi tay kẻ</Link></li>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Sơ mi dài tay</p>
+                                            <Link to="" className='font-bold'>Sơ mi dài tay</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className="hover:text-black">Sơ mi dài tay dạ</li>
-                                                <li className="hover:text-black">Sơ mi dài tay họa tiết</li>
-                                                <li className="hover:text-black">Sơ mi dài tay kẻ</li>
-                                                <li className="hover:text-black">Sơ mi dài tay trơn</li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi dài tay dạ</Link></li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi dài tay họa tiết</Link></li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi dài tay kẻ</Link></li>
+                                                <li className="hover:text-black"><Link to="">Sơ mi dài tay trơn</Link></li>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="w-[35%]">
+                                <Link to="" className="w-[35%]">
                                     <img className='w-full' src="../../public/images/imgs-menu/mega_menu_3_img.jpg" alt="" />
-                                </div>
+                                </Link>
                             </div>
                         </li>
-                        <li className='mx-[15px] cursor-pointer flex items-center group leading-[73px]'>Quần nam
+                        <li className='mx-[15px] flex items-center group leading-[73px]'><Link to="">Quần nam</Link>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
@@ -82,67 +83,71 @@ const Header = () => {
                                 <div className="w-[65%] tracking-wide">
                                     <div className="grid grid-cols-4">
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Quần dài kaki</p>
+                                            <Link to="" className='font-bold'>Quần dài kaki</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className='hover:text-black'>Quần dài kaki basic</li>
-                                                <li className='hover:text-black'>Quần kaki phối thun cạp</li>
+                                                <li className='hover:text-black'><Link to="">Quần dài kaki basic</Link></li>
+                                                <li className='hover:text-black'><Link to="">Quần kaki phối thun cạp</Link></li>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Quần âu</p>
+                                            <Link to="" className='font-bold'>Quần âu</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className="hover:text-black">Quần âu basic</li>
-                                                <li className="hover:text-black">Quần âu phối thun cạp</li>
-                                                <li className="hover:text-black">Quần âu LV</li>
-                                                <li className="hover:text-black">Quần âu carrot</li>
+                                                <li className="hover:text-black"><Link to="">Quần âu basic</Link></li>
+                                                <li className="hover:text-black"><Link to="">Quần âu phối thun cạp</Link></li>
+                                                <li className="hover:text-black"><Link to="">Quần âu LV</Link></li>
+                                                <li className="hover:text-black"><Link to="">Quần âu carrot</Link></li>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Quần jeans</p>
+                                            <Link to="" className='font-bold'>Quần jeans</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className="hover:text-black">Quần jeans basic</li>
-                                                <li className="hover:text-black">Quần jeans rách</li>
-                                                <li className="hover:text-black">Quần jeans xước</li>
+                                                <li className="hover:text-black"><Link to="">Quần jeans basic</Link></li>
+                                                <li className="hover:text-black"><Link to="">Quần jeans rách</Link></li>
+                                                <li className="hover:text-black"><Link to="">Quần jeans xước</Link></li>
                                             </div>
                                         </div>
                                         <div className="flex flex-col">
-                                            <p className='font-bold'>Quần short</p>
+                                            <Link to="" className='font-bold'>Quần short</Link>
                                             <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                                                <li className="hover:text-black">Short kaki</li>
-                                                <li className="hover:text-black">Short đũi</li>
-                                                <li className="hover:text-black">Short gió</li>
+                                                <li className="hover:text-black"><Link to="">Short kaki</Link></li>
+                                                <li className="hover:text-black"><Link to="">Short đũi</Link></li>
+                                                <li className="hover:text-black"><Link to="">Short gió</Link></li>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="w-[35%]">
+                                <Link to="" className="w-[35%]">
                                     <img className='w-full' src="../../public/images/imgs-menu/mega_menu_2_img.jpg" alt="" />
-                                </div>
+                                </Link>
                             </div>
                         </li>
-                        <li className='mx-[15px] cursor-pointer group flex items-center leading-[73px] relative'>Hàng đông
+                        <li className='mx-[15px] group flex items-center leading-[73px] relative'><Link to="">Hàng đông</Link>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
                             <div className="dropdown absolute  top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100%] transition-all ease-linear bg-white w-[200px] pointer-events-none group-hover:pointer-events-auto py-4 leading-7 z-50 px-[20px] border-t-2 flex">
-                                <p className='font-normal'>Áo khoác gió</p>
+                                <Link to="" className='font-normal'>Áo khoác gió</Link>
                             </div>
                         </li>
-                        <li className='mx-[15px] cursor-pointer leading-[73px]'>Hệ thống cửa hàng</li>
+                        <li className='mx-[15px] leading-[73px]'><Link to="">Hệ thống cửa hàng</Link></li>
                     </ul>
                     <div className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px] cursor-pointer">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px] cursor-pointer">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                        </svg>
-                        <div className="relative">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] cursor-pointer">
+                        <Link to="">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px] cursor-pointer">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                        </Link>
+                        <Link to="">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px]">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
+                        </Link>
+                        <Link to="" className="relative">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px]">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                             </svg>
                             <span className='w-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]'>1</span>
-                        </div>
+                        </Link>
                     </div>
                 </div>
             </div>
