@@ -20,7 +20,7 @@ export const getAllCategory = createAsyncThunk(
         const { data } = await axios.get<{ categories: ICategory[] }>(
             "http://localhost:8080/api/categories"
         );
-        return data.categories;
+        return data
     }
 );
 
