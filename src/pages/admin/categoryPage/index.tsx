@@ -45,7 +45,6 @@ const categoryPage = () => {
     const data = categories?.map((cate: ICategory) => ({
         key: cate._id,
         name: cate.name,
-        image: cate.image,
     }));
     console.log(categories);
 
@@ -55,12 +54,12 @@ const categoryPage = () => {
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
-                    <Image
+                    {/* <Image
                         width={70}
                         src={record.image}
                         alt="Category Image"
                         className=""
-                    />
+                    /> */}
                     <a className='w-full overflow-hidden'>{record.name}</a>
                 </div>
             )
