@@ -1,8 +1,52 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { Link } from 'react-router-dom'
 
 const Header = () => {
+
+
+    // hàm dropdownUser
+    const handleDropdown = () => {
+        const iconUser = document.querySelector(".icon-user")
+        const dropdown = document.querySelector(".dropdown-user")
+        const hiddenUser = document.querySelector(".dropdown-user.hidden")
+        const overlay = document.querySelector(".overlay-dropdownUser")
+        const isSelected = document.querySelector(".isSelected")
+        const signinDropdown = document.querySelector(".signinDropdown")
+
+        isSelected?.classList.remove("translate-x-0")
+        isSelected?.classList.add("translate-x-[150%]")
+        signinDropdown?.classList.remove("translate-x-[-150%]")
+        if (dropdown?.classList.contains("opacity-0")) {
+            dropdown?.classList.remove("opacity-0")
+            dropdown?.classList.remove("pointer-events-none")
+            overlay?.classList.remove("hidden")
+        } else {
+            dropdown?.classList.add("pointer-events-none")
+            dropdown?.classList.add("opacity-0")
+            overlay?.classList.add("hidden")
+        }
+        overlay?.addEventListener("click", () => {
+            dropdown?.classList.add("pointer-events-none")
+            dropdown?.classList.add("opacity-0")
+            overlay.classList.add("hidden")
+        })
+    }
+    const forgotPassword = () => {
+        const isSelected = document.querySelector(".isSelected")
+        const signinDropdown = document.querySelector(".signinDropdown")
+        isSelected?.classList.add("translate-x-0")
+        isSelected?.classList.remove("translate-x-[150%]")
+        signinDropdown?.classList.add("translate-x-[-150%]")
+    }
+    const backSigninDropdown = () => {
+        const isSelected = document.querySelector(".isSelected")
+        const signinDropdown = document.querySelector(".signinDropdown")
+        isSelected?.classList.remove("translate-x-0")
+        isSelected?.classList.add("translate-x-[150%]")
+        signinDropdown?.classList.remove("translate-x-[-150%]")
+    }
     return (
-        <div className='sticky top-0 bg-white'>
+        <div className='sticky top-0 bg-white z-[99]'>
             <div className='bg-[#242021] h-[36px] left-0 right-0'>
                 <div className="container text-white h-full flex justify-between items-center">
                     <p className='text-[13px]'>Hotline mua hàng:    <strong>0967584597</strong>   (9:00-21:00, Tất cả hàng tuần)      <span className='mx-[10px]'>|</span>       Liên hệ</p>
@@ -17,21 +61,23 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className="">
+            <div className="border-b-2">
                 <div className="h-[73px] flex justify-between container">
                     {/* logo */}
                     <div className="h-[73px] flex items-center">
-                        <img src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173" className='w-[220px] h-[53px]' alt="" />
+                        <Link to="/">
+                            <img src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173" className='w-[220px] h-[53px]' alt="" />
+                        </Link>
                     </div>
                     {/* menu */}
-                    <ul className='flex font-semibold text-[#666666] tracking-wide'>
+                    <ul className='flex font-semibold text-[#666666]  tracking-wide'>
                         <li className='mx-[15px] cursor-pointer leading-[73px]'>Sale</li>
                         <li className='mx-[15px] cursor-pointer flex items-center group leading-[73px] static'>
                             <a href="">Áo nam</a>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
-                            <div className='dropdown absolute left-0 right-0 top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100px] transition-all ease-in-out bg-white w-full pointer-events-none group-hover:pointer-events-auto py-[25px] leading-7 z-50 px-[50px] border-t-2 flex'>
+                            <div className='dropdown absolute left-0 border-2 right-0 top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100px] transition-all ease-in-out bg-white w-full pointer-events-none group-hover:pointer-events-auto py-[25px] leading-7 px-[50px] border-t-2 flex'>
                                 <div className="w-[65%] tracking-wide">
                                     <div className="grid grid-cols-4">
                                         <div className="flex flex-col">
@@ -78,7 +124,7 @@ const Header = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
-                            <div className='dropdown absolute left-0 right-0 top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100px] transition-all ease-linear bg-white w-full pointer-events-none group-hover:pointer-events-auto py-[25px] leading-7 z-50 px-[50px] border-t-2 flex'>
+                            <div className='dropdown absolute left-0 border-2 right-0 top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100px] transition-all ease-linear bg-white w-full pointer-events-none group-hover:pointer-events-auto py-[25px] leading-7 z-50 px-[50px] border-t-2 flex'>
                                 <div className="w-[65%] tracking-wide">
                                     <div className="grid grid-cols-4">
                                         <div className="flex flex-col">
@@ -124,19 +170,58 @@ const Header = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                             </svg>
-                            <div className="dropdown absolute  top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100%] transition-all ease-linear bg-white w-[200px] pointer-events-none group-hover:pointer-events-auto py-4 leading-7 z-50 px-[20px] border-t-2 flex">
+                            <div className="dropdown absolute  top-[150px] border-2 opacity-0 group-hover:opacity-100 group-hover:top-[100%] transition-all ease-linear bg-white w-[200px] pointer-events-none group-hover:pointer-events-auto py-4 leading-7 z-50 px-[20px] border-t-2 flex">
                                 <p className='font-normal'>Áo khoác gió</p>
                             </div>
                         </li>
                         <li className='mx-[15px] cursor-pointer leading-[73px]'>Hệ thống cửa hàng</li>
                     </ul>
+                    {/* icon */}
                     <div className="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px] cursor-pointer">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                         </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px] cursor-pointer">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                        </svg>
+                        {/* icon user */}
+                        <div className="relative">
+                            <svg onClick={handleDropdown} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] mr-[15px] cursor-pointer icon-user">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                            </svg>
+                            <div className="w-[350px] h-[400px] top-[190%] right-[-23px] py-[15px] px-[20px] absolute z-50 bg-white shadow-inner tracking-wide before:content-[''] before:absolute before:top-0 before:right-[3rem] before:border-l-[12px]  before:border-r-[10px] before:border-t-[10px] before:border-b-[10px] before:border-l-white before:border-r-white before:border-b-white before:translate-y-[-100%] before:rotate-[180deg] dropdown-user opacity-0 transition-all ease-in-out pointer-events-none cursor-pointer overflow-x-hidden">
+                                <div className="relative">
+                                    {/* singin */}
+                                    <div className="flex flex-col transition-all ease-in-out signinDropdown absolute left-0 right-0  items-center">
+                                        <h1 className='uppercase text-[18px] text-[#333333]'>Đăng nhập tài khoản</h1>
+                                        <p className='text-[#666666]'>Nhập email và mật khẩu của bạn</p>
+                                        <hr className='my-4 w-full' />
+                                        <input type="text" className='py-2 px-2 w-full border-2 focus:outline-none mt-3' placeholder='Email' />
+                                        <input type="text" className='py-2 px-2 w-full border-2 focus:outline-none mt-3' placeholder='Mật khẩu' />
+                                        <button className='w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg'>Đăng nhập</button>
+                                        <div className="flex text-[#666666] w-full text-[12px] justify-between mt-8">
+                                            <p>Bạn đã có tài khoản chưa?</p>
+                                            <Link to='/signup' className='hover:text-black'>Tạo tài khoản</Link>
+                                        </div>
+                                        <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
+                                            <p>Quên mật khẩu?</p>
+                                            <button onClick={forgotPassword} className='hover:text-black'>Khôi phục mật khẩu</button>
+                                        </div>
+                                    </div>
+                                    {/* khôi phục mật khẩu */}
+                                    <div className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
+                                        <h1 className='uppercase text-[18px] text-[#333333]'>Khôi phục mật khẩu</h1>
+                                        <p className='text-[#666666]'>Nhập email của bạn</p>
+                                        <hr className='my-4 w-full' />
+                                        <input type="text" className='py-2 px-2 w-full border-2 focus:outline-none mt-3' placeholder='Email' />
+                                        <button className='w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg'>Khôi phục</button>
+                                        <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
+                                            <p>Bạn đã nhớ mật khẩu?</p>
+                                            <button onClick={backSigninDropdown} className='hover:text-black'>Trở về đăng nhập</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="left-0 right-0 bottom-0 absolute hidden overlay-dropdownUser bg-[#666666] opacity-30 w-full h-[100vh] top-[100%]"></div>
+                        {/* icon cart */}
                         <div className="relative">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] cursor-pointer">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -147,7 +232,7 @@ const Header = () => {
                 </div>
             </div>
 
-        </div>
+        </div >
     )
 }
 

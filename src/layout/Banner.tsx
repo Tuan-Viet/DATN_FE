@@ -10,7 +10,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/scrollbar';
 const Banner = () => {
     return (
-        <>
+        <div>
             <Swiper
                 // install Swiper modules
                 modules={[Navigation, Pagination, Scrollbar, A11y]}
@@ -21,7 +21,7 @@ const Banner = () => {
                 scrollbar={{ draggable: true }}
                 onSwiper={(swiper) => console.log(swiper)}
                 onSlideChange={() => console.log('slide change')}
-                className='w-full h-[650px] -z-10'
+                className='w-full h-[650px]'
             >
                 <SwiperSlide className='w-[500px]'>
                     <img className='w-full h-full object-cover' src="//theme.hstatic.net/200000690725/1001078549/14/slide_2_img.jpg?v=173" alt="" />
@@ -33,7 +33,7 @@ const Banner = () => {
                     <img className='w-full h-full object-cover' src="https://theme.hstatic.net/200000690725/1001078549/14/slide_4_img.jpg?v=173" alt="" />
                 </SwiperSlide>
             </Swiper>
-        </>
+        </div>
     )
 }
 
