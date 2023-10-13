@@ -10,6 +10,9 @@ const signup = () => {
         const formSignin = document.querySelector(".formSignin")
         const buttonSignup2 = document.querySelector(".buttonSignup-2")
         const buttonSignin2 = document.querySelector(".buttonSignin-2")
+        const buttonSignin3 = document.querySelector(".buttonSignin-3")
+        const buttonForgotPass = document.querySelector(".buttonForgotPass")
+        const formForgotPass = document.querySelector(".formForgotPass")
         const navigateButtonSignup = () => {
             formSignin?.classList.add("hidden")
             formSignup?.classList.remove("hidden")
@@ -30,9 +33,21 @@ const signup = () => {
         })
         buttonSignup?.addEventListener("click", () => {
             navigateButtonSignup()
+            formForgotPass?.classList.add("hidden")
         })
         buttonSignup2?.addEventListener("click", () => {
             navigateButtonSignup()
+        })
+        buttonSignin3?.addEventListener("click", () => {
+            navigateButtonSignin()
+            formForgotPass?.classList.add("hidden")
+        })
+        buttonForgotPass?.addEventListener("click", () => {
+            formForgotPass?.classList.remove("hidden")
+            formSignin?.classList.add("hidden")
+            formSignup?.classList.add("hidden")
+            buttonSignin?.classList.add("text-black")
+            buttonSignup?.classList.remove("text-black")
         })
     }, [])
     return <>
@@ -67,7 +82,18 @@ const signup = () => {
                             <p>Bạn chưa có tài khoản?</p>
                             <p className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80 buttonSignup-2">Đăng ký</p>
                         </div>
-                        <p>Bạn quên mật khẩu?<span className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80">Quên mật khẩu</span></p>
+                        <p>Bạn quên mật khẩu?<span className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80 buttonForgotPass">Quên mật khẩu</span></p>
+                    </div>
+                </div>
+            </form>
+            {/* forgot password */}
+            <form className="w-full formForgotPass hidden" action="">
+                <input type="text" placeholder="Vui lòng nhập email của bạn ..." className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white " />
+                <div className="flex mt-[25px]">
+                    <button className="bg-[#333333] hover:bg-black transition-all ease-linear px-[28px] py-[12px] text-[#ffffff] rounded-lg uppercase tracking-wide">Gửi email</button>
+                    <div className="flex flex-col ml-[30px]">
+                        <p>Quay lại?</p>
+                        <p className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80 buttonSignin-3">Đăng Nhập</p>
                     </div>
                 </div>
             </form>

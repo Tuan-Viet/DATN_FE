@@ -2,8 +2,6 @@ import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
-
-
     // hàm dropdownUser
     const handleDropdown = () => {
         const iconUser = document.querySelector(".icon-user")
