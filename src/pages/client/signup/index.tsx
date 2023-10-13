@@ -27,6 +27,7 @@ const signup = () => {
         }
         buttonSignin?.addEventListener("click", () => {
             navigateButtonSignin()
+            formForgotPass?.classList.add("hidden")
         })
         buttonSignin2?.addEventListener("click", () => {
             navigateButtonSignin()
