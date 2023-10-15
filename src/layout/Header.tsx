@@ -1,9 +1,8 @@
-import React from 'react'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
     return (
-        <div className='sticky top-0 bg-white'>
+        <div className='sticky z-50 top-0 bg-white'>
             <div className='bg-[#242021] h-[36px] left-0 right-0'>
                 <div className="container text-white h-full flex justify-between items-center">
                     <p className='text-[13px]'>Hotline mua hàng:    <strong><Link to="">0967584597</Link></strong>   (9:00-21:00, Tất cả hàng tuần)      <span className='mx-[10px]'>|</span>    <Link to="">Liên hệ</Link></p>
@@ -12,7 +11,7 @@ const Header = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
                             </svg>
-                            <p className='px-[4px] h-[14px] flex items-center justify-center bg-red-600 rounded-[50%] absolute bottom-0 right-[-2px] top-[-5px] text-[10px]'>1</p>
+                            <p className='px-[4px] w-[14px] h-[14px] flex items-center justify-center bg-red-600 rounded-full absolute bottom-0 right-[-2px] top-[-5px] text-[10px]'>1</p>
                         </div>
                         <p>Thông báo của tôi</p>
                     </div>
@@ -21,9 +20,9 @@ const Header = () => {
             <div className="">
                 <div className="h-[73px] flex justify-between container">
                     {/* logo */}
-                    <div className="h-[73px] flex items-center">
+                    <Link to="/" className="h-[73px] flex items-center">
                         <img src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173" className='w-[220px] h-[53px]' alt="" />
-                    </div>
+                    </Link>
                     {/* menu */}
                     <ul className='flex font-semibold tracking-wide'>
                         <li className='mx-[15px] leading-[73px]'><Link to="">Sale</Link></li>
@@ -146,7 +145,7 @@ const Header = () => {
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px]">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                             </svg>
-                            <span className='w-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]'>1</span>
+                            <span className='w-[20px] h-[20px] flex items-center justify-center rounded-full bg-red-600 text-white absolute top-[-5px] right-[-5px]'>1</span>
                         </Link>
                     </div>
                 </div>

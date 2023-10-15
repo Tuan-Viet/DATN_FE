@@ -13,3 +13,25 @@ html {
     font-size: 16px;
     font-weight: 400;
 }
+
+.category-list .swiper-slide {
+    user-select: none;
+    width: 352.5px;
+    overflow: hidden;
+  }
+
+  .product-sale .swiper-slide {
+    user-select: none;
+    width: 230px;
+    overflow: hidden;
+  }
+
+  .swiper-button-prev {
+    color: white;
+  }
+  .swiper-button-next {
+    color: white;
+  }
+  .swiper-pagination-bullet-active {
+    background-color: #fff;
+  }
