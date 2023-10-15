@@ -6,6 +6,11 @@ export default {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: '#1677ff',
+      },
+    },
+    extend: {
       fontFamily: {
         body: ["Quicksand", "sans-serif"],
       },
