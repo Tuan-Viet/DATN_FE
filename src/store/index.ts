@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import categoryApi from './category/category.service'
 import productAPI from './product/product.service'
 import categorySlice from './category/categorySlice'
+import productSlice from './product/productSlice'
 
 
 
@@ -9,7 +10,8 @@ export const store = configureStore({
     reducer: {
         [categoryApi.reducerPath]: categoryApi.reducer,
         [productAPI.reducerPath]: productAPI.reducer,
-        categorySlice: categorySlice
+        categorySlice: categorySlice,
+        productSlice: productSlice,
 
     },
     middleware: (getDefaultMiddleware) =>

@@ -4,6 +4,8 @@ import {
     Popconfirm,
     Image,
     Button,
+    message,
+    Spin
 } from 'antd';
 import {
     EditFilled,
@@ -11,9 +13,53 @@ import {
     PlusOutlined,
     EyeOutlined
 } from '@ant-design/icons';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
+import { useEffect } from 'react';
+import { Dispatch } from '@reduxjs/toolkit';
+import { RootState } from '../../../store';
+import { deleteProductSlice, listProductSlice } from '../../../store/product/productSlice';
+import { ICategory } from '../../../store/category/category.interface';
 
 const productPage = () => {
+    const dispatch: Dispatch<any> = useDispatch()
+    const [onRemove] = useRemoveProductMutation()
+    const [messageApi, contextHolder] = message.useMessage();
+    const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
+    const productState = useSelector((state: RootState) => state.productSlice.products)
+
+    console.log(productState);
+
+    useEffect(() => {
+        if (isSuccess) {
+            dispatch(listProductSlice(listProduct))
+        }
+    }, [isSuccess])
+    if (isError) {
+        return <>error</>;
+    }
+    if (isLoading) {
+        return <>
+            <div className="flex justify-center items-center h-[600px]">
+                <Spin size='large' />
+            </div>
+        </>;
+    }
+
+    const confirm = async (id: string) => {
+        try {
+            if (id) {
+                await onRemove(id).then(() => dispatch(deleteProductSlice(id)))
+                messageApi.open({
+                    type: 'success',
+                    content: 'Delete product successfully!',
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     const columns = [
         {
             title: 'Product Name',
@@ -22,11 +68,11 @@ const productPage = () => {
                 <div className="flex items-center  ">
                     <Image
                         width={70}
-                        src={record.images}
+                        src={record.images[0]}
                         alt="Product Image"
                         className=""
                     />
-                    <a className='w-full overflow-hidden ml-1'>{record.name}</a>
+                    <a className='w-full overflow-hidden ml-1'>{record.title}</a>
                 </div>
             ),
             className: 'w-1/4',
@@ -36,21 +82,18 @@ const productPage = () => {
             dataIndex: 'price',
             key: 'price',
         },
-        // {
-        //     title: 'Description',
-        //     dataIndex: 'description',
-        //     key: 'description',
-        // },
         {
-            title: 'Quantity',
-            dataIndex: 'quantity',
-            key: 'quantity',
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
         },
         {
             title: "Category",
             key: "category",
-            dataIndex: "category",
+            dataIndex: "categoryId",
+            render: (cate: ICategory) => <span>{cate?.name}</span>,
         },
+
         {
             title: 'Action',
             key: 'action',
@@ -77,20 +120,10 @@ const productPage = () => {
         },
 
     ];
-    const data = [
-        {
-            key: '1',
-            name: 'Quần áo mùa hè',
-            images: 'https://zizoou.com/cdn/shop/products/Ao-khoac-Jean-somi-form-rong-xanh-2-2-ZiZoou-Store.jpg?v=1676538411',
-            price: 200000,
-            quantity: 99,
-            category: "Quần áo"
-
-        },
-
-    ];
     return (
         <div className="">
+
+            {contextHolder}
             <Space className='flex justify-between mb-5'>
                 <div className="">
                     <span className="block text-xl text-primary">
@@ -110,7 +143,7 @@ const productPage = () => {
             </Space>
             <div className="border p-3 rounded-lg min-h-screen bg-white">
 
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={productState} pagination={{ pageSize: 20 }} />
             </div>
         </div>
     )

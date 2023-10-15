@@ -23,7 +23,7 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
     const btnSubmit = async () => {
         try {
             await onAdd(values)
-            alert("Thêm category thành công")
+            message.success("Add category successfully")
             navigate("/admin/category")
         } catch (error) {
             console.log(error);
@@ -88,7 +88,14 @@ const categoryAdd = () => {
                 className="mx-auto max-w-[500px]"
             >
                 {/* Name Category */}
-                <Form.Item name="name" label="Category Name" rules={[{ required: true, message: 'Please input your Name!' }]}>
+                <Form.Item
+                    name="name"
+                    label="Category Name"
+                    rules={[
+                        { required: true, message: 'Please input your Name!' },
+                        { min: 3, message: 'Name must be at least 3 characters long' },
+                    ]}
+                >
                     <Input />
                 </Form.Item>
 

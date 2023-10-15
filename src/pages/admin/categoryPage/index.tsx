@@ -36,7 +36,11 @@ const categoryPage = () => {
         return <>error</>;
     }
     if (isLoading) {
-        return <>isLoading</>;
+        return <>
+            <div className="flex justify-center items-center h-[600px]">
+                <Spin size='large' />
+            </div>
+        </>;
     }
 
     const confirm = async (id: string) => {
