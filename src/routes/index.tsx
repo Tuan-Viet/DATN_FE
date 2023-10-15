@@ -1,4 +1,5 @@
 import routes from "../config/routes";
+import Banner from "../layout/Banner";
 import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
@@ -6,6 +7,7 @@ import dashboardPage from "../pages/admin/dashboard";
 import productAdd from "../pages/admin/productAdd";
 import productPage from "../pages/admin/productPage/index.";
 import productUpdate from "../pages/admin/productUpdate";
+import About from "../pages/client/About";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -14,6 +16,8 @@ import signup from "../pages/client/signup";
 
 export const publicRoutes = [
     { path: routes.home, Component: homePage },
+    { path: routes.banner, Component: Banner },
+    { path: routes.about, Component: About },
     { path: routes.productDetail, Component: productDetail },
     { path: routes.cart, Component: cartPage },
     { path: routes.signin, Component: signin },
