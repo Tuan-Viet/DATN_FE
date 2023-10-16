@@ -93,7 +93,16 @@ const categoryAdd = () => {
                     label="Category Name"
                     rules={[
                         { required: true, message: 'Please input your Name!' },
+                        {
+                            validator: (_, value) => {
+                                if (value && value.trim() === '') {
+                                    return Promise.reject('Name cannot be just whitespace.');
+                                }
+                                return Promise.resolve();
+                            },
+                        },
                         { min: 3, message: 'Name must be at least 3 characters long' },
+
                     ]}
                 >
                     <Input />

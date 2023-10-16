@@ -11,7 +11,8 @@ import {
     EditFilled,
     DeleteFilled,
     PlusOutlined,
-    EyeOutlined
+    EyeOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
@@ -66,12 +67,13 @@ const productPage = () => {
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
-                    <Image
-                        width={70}
-                        src={record.images[0]}
-                        alt="Product Image"
-                        className=""
-                    />
+                    <Image.PreviewGroup items={record.images.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
+                        <Image
+                            width={70}
+                            src={record.images[0]}
+                        />
+                    </Image.PreviewGroup>
+
                     <a className='w-full overflow-hidden ml-1'>{record.title}</a>
                 </div>
             ),
@@ -81,6 +83,14 @@ const productPage = () => {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
+            render: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        },
+        {
+            title: 'Discount',
+            dataIndex: 'discount',
+            key: 'discount',
+            render: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
         },
         {
             title: 'Description',
@@ -88,10 +98,10 @@ const productPage = () => {
             key: 'description',
         },
         {
-            title: "Category",
-            key: "category",
-            dataIndex: "categoryId",
-            render: (cate: ICategory) => <span>{cate?.name}</span>,
+            title: 'Category',
+            dataIndex: 'categoryId',
+            key: 'categoryId',
+            render: (cate: any) => (cate)
         },
 
         {
@@ -126,15 +136,15 @@ const productPage = () => {
             {contextHolder}
             <Space className='flex justify-between mb-5'>
                 <div className="">
-                    <span className="block text-xl text-primary">
+                    <span className="block text-xl text-[#1677ff]">
                         Product List
                     </span>
-                    <span className="block text-base  text-primary">
+                    <span className="block text-base  text-[#1677ff]">
                         Manage your products
                     </span>
                 </div>
                 <Link to={`add`}>
-                    <Button type='primary' className='bg-primary'
+                    <Button type='primary' className='bg-[#1677ff]'
                         icon={<PlusOutlined />}
                     >
                         Add New Product
@@ -142,7 +152,16 @@ const productPage = () => {
                 </Link>
             </Space>
             <div className="border p-3 rounded-lg min-h-screen bg-white">
-
+                <div className="pb-6 pt-3">
+                    <form >
+                        <input type="text" className='border p-2 w-64 outline-none '
+                            // {...register("_searchText")}
+                            placeholder="" />
+                        <button type="submit" className='p-2 bg-[#1677ff]'>
+                            <SearchOutlined className='text-white' />
+                        </button>
+                    </form>
+                </div>
                 <Table columns={columns} dataSource={productState} pagination={{ pageSize: 20 }} />
             </div>
         </div>

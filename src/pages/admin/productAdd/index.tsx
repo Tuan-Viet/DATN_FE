@@ -13,14 +13,15 @@ import {
     Row,
     Col,
     Card,
-    Typography
+    Typography,
+    Breadcrumb
 } from 'antd';
 import {
     UploadOutlined,
     CloseOutlined,
     CloudUploadOutlined
 } from "@ant-design/icons";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ICategory } from '../../../store/category/category.interface';
 import { useAddProductMutation } from '../../../store/product/product.service';
@@ -104,7 +105,18 @@ const productAdd = () => {
         action: "http://localhost:8080/api/images/upload",
     };
     return <>
-        <div>
+        <Breadcrumb className='pb-3'
+            items={[
+
+                {
+                    title: <Link to={`/admin/product`}>Product</Link>,
+                },
+                {
+                    title: 'Add Product',
+                },
+            ]}
+        />
+        <div className='border p-10 rounded-lg  bg-white'>
             <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff]">
                 Create New Product
             </h3>
@@ -199,8 +211,9 @@ const productAdd = () => {
                         <div style={{ display: 'flex', rowGap: 16, flexDirection: 'column' }}>
                             {fields.map((field) => (
                                 <Card
+                                    className='bg-zinc-50'
                                     size="small"
-                                    title={`Product Deatil ${field.name + 1}`}
+                                    title={`Color ${field.name + 1}`}
                                     key={field.key}
                                     extra={
                                         <CloseOutlined
@@ -229,7 +242,7 @@ const productAdd = () => {
 
                                         <div className="w-2/3">
                                             {/* Nest Form.List */}
-                                            <Form.Item label="items">
+                                            <Form.Item label="">
                                                 <Form.List name={[field.name, 'items']}>
                                                     {(subFields, subOpt) => (
                                                         <div style={{ display: 'flex', flexDirection: 'column', rowGap: 16 }}>

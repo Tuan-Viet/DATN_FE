@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { FormInstance } from 'antd';
-import { Button, Form, Input, Space, message } from 'antd';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Breadcrumb, Button, Form, Input, Space, message } from 'antd';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ICategory } from '../../../store/category/category.interface';
 import { useFetchOneCategoryQuery, useUpdateCategoryMutation } from '../../../store/category/category.service';
 
@@ -54,30 +54,44 @@ const categoryUpdate = () => {
         }
     };
     return <>
-        <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff]">
-            Update Category
-        </h3>
-        <Form
-            form={form}
-            name="validateOnly"
-            layout="vertical"
-            onFinish={onFinish}
-            autoComplete="off"
-            className="mx-auto max-w-[500px]"
-        >
-            <Form.Item name="_id" style={{ display: "none" }}>
-                <Input />
-            </Form.Item>
-            <Form.Item name="name" label="Name" rules={[{ required: true }]}>
-                <Input />
-            </Form.Item>
-            <Form.Item>
-                <Space>
-                    <SubmitButton form={form} />
-                    {/* <Button htmlType="reset">Reset</Button> */}
-                </Space>
-            </Form.Item>
-        </Form>
+        <Breadcrumb className='pb-3'
+            items={[
+
+                {
+                    title: <Link to={`/admin/category`}>Category</Link>,
+                },
+                {
+                    title: 'Update Category',
+                },
+            ]}
+        />
+        <div className="border p-10 rounded-lg  bg-white">
+            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff]">
+                Update Category
+            </h3>
+            <Form
+                form={form}
+                name="validateOnly"
+                layout="vertical"
+                onFinish={onFinish}
+                autoComplete="off"
+                className="mx-auto max-w-[500px]"
+            >
+                <Form.Item name="_id" style={{ display: "none" }}>
+                    <Input />
+                </Form.Item>
+                <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                    <Input />
+                </Form.Item>
+                <Form.Item>
+                    <Space>
+                        <SubmitButton form={form} />
+                        {/* <Button htmlType="reset">Reset</Button> */}
+                    </Space>
+                </Form.Item>
+            </Form>
+        </div>
+
     </>
 }
 export default categoryUpdate;

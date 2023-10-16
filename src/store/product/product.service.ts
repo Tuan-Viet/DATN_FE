@@ -34,7 +34,7 @@ const productAPI = createApi({
         updateProduct: builer.mutation({
             query: ({ id, ...product }) => ({
                 url: "/products/" + id,
-                method: "PUT",
+                method: "PATCH",
                 body: product
             }),
             invalidatesTags: ["products"]

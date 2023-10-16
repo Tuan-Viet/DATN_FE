@@ -35,7 +35,7 @@ const items: MenuItem[] = [
         getItem(<Link to={"/admin/product/add"}>Create New</Link >, '3'),
         getItem(<Link to={"/admin/product"}>View List</Link >, '4'),
     ]),
-    getItem('Categorys', 'sub2', <AppstoreAddOutlined />, [
+    getItem('Category', 'sub2', <AppstoreAddOutlined />, [
         getItem(<Link to={"/admin/category/add"}>Create New</Link >, '5'),
         getItem(<Link to={"/admin/category"}>View List</Link >, '6'),
     ]),
