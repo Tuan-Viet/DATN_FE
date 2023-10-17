@@ -28,13 +28,15 @@ const productFilterSlice = createSlice({
     initialState: initialProductFilter,
     reducers: ({
         listProductFilterSlice: (state: IProductFilterState, actions: PayloadAction<IProduct[]>) => {
-            console.log(actions.payload);
-
             state.products = actions.payload
+        },
+        deleteProductFilterSlice: (state: IProductState, actions: PayloadAction<string>) => {
+            state.products = state.products.filter((product) => product._id !== actions.payload)
         },
         listProductCategorySlice: (state: IProductFilterState, actions: PayloadAction<IProductFilterState>) => {
             const nameTerm = actions.payload.nameTerm.trim()
             const listProductFilter = actions.payload?.products?.filter((product) => product.categoryId && product.categoryId.includes(nameTerm))
+            console.log(listProductFilter);
             state.products = listProductFilter
         },
         listProductSearchSlice: (state: IProductFilterState, actions: PayloadAction<IProductSearchState>) => {
@@ -45,7 +47,7 @@ const productFilterSlice = createSlice({
     })
 })
 
-export const { listProductFilterSlice, listProductCategorySlice, listProductSearchSlice } = productFilterSlice.actions
+export const { listProductFilterSlice, listProductCategorySlice, listProductSearchSlice, deleteProductFilterSlice } = productFilterSlice.actions
 export const { listProductSlice, deleteProductSlice } = productSlice.actions
 export const productFilterSliceReducer = productFilterSlice.reducer
 export default productSlice.reducer

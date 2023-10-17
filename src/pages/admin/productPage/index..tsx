@@ -20,7 +20,7 @@ import { useFetchListProductQuery, useRemoveProductMutation } from '../../../sto
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
+import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 
 const productPage = () => {
@@ -29,9 +29,9 @@ const productPage = () => {
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
-    const productState = useSelector((state: RootState) => state.productSlice.products)
+    // const productState = useSelector((state: RootState) => state.productSlice.products)
+    // const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
-    const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
@@ -58,7 +58,7 @@ const productPage = () => {
     const confirm = async (id: string) => {
         try {
             if (id) {
-                await onRemove(id).then(() => dispatch(deleteProductSlice(id)))
+                await onRemove(id).then(() => dispatch(deleteProductFilterSlice(id)))
                 messageApi.open({
                     type: 'success',
                     content: 'Delete product successfully!',
@@ -140,7 +140,6 @@ const productPage = () => {
     ];
     return (
         <div className="">
-
             {contextHolder}
             <Space className='flex justify-between mb-5'>
                 <div className="">
