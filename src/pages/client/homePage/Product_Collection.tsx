@@ -36,7 +36,7 @@ const Product_Collection = () => {
     }
   }, [isSuccessProduct])
   return (
-    <div className="bg-[#faefec] py-[60px] mb-[60px] container">
+    <div className="py-[60px] mb-[60px]">
       <div className="max-w-[1500px] mx-auto">
         <div className="tabs flex justify-center items-center gap-[40px] mb-[50px]">
           {categoryState?.map((cate, index) => {
@@ -45,7 +45,7 @@ const Product_Collection = () => {
             </div>
           })}
         </div>
-        <div className="outstanding-product mb-12 flex gap-x-[25px] flex-wrap gap-y-[30px]">
+        <div className="outstanding-product mb-12 grid grid-cols-5 gap-[10px]">
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <div key={index} className="relative group w-[280px] cursor-pointer">
               <Link to="">
