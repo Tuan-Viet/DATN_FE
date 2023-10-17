@@ -13,6 +13,8 @@ const Product_Collection = () => {
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
   const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
+  console.log(productFilterState);
+
   const onHandleFilter = (_id: string) => {
     if (_id && listProduct) {
       dispatch(listProductCategorySlice({ nameTerm: _id, products: listProduct }))
@@ -21,21 +23,22 @@ const Product_Collection = () => {
   useEffect(() => {
     if (isSuccessCategory) {
       dispatch(listCategorySlice(listCategory))
-      localStorage.setItem("firstCategoryId", JSON.stringify(listCategory[0]._id))
+      localStorage.setItem("firstCategoryId", JSON.stringify(listCategory?.[0]?._id))
     }
   }, [isSuccessCategory])
   useEffect(() => {
     if (isSuccessProduct) {
       const getIdCateFirstStore = JSON.parse(localStorage.getItem("firstCategoryId")!)
-      const listProductFirstCategory = listProduct.filter((product) => product.categoryId === getIdCateFirstStore)
-      dispatch(listProductFilterSlice(listProductFirstCategory))
+      if (getIdCateFirstStore) {
+        const listProductFirstCategory = listProduct.filter((product) => product.categoryId === getIdCateFirstStore)
+        dispatch(listProductFilterSlice(listProductFirstCategory))
+      }
     }
   }, [isSuccessProduct])
   return (
     <div className="bg-[#faefec] py-[60px] mb-[60px] container">
       <div className="max-w-[1500px] mx-auto">
         <div className="tabs flex justify-center items-center gap-[40px] mb-[50px]">
-          {/* <span onClick={() => onHandleFilter("")} className="tab-item text-[30px] font-medium hover:text-black hover:underline transition-all cursor-pointer">All</span> */}
           {categoryState?.map((cate, index) => {
             return <div onClick={() => onHandleFilter(cate._id!)} key={index} className="tab-item text-[30px] font-medium hover:text-black hover:underline transition-all cursor-pointer">
               {cate.name}
@@ -43,35 +46,35 @@ const Product_Collection = () => {
           })}
         </div>
         <div className="outstanding-product mb-12 flex gap-x-[25px] flex-wrap gap-y-[30px]">
-          {productFilterState.length > 0 ? productFilterState?.map((product, index) => {
-            return <div className="relative group w-[280px] cursor-pointer">
+          {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
+            return <div key={index} className="relative group w-[280px] cursor-pointer">
               <Link to="">
                 <img
-                  src={`${product.images?.[0]}`}
+                  src={`${product?.images?.[0]}`}
                   className="mx-auto h-[360px] w-full"
                   alt=""
                 />
               </Link>
               <div className="product-info p-[8px] bg-white">
                 <div className="text-sm flex justify-between mb-3">
-                  <span>+{product.variants.length} màu sắc</span>
-                  <span>+{[...new Set(product?.variants?.flatMap(items => items.items?.map(color => color.size)))]?.length} Kích thước</span>
+                  <span>+{product?.variants?.length} màu sắc</span>
+                  <span>+{[...new Set(product?.variants?.flatMap(items => items?.items?.map(color => color.size)))]?.length} Kích thước</span>
                 </div>
                 <Link to="" className="font-medium">
-                  {product.title}
+                  {product?.title}
                 </Link>
                 <div className="price flex gap-x-[8px] items-baseline">
                   <span className="text-sm text-[#FF2C26] font-semibold">
-                    {product.discount.toLocaleString("vi-VN")}đ
+                    {product?.discount?.toLocaleString("vi-VN")}đ
                   </span>
                   <span className="text-[13px] text-[#878C8F]">
-                    <del>{product.price.toLocaleString("vi-VN")}đ
+                    <del>{product?.price?.toLocaleString("vi-VN")}đ
                     </del>
                   </span>
                 </div>
               </div>
               <div>
-                {product.price > product.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
                   {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
                 </span> : ""}
               </div>

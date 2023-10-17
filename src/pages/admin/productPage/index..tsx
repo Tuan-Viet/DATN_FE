@@ -20,7 +20,7 @@ import { useFetchListProductQuery, useRemoveProductMutation } from '../../../sto
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
+import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 import { useForm } from "react-hook-form";
 
@@ -32,7 +32,8 @@ const productPage = () => {
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
-    const productState = useSelector((state: RootState) => state.productSlice.products)
+    // const productState = useSelector((state: RootState) => state.productSlice.products)
+    // const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     console.log("cate", categoryState);
@@ -61,13 +62,17 @@ const productPage = () => {
     }
 
     const confirm = async (id: string) => {
-
-        await onRemove(id).then(() => dispatch(deleteProductSlice(id)))
-        messageApi.open({
-            type: 'success',
-            content: 'Delete product successfully!',
-        });
-
+        try {
+            if (id) {
+                await onRemove(id).then(() => dispatch(deleteProductFilterSlice(id)))
+                messageApi.open({
+                    type: 'success',
+                    content: 'Delete product successfully!',
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
     const columns = [
         {
@@ -144,7 +149,6 @@ const productPage = () => {
     ];
     return (
         <div className="">
-
             {contextHolder}
             <Space className='flex justify-between mb-5'>
                 <div className="">
