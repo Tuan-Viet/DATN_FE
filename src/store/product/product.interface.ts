@@ -8,10 +8,10 @@ export interface IProduct {
     thumnail: string;
     quantity: number;
     variants: IVariants[];
-    // categoryId?: string;
-    categoryId: {
-        _id?: string;
-    };
+    categoryId?: string;
+    // categoryId: {
+    //     _id: string;
+    // };
     createdAt: Date;
     updatedAt: Date;
     deleted: boolean;
@@ -36,5 +36,17 @@ interface Images {
 export interface IProductState {
     products: IProduct[]
 }
+
+export interface IProductFilterState {
+    nameTerm: string
+    products: IProduct[]
+}
+
+export interface IProductSearchState {
+    searchTerm: string
+    products: IProduct[]
+}
+
+
 
 export default IProduct;

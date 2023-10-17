@@ -73,7 +73,7 @@ const productUpdate = () => {
         images: product?.images,
         variants: product?.variants,
         description: product?.description,
-        categoryId: product?.categoryId?._id ?? product?.categoryId,
+        categoryId: product?.categoryId && product?.categoryId,
     });
     console.log(product);
 

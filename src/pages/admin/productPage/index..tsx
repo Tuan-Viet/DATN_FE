@@ -17,26 +17,33 @@ import {
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductSlice, listProductSlice } from '../../../store/product/productSlice';
+import { deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 
 const productPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const [onRemove] = useRemoveProductMutation()
+    const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
     const productState = useSelector((state: RootState) => state.productSlice.products)
-
-    console.log(productState);
-
+    const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
+    const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     useEffect(() => {
-        if (isSuccess) {
-            dispatch(listProductSlice(listProduct))
+        if (listProduct) {
+            if (search === "" || !search) {
+                dispatch(listProductFilterSlice(listProduct))
+            }
         }
-    }, [isSuccess])
+    }, [isSuccess, search])
+    const handleSearch = () => {
+        if (listProduct)
+            dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
+
+    }
     if (isError) {
         return <>error</>;
     }
@@ -67,14 +74,14 @@ const productPage = () => {
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
-                    <Image.PreviewGroup items={record.images.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
+                    <Image.PreviewGroup items={record?.images.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
                         <Image
                             width={70}
-                            src={record.images[0]}
+                            src={record?.images[0]}
                         />
                     </Image.PreviewGroup>
 
-                    <a className='w-full overflow-hidden ml-1'>{record.title}</a>
+                    <a className='w-full overflow-hidden ml-1'>{record?.title}</a>
                 </div>
             ),
             className: 'w-1/4',
@@ -83,13 +90,13 @@ const productPage = () => {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-            render: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         },
         {
             title: 'Discount',
             dataIndex: 'discount',
             key: 'discount',
-            render: (value: number) => value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
 
         },
         {
@@ -97,11 +104,12 @@ const productPage = () => {
             dataIndex: 'description',
             key: 'description',
         },
+
         {
             title: 'Category',
             dataIndex: 'categoryId',
             key: 'categoryId',
-            render: (cate: any) => (cate)
+            render: (cateId: any) => (cateId)
         },
 
         {
@@ -109,20 +117,20 @@ const productPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle">
-                    <Link to={`/admin/product/${record._id}`}>
+                    <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
                     </Link>
                     <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
-                        onConfirm={() => confirm(record._id)}
+                        onConfirm={() => confirm(record?._id)}
                         okText="Yes"
                         cancelText="No"
                         okButtonProps={{ className: "text-white bg-blue-400" }}
                     >
                         <DeleteFilled className='text-xl text-red-400' />
                     </Popconfirm>
-                    <Link to={`/admin/product/update/${record._id}`}>
+                    <Link to={`/admin/product/update/${record?._id}`}>
                         <EditFilled className='text-xl text-yellow-400' />
                     </Link>
                 </Space>
@@ -154,15 +162,14 @@ const productPage = () => {
             <div className="border p-3 rounded-lg min-h-screen bg-white">
                 <div className="pb-6 pt-3">
                     <form >
-                        <input type="text" className='border p-2 w-64 outline-none '
-                            // {...register("_searchText")}
+                        <input onChange={(e) => setSearch(e.target.value)} type="text" className='border p-2 w-64 outline-none '
                             placeholder="" />
-                        <button type="submit" className='p-2 bg-[#1677ff]'>
+                        <button type="button" onClick={handleSearch} className='p-2 bg-[#1677ff]'>
                             <SearchOutlined className='text-white' />
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={productState} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 20 }} />
             </div>
         </div>
     )

@@ -1,40 +1,66 @@
-import React from 'react'
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/scrollbar';
 const Banner = () => {
-    return (
-        <div>
-            <Swiper
-                // install Swiper modules
-                modules={[Navigation, Pagination, Scrollbar, A11y]}
-                spaceBetween={0}
-                slidesPerView={1}
-                navigation
-                pagination={{ clickable: true }}
-                scrollbar={{ draggable: true }}
-                onSwiper={(swiper) => console.log(swiper)}
-                onSlideChange={() => console.log('slide change')}
-                className='w-full h-[650px]'
-            >
-                <SwiperSlide className='w-[500px]'>
-                    <img className='w-full h-full object-cover' src="//theme.hstatic.net/200000690725/1001078549/14/slide_2_img.jpg?v=173" alt="" />
-                </SwiperSlide>
-                <SwiperSlide className='w-[500px]'>
-                    <img className='w-full h-full object-cover' src="//theme.hstatic.net/200000690725/1001078549/14/slide_3_img.jpg?v=173" alt="" />
-                </SwiperSlide>
-                <SwiperSlide className='w-[500px]'>
-                    <img className='w-full h-full object-cover' src="https://theme.hstatic.net/200000690725/1001078549/14/slide_4_img.jpg?v=173" alt="" />
-                </SwiperSlide>
-            </Swiper>
-        </div>
-    )
-}
+  return (
+    <>
+      <Swiper
+        modules={[Navigation, Pagination, Autoplay]}
+        grabCursor={"true"}
+        spaceBetween={30}
+        slidesPerView={"auto"}
+        pagination={{ clickable: true, dynamicBullets: true }}
+        navigation={true}
+        autoplay={{ delay: 3000 }}
+      >
+        <SwiperSlide>
+          <div className="relative">
+            <Link to="">
+              <img
+                src="/images/banner/slide_1_img.png"
+                className="h-[730px] object-cover"
+                alt=""
+              />
+            </Link>
+          </div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div className="relative">
+            <Link to="">
+              <img
+                src="/images/banner/slide_2_img.png"
+                className="h-[730px] object-cover"
+                alt=""
+              />
+            </Link>
+          </div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div className="relative">
+            <Link to="">
+              <img
+                src="/images/banner/slide_3_img.png"
+                className="h-[730px] object-cover"
+                alt=""
+              />
+            </Link>
+          </div>
+        </SwiperSlide>
+        <SwiperSlide>
+          <div className="relative">
+            <Link to="">
+              <img
+                src="/images/banner/slide_4_img.png"
+                className="h-[730px] object-cover"
+                alt=""
+              />
+            </Link>
+          </div>
+        </SwiperSlide>
+      </Swiper>
+    </>
+  );
+};
 
-export default Banner
+export default Banner;
