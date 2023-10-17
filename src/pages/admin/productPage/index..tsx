@@ -22,9 +22,12 @@ import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
+import { useForm } from "react-hook-form";
+
 
 const productPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
+    const { handleSubmit } = useForm();
     const [onRemove] = useRemoveProductMutation()
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
@@ -32,6 +35,8 @@ const productPage = () => {
     const productState = useSelector((state: RootState) => state.productSlice.products)
     const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+    console.log("cate", categoryState);
+
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
@@ -56,17 +61,13 @@ const productPage = () => {
     }
 
     const confirm = async (id: string) => {
-        try {
-            if (id) {
-                await onRemove(id).then(() => dispatch(deleteProductSlice(id)))
-                messageApi.open({
-                    type: 'success',
-                    content: 'Delete product successfully!',
-                });
-            }
-        } catch (error) {
-            console.log(error);
-        }
+
+        await onRemove(id).then(() => dispatch(deleteProductSlice(id)))
+        messageApi.open({
+            type: 'success',
+            content: 'Delete product successfully!',
+        });
+
     }
     const columns = [
         {
@@ -109,7 +110,10 @@ const productPage = () => {
             title: 'Category',
             dataIndex: 'categoryId',
             key: 'categoryId',
-            render: (cateId: any) => (cateId)
+            render: (cateId: any) => {
+                const category = categoryState.find((cate) => cate._id === cateId);
+                return category ? category.name : 'N/A';
+            }
         },
 
         {
@@ -161,10 +165,10 @@ const productPage = () => {
             </Space>
             <div className="border p-3 rounded-lg min-h-screen bg-white">
                 <div className="pb-6 pt-3">
-                    <form >
+                    <form onSubmit={handleSubmit(handleSearch)}>
                         <input onChange={(e) => setSearch(e.target.value)} type="text" className='border p-2 w-64 outline-none '
                             placeholder="" />
-                        <button type="button" onClick={handleSearch} className='p-2 bg-[#1677ff]'>
+                        <button type="submit" className='p-2 bg-[#1677ff]'>
                             <SearchOutlined className='text-white' />
                         </button>
                     </form>
