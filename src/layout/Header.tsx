@@ -2,6 +2,8 @@ import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
+
+
     // hàm dropdownUser
     const handleDropdown = () => {
         const iconUser = document.querySelector(".icon-user")
@@ -43,6 +45,44 @@ const Header = () => {
         isSelected?.classList.add("translate-x-[150%]")
         signinDropdown?.classList.remove("translate-x-[-150%]")
     }
+    // overlay-cart
+    useEffect(() => {
+        const overlayCart = document.querySelector(".overlay-cart")
+        const iconOutCart = document.querySelector(".icon-outCart")
+        const overlay = document.querySelector(".overlay")
+        const iconCart = document.querySelector(".icon-cart")
+        const closeDropdownUser = () => {
+            const overlayDropdownUser = document.querySelector(".overlay-dropdownUser")
+            const dropdown = document.querySelector(".dropdown-user")
+            if (!overlayDropdownUser?.classList.contains("hidden")) {
+                overlayDropdownUser?.classList.add("hidden")
+                dropdown?.classList.add("pointer-events-none")
+            }
+        }
+        iconCart?.addEventListener("click", () => {
+            overlay?.classList.remove("hidden")
+            overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+            const dropdown = document.querySelector(".dropdown-user")
+            if (!dropdown?.classList.contains("opacity-0")) {
+                dropdown?.classList.add("opacity-0")
+                dropdown?.classList.add("pointer-events-none")
+
+            }
+        })
+        iconOutCart?.addEventListener("click", () => {
+            overlay?.classList.add("hidden")
+            overlayCart?.classList.add("translate-x-[100%]", "opacity-0")
+            closeDropdownUser()
+        })
+        overlay?.addEventListener("click", () => {
+            overlay?.classList.add("hidden")
+            overlayCart?.classList.add("translate-x-[100%]", "opacity-0")
+            closeDropdownUser()
+        })
+        overlayCart?.addEventListener("click", (e) => {
+            e.stopPropagation()
+        })
+    }, [])
     return (
         <>
             <div className='sticky top-0 bg-white z-[99]'>
@@ -221,17 +261,162 @@ const Header = () => {
                             </div>
                             <div className="left-0 right-0 bottom-0 absolute hidden overlay-dropdownUser bg-[#666666] opacity-30 w-full h-[100vh] top-[100%]"></div>
                             {/* icon cart */}
-                            <div className="relative">
+                            <div className="relative icon-cart cursor-pointer">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-[32px] h-[26px] cursor-pointer">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                                 </svg>
                                 <span className='w-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]'>1</span>
                             </div>
+
                         </div>
                     </div>
                 </div>
-            </div >
+                {/* overlay-cart */}
+                <div className='fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]'>
+                </div>
+                {/* cart */}
+                <div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between">
+                    {/* list product */}
+                    <div className="">
+                        <h1 className='font-bold tracking-wide text-[20px] mb-[10px]'>Giỏ hàng</h1>
+                        <h1 className="tracking-wide py-[10px] text-sm">Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong> để có thể <strong className="uppercase">miễn phí vận chuyển</strong></h1>
+                        <hr className='my-[20px]' />
+                        <div className="overflow-y-scroll h-[450px]">
+                            <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
+                                <img src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg" alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
+                                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                    <div className="mt-5 sm:mt-0">
+                                        {/* name */}
+                                        <h2 className="text-lg font-bold text-gray-900">Áo Polo trơn hiệu ứng ESTP041</h2>
+                                        {/* color and size */}
+                                        <p className="mt-1 text-xs text-gray-700">Trắng - kem đậm / S</p>
+                                        {/* price product */}
+                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">400.000đ</p>
+                                    </div>
+                                    <div className="absolute right-[10px] top-[10px]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                        <div className="flex items-center">
+                                            <p className="font-bold tracking-wide text-[15px]">400.000đ</p>
+                                        </div>
+                                        <div className="flex items-center border-gray-100">
+                                            <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
+                                            <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value="2" min="1" />
+                                            <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
+                                <img src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg" alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
+                                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                    <div className="mt-5 sm:mt-0">
+                                        {/* name */}
+                                        <h2 className="text-lg font-bold text-gray-900">Áo Polo trơn hiệu ứng ESTP041</h2>
+                                        {/* color and size */}
+                                        <p className="mt-1 text-xs text-gray-700">Trắng - kem đậm / S</p>
+                                        {/* price product */}
+                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">400.000đ</p>
+                                    </div>
+                                    <div className="absolute right-[10px] top-[10px]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                        <div className="flex items-center">
+                                            <p className="font-bold tracking-wide text-[15px]">400.000đ</p>
+                                        </div>
+                                        <div className="flex items-center border-gray-100">
+                                            <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
+                                            <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value="2" min="1" />
+                                            <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
+                                <img src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg" alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
+                                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                    <div className="mt-5 sm:mt-0">
+                                        {/* name */}
+                                        <h2 className="text-lg font-bold text-gray-900">Áo Polo trơn hiệu ứng ESTP041</h2>
+                                        {/* color and size */}
+                                        <p className="mt-1 text-xs text-gray-700">Trắng - kem đậm / S</p>
+                                        {/* price product */}
+                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">400.000đ</p>
+                                    </div>
+                                    <div className="absolute right-[10px] top-[10px]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                        <div className="flex items-center">
+                                            <p className="font-bold tracking-wide text-[15px]">400.000đ</p>
+                                        </div>
+                                        <div className="flex items-center border-gray-100">
+                                            <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
+                                            <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value="2" min="1" />
+                                            <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
+                                <img src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg" alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
+                                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                    <div className="mt-5 sm:mt-0">
+                                        {/* name */}
+                                        <h2 className="text-lg font-bold text-gray-900">Áo Polo trơn hiệu ứng ESTP041</h2>
+                                        {/* color and size */}
+                                        <p className="mt-1 text-xs text-gray-700">Trắng - kem đậm / S</p>
+                                        {/* price product */}
+                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">400.000đ</p>
+                                    </div>
+                                    <div className="absolute right-[10px] top-[10px]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </div>
+                                    <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                        <div className="flex items-center">
+                                            <p className="font-bold tracking-wide text-[15px]">400.000đ</p>
+                                        </div>
+                                        <div className="flex items-center border-gray-100">
+                                            <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
+                                            <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value="2" min="1" />
+                                            <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
+                        </div>
+                    </div>
+                    {/* pay */}
+                    <div className="mt-6  w-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-full">
+                        <div className="flex justify-between">
+                            <p className="text-lg font-bold">Tổng tiền:</p>
+                            <div className="">
+                                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">400.000đ</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-[10px]">
+                            <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
+                            <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/cart">Xem giỏ hàng</Link></button>
+                        </div>
+                    </div>
+                    <div className="absolute right-[10px] top-[10px] icon-outCart">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-7 w-7 cursor-pointer duration-150 hover:text-red-500">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                </div>
+            </div >
         </>
 
     )
