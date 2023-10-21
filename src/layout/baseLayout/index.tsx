@@ -8,7 +8,7 @@ type Props = {
 };
 
 const BaseLayout = ({ children }: Props) => {
-    return <div>
+    return <div className="">
         {children}
     </div>;
 };
