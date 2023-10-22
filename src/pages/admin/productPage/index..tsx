@@ -23,6 +23,8 @@ import { RootState } from '../../../store';
 import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 import { useForm } from "react-hook-form";
+import { listCategorySlice } from '../../../store/category/categorySlice';
+import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 
 
 const productPage = () => {
@@ -32,8 +34,8 @@ const productPage = () => {
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
+    const { data: listCategory } = useFetchListCategoryQuery()
     // const productState = useSelector((state: RootState) => state.productSlice.products)
-    // const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     console.log("cate", categoryState);
@@ -44,7 +46,10 @@ const productPage = () => {
                 dispatch(listProductFilterSlice(listProduct))
             }
         }
-    }, [isSuccess, search])
+        if (listCategory) {
+            dispatch(listCategorySlice(listCategory));
+        }
+    }, [isSuccess, search, listCategory])
     const handleSearch = () => {
         if (listProduct)
             dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
@@ -118,7 +123,8 @@ const productPage = () => {
             render: (cateId: any) => {
                 const category = categoryState.find((cate) => cate._id === cateId);
                 return category ? category.name : 'N/A';
-            }
+            },
+            className: 'w-[150px]',
         },
 
         {
@@ -177,7 +183,7 @@ const productPage = () => {
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 10 }} />
             </div>
         </div>
     )

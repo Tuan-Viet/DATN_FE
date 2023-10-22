@@ -65,6 +65,13 @@ const productAdd = () => {
             label: `${cate.name}`,
             value: `${cate._id!}`,
         }));
+
+    const optionSize = [
+        { value: 'S', label: 'S' },
+        { value: 'M', label: 'M' },
+        { value: 'L', label: 'L' },
+        { value: 'XL', label: 'XL' },
+    ]
     const onFinish = async (values: any) => {
         console.log(values);
         let newImages;
@@ -102,7 +109,7 @@ const productAdd = () => {
         listType: "picture",
         name: "images",
         multiple: true,
-        action: "http://localhost:8080/api/images/upload",
+        action: " http://localhost:8080/api/images/upload",
     };
     return <>
         <Breadcrumb className='pb-3'
@@ -224,7 +231,7 @@ const productAdd = () => {
                                     }
                                 >
                                     <div className="flex justify-between px-10 py-3">
-                                        <div className="text-center">
+                                        <div className="text-center w-[300]">
                                             <Form.Item name={[field.name, 'imageColor']}>
                                                 <Upload
                                                     {...props}
@@ -235,7 +242,7 @@ const productAdd = () => {
                                                     <CloudUploadOutlined />
                                                 </Upload>
                                             </Form.Item>
-                                            <Form.Item name={[field.name, 'nameColor']}>
+                                            <Form.Item name={[field.name, 'nameColor']} rules={[{ required: true, message: 'Please input your Name Color!' }]}>
                                                 <Input placeholder="Enter Color Image" />
                                             </Form.Item>
                                         </div>
@@ -248,19 +255,14 @@ const productAdd = () => {
                                                         <div style={{ display: 'flex', flexDirection: 'column', rowGap: 16 }}>
                                                             {subFields.map((subField) => (
                                                                 <Space key={subField.key} className='flex justify-between'>
-                                                                    <Form.Item noStyle name={[subField.name, 'size']}>
+                                                                    <Form.Item noStyle name={[subField.name, 'size']} rules={[{ required: true }]}>
                                                                         <Select
                                                                             placeholder="Choose Category"
                                                                             style={{ width: 356 }}
-                                                                            options={[
-                                                                                { value: 'S', label: 'S' },
-                                                                                { value: 'M', label: 'M' },
-                                                                                { value: 'L', label: 'L' },
-                                                                                { value: 'XL', label: 'XL' },
-                                                                            ]}
+                                                                            options={optionSize}
                                                                         />
                                                                     </Form.Item>
-                                                                    <Form.Item noStyle name={[subField.name, 'quantity']} >
+                                                                    <Form.Item noStyle name={[subField.name, 'quantity']} rules={[{ required: true }]}>
                                                                         <Input style={{ width: 360 }} placeholder="Enter quantity" />
                                                                     </Form.Item>
                                                                     <CloseOutlined

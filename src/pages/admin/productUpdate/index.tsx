@@ -27,8 +27,9 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ICategory } from '../../../store/category/category.interface';
-import { useFetchListProductQuery, useUpdateProductMutation } from '../../../store/product/product.service';
+import { useFetchListProductQuery, useFetchOneProductQuery, useUpdateProductMutation } from '../../../store/product/product.service';
 import IProduct from '../../../store/product/product.interface';
+import axios from 'axios';
 const { Dragger } = Upload;
 const { TextArea } = Input;
 
@@ -57,13 +58,78 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
     );
 };
 
+interface ProductDetail {
+    _id: string;
+    product_id: string;
+    nameColor: string;
+    imageColor: string;
+    quantity: number;
+    size: string;
+    sold: number;
+    deleted: boolean;
+}
+
 const productUpdate = () => {
     const navigate = useNavigate();
     const { data: categories, } = useFetchListCategoryQuery();
     const { data: products } = useFetchListProductQuery();
     console.log(products);
     const { id } = useParams();
-    const product = products?.find((product: IProduct) => product._id === id);
+    // const product = products?.find((product: IProduct) => product._id === id);
+    const { data: fetchOneProdđuct } = useFetchOneProductQuery(id)
+    const [productDetails, setProductDetails] = useState<ProductDetail[]>([]); // State để lưu thông tin sản phẩm chi tiết
+
+
+    const product = fetchOneProdđuct?.data
+    // Sử dụng useEffect để gọi API khi component được render
+    useEffect(() => {
+        if (product?.variants) {
+            const promises = product.variants.map((variantId: any) => {
+                return axios
+                    .get(` http://localhost:8080/api/productDetails/${variantId}`)
+                    .then((response) => response.data.data) // Access the 'data' property
+                    .catch((error) => {
+                        console.error(`Error fetching product details for variant ${variantId}:`, error);
+                        return null;
+                    });
+            });
+
+            Promise.all(promises)
+                .then((results) => {
+                    // Filter out null responses
+                    const filteredResults = results.filter((detail) => detail !== null);
+                    setProductDetails(filteredResults);
+                });
+        }
+    }, [product]);
+    console.log("product deatail: ", productDetails);
+
+
+    const variantsMap = new Map();
+    productDetails.forEach((detail) => {
+        const key = `${detail.imageColor}-${detail.nameColor}`;
+        if (variantsMap.has(key)) {
+            const existingVariant = variantsMap.get(key);
+            // Tạo một đối tượng mới với _id và thêm nó vào items
+            const newItem = { _id: detail._id, size: detail.size, quantity: detail.quantity };
+            existingVariant.items.push(newItem);
+        } else {
+            variantsMap.set(key, {
+                product_id: id,
+                imageColor: detail.imageColor,
+                nameColor: detail.nameColor,
+                sold: detail.sold,
+                deleted: detail.deleted,
+                items: [{ _id: detail._id, size: detail.size, quantity: detail.quantity }]
+            });
+        }
+    });
+
+    // Chuyển dữ liệu từ Map thành mảng variants
+    const variants = Array.from(variantsMap.values());
+
+    console.log("variants:", variants);
+
     const [form] = Form.useForm();
     form.setFieldsValue({
         _id: product?._id,
@@ -71,7 +137,7 @@ const productUpdate = () => {
         discount: product?.discount,
         price: product?.price,
         images: product?.images,
-        variants: product?.variants,
+        variants: variants,
         description: product?.description,
         categoryId: product?.categoryId && product?.categoryId,
     });
@@ -85,12 +151,22 @@ const productUpdate = () => {
             label: `${cate.name}`,
             value: `${cate._id!}`,
         }));
+
+    const optionSize = [
+        { value: 'S', label: 'S' },
+        { value: 'M', label: 'M' },
+        { value: 'L', label: 'L' },
+        { value: 'XL', label: 'XL' },
+    ]
     const [imageList, setImageList] = useState<string[]>(product?.images || []);
+
     const handleRemoveImage = (index: number) => {
         const updatedImages = [...imageList];
         updatedImages.splice(index, 1);
         setImageList(updatedImages);
+
     };
+
     const onFinish = async (values: any) => {
         try {
             let newImages: string[] = [];
@@ -114,7 +190,45 @@ const productUpdate = () => {
                 });
             }
             const updatedImageList = [...imageList, ...newImages];
+
+            const variantsData = values.variants;
+
+            const deletedIds: string[] = [];
+
+            // Lặp qua mảng variants ban đầu
+            for (const variant of variants) {
+                // Lặp qua các phần tử trong mảng items của variant
+                for (const item of variant.items) {
+                    // Kiểm tra xem _id của item không tồn tại trong mảng variantsData
+                    if (!variantsData.some((dataVariant: any) =>
+                        dataVariant.items.some((dataItem: any) => dataItem._id === item._id)
+                    )) {
+                        deletedIds.push(item._id);
+                    }
+                }
+            }
+            console.log(deletedIds);
+            const apiUrl = ' http://localhost:8080/api/productDetails/'; //
+            deletedIds.forEach(async (id) => {
+                try {
+                    await axios.delete(`${apiUrl}/${id}`);
+                } catch (error) {
+                    console.log(error);
+
+                }
+            });
+            const newVariants: string[] = [];
+            for (const variant of variants) {
+                for (const item of variant.items) {
+                    if (!deletedIds.includes(item._id)) {
+                        newVariants.push(item._id);
+                    }
+                }
+            }
+
+            // console.log("Các _id không bị xóa: ", newVariants);
             const newValues = { ...values, images: updatedImageList };
+            console.log("Values update", newValues);
 
             await onUpdate({ id, ...newValues })
                 .then(() =>
@@ -132,7 +246,7 @@ const productUpdate = () => {
         listType: "picture",
         name: "images",
         multiple: true,
-        action: "http://localhost:8080/api/images/upload",
+        action: " http://localhost:8080/api/images/upload",
     };
     return <>
         <Breadcrumb className='pb-3'
@@ -272,13 +386,14 @@ const productUpdate = () => {
                                     extra={
                                         <CloseOutlined
                                             onClick={() => {
+
                                                 remove(field.name);
                                             }}
                                         />
                                     }
                                 >
                                     <div className="flex justify-between px-10 py-3">
-                                        <div className="text-center">
+                                        <div className="text-center w-[300px]">
                                             <Form.Item name={[field.name, 'imageColor']}>
                                                 <Upload
                                                     {...props}
@@ -287,11 +402,34 @@ const productUpdate = () => {
                                                     maxCount={1}
 
                                                 >
-                                                    {product?.variants[field.name]?.imageColor ? (
-                                                        <img src={product?.variants[field.name]?.imageColor} alt="Image" style={{ width: '100px' }} />
+                                                    {variants[field.name]?.imageColor ? (
+                                                        <div className="w-[100px] h-[100px] p-1 relative">
+                                                            <img
+                                                                src={variants[field.name]?.imageColor}
+                                                                alt="Image"
+                                                                style={{
+                                                                    margin: '0 auto',
+                                                                    maxWidth: '100%',
+                                                                    maxHeight: '100%',
+                                                                    filter: 'brightness(60%)',
+                                                                }}
+                                                            />
+                                                            <CloudUploadOutlined
+                                                                style={{
+                                                                    position: 'absolute',
+                                                                    top: '50%',
+                                                                    left: '50%',
+                                                                    transform: 'translate(-50%, -50%)',
+                                                                    color: 'white'
+                                                                }}
+                                                            />
+                                                        </div>
                                                     ) : (
-                                                        <CloudUploadOutlined />
+                                                        <div className="w-[100px] h-[100px] p-3 flex items-center justify-center">
+                                                            <CloudUploadOutlined />
+                                                        </div>
                                                     )}
+
                                                 </Upload>
                                             </Form.Item>
 
@@ -313,12 +451,7 @@ const productUpdate = () => {
                                                                         <Select
                                                                             placeholder="Choose Category"
                                                                             style={{ width: 356 }}
-                                                                            options={[
-                                                                                { value: 'S', label: 'S' },
-                                                                                { value: 'M', label: 'M' },
-                                                                                { value: 'L', label: 'L' },
-                                                                                { value: 'XL', label: 'XL' },
-                                                                            ]}
+                                                                            options={optionSize}
                                                                         />
                                                                     </Form.Item>
                                                                     <Form.Item noStyle name={[subField.name, 'quantity']} >
