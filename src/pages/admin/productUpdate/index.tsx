@@ -79,7 +79,6 @@ const productUpdate = () => {
     const { data: fetchOneProdđuct } = useFetchOneProductQuery(id)
     const [productDetails, setProductDetails] = useState<ProductDetail[]>([]); // State để lưu thông tin sản phẩm chi tiết
 
-
     const product = fetchOneProdđuct?.data
     // Sử dụng useEffect để gọi API khi component được render
     useEffect(() => {
