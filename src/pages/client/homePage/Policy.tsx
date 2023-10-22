@@ -2,7 +2,7 @@ import React from "react";
 
 const Policy = () => {
   return (
-    <div className="container">
+    <div className="max-w-[1500px] mx-auto">
       <div className="flex pb-[60px] justify-between gap-y-[20px] flex-wrap">
         <div className="flex gap-x-[15px] items-center">
           <img src="/images/icon/home_policy_icon_1.png" alt="" className="w-[48px] h-[48px]" />

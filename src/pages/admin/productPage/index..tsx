@@ -20,7 +20,7 @@ import { useFetchListProductQuery, useRemoveProductMutation } from '../../../sto
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
+import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 
 const productPage = () => {
@@ -29,20 +29,18 @@ const productPage = () => {
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
-    // const productState = useSelector((state: RootState) => state.productSlice.products)
-    // const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
-    const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
+    const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
-                dispatch(listProductFilterSlice(listProduct))
+                dispatch(listProductSearch(listProduct))
             }
         }
     }, [isSuccess, search])
     const handleSearch = () => {
-        if (listProduct)
+        if (listProduct) {
             dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
-
+        }
     }
     if (isError) {
         return <>error</>;
@@ -58,7 +56,7 @@ const productPage = () => {
     const confirm = async (id: string) => {
         try {
             if (id) {
-                await onRemove(id).then(() => dispatch(deleteProductFilterSlice(id)))
+                await onRemove(id).then(() => dispatch(deleteProductSearchSlice(id)))
                 messageApi.open({
                     type: 'success',
                     content: 'Delete product successfully!',
@@ -168,7 +166,7 @@ const productPage = () => {
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={productSearchState} pagination={{ pageSize: 20 }} />
             </div>
         </div>
     )
