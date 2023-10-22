@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import categoryApi from './category/category.service'
 import productAPI from './product/product.service'
 import categorySlice from './category/categorySlice'
-import { productFilterSliceReducer, productOutstandReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer } from './product/productSlice'
+import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer } from './product/productSlice'
 import productDetailSlice from './productDetail/productDetailSlice'
 import productDetailAPI from './productDetail/productDetail.service'
 
@@ -20,6 +20,7 @@ export const store = configureStore({
         productSaleSlice: productSaleSliceReducer,
         productSearchReducer: productSearchReducer,
         productOutstandReducer: productOutstandReducer,
+        productRelatedSliceReducer: productRelatedSliceReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware),

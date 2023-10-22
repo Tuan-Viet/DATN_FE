@@ -5,16 +5,25 @@ import { useFetchListCategoryQuery } from "../../../store/category/category.serv
 import { useDispatch, useSelector } from "react-redux";
 import { listCategorySlice } from "../../../store/category/categorySlice";
 import { RootState } from "../../../store";
+import { useFetchListProductQuery } from "../../../store/product/product.service";
+import { listProductSlice } from "../../../store/product/productSlice";
 
 const Category = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
+  const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+  const productState = useSelector((state: RootState) => state.productSlice.products)
   useEffect(() => {
     if (isSuccessCategory) {
       dispatch(listCategorySlice(listCategory))
     }
   }, [isSuccessCategory])
+  useEffect(() => {
+    if (isSuccessProduct) {
+      dispatch(listProductSlice(listProduct))
+    }
+  }, [isSuccessProduct])
   return (
     <div className="mt-24 max-w-[1500px] mx-auto mb-[80px]">
       <h1 className="text-[37px] font-semibold uppercase mb-8">
@@ -30,9 +39,10 @@ const Category = () => {
           {categoryState?.map((cate, index) => {
             return <SwiperSlide key={index}>
               <div className="relative">
+
                 <Link to="">
                   <img
-                    src="/images/img-product/home_category_1_img.png"
+                    src="https://product.hstatic.net/200000690725/product/52867307615_31136f5038_o_35df730e699c43b8be0141156f6b61ed_master.jpg"
                     className="mx-auto transition-all hover:scale-105"
                     alt=""
                   />

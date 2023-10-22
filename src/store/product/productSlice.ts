@@ -91,6 +91,19 @@ const productOutstandSlice = createSlice({
         },
     })
 })
+const productRelatedSlice = createSlice({
+    name: "products",
+    initialState: initialStateProduct,
+    reducers: ({
+        listProductRelated: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
+            state.products = actions.payload
+        },
+        listProductRelatedSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
+            const productOutStand = actions.payload.filter((product) => product && product.variants)
+            state.products = productOutStand
+        },
+    })
+})
 // product
 export const { listProductSlice, deleteProductSlice } = productSlice.actions
 // productbyCategory
@@ -101,10 +114,14 @@ export const { listProductSale, listProductSaleSlice } = productSaleSlice.action
 export const { listProductSearch, listProductSearchSlice, deleteProductSearchSlice } = productSearchSlice.actions
 // productOutStand
 export const { listProductOutStand, listProductOutStandSlice } = productOutstandSlice.actions
+// productRelated
+
+export const { listProductRelated, listProductRelatedSlice } = productRelatedSlice.actions
 // reducer
 export const productSliceReducer = productSlice.reducer
 export const productFilterSliceReducer = productFilterSlice.reducer
 export const productSaleSliceReducer = productSaleSlice.reducer
 export const productSearchReducer = productSearchSlice.reducer
 export const productOutstandReducer = productOutstandSlice.reducer
+export const productRelatedSliceReducer = productRelatedSlice.reducer
 

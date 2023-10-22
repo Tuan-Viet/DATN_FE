@@ -45,17 +45,7 @@ const Product_Collection = () => {
       }
     }
   }, [isSuccessProduct])
-  // useEffect(() => {
-  //   const newSize = []
-  //   productFilterState.map((product) => {
-  //     productDetailState.map((item) => {
-  //       {
-  //         item.product_id === product._id ?
-  //           console.log(item.size) : console.log(0)
-  //       }
-  //     })
-  //   })
-  // }, [productDetailState, productFilterState])
+
   return (
     <div className="py-[60px] mb-[60px]">
       <div className="max-w-[1500px] mx-auto">
@@ -70,13 +60,13 @@ const Product_Collection = () => {
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <div key={index} className="relative group w-[280px] cursor-pointer">
               <button type="submit">
-                <Link to={`/products/${product._id}`}>
+                <a href={`/products/${product._id}`}>
                   <img
                     src={`${product?.images?.[0]}`}
                     className="mx-auto h-[360px] w-full"
                     alt=""
                   />
-                </Link>
+                </a>
               </button>
               <div className="product-info p-[8px] bg-white">
                 <div className="text-sm flex justify-between mb-3">

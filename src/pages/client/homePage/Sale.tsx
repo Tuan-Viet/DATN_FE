@@ -41,13 +41,13 @@ const Sale = () => {
             {productSaleState?.map((product, index) => {
               return <SwiperSlide key={index}>
                 <div className="relative group">
-                  <Link to="">
+                  <a href={`/products/${product._id}`}>
                     <img
                       src={product.images?.[0]}
                       className="mx-auto h-[295px] w-full"
                       alt=""
                     />
-                  </Link>
+                  </a>
                   <div className="product-info p-[8px] bg-white">
                     <div className="text-sm flex justify-between mb-3">
                       <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
