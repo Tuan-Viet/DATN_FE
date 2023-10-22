@@ -20,7 +20,7 @@ import { useFetchListProductQuery, useRemoveProductMutation } from '../../../sto
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
+import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 import { useForm } from "react-hook-form";
 import { listCategorySlice } from '../../../store/category/categorySlice';
@@ -34,16 +34,15 @@ const productPage = () => {
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
+    const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
     const { data: listCategory } = useFetchListCategoryQuery()
     // const productState = useSelector((state: RootState) => state.productSlice.products)
-    const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
-    console.log("cate", categoryState);
 
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
-                dispatch(listProductFilterSlice(listProduct))
+                dispatch(listProductSearch(listProduct))
             }
         }
         if (listCategory) {
@@ -51,9 +50,9 @@ const productPage = () => {
         }
     }, [isSuccess, search, listCategory])
     const handleSearch = () => {
-        if (listProduct)
+        if (listProduct) {
             dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
-
+        }
     }
     if (isError) {
         return <>error</>;
@@ -69,7 +68,7 @@ const productPage = () => {
     const confirm = async (id: string) => {
         try {
             if (id) {
-                await onRemove(id).then(() => dispatch(deleteProductFilterSlice(id)))
+                await onRemove(id).then(() => dispatch(deleteProductSearchSlice(id)))
                 messageApi.open({
                     type: 'success',
                     content: 'Delete product successfully!',
@@ -183,7 +182,7 @@ const productPage = () => {
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 10 }} />
+                <Table columns={columns} dataSource={productSearchState} pagination={{ pageSize: 20 }} />
             </div>
         </div>
     )
