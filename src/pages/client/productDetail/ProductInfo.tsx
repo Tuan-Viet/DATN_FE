@@ -1,13 +1,13 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { Link, useParams } from "react-router-dom";
+import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { useFetchOneProductQuery } from "../../../store/product/product.service";
 
 const ProductInfo = () => {
   const [quantity, setQuantity] = useState(1);
   const [currentTab, setCurrentTab] = useState(1);
-  const { data: listProductDetail } = useListProductDetailQuery()
   const renderContent = () => {
     switch (currentTab) {
       case 1:
@@ -212,621 +212,621 @@ const ProductInfo = () => {
       setQuantity(quantity - 1);
     }
   };
-  return (
-    <div className="max-w-[1500px] mx-auto mb-[70px]">
-      <div className="flex gap-x-7 mb-10">
-        <div className="w-[433px]">
-          <div className="product-detail-thumbnail w-[433px] mb-[10px]">
-            <Swiper
-              modules={[Navigation, Autoplay]}
-              grabCursor={"true"}
-              spaceBetween={30}
-              slidesPerView={"auto"}
-              navigation={true}
-              autoplay={{ delay: 3000 }}
-            >
-              <SwiperSlide>
-                <div className="">
+  // fetch ProductDetail
+  const { id } = useParams()
+  // const { data: getOneProductDetail, isSuccess: isSuccessProductDetail } = useGetOneProductDetailQuery(id)
+  if (id) {
+    const { data } = useFetchOneProductQuery(id)
+    const getOneProduct = data?.data
+    return (
+      <div className="max-w-[1500px] mx-auto mb-[70px]">
+        <div className="flex gap-x-7 mb-10">
+          <div className="w-[433px]">
+            <div className="product-detail-thumbnail w-[433px] mb-[10px]">
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                grabCursor={"true"}
+                spaceBetween={30}
+                slidesPerView={"auto"}
+                navigation={true}
+                autoplay={{ delay: 3000 }}
+              >
+                <SwiperSlide>
+                  <div className="">
+                    <img
+                      src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
+                      className="h-[555px] object-cover"
+                      alt=""
+                    />
+                  </div>
+                </SwiperSlide>
+              </Swiper>
+            </div>
+            {/* list anh */}
+            <div className="flex justify-between">
+              <img
+                src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
+                alt=""
+                className="w-[61.83px] h-[79.13px]"
+              />
+              <img
+                src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
+                alt=""
+                className="w-[61.83px] h-[79.13px]"
+              />
+              <img
+                src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
+                alt=""
+                className="w-[61.83px] h-[79.13px]"
+              />
+              <img
+                src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
+                alt=""
+                className="w-[61.83px] h-[79.13px]"
+              />
+              <img
+                src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
+                alt=""
+                className="w-[61.83px] h-[79.13px]"
+              />
+              <img
+                src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
+                alt=""
+                className="w-[61.83px] h-[79.13px]"
+              />
+            </div>
+          </div>
+          <div className="product-info">
+            <div className="mb-10">
+              <h1 className="text-[26px] font-bold mb-2">
+                {getOneProduct?.title}
+              </h1>
+              <div className="flex gap-x-5 text-sm">
+                <span>
+                  Mã sản phẩm: <b>ESTA01012CT06MB_NV-S</b>
+                </span>
+                <span>
+                  Tình trạng: <b>Còn hàng</b>
+                </span>
+                <span>
+                  Thương hiệu: <b className="uppercase">HUSTLE</b>
+                </span>
+              </div>
+            </div>
+            <form>
+              <div className="px-4">
+                <div className="flex items-center gap-x-[109px] py-4 mb-2">
+                  <span className="text-sm font-bold">Giá:</span>
+                  <span className="font-bold text-xl text-[#FF2C26]">
+                    {getOneProduct?.discount.toLocaleString("vi-VN")}đ
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-[75.71px] py-4 mb-2">
+                  <span className="text-sm font-bold">Màu sắc:</span>
+                  <select
+                    id="countries"
+                    className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
+                  >
+                    <option selected>Chọn màu</option>
+                    <option value="Xanh navy">Xanh navy</option>
+                    <option value="Trắng - kem đậm">Trắng - kem đậm</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-x-[60.81px] py-4 mb-2">
+                  <span className="text-sm font-bold">Kích thước:</span>
+                  <select
+                    id="countries"
+                    className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
+                  >
+                    <option selected>Chọn size</option>
+                    <option value="S">S</option>
+                    <option value="M">M</option>
+                    <option value="L">L</option>
+                    <option value="XL">XL</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
+                  <span className="text-sm font-bold">Số lượng:</span>
+                  <div>
+                    <label htmlFor="Quantity" className="sr-only">
+                      {" "}
+                      Quantity{" "}
+                    </label>
+
+                    <div className="flex items-center border border-gray-300 rounded">
+                      <button
+                        onClick={decreaseQuantity}
+                        type="button"
+                        className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                      >
+                        &minus;
+                      </button>
+
+                      <input
+                        type="number"
+                        id="Quantity"
+                        value={quantity}
+                        className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+
+                      <button
+                        onClick={increaseQuantity}
+                        type="button"
+                        className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="mb-7">
+                <div className="flex gap-x-[15px] mb-5">
+                  <button className="w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                    Thêm vào giỏ
+                  </button>
+                  <button className="w-[336px] border h-[50px] rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all">
+                    Mua ngay
+                  </button>
+                </div>
+                <button className="w-[687px] border h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
+                  Click vào đây để nhận ưu đãi
+                </button>
+              </div>
+            </form>
+            <div className="policy flex justify-between gap-x-[13px]">
+              <div>
+                <div className="flex items-center gap-x-[10px] mb-4">
                   <img
-                    src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-                    className="h-[555px] object-cover"
+                    src="/images/icon/product_info1_desc1_img.png"
+                    className="w-[30px] h-[30px]"
                     alt=""
                   />
+                  <span className="text-sm">
+                    Miễn phí giao hàng cho đơn hàng từ 500K
+                  </span>
+                </div>
+                <div className="flex items-center gap-x-[10px] mb-4">
+                  <img
+                    src="/images/icon/product_info2_desc1_img.png"
+                    className="w-[30px] h-[30px]"
+                    alt=""
+                  />
+                  <span className="text-sm">
+                    ĐỔI SẢN PHẨM DỄ DÀNG (Trong vòng 7 ngày khi còn nguyên tem
+                    mác)
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-x-[10px] mb-4">
+                  <img
+                    src="/images/icon/product_info1_desc2_img.png"
+                    className="w-[30px] h-[30px]"
+                    alt=""
+                  />
+                  <span className="text-sm">Hàng phân phối chính hãng 100%</span>
+                </div>
+                <div className="flex items-center gap-x-[10px] mb-4">
+                  <img
+                    src="/images/icon/product_info2_desc2_img.png"
+                    className="w-[30px] h-[30px]"
+                    alt=""
+                  />
+                  <span className="text-sm">
+                    Kiểm tra, thanh toán khi nhận hàng COD
+                  </span>
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center gap-x-[10px] mb-4">
+                  <img
+                    src="/images/icon/product_info1_desc3_img.png"
+                    className="w-[30px] h-[30px]"
+                    alt=""
+                  />
+                  <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
+                </div>
+                <div className="flex items-center gap-x-[10px] mb-4">
+                  <img
+                    src="/images/icon/product_info2_desc3_img.png"
+                    className="w-[30px] h-[30px]"
+                    alt=""
+                  />
+                  <span className="text-sm">
+                    Kiểm tra, thanh toán khi nhận hàng COD
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="product-tabs flex gap-x-[60px]">
+            <div>
+              <button
+                className={`${currentTab === 1
+                  ? "border-b-2 border-black text-black"
+                  : "text-[#b3b3b3]"
+                  } text-lg font-semibold pb-2`}
+                onClick={() => setCurrentTab(1)}
+              >
+                Mô tả sản phẩm
+              </button>
+            </div>
+            <div>
+              <button
+                className={`${currentTab === 2
+                  ? "border-b-2 border-black text-black"
+                  : "text-[#b3b3b3]"
+                  } text-lg font-semibold pb-2`}
+                onClick={() => setCurrentTab(2)}
+              >
+                Đánh giá - Nhận xét từ khách hàng
+              </button>
+            </div>
+            <div>
+              <button
+                className={`${currentTab === 3
+                  ? "border-b-2 border-black text-black"
+                  : "text-[#b3b3b3]"
+                  } text-lg font-semibold pb-2`}
+                onClick={() => setCurrentTab(3)}
+              >
+                Chính sách đổi trả
+              </button>
+            </div>
+            <div>
+              <button
+                className={`${currentTab === 4
+                  ? "border-b-2 border-black text-black"
+                  : "text-[#b3b3b3]"
+                  } text-lg font-semibold pb-2`}
+                onClick={() => setCurrentTab(4)}
+              >
+                Chính sách bảo mật
+              </button>
+            </div>
+          </div>
+          <div className="mt-[40px]">{renderContent()}</div>
+        </div>
+        <div>
+          <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase">
+            Sản phẩm liên quan
+          </h1>
+          <div className="product-related mb-12">
+            <Swiper
+              modules={[Navigation]}
+              grabCursor={"true"}
+              spaceBetween={25}
+              slidesPerView={"auto"}
+              navigation={true}
+            >
+              <SwiperSlide>
+                <div className="relative group">
+                  <Link to="">
+                    <img
+                      src="/images/img-product/home_category_1_img.png"
+                      className="mx-auto h-[351px] w-full"
+                      alt=""
+                    />
+                  </Link>
+                  <div className="product-info p-[8px] bg-white">
+                    <div className="text-sm flex justify-between mb-3">
+                      <span>+3 Màu sắc</span>
+                      <span>+4 Kích thước</span>
+                    </div>
+                    <Link to="" className="font-medium">
+                      Áo khoác gió 1 lớp mũ liền EWCW007
+                    </Link>
+                    <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-sm text-[#FF2C26] font-semibold">
+                        299,000₫
+                      </span>
+                      <span className="text-[13px] text-[#878C8F]">
+                        <del>500,000₫</del>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -40%
+                  </span>
+                  <Link
+                    to=""
+                    className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      />
+                    </svg>
+                    <span className="uppercase text-xs font-semibold">
+                      Thêm vào giỏ
+                    </span>
+                  </Link>
                 </div>
               </SwiperSlide>
               <SwiperSlide>
-                <div className="">
-                  <img
-                    src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-                    className="h-[555px] object-cover"
-                    alt=""
-                  />
+                <div className="relative group">
+                  <Link to="">
+                    <img
+                      src="/images/img-product/home_category_1_img.png"
+                      className="mx-auto h-[351px] w-full"
+                      alt=""
+                    />
+                  </Link>
+                  <div className="product-info p-[8px] bg-white">
+                    <div className="text-sm flex justify-between mb-3">
+                      <span>+3 Màu sắc</span>
+                      <span>+4 Kích thước</span>
+                    </div>
+                    <Link to="" className="font-medium">
+                      Áo khoác gió 1 lớp mũ liền EWCW007
+                    </Link>
+                    <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-sm text-[#FF2C26] font-semibold">
+                        299,000₫
+                      </span>
+                      <span className="text-[13px] text-[#878C8F]">
+                        <del>500,000₫</del>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -40%
+                  </span>
+                  <Link
+                    to=""
+                    className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      />
+                    </svg>
+                    <span className="uppercase text-xs font-semibold">
+                      Thêm vào giỏ
+                    </span>
+                  </Link>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide>
+                <div className="relative group">
+                  <Link to="">
+                    <img
+                      src="/images/img-product/home_category_1_img.png"
+                      className="mx-auto h-[351px] w-full"
+                      alt=""
+                    />
+                  </Link>
+                  <div className="product-info p-[8px] bg-white">
+                    <div className="text-sm flex justify-between mb-3">
+                      <span>+3 Màu sắc</span>
+                      <span>+4 Kích thước</span>
+                    </div>
+                    <Link to="" className="font-medium">
+                      Áo khoác gió 1 lớp mũ liền EWCW007
+                    </Link>
+                    <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-sm text-[#FF2C26] font-semibold">
+                        299,000₫
+                      </span>
+                      <span className="text-[13px] text-[#878C8F]">
+                        <del>500,000₫</del>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -40%
+                  </span>
+                  <Link
+                    to=""
+                    className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      />
+                    </svg>
+                    <span className="uppercase text-xs font-semibold">
+                      Thêm vào giỏ
+                    </span>
+                  </Link>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide>
+                <div className="relative group">
+                  <Link to="">
+                    <img
+                      src="/images/img-product/home_category_1_img.png"
+                      className="mx-auto h-[351px] w-full"
+                      alt=""
+                    />
+                  </Link>
+                  <div className="product-info p-[8px] bg-white">
+                    <div className="text-sm flex justify-between mb-3">
+                      <span>+3 Màu sắc</span>
+                      <span>+4 Kích thước</span>
+                    </div>
+                    <Link to="" className="font-medium">
+                      Áo khoác gió 1 lớp mũ liền EWCW007
+                    </Link>
+                    <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-sm text-[#FF2C26] font-semibold">
+                        299,000₫
+                      </span>
+                      <span className="text-[13px] text-[#878C8F]">
+                        <del>500,000₫</del>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -40%
+                  </span>
+                  <Link
+                    to=""
+                    className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      />
+                    </svg>
+                    <span className="uppercase text-xs font-semibold">
+                      Thêm vào giỏ
+                    </span>
+                  </Link>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide>
+                <div className="relative group">
+                  <Link to="">
+                    <img
+                      src="/images/img-product/home_category_1_img.png"
+                      className="mx-auto h-[351px] w-full"
+                      alt=""
+                    />
+                  </Link>
+                  <div className="product-info p-[8px] bg-white">
+                    <div className="text-sm flex justify-between mb-3">
+                      <span>+3 Màu sắc</span>
+                      <span>+4 Kích thước</span>
+                    </div>
+                    <Link to="" className="font-medium">
+                      Áo khoác gió 1 lớp mũ liền EWCW007
+                    </Link>
+                    <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-sm text-[#FF2C26] font-semibold">
+                        299,000₫
+                      </span>
+                      <span className="text-[13px] text-[#878C8F]">
+                        <del>500,000₫</del>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -40%
+                  </span>
+                  <Link
+                    to=""
+                    className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      />
+                    </svg>
+                    <span className="uppercase text-xs font-semibold">
+                      Thêm vào giỏ
+                    </span>
+                  </Link>
+                </div>
+              </SwiperSlide>
+              <SwiperSlide>
+                <div className="relative group">
+                  <Link to="">
+                    <img
+                      src="/images/img-product/home_category_1_img.png"
+                      className="mx-auto h-[351px] w-full"
+                      alt=""
+                    />
+                  </Link>
+                  <div className="product-info p-[8px] bg-white">
+                    <div className="text-sm flex justify-between mb-3">
+                      <span>+3 Màu sắc</span>
+                      <span>+4 Kích thước</span>
+                    </div>
+                    <Link to="" className="font-medium">
+                      Áo khoác gió 1 lớp mũ liền EWCW008
+                    </Link>
+                    <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-sm text-[#FF2C26] font-semibold">
+                        299,000₫
+                      </span>
+                      <span className="text-[13px] text-[#878C8F]">
+                        <del>500,000₫</del>
+                      </span>
+                    </div>
+                  </div>
+                  <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -40%
+                  </span>
+                  <Link
+                    to=""
+                    className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                      />
+                    </svg>
+                    <span className="uppercase text-xs font-semibold">
+                      Thêm vào giỏ
+                    </span>
+                  </Link>
                 </div>
               </SwiperSlide>
             </Swiper>
           </div>
-          <div className="flex justify-between">
-            <img
-              src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-              alt=""
-              className="w-[61.83px] h-[79.13px]"
-            />
-            <img
-              src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-              alt=""
-              className="w-[61.83px] h-[79.13px]"
-            />
-            <img
-              src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-              alt=""
-              className="w-[61.83px] h-[79.13px]"
-            />
-            <img
-              src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-              alt=""
-              className="w-[61.83px] h-[79.13px]"
-            />
-            <img
-              src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-              alt=""
-              className="w-[61.83px] h-[79.13px]"
-            />
-            <img
-              src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-              alt=""
-              className="w-[61.83px] h-[79.13px]"
-            />
-          </div>
-        </div>
-        <div className="product-info">
-          <div className="mb-10">
-            <h1 className="text-[26px] font-bold mb-2">
-              Áo Tanktop họa tiết Defeat ESTA010
-            </h1>
-            <div className="flex gap-x-5 text-sm">
-              <span>
-                Mã sản phẩm: <b>ESTA01012CT06MB_NV-S</b>
-              </span>
-              <span>
-                Tình trạng: <b>Còn hàng</b>
-              </span>
-              <span>
-                Thương hiệu: <b className="uppercase">HUSTLE</b>
-              </span>
-            </div>
-          </div>
-          <form>
-            <div className="px-4">
-              <div className="flex items-center gap-x-[109px] py-4 mb-2">
-                <span className="text-sm font-bold">Giá:</span>
-                <span className="font-bold text-xl text-[#FF2C26]">
-                  250,000₫
-                </span>
-              </div>
-              <div className="flex items-center gap-x-[75.71px] py-4 mb-2">
-                <span className="text-sm font-bold">Màu sắc:</span>
-                <select
-                  id="countries"
-                  className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
-                >
-                  <option selected>Chọn màu</option>
-                  <option value="Xanh navy">Xanh navy</option>
-                  <option value="Trắng - kem đậm">Trắng - kem đậm</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-x-[60.81px] py-4 mb-2">
-                <span className="text-sm font-bold">Kích thước:</span>
-                <select
-                  id="countries"
-                  className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
-                >
-                  <option selected>Chọn size</option>
-                  <option value="S">S</option>
-                  <option value="M">M</option>
-                  <option value="L">L</option>
-                  <option value="XL">XL</option>
-                </select>
-              </div>
-              <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
-                <span className="text-sm font-bold">Số lượng:</span>
-                <div>
-                  <label htmlFor="Quantity" className="sr-only">
-                    {" "}
-                    Quantity{" "}
-                  </label>
-
-                  <div className="flex items-center border border-gray-300 rounded">
-                    <button
-                      onClick={decreaseQuantity}
-                      type="button"
-                      className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                    >
-                      &minus;
-                    </button>
-
-                    <input
-                      type="number"
-                      id="Quantity"
-                      value={quantity}
-                      className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-                    />
-
-                    <button
-                      onClick={increaseQuantity}
-                      type="button"
-                      className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="mb-7">
-              <div className="flex gap-x-[15px] mb-5">
-                <button className="w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
-                  Thêm vào giỏ
-                </button>
-                <button className="w-[336px] border h-[50px] rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all">
-                  Mua ngay
-                </button>
-              </div>
-              <button className="w-[687px] border h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
-                Click vào đây để nhận ưu đãi
-              </button>
-            </div>
-          </form>
-          <div className="policy flex justify-between gap-x-[13px]">
-            <div>
-              <div className="flex items-center gap-x-[10px] mb-4">
-                <img
-                  src="/images/icon/product_info1_desc1_img.png"
-                  className="w-[30px] h-[30px]"
-                  alt=""
-                />
-                <span className="text-sm">
-                  Miễn phí giao hàng cho đơn hàng từ 500K
-                </span>
-              </div>
-              <div className="flex items-center gap-x-[10px] mb-4">
-                <img
-                  src="/images/icon/product_info2_desc1_img.png"
-                  className="w-[30px] h-[30px]"
-                  alt=""
-                />
-                <span className="text-sm">
-                  ĐỔI SẢN PHẨM DỄ DÀNG (Trong vòng 7 ngày khi còn nguyên tem
-                  mác)
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-x-[10px] mb-4">
-                <img
-                  src="/images/icon/product_info1_desc2_img.png"
-                  className="w-[30px] h-[30px]"
-                  alt=""
-                />
-                <span className="text-sm">Hàng phân phối chính hãng 100%</span>
-              </div>
-              <div className="flex items-center gap-x-[10px] mb-4">
-                <img
-                  src="/images/icon/product_info2_desc2_img.png"
-                  className="w-[30px] h-[30px]"
-                  alt=""
-                />
-                <span className="text-sm">
-                  Kiểm tra, thanh toán khi nhận hàng COD
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-x-[10px] mb-4">
-                <img
-                  src="/images/icon/product_info1_desc3_img.png"
-                  className="w-[30px] h-[30px]"
-                  alt=""
-                />
-                <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
-              </div>
-              <div className="flex items-center gap-x-[10px] mb-4">
-                <img
-                  src="/images/icon/product_info2_desc3_img.png"
-                  className="w-[30px] h-[30px]"
-                  alt=""
-                />
-                <span className="text-sm">
-                  Kiểm tra, thanh toán khi nhận hàng COD
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-      <div>
-        <div className="product-tabs flex gap-x-[60px]">
-          <div>
-            <button
-              className={`${currentTab === 1
-                ? "border-b-2 border-black text-black"
-                : "text-[#b3b3b3]"
-                } text-lg font-semibold pb-2`}
-              onClick={() => setCurrentTab(1)}
-            >
-              Mô tả sản phẩm
-            </button>
-          </div>
-          <div>
-            <button
-              className={`${currentTab === 2
-                ? "border-b-2 border-black text-black"
-                : "text-[#b3b3b3]"
-                } text-lg font-semibold pb-2`}
-              onClick={() => setCurrentTab(2)}
-            >
-              Đánh giá - Nhận xét từ khách hàng
-            </button>
-          </div>
-          <div>
-            <button
-              className={`${currentTab === 3
-                ? "border-b-2 border-black text-black"
-                : "text-[#b3b3b3]"
-                } text-lg font-semibold pb-2`}
-              onClick={() => setCurrentTab(3)}
-            >
-              Chính sách đổi trả
-            </button>
-          </div>
-          <div>
-            <button
-              className={`${currentTab === 4
-                ? "border-b-2 border-black text-black"
-                : "text-[#b3b3b3]"
-                } text-lg font-semibold pb-2`}
-              onClick={() => setCurrentTab(4)}
-            >
-              Chính sách bảo mật
-            </button>
-          </div>
-        </div>
-        <div className="mt-[40px]">{renderContent()}</div>
-      </div>
-      <div>
-        <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase">
-          Sản phẩm liên quan
-        </h1>
-        <div className="product-related mb-12">
-          <Swiper
-            modules={[Navigation]}
-            grabCursor={"true"}
-            spaceBetween={25}
-            slidesPerView={"auto"}
-            navigation={true}
-          >
-            <SwiperSlide>
-              <div className="relative group">
-                <Link to="">
-                  <img
-                    src="/images/img-product/home_category_1_img.png"
-                    className="mx-auto h-[351px] w-full"
-                    alt=""
-                  />
-                </Link>
-                <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
-                    <span>+3 Màu sắc</span>
-                    <span>+4 Kích thước</span>
-                  </div>
-                  <Link to="" className="font-medium">
-                    Áo khoác gió 1 lớp mũ liền EWCW007
-                  </Link>
-                  <div className="price flex gap-x-[8px] items-baseline">
-                    <span className="text-sm text-[#FF2C26] font-semibold">
-                      299,000₫
-                    </span>
-                    <span className="text-[13px] text-[#878C8F]">
-                      <del>500,000₫</del>
-                    </span>
-                  </div>
-                </div>
-                <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  -40%
-                </span>
-                <Link
-                  to=""
-                  className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
-                  <span className="uppercase text-xs font-semibold">
-                    Thêm vào giỏ
-                  </span>
-                </Link>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="relative group">
-                <Link to="">
-                  <img
-                    src="/images/img-product/home_category_1_img.png"
-                    className="mx-auto h-[351px] w-full"
-                    alt=""
-                  />
-                </Link>
-                <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
-                    <span>+3 Màu sắc</span>
-                    <span>+4 Kích thước</span>
-                  </div>
-                  <Link to="" className="font-medium">
-                    Áo khoác gió 1 lớp mũ liền EWCW007
-                  </Link>
-                  <div className="price flex gap-x-[8px] items-baseline">
-                    <span className="text-sm text-[#FF2C26] font-semibold">
-                      299,000₫
-                    </span>
-                    <span className="text-[13px] text-[#878C8F]">
-                      <del>500,000₫</del>
-                    </span>
-                  </div>
-                </div>
-                <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  -40%
-                </span>
-                <Link
-                  to=""
-                  className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
-                  <span className="uppercase text-xs font-semibold">
-                    Thêm vào giỏ
-                  </span>
-                </Link>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="relative group">
-                <Link to="">
-                  <img
-                    src="/images/img-product/home_category_1_img.png"
-                    className="mx-auto h-[351px] w-full"
-                    alt=""
-                  />
-                </Link>
-                <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
-                    <span>+3 Màu sắc</span>
-                    <span>+4 Kích thước</span>
-                  </div>
-                  <Link to="" className="font-medium">
-                    Áo khoác gió 1 lớp mũ liền EWCW007
-                  </Link>
-                  <div className="price flex gap-x-[8px] items-baseline">
-                    <span className="text-sm text-[#FF2C26] font-semibold">
-                      299,000₫
-                    </span>
-                    <span className="text-[13px] text-[#878C8F]">
-                      <del>500,000₫</del>
-                    </span>
-                  </div>
-                </div>
-                <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  -40%
-                </span>
-                <Link
-                  to=""
-                  className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
-                  <span className="uppercase text-xs font-semibold">
-                    Thêm vào giỏ
-                  </span>
-                </Link>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="relative group">
-                <Link to="">
-                  <img
-                    src="/images/img-product/home_category_1_img.png"
-                    className="mx-auto h-[351px] w-full"
-                    alt=""
-                  />
-                </Link>
-                <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
-                    <span>+3 Màu sắc</span>
-                    <span>+4 Kích thước</span>
-                  </div>
-                  <Link to="" className="font-medium">
-                    Áo khoác gió 1 lớp mũ liền EWCW007
-                  </Link>
-                  <div className="price flex gap-x-[8px] items-baseline">
-                    <span className="text-sm text-[#FF2C26] font-semibold">
-                      299,000₫
-                    </span>
-                    <span className="text-[13px] text-[#878C8F]">
-                      <del>500,000₫</del>
-                    </span>
-                  </div>
-                </div>
-                <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  -40%
-                </span>
-                <Link
-                  to=""
-                  className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
-                  <span className="uppercase text-xs font-semibold">
-                    Thêm vào giỏ
-                  </span>
-                </Link>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="relative group">
-                <Link to="">
-                  <img
-                    src="/images/img-product/home_category_1_img.png"
-                    className="mx-auto h-[351px] w-full"
-                    alt=""
-                  />
-                </Link>
-                <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
-                    <span>+3 Màu sắc</span>
-                    <span>+4 Kích thước</span>
-                  </div>
-                  <Link to="" className="font-medium">
-                    Áo khoác gió 1 lớp mũ liền EWCW007
-                  </Link>
-                  <div className="price flex gap-x-[8px] items-baseline">
-                    <span className="text-sm text-[#FF2C26] font-semibold">
-                      299,000₫
-                    </span>
-                    <span className="text-[13px] text-[#878C8F]">
-                      <del>500,000₫</del>
-                    </span>
-                  </div>
-                </div>
-                <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  -40%
-                </span>
-                <Link
-                  to=""
-                  className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
-                  <span className="uppercase text-xs font-semibold">
-                    Thêm vào giỏ
-                  </span>
-                </Link>
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="relative group">
-                <Link to="">
-                  <img
-                    src="/images/img-product/home_category_1_img.png"
-                    className="mx-auto h-[351px] w-full"
-                    alt=""
-                  />
-                </Link>
-                <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
-                    <span>+3 Màu sắc</span>
-                    <span>+4 Kích thước</span>
-                  </div>
-                  <Link to="" className="font-medium">
-                    Áo khoác gió 1 lớp mũ liền EWCW008
-                  </Link>
-                  <div className="price flex gap-x-[8px] items-baseline">
-                    <span className="text-sm text-[#FF2C26] font-semibold">
-                      299,000₫
-                    </span>
-                    <span className="text-[13px] text-[#878C8F]">
-                      <del>500,000₫</del>
-                    </span>
-                  </div>
-                </div>
-                <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  -40%
-                </span>
-                <Link
-                  to=""
-                  className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-5 h-5"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                    />
-                  </svg>
-                  <span className="uppercase text-xs font-semibold">
-                    Thêm vào giỏ
-                  </span>
-                </Link>
-              </div>
-            </SwiperSlide>
-          </Swiper>
-        </div>
-      </div>
-    </div>
-  );
+    );
+
+  }
 };
 
 export default ProductInfo;
