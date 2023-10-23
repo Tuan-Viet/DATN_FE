@@ -364,7 +364,7 @@ const ProductInfo = () => {
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                   <div className="flex">
-                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
+                    {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
                       return <div className="mx-1">
                         <input onClick={() => handleProductDetail(nameColor)} type="radio" id={nameColor} name="color" value={nameColor} className="hidden peer" />
                         <label htmlFor={nameColor}
@@ -379,7 +379,7 @@ const ProductInfo = () => {
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Kích thước</div>
                   <div className="flex">
-                    {[...new Set(productDetailFilterState.map((item) => item.size))].map((size) => {
+                    {/* {[...new Set(productDetailFilterState?.map((item) => item.size))].map((size) => {
                       return <div className="mx-1">
                         <input type="radio" id={size} name="size" value={size} className="hidden peer" />
                         <label htmlFor={size}
@@ -388,9 +388,30 @@ const ProductInfo = () => {
                           {size}
                         </label>
                       </div>
+                    })} */}
+                    {productDetailFilterState?.map((item) => {
+                      return <>
+                        {item.quantity > 0 ? <div className="mx-1">
+                          <input type="radio" id={item.size} name="item.size" value={item.size} className="hidden peer" />
+                          <label htmlFor={item.size}
+                            className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                          >
+                            {item.size}
+                          </label>
+                        </div> :
+                          <div className="mx-1">
+                            {/* <input type="radio" id={item.size} name="item.size" value={item.size} className="hidden peer" /> */}
+                            <label
+                              className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
+                            >
+                              {item.size}
+                            </label>
+                          </div>
+                        }
+                      </>
                     })}
                   </div>
-                </div>
+                </div >
                 <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
                   <span className="text-sm font-bold">Số lượng:</span>
                   <div>
