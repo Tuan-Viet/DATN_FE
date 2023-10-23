@@ -4,29 +4,84 @@ import {
     Popconfirm,
     Image,
     Button,
+    message,
+    Spin
 } from 'antd';
 import {
     EditFilled,
     DeleteFilled,
     PlusOutlined,
-    EyeOutlined
+    EyeOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
+import { useEffect, useState } from 'react';
+import { Dispatch } from '@reduxjs/toolkit';
+import { RootState } from '../../../store';
+import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
+import { ICategory } from '../../../store/category/category.interface';
 
 const productPage = () => {
+    const dispatch: Dispatch<any> = useDispatch()
+    const [onRemove] = useRemoveProductMutation()
+    const [search, setSearch] = useState<string>("")
+    const [messageApi, contextHolder] = message.useMessage();
+    const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
+    // const productState = useSelector((state: RootState) => state.productSlice.products)
+    // const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+    const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
+    useEffect(() => {
+        if (listProduct) {
+            if (search === "" || !search) {
+                dispatch(listProductFilterSlice(listProduct))
+            }
+        }
+    }, [isSuccess, search])
+    const handleSearch = () => {
+        if (listProduct)
+            dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
+
+    }
+    if (isError) {
+        return <>error</>;
+    }
+    if (isLoading) {
+        return <>
+            <div className="flex justify-center items-center h-[600px]">
+                <Spin size='large' />
+            </div>
+        </>;
+    }
+
+    const confirm = async (id: string) => {
+        try {
+            if (id) {
+                await onRemove(id).then(() => dispatch(deleteProductFilterSlice(id)))
+                messageApi.open({
+                    type: 'success',
+                    content: 'Delete product successfully!',
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
     const columns = [
         {
             title: 'Product Name',
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
-                    <Image
-                        width={70}
-                        src={record.images}
-                        alt="Product Image"
-                        className=""
-                    />
-                    <a className='w-full overflow-hidden ml-1'>{record.name}</a>
+                    <Image.PreviewGroup items={record?.images.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
+                        <Image
+                            width={70}
+                            src={record?.images[0]}
+                        />
+                    </Image.PreviewGroup>
+
+                    <a className='w-full overflow-hidden ml-1'>{record?.title}</a>
                 </div>
             ),
             className: 'w-1/4',
@@ -35,41 +90,47 @@ const productPage = () => {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-        },
-        // {
-        //     title: 'Description',
-        //     dataIndex: 'description',
-        //     key: 'description',
-        // },
-        {
-            title: 'Quantity',
-            dataIndex: 'quantity',
-            key: 'quantity',
+            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         },
         {
-            title: "Category",
-            key: "category",
-            dataIndex: "category",
+            title: 'Discount',
+            dataIndex: 'discount',
+            key: 'discount',
+            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+
         },
+        {
+            title: 'Description',
+            dataIndex: 'description',
+            key: 'description',
+        },
+
+        {
+            title: 'Category',
+            dataIndex: 'categoryId',
+            key: 'categoryId',
+            render: (cateId: any) => (cateId)
+        },
+
         {
             title: 'Action',
             key: 'action',
             render: (record: any) => (
                 <Space size="middle">
-                    <Link to={`/admin/product/${record._id}`}>
+                    <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
                     </Link>
                     <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
-                        onConfirm={() => confirm(record._id)}
+                        onConfirm={() => confirm(record?._id)}
                         okText="Yes"
                         cancelText="No"
                         okButtonProps={{ className: "text-white bg-blue-400" }}
                     >
                         <DeleteFilled className='text-xl text-red-400' />
                     </Popconfirm>
-                    <Link to={`/admin/product/update/${record._id}`}>
+                    <Link to={`/admin/product/update/${record?._id}`}>
                         <EditFilled className='text-xl text-yellow-400' />
                     </Link>
                 </Space>
@@ -77,31 +138,20 @@ const productPage = () => {
         },
 
     ];
-    const data = [
-        {
-            key: '1',
-            name: 'Quần áo mùa hè',
-            images: 'https://zizoou.com/cdn/shop/products/Ao-khoac-Jean-somi-form-rong-xanh-2-2-ZiZoou-Store.jpg?v=1676538411',
-            price: 200000,
-            quantity: 99,
-            category: "Quần áo"
-
-        },
-
-    ];
     return (
         <div className="">
+            {contextHolder}
             <Space className='flex justify-between mb-5'>
                 <div className="">
-                    <span className="block text-xl text-primary">
+                    <span className="block text-xl text-[#1677ff]">
                         Product List
                     </span>
-                    <span className="block text-base  text-primary">
+                    <span className="block text-base  text-[#1677ff]">
                         Manage your products
                     </span>
                 </div>
                 <Link to={`add`}>
-                    <Button type='primary' className='bg-primary'
+                    <Button type='primary' className='bg-[#1677ff]'
                         icon={<PlusOutlined />}
                     >
                         Add New Product
@@ -109,8 +159,16 @@ const productPage = () => {
                 </Link>
             </Space>
             <div className="border p-3 rounded-lg min-h-screen bg-white">
-
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} />
+                <div className="pb-6 pt-3">
+                    <form >
+                        <input onChange={(e) => setSearch(e.target.value)} type="text" className='border p-2 w-64 outline-none '
+                            placeholder="" />
+                        <button type="button" onClick={handleSearch} className='p-2 bg-[#1677ff]'>
+                            <SearchOutlined className='text-white' />
+                        </button>
+                    </form>
+                </div>
+                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 20 }} />
             </div>
         </div>
     )

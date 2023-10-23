@@ -9,6 +9,7 @@ import Sale from "./Sale";
 
 const homePage = () => {
     return <>
+
         <Header></Header>
         <Banner></Banner>
         <Category></Category>
@@ -17,6 +18,7 @@ const homePage = () => {
         <Product_Collection></Product_Collection>
         <Policy></Policy>
         <Footer></Footer>
+
     </>
 }
 export default homePage;

@@ -8,7 +8,7 @@ const productAPI = createApi({
     }),
     tagTypes: ["products"],
     endpoints: (builer) => ({
-        fetchListProduct: builer.query<IProduct[], IProduct>({
+        fetchListProduct: builer.query<IProduct[], void>({
             query: () => `/products`,
             providesTags: ["products"]
         }),
@@ -16,7 +16,7 @@ const productAPI = createApi({
             query: (id) => `/products/` + id,
             providesTags: ["products"]
         }),
-        removeProduct: builer.mutation<IProduct, void>({
+        removeProduct: builer.mutation({
             query: (id) => ({
                 url: "/products/" + id,
                 method: "DELETE"
@@ -34,7 +34,7 @@ const productAPI = createApi({
         updateProduct: builer.mutation({
             query: ({ id, ...product }) => ({
                 url: "/products/" + id,
-                method: "PUT",
+                method: "PATCH",
                 body: product
             }),
             invalidatesTags: ["products"]
