@@ -1,14 +1,15 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { Dispatch, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
+import { listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { useFetchOneCategoryQuery } from "../../../store/category/category.service";
 import { listProductRelated, listProductRelatedSlice } from "../../../store/product/productSlice";
+import axios from "axios";
 
 const ProductInfo = () => {
   const [quantity, setQuantity] = useState(1);
@@ -223,25 +224,50 @@ const ProductInfo = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: dataOneProduct } = useFetchOneProductQuery(id)
     const getOneProduct = dataOneProduct?.data
-
-    const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+    const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
     const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
+    const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+
     useEffect(() => {
       if (getCategoryById) {
-        dispatch(listProductRelated(getCategoryById.products))
+        dispatch(listProductRelated(getCategoryById?.products))
       }
     }, [getCategoryById])
     useEffect(() => {
-      if (listProductDetail) {
-        dispatch(listProductDetailSlice(listProductDetail))
+      if (listProductDetailApi) {
+        dispatch(listProductDetailSlice(listProductDetailApi))
       }
     }, [isSuccessProductDetail])
-    const handleProductDetail = (id: string) => {
-      console.log(id);
+    // lay ra mau [0]
+    useEffect(() => {
+      if (productDetailState && getOneProduct) {
+        const firstColor = productDetailState?.filter((pro) => pro.product_id === getOneProduct._id).map((colors) => colors.nameColor)
+        localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
+      }
+    }, [productDetailState, getOneProduct])
+    const handleProductDetail = async (name: string) => {
+      try {
+        if (listProductDetailApi) {
+          await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: listProductDetailApi }))
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
-
+    const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
+    useEffect(() => {
+      if (productDetailFilterState.length === 0 && listProductDetailApi) {
+        if (getFirstColor) {
+          dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
+        }
+      }
+    }, [listProductDetailApi, getFirstColor])
+    const navigate = useNavigate()
+    useEffect(() => {
+      localStorage.removeItem("firstColor")
+    }, [navigate])
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
         <div className="flex gap-x-7 mb-10">
@@ -249,7 +275,7 @@ const ProductInfo = () => {
             {/* anh to */}
             <div className="product-detail-thumbnail w-[433px] mb-[10px]">
               <Swiper
-                modules={[Navigation, Autoplay]}
+                modules={[Navigation]}
                 grabCursor={"true"}
                 spaceBetween={30}
                 slidesPerView={"auto"}
@@ -269,7 +295,7 @@ const ProductInfo = () => {
                     />
                   </div>
                 </SwiperSlide>
-                {[...new Set(productDetailState.filter((pro) => pro.product_id === getOneProduct?._id).flatMap((i) => i.imageColor))].map((url, index) => {
+                {[...new Set(productDetailState?.filter((pro) => pro.product_id === getOneProduct?._id).flatMap((i) => i.imageColor))].map((url, index) => {
                   return <>
                     <SwiperSlide key={index}>
                       <div className="">
@@ -285,7 +311,7 @@ const ProductInfo = () => {
               </Swiper>
             </div>
             {/* anh nho? */}
-            {getOneProduct?.images.map((item, index) => {
+            {getOneProduct?.images?.map((item, index) => {
               return <div className="flex ml-[-8px]" key={index}>
                 <img
                   src={item}
@@ -335,34 +361,12 @@ const ProductInfo = () => {
                     -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
                   </span> : ""}
                 </div>
-                {/* <div className="flex items-center gap-x-[75.71px] py-4 mb-2">
-                  <span className="text-sm font-bold">Màu sắc:</span>
-                  <select
-                    id="countries"
-                    className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
-                  >
-                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
-                      return <option value={nameColor}>{nameColor}</option>
-                    })}
-                  </select>
-                </div>
-                <div className="flex items-center gap-x-[60.81px] py-4 mb-2">
-                  <span className="text-sm font-bold">Kích thước:</span>
-                  <select
-                    id="countries"
-                    className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
-                  >
-                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.size))].map((size) => {
-                      return <option value={size}>{size}</option>
-                    })}
-                  </select>
-                </div> */}
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                   <div className="flex">
                     {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
                       return <div className="mx-1">
-                        <input type="radio" id={nameColor} name="color" value={nameColor} className="hidden peer" />
+                        <input onClick={() => handleProductDetail(nameColor)} type="radio" id={nameColor} name="color" value={nameColor} className="hidden peer" />
                         <label htmlFor={nameColor}
                           className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                         >
@@ -371,13 +375,11 @@ const ProductInfo = () => {
                       </div>
                     })}
                   </div>
-
-
                 </div>
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Kích thước</div>
                   <div className="flex">
-                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.size))].map((size) => {
+                    {[...new Set(productDetailFilterState.map((item) => item.size))].map((size) => {
                       return <div className="mx-1">
                         <input type="radio" id={size} name="size" value={size} className="hidden peer" />
                         <label htmlFor={size}

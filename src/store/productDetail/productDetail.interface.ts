@@ -5,7 +5,14 @@ export interface IProductDetail {
     size: string
     sold: number
     imageColor: string
+    quantity: number
 }
 export interface IProductDetailState {
+    productDetails: IProductDetail[]
+}
+
+export interface IProductDetailFilterState {
+    _id: string,
+    nameTerm: string
     productDetails: IProductDetail[]
 }
