@@ -69,7 +69,7 @@ const Sale = () => {
                   </div>
                   <div>
                     {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                      {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
+                      -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
                     </span> : ""}
                   </div>
                   <Link to="" className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all">

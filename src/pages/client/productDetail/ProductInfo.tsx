@@ -223,9 +223,9 @@ const ProductInfo = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: dataOneProduct } = useFetchOneProductQuery(id)
     const getOneProduct = dataOneProduct?.data
+
     const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
-
     const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
     useEffect(() => {
@@ -238,12 +238,15 @@ const ProductInfo = () => {
         dispatch(listProductDetailSlice(listProductDetail))
       }
     }, [isSuccessProductDetail])
-
+    const handleProductDetail = (id: string) => {
+      console.log(id);
+    }
 
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
         <div className="flex gap-x-7 mb-10">
           <div className="w-[433px]">
+            {/* anh to */}
             <div className="product-detail-thumbnail w-[433px] mb-[10px]">
               <Swiper
                 modules={[Navigation, Autoplay]}
@@ -253,50 +256,53 @@ const ProductInfo = () => {
                 navigation={true}
                 autoplay={{ delay: 3000 }}
               >
+                {/* {getOneProduct?.images.map((item, index) => {
+                  return <div key={index}>
+                  </div>
+                })} */}
                 <SwiperSlide>
                   <div className="">
                     <img
-                      src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
+                      src={getOneProduct?.images?.[0]}
                       className="h-[555px] object-cover"
                       alt=""
                     />
                   </div>
                 </SwiperSlide>
+                {[...new Set(productDetailState.filter((pro) => pro.product_id === getOneProduct?._id).flatMap((i) => i.imageColor))].map((url, index) => {
+                  return <>
+                    <SwiperSlide key={index}>
+                      <div className="">
+                        <img
+                          src={url}
+                          className="h-[555px] object-cover"
+                          alt=""
+                        />
+                      </div>
+                    </SwiperSlide>
+                  </>
+                })}
               </Swiper>
             </div>
-            {/* list anh */}
-            <div className="flex justify-between">
-              <img
-                src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-                alt=""
-                className="w-[61.83px] h-[79.13px]"
-              />
-              <img
-                src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-                alt=""
-                className="w-[61.83px] h-[79.13px]"
-              />
-              <img
-                src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-                alt=""
-                className="w-[61.83px] h-[79.13px]"
-              />
-              <img
-                src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-                alt=""
-                className="w-[61.83px] h-[79.13px]"
-              />
-              <img
-                src="/images/img-product/esta010-1_ad9f734ad81a4f339a557960d10dd7f5_master.png"
-                alt=""
-                className="w-[61.83px] h-[79.13px]"
-              />
-              <img
-                src="/images/img-product/esta010-2_8a537af4aa4444c0aa99eeaca96547da_master.png"
-                alt=""
-                className="w-[61.83px] h-[79.13px]"
-              />
-            </div>
+            {/* anh nho? */}
+            {getOneProduct?.images.map((item, index) => {
+              return <div className="flex ml-[-8px]" key={index}>
+                <img
+                  src={item}
+                  className="w-[61.83px] h-[79.13px] cursor-pointer ml-2"
+                  alt=""
+                />
+                {[...new Set(productDetailState.filter((pro) => pro.product_id === getOneProduct._id).map((i) => i.imageColor))].map((url) => {
+                  return <>
+                    <img
+                      src={url}
+                      className="w-[61.83px] h-[79.13px] ml-2 cursor-pointer"
+                      alt=""
+                    />
+                  </>
+                })}
+              </div>
+            })}
           </div>
           <div className="product-info">
             <div className="mb-10">
@@ -319,19 +325,25 @@ const ProductInfo = () => {
               <div className="px-4">
                 <div className="flex items-center gap-x-[109px] py-4 mb-2">
                   <span className="text-sm font-bold">Giá:</span>
-                  <span className="font-bold text-xl text-[#FF2C26]">
-                    {getOneProduct?.discount.toLocaleString("vi-VN")}đ
-                  </span>
+                  <div className="font-bold text-xl text-[#FF2C26]">
+                    {getOneProduct?.discount?.toLocaleString("vi-VN")}đ
+                    <del className="font-bold text-sm text-[#ccc] ml-2">
+                      {getOneProduct?.price?.toLocaleString("vi-VN")}đ
+                    </del>
+                  </div>
+                  {getOneProduct && getOneProduct?.price > getOneProduct?.discount ? <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
+                    -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
+                  </span> : ""}
                 </div>
-                <div className="flex items-center gap-x-[75.71px] py-4 mb-2">
+                {/* <div className="flex items-center gap-x-[75.71px] py-4 mb-2">
                   <span className="text-sm font-bold">Màu sắc:</span>
                   <select
                     id="countries"
                     className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
                   >
-                    <option value="Xanh navy">Xanh navy</option>
-                    <option selected>Chọn màu</option>
-                    <option value="Trắng - kem đậm">Trắng - kem đậm</option>
+                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
+                      return <option value={nameColor}>{nameColor}</option>
+                    })}
                   </select>
                 </div>
                 <div className="flex items-center gap-x-[60.81px] py-4 mb-2">
@@ -340,12 +352,42 @@ const ProductInfo = () => {
                     id="countries"
                     className="bg-gray-50 outline-none border border-gray-300 text-gray-900 w-2/4 text-sm rounded block p-2.5"
                   >
-                    <option selected>Chọn size</option>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="XL">XL</option>
+                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.size))].map((size) => {
+                      return <option value={size}>{size}</option>
+                    })}
                   </select>
+                </div> */}
+                <div className="flex my-6">
+                  <div className="w-[13%] text-sm font-bold">Màu sắc</div>
+                  <div className="flex">
+                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
+                      return <div className="mx-1">
+                        <input type="radio" id={nameColor} name="color" value={nameColor} className="hidden peer" />
+                        <label htmlFor={nameColor}
+                          className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                          {nameColor}
+                        </label>
+                      </div>
+                    })}
+                  </div>
+
+
+                </div>
+                <div className="flex my-6">
+                  <div className="w-[13%] text-sm font-bold">Kích thước</div>
+                  <div className="flex">
+                    {[...new Set(productDetailState.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.size))].map((size) => {
+                      return <div className="mx-1">
+                        <input type="radio" id={size} name="size" value={size} className="hidden peer" />
+                        <label htmlFor={size}
+                          className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        >
+                          {size}
+                        </label>
+                      </div>
+                    })}
+                  </div>
                 </div>
                 <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
                   <span className="text-sm font-bold">Số lượng:</span>

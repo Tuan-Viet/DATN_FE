@@ -92,7 +92,7 @@ const Product_Collection = () => {
               </div>
               <div>
                 {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
+                  -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
                 </span> : ""}
               </div>
 
