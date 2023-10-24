@@ -12,6 +12,8 @@ import { listProductDetailSlice } from "../../../store/productDetail/productDeta
 const Product_Collection = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
+  console.log(listCategory);
+
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
 
@@ -40,22 +42,12 @@ const Product_Collection = () => {
     if (isSuccessProduct) {
       const getIdCateFirstStore = JSON.parse(localStorage.getItem("firstCategoryId")!)
       if (getIdCateFirstStore) {
-        const listProductFirstCategory = listProduct.filter((product) => product.categoryId === getIdCateFirstStore)
+        const listProductFirstCategory = listProduct.filter((product) => product.categoryId?._id === getIdCateFirstStore)
         dispatch(listProductFilterSlice(listProductFirstCategory))
       }
     }
   }, [isSuccessProduct])
-  // useEffect(() => {
-  //   const newSize = []
-  //   productFilterState.map((product) => {
-  //     productDetailState.map((item) => {
-  //       {
-  //         item.product_id === product._id ?
-  //           console.log(item.size) : console.log(0)
-  //       }
-  //     })
-  //   })
-  // }, [productDetailState, productFilterState])
+
   return (
     <div className="py-[60px] mb-[60px]">
       <div className="max-w-[1500px] mx-auto">
@@ -70,13 +62,13 @@ const Product_Collection = () => {
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <div key={index} className="relative group w-[280px] cursor-pointer">
               <button type="submit">
-                <Link to={`/products/${product._id}`}>
+                <a href={`/products/${product._id}`}>
                   <img
                     src={`${product?.images?.[0]}`}
                     className="mx-auto h-[360px] w-full"
                     alt=""
                   />
-                </Link>
+                </a>
               </button>
               <div className="product-info p-[8px] bg-white">
                 <div className="text-sm flex justify-between mb-3">
@@ -102,7 +94,7 @@ const Product_Collection = () => {
               </div>
               <div>
                 {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
+                  -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
                 </span> : ""}
               </div>
 

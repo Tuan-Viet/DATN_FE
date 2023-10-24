@@ -90,7 +90,6 @@ const productAdd = () => {
                 if (variant.imageColor) {
                     if (variant.imageColor.fileList && variant.imageColor.fileList.length === 1) {
                         variant.imageColor = variant.imageColor.fileList[0].response[0].url;
-                        console.log("Image :", variant.imageColor);
                     }
                 }
             });

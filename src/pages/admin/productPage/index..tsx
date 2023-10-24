@@ -120,7 +120,9 @@ const productPage = () => {
             dataIndex: 'categoryId',
             key: 'categoryId',
             render: (cateId: any) => {
-                const category = categoryState.find((cate) => cate._id === cateId);
+                const category = categoryState.find((cate) => cate._id === cateId._id);
+                console.log(category);
+
                 return category ? category.name : 'N/A';
             },
             className: 'w-[150px]',

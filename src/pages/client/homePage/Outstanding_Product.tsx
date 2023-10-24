@@ -34,13 +34,13 @@ const Outstanding_Product = () => {
       <div className="outstanding-product mb-12 flex gap-x-[25px] flex-wrap gap-y-[30px]">
         {productOutStandState?.map((product, index) => {
           return <div key={index} className="relative group w-[280px] border border-[#000]">
-            <Link to="">
+            <a href={`/products/${product._id}`}>
               <img
                 src={product.images?.[0]}
                 className="mx-auto h-[360px] w-full"
                 alt=""
               />
-            </Link>
+            </a>
             <div className="product-info p-[8px] bg-white">
               <div className="text-sm flex justify-between mb-3">
                 <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
@@ -62,9 +62,11 @@ const Outstanding_Product = () => {
                 </div>
               </div>
             </div>
-            <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-              -40%
-            </span>
+            <div>
+              {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
+              </span> : ""}
+            </div>
             <Link
               to=""
               className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
