@@ -19,6 +19,7 @@ export interface IProduct {
     deleted: boolean;
 }
 
+
 interface IVariants {
     imageColor: string
     nameColor: string

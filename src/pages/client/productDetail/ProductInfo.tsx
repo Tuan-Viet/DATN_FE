@@ -12,218 +12,217 @@ import { listProductRelated, listProductRelatedSlice } from "../../../store/prod
 import axios from "axios";
 
 const ProductInfo = () => {
-  const [quantity, setQuantity] = useState(1);
-  const [currentTab, setCurrentTab] = useState(1);
-  const renderContent = () => {
-    switch (currentTab) {
-      case 1:
-        return (
-          <div className="mb-[40px]">
-            <p>
-              Áo tanktop nam cá tính, năng động mặc cực thoải mái. Mẫu áo ba lỗ
-              nam trẻ trung với 2 màu dễ mặc.
-            </p>
-          </div>
-        );
-      case 2:
-        return <div className="mb-[40px]">Nội dung của tab 2</div>;
-      case 3:
-        return (
-          <div className="text-sm mb-[40px]">
-            <p className="font-bold mb-3">1. CHÍNH SÁCH ÁP DỤNG</p>
-            <p className="mb-3 ">Áp dụng từ ngày 01/09/2018.</p>
-            <p className="mb-3 ">
-              Trong vòng 07 ngày kể từ ngày mua sản phẩm với các sản phẩm
-              HUSTLE.
-            </p>
-            <p className="mb-3 ">
-              Áp dụng đối với sản phẩm nguyên giá và sản phẩm giảm giá ít hơn
-              50%.
-            </p>
-            <p className="mb-3 ">
-              Sản phẩm nguyên giá chỉ được đổi 01 lần duy nhất sang sản phẩm
-              nguyên giá khác và không thấp hơn giá trị sản phẩm đã mua.
-            </p>
-            <p className="mb-3 ">
-              Sản phẩm giảm giá/khuyến mại ít hơn 50% được đổi 01 lần sang màu
-              khác hoặc size khác trên cùng 1 mã trong điều kiện còn sản phẩm
-              hoặc theo quy chế chương trình (nếu có). Nếu sản phẩm đổi đã hết
-              hàng khi đó KH sẽ được đổi sang sản phẩm khác có giá trị ngang
-              bằng hoặc cao hơn. Khách hàng sẽ thanh toán phần tiền chênh lệch
-              nếu sản phẩm đổi có giá trị cao hơn sản phẩm đã mua.
-            </p>
-            <p className="mb-3 ">
-              Chính sách chỉ áp dụng khi sản phẩm còn hóa đơn mua hàng, còn
-              nguyên nhãn mác, thẻ bài đính kèm sản phẩm và sản phẩm không bị dơ
-              bẩn, hư hỏng bởi những tác nhân bên ngoài cửa hàng sau khi mua sản
-              phẩm.
-            </p>
-            <p className="mb-3 ">
-              Sản phẩm đồ lót và phụ kiện không được đổi trả.
-            </p>
-            <p className="font-bold mb-3 ">2. ĐIỀU KIỆN ĐỔI SẢN PHẨM</p>
-            <p className="mb-3 ">
-              Đổi hàng trong vòng 07 ngày kể từ ngày khách hàng nhận được sản
-              phẩm.
-            </p>
-            <p className="mb-3 ">
-              Sản phẩm còn nguyên tem, mác và chưa qua sử dụng.
-            </p>
-            <p className="font-bold mb-3 ">3. THỰC HIỆN ĐỔI SẢN PHẨM</p>
-            <p className="mb-3 ">
-              Quý khách có thể đổi hàng Online tại hệ thống cửa hàng và đại lý
-              HUSTLE trên toàn quốc . Lưu ý: vui lòng mang theo sản phẩm và
-              phiếu giao hàng.
-            </p>
-            <p className="mb-3 ">
-              Nếu tại khu vực bạn không có cửa hàng HUSTLE hoặc sản phẩm bạn
-              muốn đổi thì vui lòng làm theo các bước sau:
-            </p>
-            <p className="mb-3 ">
-              Bước 1: Gọi đến Tổng đài: 0931733469 các ngày trong tuần (trừ ngày
-              lễ), cung cấp mã đơn hàng và mã sản phẩm cần đổi.
-            </p>
-            <p className="mb-3 ">
-              Bước 2: Vui lòng gửi hàng đổi về địa chỉ : Kho Online HUSTLE -
-              1165 Giải Phóng, Thịnh Liệt, Q. Hoàng Mai, Hà Nội.
-            </p>
-            <p className="mb-3 ">
-              Bước 3: HUSTLE gửi đổi sản phẩm mới khi nhận được hàng. Trong
-              trường hợp hết hàng, HUSTLE sẽ liên hệ xác nhận.
-            </p>
-          </div>
-        );
-      case 4:
-        return (
-          <div className="mb-[40px]">
-            <h2 className="font-bold text-3xl mb-3">
-              BẢO MẬT THÔNG TIN KHÁCH HÀNG HUSTLE
-            </h2>
-            <div className="text-sm">
-              <p className="font-bold mb-3 ">
-                1. Thu thập và sử dụng thông tin của TORANO
-              </p>
-              <p className="mb-3 ">
-                TORANO chỉ thu thập các loại thông tin cơ bản liên quan đến đơn
-                đặt hàng gồm:……
-              </p>
-              <p className="mb-3 ">
-                Các thông tin này được sử dụng nhằm mục đích xử lý đơn hàng,
-                nâng cao chất lượng dịch vụ, nghiên cứu thị trường, các hoạt
-                động marketing, chăm sóc khách hàng, quản lý nội bộ hoặc theo
-                yêu cầu của pháp luật. Khách hàng tùy từng thời điểm có thể
-                chỉnh sửa lại các thông tin đã cung cấp để đảm bảo được hưởng
-                đầy đủ các quyền mà TORANO dành cho Khách hàng của mình.
-              </p>
-              <p className="mb-3 ">TORANO cam kết:</p>
-              <p className="mb-3 ">
-                Thông tin cá nhân của khách hàng được sử dụng đúng vào mục đích
-                của việc thu thập và cung cấp;
-              </p>
-              <p className="mb-3 ">
-                Mọi việc thu thập và sử dụng thông tin đã thu thập được của
-                Khách hàng đều được thông qua ý kiến của Khách hàng
-              </p>
-              <p className="mb-3 ">
-                Chỉ sử dụng các thông tin được Khách hàng đã cung cấp cho
-                TORANO, không sử dụng các thông tin của Khách hàng được biết đến
-                theo các phương thức khác;
-              </p>
-              <p className="mb-3 ">Thời gian lưu trữ và bảo mật thông tin:</p>
-              <p className="mb-3 ">
-                Chỉ cho phép các đối tượng sau được tiếp cận với thông tin của
-                Khách hàng:
-              </p>
-              <p className="mb-3 ">
-                Người thực hiện việc cung cấp hàng hóa, dịch vụ từ TORANO theo
-                yêu cầu của Khách hàng;
-              </p>
-              <p className="mb-3 ">
-                Người thực hiện việc chăm sóc Khách hàng đã sử dụng hàng hóa,
-                dịch vụ của TORANO;
-              </p>
-              <p className="mb-3 ">
-                Người tiếp nhận và xử lý các thắc mắc của Khách hàng trong quá
-                trình sử dụng hàng hóa, dịch vụ của TORANO;
-              </p>
-              <p className="mb-3 ">Cơ quan Nhà nước có thẩm quyền</p>
-              <p className="mb-3 ">
-                Trong quá trình chào hàng, quảng cáo và chăm sóc Khách hàng,
-                Khách hàng hoàn toàn có thể gửi yêu cầu dừng việc sử dụng thông
-                tin theo cách thức tương ứng mà hoạt động chào hàng, quảng cáo
-                và chăm sóc khách hàng gửi tới Khách hàng.
-              </p>
-              <p className="font-bold mb-3 ">
-                2. Cách thức bảo mật thông tin khách hàng:
-              </p>
-              <p className="mb-3 ">
-                Việc bảo mật các thông tin do Khách hàng cung cấp được dựa trên
-                sự đảm bảo việc tuân thủ của từng cán bộ, nhân viên TORANO, đối
-                tác và hệ thống lưu trữ dữ liệu. Trong trường hợp máy chủ lưu
-                trữ thông tin bị hacker tấn công dẫn đến mất mát dữ liệu cá nhân
-                Khách hàng, TORANO sẽ có trách nhiệm thông báo vụ việc cho cơ
-                quan chức năng điều tra xử lý kịp thời và thông báo cho Khách
-                hàng được biết. Tuy nhiên, do đặc điểm của môi trường internet,
-                không một dữ liệu nào trên môi trường mạng cũng có thể được bảo
-                mật 100%. Vì vậy, TORANO không cam kết chắc chắn rằng các thông
-                tin tiếp nhận từ Khách hàng được bảo mật tuyệt đối.
-              </p>
-              <p className="font-bold mb-3 ">
-                3. Trách nhiệm bảo mật thông tin Khách hàng
-              </p>
-              <p className="mb-3 ">
-                Khách hàng vui lòng chỉ cung cấp đúng và đủ các thông tin theo
-                yêu cầu của TORANO đặc biệt tránh cung cấp các thông tin liên
-                quan đến tài khoản ngân hàng khi chưa được mã hóa thông tin
-                trong các giao dịch thanh toán trực tuyến hoặc các thông tin
-                nhạy cảm khác. Khách hàng hoàn toàn chịu trách nhiệm về tính
-                trung thực và chính xác đối với các thông tin đã cung cấp cũng
-                như tự chịu trách nhiệm nếu cung cấp các thông tin ngoài yêu
-                cầu.
-              </p>
-              <p className="mb-3 ">
-                Trong trường hợp Khách hàng cung cấp thông tin cá nhân của mình
-                cho nhiều tổ chức, cá nhân khác nhau, Khách hàng phải yêu cầu
-                các bên liên quan cùng bảo mật. Mọi thông tin cá nhân của Khách
-                hàng khi bị tiết lộ gây thiệt hại đến Khách hàng, Khách hàng
-                phải tự xác định được nguồn tiết lộ thông tin. TORANO không chịu
-                trách nhiệm khi thông tin Khách hàng bị tiết lộ mà không có căn
-                cứ xác đáng thể hiện TORANO là bên tiết lộ thông tin.
-              </p>
-              <p className="mb-3 ">
-                TORANO không chịu trách nhiệm về việc tiết lộ thông tin của
-                Khách hàng nếu Khách hàng không tuân thủ các yêu cầu trên.
-              </p>
-              <p className="font-bold mb-3 ">
-                4. Luật áp dụng khi xảy ra tranh chấp
-              </p>
-              <p className="mb-3 ">
-                Mọi tranh chấp xảy ra giữa Khách hàng và TORANO sẽ được hòa
-                giải. Nếu hòa giải không thành sẽ được giải quyết tại Tòa án có
-                thẩm quyền và tuân theo pháp luật Việt Nam.
-              </p>
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-  const increaseQuantity = () => {
-    setQuantity(quantity + 1);
-  };
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
   // fetch ProductDetail
   const { id } = useParams()
   if (id) {
+    const [quantity, setQuantity] = useState(1);
+    const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
-    const { data: dataOneProduct } = useFetchOneProductQuery(id)
-    const getOneProduct = dataOneProduct?.data
+    const { data: getOneProduct } = useFetchOneProductQuery(id)
+    const renderContent = () => {
+      switch (currentTab) {
+        case 1:
+          return (
+            <div className="mb-[40px]">
+              <p>
+                {getOneProduct?.description}
+              </p>
+            </div>
+          );
+        case 2:
+          return <div className="mb-[40px]">Nội dung của tab 2</div>;
+        case 3:
+          return (
+            <div className="text-sm mb-[40px]">
+              <p className="font-bold mb-3">1. CHÍNH SÁCH ÁP DỤNG</p>
+              <p className="mb-3 ">Áp dụng từ ngày 01/09/2018.</p>
+              <p className="mb-3 ">
+                Trong vòng 07 ngày kể từ ngày mua sản phẩm với các sản phẩm
+                HUSTLE.
+              </p>
+              <p className="mb-3 ">
+                Áp dụng đối với sản phẩm nguyên giá và sản phẩm giảm giá ít hơn
+                50%.
+              </p>
+              <p className="mb-3 ">
+                Sản phẩm nguyên giá chỉ được đổi 01 lần duy nhất sang sản phẩm
+                nguyên giá khác và không thấp hơn giá trị sản phẩm đã mua.
+              </p>
+              <p className="mb-3 ">
+                Sản phẩm giảm giá/khuyến mại ít hơn 50% được đổi 01 lần sang màu
+                khác hoặc size khác trên cùng 1 mã trong điều kiện còn sản phẩm
+                hoặc theo quy chế chương trình (nếu có). Nếu sản phẩm đổi đã hết
+                hàng khi đó KH sẽ được đổi sang sản phẩm khác có giá trị ngang
+                bằng hoặc cao hơn. Khách hàng sẽ thanh toán phần tiền chênh lệch
+                nếu sản phẩm đổi có giá trị cao hơn sản phẩm đã mua.
+              </p>
+              <p className="mb-3 ">
+                Chính sách chỉ áp dụng khi sản phẩm còn hóa đơn mua hàng, còn
+                nguyên nhãn mác, thẻ bài đính kèm sản phẩm và sản phẩm không bị dơ
+                bẩn, hư hỏng bởi những tác nhân bên ngoài cửa hàng sau khi mua sản
+                phẩm.
+              </p>
+              <p className="mb-3 ">
+                Sản phẩm đồ lót và phụ kiện không được đổi trả.
+              </p>
+              <p className="font-bold mb-3 ">2. ĐIỀU KIỆN ĐỔI SẢN PHẨM</p>
+              <p className="mb-3 ">
+                Đổi hàng trong vòng 07 ngày kể từ ngày khách hàng nhận được sản
+                phẩm.
+              </p>
+              <p className="mb-3 ">
+                Sản phẩm còn nguyên tem, mác và chưa qua sử dụng.
+              </p>
+              <p className="font-bold mb-3 ">3. THỰC HIỆN ĐỔI SẢN PHẨM</p>
+              <p className="mb-3 ">
+                Quý khách có thể đổi hàng Online tại hệ thống cửa hàng và đại lý
+                HUSTLE trên toàn quốc . Lưu ý: vui lòng mang theo sản phẩm và
+                phiếu giao hàng.
+              </p>
+              <p className="mb-3 ">
+                Nếu tại khu vực bạn không có cửa hàng HUSTLE hoặc sản phẩm bạn
+                muốn đổi thì vui lòng làm theo các bước sau:
+              </p>
+              <p className="mb-3 ">
+                Bước 1: Gọi đến Tổng đài: 0931733469 các ngày trong tuần (trừ ngày
+                lễ), cung cấp mã đơn hàng và mã sản phẩm cần đổi.
+              </p>
+              <p className="mb-3 ">
+                Bước 2: Vui lòng gửi hàng đổi về địa chỉ : Kho Online HUSTLE -
+                1165 Giải Phóng, Thịnh Liệt, Q. Hoàng Mai, Hà Nội.
+              </p>
+              <p className="mb-3 ">
+                Bước 3: HUSTLE gửi đổi sản phẩm mới khi nhận được hàng. Trong
+                trường hợp hết hàng, HUSTLE sẽ liên hệ xác nhận.
+              </p>
+            </div>
+          );
+        case 4:
+          return (
+            <div className="mb-[40px]">
+              <h2 className="font-bold text-3xl mb-3">
+                BẢO MẬT THÔNG TIN KHÁCH HÀNG HUSTLE
+              </h2>
+              <div className="text-sm">
+                <p className="font-bold mb-3 ">
+                  1. Thu thập và sử dụng thông tin của TORANO
+                </p>
+                <p className="mb-3 ">
+                  TORANO chỉ thu thập các loại thông tin cơ bản liên quan đến đơn
+                  đặt hàng gồm:……
+                </p>
+                <p className="mb-3 ">
+                  Các thông tin này được sử dụng nhằm mục đích xử lý đơn hàng,
+                  nâng cao chất lượng dịch vụ, nghiên cứu thị trường, các hoạt
+                  động marketing, chăm sóc khách hàng, quản lý nội bộ hoặc theo
+                  yêu cầu của pháp luật. Khách hàng tùy từng thời điểm có thể
+                  chỉnh sửa lại các thông tin đã cung cấp để đảm bảo được hưởng
+                  đầy đủ các quyền mà TORANO dành cho Khách hàng của mình.
+                </p>
+                <p className="mb-3 ">TORANO cam kết:</p>
+                <p className="mb-3 ">
+                  Thông tin cá nhân của khách hàng được sử dụng đúng vào mục đích
+                  của việc thu thập và cung cấp;
+                </p>
+                <p className="mb-3 ">
+                  Mọi việc thu thập và sử dụng thông tin đã thu thập được của
+                  Khách hàng đều được thông qua ý kiến của Khách hàng
+                </p>
+                <p className="mb-3 ">
+                  Chỉ sử dụng các thông tin được Khách hàng đã cung cấp cho
+                  TORANO, không sử dụng các thông tin của Khách hàng được biết đến
+                  theo các phương thức khác;
+                </p>
+                <p className="mb-3 ">Thời gian lưu trữ và bảo mật thông tin:</p>
+                <p className="mb-3 ">
+                  Chỉ cho phép các đối tượng sau được tiếp cận với thông tin của
+                  Khách hàng:
+                </p>
+                <p className="mb-3 ">
+                  Người thực hiện việc cung cấp hàng hóa, dịch vụ từ TORANO theo
+                  yêu cầu của Khách hàng;
+                </p>
+                <p className="mb-3 ">
+                  Người thực hiện việc chăm sóc Khách hàng đã sử dụng hàng hóa,
+                  dịch vụ của TORANO;
+                </p>
+                <p className="mb-3 ">
+                  Người tiếp nhận và xử lý các thắc mắc của Khách hàng trong quá
+                  trình sử dụng hàng hóa, dịch vụ của TORANO;
+                </p>
+                <p className="mb-3 ">Cơ quan Nhà nước có thẩm quyền</p>
+                <p className="mb-3 ">
+                  Trong quá trình chào hàng, quảng cáo và chăm sóc Khách hàng,
+                  Khách hàng hoàn toàn có thể gửi yêu cầu dừng việc sử dụng thông
+                  tin theo cách thức tương ứng mà hoạt động chào hàng, quảng cáo
+                  và chăm sóc khách hàng gửi tới Khách hàng.
+                </p>
+                <p className="font-bold mb-3 ">
+                  2. Cách thức bảo mật thông tin khách hàng:
+                </p>
+                <p className="mb-3 ">
+                  Việc bảo mật các thông tin do Khách hàng cung cấp được dựa trên
+                  sự đảm bảo việc tuân thủ của từng cán bộ, nhân viên TORANO, đối
+                  tác và hệ thống lưu trữ dữ liệu. Trong trường hợp máy chủ lưu
+                  trữ thông tin bị hacker tấn công dẫn đến mất mát dữ liệu cá nhân
+                  Khách hàng, TORANO sẽ có trách nhiệm thông báo vụ việc cho cơ
+                  quan chức năng điều tra xử lý kịp thời và thông báo cho Khách
+                  hàng được biết. Tuy nhiên, do đặc điểm của môi trường internet,
+                  không một dữ liệu nào trên môi trường mạng cũng có thể được bảo
+                  mật 100%. Vì vậy, TORANO không cam kết chắc chắn rằng các thông
+                  tin tiếp nhận từ Khách hàng được bảo mật tuyệt đối.
+                </p>
+                <p className="font-bold mb-3 ">
+                  3. Trách nhiệm bảo mật thông tin Khách hàng
+                </p>
+                <p className="mb-3 ">
+                  Khách hàng vui lòng chỉ cung cấp đúng và đủ các thông tin theo
+                  yêu cầu của TORANO đặc biệt tránh cung cấp các thông tin liên
+                  quan đến tài khoản ngân hàng khi chưa được mã hóa thông tin
+                  trong các giao dịch thanh toán trực tuyến hoặc các thông tin
+                  nhạy cảm khác. Khách hàng hoàn toàn chịu trách nhiệm về tính
+                  trung thực và chính xác đối với các thông tin đã cung cấp cũng
+                  như tự chịu trách nhiệm nếu cung cấp các thông tin ngoài yêu
+                  cầu.
+                </p>
+                <p className="mb-3 ">
+                  Trong trường hợp Khách hàng cung cấp thông tin cá nhân của mình
+                  cho nhiều tổ chức, cá nhân khác nhau, Khách hàng phải yêu cầu
+                  các bên liên quan cùng bảo mật. Mọi thông tin cá nhân của Khách
+                  hàng khi bị tiết lộ gây thiệt hại đến Khách hàng, Khách hàng
+                  phải tự xác định được nguồn tiết lộ thông tin. TORANO không chịu
+                  trách nhiệm khi thông tin Khách hàng bị tiết lộ mà không có căn
+                  cứ xác đáng thể hiện TORANO là bên tiết lộ thông tin.
+                </p>
+                <p className="mb-3 ">
+                  TORANO không chịu trách nhiệm về việc tiết lộ thông tin của
+                  Khách hàng nếu Khách hàng không tuân thủ các yêu cầu trên.
+                </p>
+                <p className="font-bold mb-3 ">
+                  4. Luật áp dụng khi xảy ra tranh chấp
+                </p>
+                <p className="mb-3 ">
+                  Mọi tranh chấp xảy ra giữa Khách hàng và TORANO sẽ được hòa
+                  giải. Nếu hòa giải không thành sẽ được giải quyết tại Tòa án có
+                  thẩm quyền và tuân theo pháp luật Việt Nam.
+                </p>
+              </div>
+            </div>
+          );
+        default:
+          return null;
+      }
+    };
+    const increaseQuantity = () => {
+      setQuantity(quantity + 1);
+    };
+
+    const decreaseQuantity = () => {
+      if (quantity > 1) {
+        setQuantity(quantity - 1);
+      }
+    };
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
     const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
@@ -318,7 +317,7 @@ const ProductInfo = () => {
                   className="w-[61.83px] h-[79.13px] cursor-pointer ml-2"
                   alt=""
                 />
-                {[...new Set(productDetailState.filter((pro) => pro.product_id === getOneProduct._id).map((i) => i.imageColor))].map((url) => {
+                {[...new Set(productDetailState?.filter((pro) => pro.product_id === getOneProduct._id).map((i) => i.imageColor))].map((url) => {
                   return <>
                     <img
                       src={url}

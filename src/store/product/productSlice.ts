@@ -41,7 +41,7 @@ const productFilterSlice = createSlice({
 
         listProductCategorySlice: (state: IProductFilterState, actions: PayloadAction<IProductFilterState>) => {
             const nameTerm = actions.payload.nameTerm.trim()
-            const listProductFilter = actions.payload?.products?.filter((product) => product.categoryId && product.categoryId.includes(nameTerm))
+            const listProductFilter = actions.payload?.products?.filter((product) => product.categoryId?._id && product.categoryId._id.includes(nameTerm))
             state.products = listProductFilter
         },
     })

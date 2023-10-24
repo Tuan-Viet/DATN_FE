@@ -80,7 +80,6 @@ const productUpdate = () => {
         const [productDetails, setProductDetails] = useState<ProductDetail[]>([]); // State để lưu thông tin sản phẩm chi tiết
 
         // const product = fetchOneProduct?.data
-        console.log(product)
 
         // Sử dụng useEffect để gọi API khi component được render
         useEffect(() => {
@@ -88,7 +87,8 @@ const productUpdate = () => {
                 const promises = product.variants.map((variantId: any) => {
                     return axios
                         .get(` http://localhost:8080/api/productDetails/${variantId}`)
-                        .then((response) => response.data) // Access the 'data' property
+                        .then((response) => response.data
+                        ) // Access the 'data' property
                         .catch((error) => {
                             console.error(`Error fetching product details for variant ${variantId}:`, error);
                             return null;
@@ -103,7 +103,6 @@ const productUpdate = () => {
                     });
             }
         }, [product]);
-        console.log("product deatail: ", productDetails);
 
 
         const variantsMap = new Map();
@@ -129,7 +128,6 @@ const productUpdate = () => {
         // Chuyển dữ liệu từ Map thành mảng variants
         const variants = Array.from(variantsMap.values());
 
-        console.log("variants:", variants);
 
         const [form] = Form.useForm();
         form.setFieldsValue({
@@ -142,7 +140,6 @@ const productUpdate = () => {
             description: product?.description,
             categoryId: product?.categoryId?._id && product?.categoryId._id,
         });
-        console.log("Get product:", product);
 
         const [onUpdate] = useUpdateProductMutation()
 
@@ -190,7 +187,6 @@ const productUpdate = () => {
                         if (variant.imageColor) {
                             if (variant.imageColor.fileList && variant.imageColor.fileList.length === 1) {
                                 variant.imageColor = variant.imageColor.fileList[0].response[0].url;
-                                console.log("Image :", variant.imageColor);
                             }
                         }
                     });
@@ -213,7 +209,6 @@ const productUpdate = () => {
                         }
                     }
                 }
-                console.log(deletedIds);
                 const apiUrl = ' http://localhost:8080/api/productDetails/'; //
                 deletedIds.forEach(async (id) => {
                     try {
@@ -234,7 +229,6 @@ const productUpdate = () => {
 
                 // console.log("Các _id không bị xóa: ", newVariants);
                 const newValues = { ...values, images: updatedImageList };
-                console.log("Values update", newValues);
 
                 await onUpdate({ id, ...newValues })
                     .then(() =>
