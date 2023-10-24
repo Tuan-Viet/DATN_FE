@@ -276,7 +276,7 @@ const ProductInfo = () => {
             <div className="product-detail-thumbnail w-[433px] mb-[10px]">
               <Swiper
                 modules={[Navigation]}
-                grabCursor={"true"}
+                // grabCursor={"true"}
                 spaceBetween={30}
                 slidesPerView={"auto"}
                 navigation={true}
@@ -584,7 +584,7 @@ const ProductInfo = () => {
           <div className="product-related mb-12">
             <Swiper
               modules={[Navigation]}
-              grabCursor={"true"}
+              // grabCursor={"true"}
               spaceBetween={25}
               slidesPerView={"auto"}
               navigation={true}

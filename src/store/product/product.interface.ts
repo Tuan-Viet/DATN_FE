@@ -1,3 +1,5 @@
+import { ICategory } from "../category/category.interface";
+
 export interface IProduct {
     _id?: string;
     title: string;
@@ -8,7 +10,7 @@ export interface IProduct {
     thumnail: string;
     quantity: number;
     variants: IVariants[];
-    categoryId?: string;
+    categoryId?: ICategory;
     // categoryId: {
     //     _id: string;
     // };
