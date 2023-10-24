@@ -19,8 +19,7 @@ const ProductInfo = () => {
     const [quantity, setQuantity] = useState(1);
     const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
-    const { data: dataOneProduct } = useFetchOneProductQuery(id)
-    const getOneProduct = dataOneProduct?.data
+    const { data: getOneProduct } = useFetchOneProductQuery(id)
     const renderContent = () => {
       switch (currentTab) {
         case 1:

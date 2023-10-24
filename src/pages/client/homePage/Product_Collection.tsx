@@ -12,6 +12,8 @@ import { listProductDetailSlice } from "../../../store/productDetail/productDeta
 const Product_Collection = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
+  console.log(listCategory);
+
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
 
@@ -40,7 +42,7 @@ const Product_Collection = () => {
     if (isSuccessProduct) {
       const getIdCateFirstStore = JSON.parse(localStorage.getItem("firstCategoryId")!)
       if (getIdCateFirstStore) {
-        const listProductFirstCategory = listProduct.filter((product) => product.categoryId === getIdCateFirstStore)
+        const listProductFirstCategory = listProduct.filter((product) => product.categoryId?._id === getIdCateFirstStore)
         dispatch(listProductFilterSlice(listProductFirstCategory))
       }
     }

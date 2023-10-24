@@ -1,27 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import IProduct from "./product.interface"
-import { ICategory } from "../category/category.interface";
-export interface IProductData {
-    data: {
-        _id?: string;
-        title: string;
-        price: number;
-        discount: number;
-        description: string;
-        images: any[];
-        thumnail: string;
-        quantity: number;
-        variants: IVariants[];
-        categoryId?: ICategory;
-        createdAt: Date;
-        updatedAt: Date;
-        deleted: boolean;
-    }
-}
-
-export interface IVariants {
-    _id: string
-}
 const productAPI = createApi({
     reducerPath: "products",
     baseQuery: fetchBaseQuery({
@@ -33,7 +11,7 @@ const productAPI = createApi({
             query: () => `/products`,
             providesTags: ["products"]
         }),
-        fetchOneProduct: builer.query<IProductData, string>({
+        fetchOneProduct: builer.query<IProduct, string>({
             query: (id) => `/products/` + id,
             providesTags: ["products"]
         }),
