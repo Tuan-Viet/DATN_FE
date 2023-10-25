@@ -3,7 +3,7 @@ import categoryApi from './category/category.service'
 import productAPI from './product/product.service'
 import categorySlice from './category/categorySlice'
 import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer } from './product/productSlice'
-import productDetailSlice, { productDetailFilterSliceReducer } from './productDetail/productDetailSlice'
+import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdReducer } from './productDetail/productDetailSlice'
 import productDetailAPI from './productDetail/productDetail.service'
 
 
@@ -22,6 +22,7 @@ export const store = configureStore({
         productOutstandReducer: productOutstandReducer,
         productRelatedSliceReducer: productRelatedSliceReducer,
         productDetailFilterSliceReducer: productDetailFilterSliceReducer,
+        productDetailIdReducer: productDetailIdReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware),

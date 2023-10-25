@@ -6,17 +6,32 @@ import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../..
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
+import { getOneIdProductDetailSlice, listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { useFetchOneCategoryQuery } from "../../../store/category/category.service";
 import { listProductRelated, listProductRelatedSlice } from "../../../store/product/productSlice";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { CartSchema, cartForm } from "../../../Schemas/Cart";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { productDetailForm, productDetailSchema } from "../../../Schemas/ProductDetail";
 
 const ProductInfo = () => {
 
   // fetch ProductDetail
   const { id } = useParams()
   if (id) {
+    const {
+      handleSubmit,
+      register,
+      setValue,
+      formState: { errors }
+    } = useForm<productDetailForm>({
+      resolver: yupResolver(productDetailSchema)
+    })
     const [quantity, setQuantity] = useState(1);
+    useEffect(() => {
+      setValue("quantity", quantity)
+    }, [setValue, quantity])
     const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
     const { data: getOneProduct } = useFetchOneProductQuery(id)
@@ -217,7 +232,6 @@ const ProductInfo = () => {
     const increaseQuantity = () => {
       setQuantity(quantity + 1);
     };
-
     const decreaseQuantity = () => {
       if (quantity > 1) {
         setQuantity(quantity - 1);
@@ -226,9 +240,19 @@ const ProductInfo = () => {
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
     const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
-    const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+    const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
+    const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
+    const handleFormProductDetail = async (data: productDetailForm) => {
+      try {
+        if (data && data.nameColor) {
+          await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
 
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
     useEffect(() => {
       if (getCategoryById) {
         dispatch(listProductRelated(getCategoryById?.products))
@@ -246,7 +270,9 @@ const ProductInfo = () => {
         localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
       }
     }, [productDetailState, getOneProduct])
-    const handleProductDetail = async (name: string) => {
+    const handleColorProductDetail = async (name: string) => {
+      setValue("product_id", id)
+      setValue("nameColor", name)
       try {
         if (listProductDetailApi) {
           await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: listProductDetailApi }))
@@ -267,9 +293,11 @@ const ProductInfo = () => {
     useEffect(() => {
       localStorage.removeItem("firstColor")
     }, [navigate])
+    // cart
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
         <div className="flex gap-x-7 mb-10">
+
           <div className="w-[433px]">
             {/* anh to */}
             <div className="product-detail-thumbnail w-[433px] mb-[10px]">
@@ -346,7 +374,8 @@ const ProductInfo = () => {
                 </span>
               </div>
             </div>
-            <form>
+            {/* form */}
+            <form onSubmit={handleSubmit(handleFormProductDetail)}>
               <div className="px-4">
                 <div className="flex items-center gap-x-[109px] py-4 mb-2">
                   <span className="text-sm font-bold">Giá:</span>
@@ -360,12 +389,16 @@ const ProductInfo = () => {
                     -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
                   </span> : ""}
                 </div>
+                <div>{errors ? errors.product_id?.message : "0"}</div>
+                <div>{errors ? errors.nameColor?.message : "0"}</div>
+                <div>{errors ? errors.size?.message : "0"}</div>
+                <div>{errors ? errors.quantity?.message : "0"}</div>
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                   <div className="flex">
                     {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
                       return <div className="mx-1">
-                        <input onClick={() => handleProductDetail(nameColor)} type="radio" id={nameColor} name="color" value={nameColor} className="hidden peer" />
+                        <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
                         <label htmlFor={nameColor}
                           className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                         >
@@ -376,22 +409,13 @@ const ProductInfo = () => {
                   </div>
                 </div>
                 <div className="flex my-6">
+                  {/* size */}
                   <div className="w-[13%] text-sm font-bold">Kích thước</div>
                   <div className="flex">
-                    {/* {[...new Set(productDetailFilterState?.map((item) => item.size))].map((size) => {
-                      return <div className="mx-1">
-                        <input type="radio" id={size} name="size" value={size} className="hidden peer" />
-                        <label htmlFor={size}
-                          className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
-                          {size}
-                        </label>
-                      </div>
-                    })} */}
                     {productDetailFilterState?.map((item) => {
                       return <>
-                        {item.quantity > 0 ? <div className="mx-1">
-                          <input type="radio" id={item.size} name="item.size" value={item.size} className="hidden peer" />
+                        {item.quantity > 0 ? <div className="mx-1" key={item._id}>
+                          <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
                           <label htmlFor={item.size}
                             className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                           >
@@ -431,6 +455,7 @@ const ProductInfo = () => {
                       <input
                         type="number"
                         id="Quantity"
+                        max={productDetailGetOneId ? productDetailGetOneId[0]?.quantity : ""}
                         value={quantity}
                         className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                       />
@@ -451,9 +476,9 @@ const ProductInfo = () => {
                   <button className="w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
                     Thêm vào giỏ
                   </button>
-                  <button className="w-[336px] border h-[50px] rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all">
+                  <Link to="" className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all">
                     Mua ngay
-                  </button>
+                  </Link>
                 </div>
                 <button className="w-[687px] border h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
                   Click vào đây để nhận ưu đãi
@@ -576,6 +601,7 @@ const ProductInfo = () => {
           </div>
           <div className="mt-[40px]">{renderContent()}</div>
         </div>
+        {/* san pham lien quan */}
         <div>
           <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase">
             Sản phẩm liên quan
@@ -642,9 +668,9 @@ const ProductInfo = () => {
                           d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                         />
                       </svg>
-                      <span className="uppercase text-xs font-semibold">
+                      <button type="button" className="uppercase text-xs font-semibold">
                         Thêm vào giỏ
-                      </span>
+                      </button>
                     </Link>
                   </div>
                 </SwiperSlide>
