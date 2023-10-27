@@ -1,6 +1,16 @@
 import { useEffect } from "react";
 import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
+import { Button, Form, Input, message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+type FormDataType = {
+    fullname: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+};
 
 const signup = () => {
     useEffect(() => {
@@ -51,6 +61,30 @@ const signup = () => {
             buttonSignup?.classList.remove("text-black")
         })
     }, [])
+
+    const [form] = Form.useForm();
+    const navigate = useNavigate();
+
+    const handSubmitSignup = async (data: FormDataType) => {
+        try {
+            await axios.post("http://localhost:8080/api/auth/register", data);
+            message.success("Successfully registered");
+            // navigate("/signin");
+        } catch (error: any) {
+            if (error.response) {
+                const serverErrorMessage = error.response.data.messages;
+                console.log(serverErrorMessage);
+                form.setFields([
+                    {
+                        name: 'email',
+                        errors: ["Email đã tồn tại"],
+                    },
+                ]);
+            } else {
+                console.log(error);
+            }
+        }
+    };
     return <>
         <Header></Header>
         <div className="w-[630px] py-[60px] mx-auto flex flex-col items-center mb-[55px]">
@@ -59,7 +93,91 @@ const signup = () => {
                 <p className="px-[30px] cursor-pointer text-black buttonSignup">Đăng ký</p>
             </div>
             {/* signup */}
-            <form className="w-full formSignup" action="">
+            <Form
+                form={form}
+                onFinish={handSubmitSignup}
+                initialValues={{ residence: ['zhejiang', 'hangzhou', 'xihu'], prefix: '86' }}
+                style={{ maxWidth: 600 }}
+                className="w-full formSignup"
+                scrollToFirstError
+            >
+                <Form.Item
+                    name="fullname"
+                    className="mb-7"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng nhập họ và tên',
+                        },
+                    ]}
+                >
+                    <input type="text" placeholder="Họ và tên của bạn ..." className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 focus:outline-none focus:bg-white " />
+                </Form.Item>
+                <Form.Item
+                    name="email"
+                    className="mb-7"
+                    rules={[
+                        {
+                            type: 'email',
+                            message: 'Email không hợp lệ',
+                        },
+                        {
+                            required: true,
+                            message: 'Vui lòng nhập email',
+                        }
+                    ]}
+                >
+                    <input type="text" placeholder="E-mail" className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 focus:outline-none focus:bg-white " />
+                </Form.Item>
+                <Form.Item
+                    name="password"
+                    className="mb-7"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng nhâp mật khẩu',
+                        },
+                        {
+                            min: 6,
+                            message: 'Mật khẩu tối thiểu 6 kí tự',
+                        },
+                    ]}
+                >
+                    <input type="password" placeholder="Password" className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 focus:outline-none focus:bg-white " />
+                </Form.Item>
+                <Form.Item
+                    name="confirmPassword"
+                    dependencies={['password']}
+                    className="mb-7"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng xác nhận lại mật khẩu',
+                        },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error('Mật khẩu không hớp'));
+                            },
+                        }),
+                    ]}
+                >
+                    <input type="password" placeholder="ConfirmPassword" className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 focus:outline-none focus:bg-white " />
+                </Form.Item>
+                <Form.Item>
+                    <div className="flex mt-5">
+                        <button className="bg-[#333333] px-[28px] py-[12px] text-[#ffffff] rounded-lg uppercase tracking-wide">Đăng Ký</button>
+                        <div className="flex flex-col  ml-[30px]">
+                            <p className="font-thin opacity-60">Bạn đã có tài khoản?</p>
+                            <p className="text-blue-400 italic buttonSignin-2 cursor-pointer opacity-60 hover:opacity-80">Đăng nhập ngay</p>
+                        </div>
+                    </div>
+                </Form.Item>
+
+            </Form>
+            {/* <form className="w-full formSignup" action="">
                 <input type="text" placeholder="Họ và tên của bạn ..." className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white " />
                 <input type="text" placeholder="Email" className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white " />
                 <input type="password" placeholder="Password" className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white " />
@@ -71,7 +189,7 @@ const signup = () => {
                         <p className="text-blue-400 italic buttonSignin-2 cursor-pointer opacity-60 hover:opacity-80">Đăng nhập ngay</p>
                     </div>
                 </div>
-            </form>
+            </form> */}
             {/* signin */}
             <form className="w-full formSignin hidden" action="">
                 <input type="text" placeholder="Vui lòng nhập email của bạn ..." className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white " />

@@ -20,6 +20,7 @@ const ProductInfo = () => {
     const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
     const { data: getOneProduct } = useFetchOneProductQuery(id)
+    console.log(getOneProduct);
     const renderContent = () => {
       switch (currentTab) {
         case 1:
@@ -225,10 +226,11 @@ const ProductInfo = () => {
     };
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
+    console.log(getCategoryById);
+
     const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
     const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
-
     useEffect(() => {
       if (getCategoryById) {
         dispatch(listProductRelated(getCategoryById?.products))
@@ -240,9 +242,11 @@ const ProductInfo = () => {
       }
     }, [isSuccessProductDetail])
     // lay ra mau [0]
+
     useEffect(() => {
       if (productDetailState && getOneProduct) {
-        const firstColor = productDetailState?.filter((pro) => pro.product_id === getOneProduct._id).map((colors) => colors.nameColor)
+        console.log(2);
+        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
         localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
       }
     }, [productDetailState, getOneProduct])
@@ -264,9 +268,9 @@ const ProductInfo = () => {
       }
     }, [listProductDetailApi, getFirstColor])
     const navigate = useNavigate()
-    useEffect(() => {
-      localStorage.removeItem("firstColor")
-    }, [navigate])
+    // useEffect(() => {
+    //   localStorage.removeItem("firstColor")
+    // }, [navigate])
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
         <div className="flex gap-x-7 mb-10">
@@ -281,10 +285,6 @@ const ProductInfo = () => {
                 navigation={true}
                 autoplay={{ delay: 3000 }}
               >
-                {/* {getOneProduct?.images.map((item, index) => {
-                  return <div key={index}>
-                  </div>
-                })} */}
                 <SwiperSlide>
                   <div className="">
                     <img
@@ -378,16 +378,6 @@ const ProductInfo = () => {
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Kích thước</div>
                   <div className="flex">
-                    {/* {[...new Set(productDetailFilterState?.map((item) => item.size))].map((size) => {
-                      return <div className="mx-1">
-                        <input type="radio" id={size} name="size" value={size} className="hidden peer" />
-                        <label htmlFor={size}
-                          className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
-                          {size}
-                        </label>
-                      </div>
-                    })} */}
                     {productDetailFilterState?.map((item) => {
                       return <>
                         {item.quantity > 0 ? <div className="mx-1">
@@ -399,7 +389,6 @@ const ProductInfo = () => {
                           </label>
                         </div> :
                           <div className="mx-1">
-                            {/* <input type="radio" id={item.size} name="item.size" value={item.size} className="hidden peer" /> */}
                             <label
                               className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
                             >
@@ -527,7 +516,7 @@ const ProductInfo = () => {
             </div>
           </div>
         </div>
-        <div>
+        {/* <div>
           <div className="product-tabs flex gap-x-[60px]">
             <div>
               <button
@@ -575,7 +564,7 @@ const ProductInfo = () => {
             </div>
           </div>
           <div className="mt-[40px]">{renderContent()}</div>
-        </div>
+        </div> */}
         <div>
           <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase">
             Sản phẩm liên quan
