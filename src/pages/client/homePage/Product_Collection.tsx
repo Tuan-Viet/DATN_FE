@@ -6,20 +6,27 @@ import { listCategorySlice } from "../../../store/category/categorySlice";
 import { RootState } from "../../../store";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { listProductCategorySlice, listProductFilterSlice, listProductSlice } from "../../../store/product/productSlice";
+import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 
 const Product_Collection = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
+  console.log(listCategory);
+
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
+  const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+
   const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
   const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
-  console.log(productFilterState);
+  const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
 
   const onHandleFilter = (_id: string) => {
     if (_id && listProduct) {
       dispatch(listProductCategorySlice({ nameTerm: _id, products: listProduct }))
     }
   }
+
   useEffect(() => {
     if (isSuccessCategory) {
       dispatch(listCategorySlice(listCategory))
@@ -27,14 +34,20 @@ const Product_Collection = () => {
     }
   }, [isSuccessCategory])
   useEffect(() => {
+    if (isSuccessProductDetail) {
+      dispatch(listProductDetailSlice(listProductDetail))
+    }
+  }, [isSuccessProductDetail])
+  useEffect(() => {
     if (isSuccessProduct) {
       const getIdCateFirstStore = JSON.parse(localStorage.getItem("firstCategoryId")!)
       if (getIdCateFirstStore) {
-        const listProductFirstCategory = listProduct.filter((product) => product.categoryId === getIdCateFirstStore)
+        const listProductFirstCategory = listProduct.filter((product) => product.categoryId?._id === getIdCateFirstStore)
         dispatch(listProductFilterSlice(listProductFirstCategory))
       }
     }
   }, [isSuccessProduct])
+
   return (
     <div className="py-[60px] mb-[60px]">
       <div className="max-w-[1500px] mx-auto">
@@ -48,17 +61,23 @@ const Product_Collection = () => {
         <div className="outstanding-product mb-12 grid grid-cols-5 gap-[10px]">
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <div key={index} className="relative group w-[280px] cursor-pointer">
-              <Link to="">
-                <img
-                  src={`${product?.images?.[0]}`}
-                  className="mx-auto h-[360px] w-full"
-                  alt=""
-                />
-              </Link>
+              <button type="submit">
+                <a href={`/products/${product._id}`}>
+                  <img
+                    src={`${product?.images?.[0]}`}
+                    className="mx-auto h-[360px] w-full"
+                    alt=""
+                  />
+                </a>
+              </button>
               <div className="product-info p-[8px] bg-white">
                 <div className="text-sm flex justify-between mb-3">
-                  <span>+{product?.variants?.length} màu sắc</span>
-                  <span>+{[...new Set(product?.variants?.flatMap(items => items?.items?.map(color => color.size)))]?.length} Kích thước</span>
+                  {/* color */}
+                  <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
+                  {/* size */}
+                  <div className="flex">+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.size))].length : 0}
+                    <p className="ml-1">Kích thước</p>
+                  </div>
                 </div>
                 <Link to="" className="font-medium">
                   {product?.title}
@@ -75,7 +94,7 @@ const Product_Collection = () => {
               </div>
               <div>
                 {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                  {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
+                  -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
                 </span> : ""}
               </div>
 

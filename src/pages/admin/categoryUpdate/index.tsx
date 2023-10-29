@@ -44,8 +44,12 @@ const categoryUpdate = () => {
     const onFinish = async (values: ICategory) => {
         try {
             if (id) {
-                console.log(values);
                 await onUpdate({ id, ...values })
+                console.log(
+                    await onUpdate({ id, ...values })
+
+                );
+
                 message.success(`Update category successfully!`);
                 navigate("/admin/category");
             }

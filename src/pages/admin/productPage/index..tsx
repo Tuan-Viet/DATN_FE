@@ -20,29 +20,39 @@ import { useFetchListProductQuery, useRemoveProductMutation } from '../../../sto
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductFilterSlice, deleteProductSlice, listProductFilterSlice, listProductSearchSlice, listProductSlice } from '../../../store/product/productSlice';
+import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
+import { useForm } from "react-hook-form";
+import { listCategorySlice } from '../../../store/category/categorySlice';
+import { useFetchListCategoryQuery } from '../../../store/category/category.service';
+
 
 const productPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
+    const { handleSubmit } = useForm();
     const [onRemove] = useRemoveProductMutation()
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
+    const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
+    const { data: listCategory } = useFetchListCategoryQuery()
     // const productState = useSelector((state: RootState) => state.productSlice.products)
-    // const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
-    const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
+    const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
-                dispatch(listProductFilterSlice(listProduct))
+                dispatch(listProductSearch(listProduct))
             }
         }
-    }, [isSuccess, search])
+        if (listCategory) {
+            dispatch(listCategorySlice(listCategory));
+        }
+    }, [isSuccess, search, listCategory])
     const handleSearch = () => {
-        if (listProduct)
+        if (listProduct) {
             dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
-
+        }
     }
     if (isError) {
         return <>error</>;
@@ -58,7 +68,7 @@ const productPage = () => {
     const confirm = async (id: string) => {
         try {
             if (id) {
-                await onRemove(id).then(() => dispatch(deleteProductFilterSlice(id)))
+                await onRemove(id).then(() => dispatch(deleteProductSearchSlice(id)))
                 messageApi.open({
                     type: 'success',
                     content: 'Delete product successfully!',
@@ -109,7 +119,13 @@ const productPage = () => {
             title: 'Category',
             dataIndex: 'categoryId',
             key: 'categoryId',
-            render: (cateId: any) => (cateId)
+            render: (cateId: any) => {
+                const category = categoryState.find((cate) => cate._id === cateId._id);
+                console.log(category);
+
+                return category ? category.name : 'N/A';
+            },
+            className: 'w-[150px]',
         },
 
         {
@@ -160,15 +176,15 @@ const productPage = () => {
             </Space>
             <div className="border p-3 rounded-lg min-h-screen bg-white">
                 <div className="pb-6 pt-3">
-                    <form >
+                    <form onSubmit={handleSubmit(handleSearch)}>
                         <input onChange={(e) => setSearch(e.target.value)} type="text" className='border p-2 w-64 outline-none '
                             placeholder="" />
-                        <button type="button" onClick={handleSearch} className='p-2 bg-[#1677ff]'>
+                        <button type="submit" className='p-2 bg-[#1677ff]'>
                             <SearchOutlined className='text-white' />
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={productFilterState} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={productSearchState} pagination={{ pageSize: 20 }} />
             </div>
         </div>
     )
