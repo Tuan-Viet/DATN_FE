@@ -10,6 +10,10 @@ import { useListProductDetailQuery } from "../../../store/productDetail/productD
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { listProductSlice } from "../../../store/product/productSlice";
+import { useForm } from "react-hook-form";
+import { orderForm, orderSchema } from "../../../Schemas/Order";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAddOrderMutation } from "../../../store/order/order.service";
 
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -20,7 +24,7 @@ const CheckoutsPage = () => {
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const [totalCart, setTotalCart] = useState<number>(0)
-
+  const [onAddOrder] = useAddOrderMutation()
   useEffect(() => {
     if (listCart) {
       dispatch(listCartSlice(listCart))
@@ -43,15 +47,38 @@ const CheckoutsPage = () => {
         total += cart.totalMoney
       })
     }
+    setValue("totalMoney", total)
     setTotalCart(total)
   }, [cartState])
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<orderForm>({
+    resolver: yupResolver(orderSchema)
+  })
+  useEffect(() => {
+    setValue("status", 1)
+    setValue("pay_method", 1)
+  }, [setValue])
+  const onSubmitOrder = async (data: orderForm) => {
+    try {
+      await onAddOrder(data)
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <>
       <Header></Header>
       <div className="container-2">
-        <form className="flex gap-[28px]">
-          <div className="">
+        <p>{errors.carts?.[0]?.productDetailId?.message}</p>
+        <p>{errors.carts?.[0]?.color?.message}</p>
+        <p>{errors.carts?.[0]?.size?.message}</p>
 
+        <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px]">
+          <div className="">
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
                 <div className="mb-3">
@@ -71,42 +98,49 @@ const CheckoutsPage = () => {
                 <div>
                   <div className="mb-3">
                     <input
+                      {...register("email")}
                       type="email"
                       id="email"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Email"
-                      required
                     />
+                    <p className="text-red-500 italic text-sm">{errors ? errors.email?.message : ""}</p>
                   </div>
                   <div className="mb-3">
                     <input
+                      {...register("fullName")}
                       type="text"
                       id="fullName"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Họ và tên"
-                      required
                     />
+                    <p className="text-red-500 italic text-sm">{errors ? errors.fullName?.message : ""}</p>
+
                   </div>
                   <div className="mb-3">
                     <input
+                      {...register("phoneNumber")}
                       type="text"
                       id="phoneNumber"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Số điện thoại"
-                      required
                     />
+                    <p className="text-red-500 italic text-sm">{errors ? errors.phoneNumber?.message : ""}</p>
+
                   </div>
                   <div className="mb-3">
                     <input
+                      {...register("address")}
                       type="text"
                       id="address"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Địa chỉ"
-                      required
                     />
+                    <p className="text-red-500 italic text-sm">{errors ? errors.address?.message : ""}</p>
                   </div>
                   <div className="mb-3">
                     <textarea
+                      {...register("note")}
                       id="note"
                       rows={4}
                       className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary focus:border-primary"
@@ -193,10 +227,16 @@ const CheckoutsPage = () => {
             <div className="pt-7 border-t-[1px] border-b-[1px] h-[430px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
                 return <div key={index}>
+                  <input type="text" value={cart.productDetailId} className="hidden" {...register(`carts.0.productDetailId`)} />
+                  <input type="number" value={cart.quantity} className="hidden" {...register("carts.0.quantity")} />
                   {
                     productDetailState?.filter((proDetail, index) => proDetail?._id === cart?.productDetailId).map((item) => {
                       return <div key={index}>
+                        <input type="text" value={item.nameColor} className="hidden" {...register("carts.0.color")} />
+                        <input type="text" value={item.size} className="hidden" {...register("carts.0.size")} />
+                        <input type="text" value={totalCart} className="hidden" {...register("carts.0.totalMoney")} />
                         {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
+                          <input type="text" value={pro.price} className="hidden" {...register("carts.0.price")} />
                           return <div className="mb-6 flex relative gap-x-20">
                             <div className="border rounded-lg relative w-[125px] h-[185px]">
                               <img

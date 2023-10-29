@@ -16,7 +16,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { productDetailForm, productDetailSchema } from "../../../Schemas/ProductDetail";
 import { addCartLocalSlice, addCartSlice } from "../../../store/cart/cartSlice";
 import { useAddCartMutation } from "../../../store/cart/cart.service";
-
+import {
+  Breadcrumb,
+  Button,
+  Form,
+  Input,
+  Space,
+  message,
+} from 'antd';
 const ProductInfo = () => {
 
   // fetch ProductDetail
@@ -31,9 +38,7 @@ const ProductInfo = () => {
       resolver: yupResolver(productDetailSchema)
     })
     const [quantity, setQuantity] = useState(1);
-    useEffect(() => {
-      setValue("quantity", quantity)
-    }, [setValue, quantity])
+
     const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
     const { data: getOneProduct } = useFetchOneProductQuery(id)
@@ -249,7 +254,9 @@ const ProductInfo = () => {
     const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
     const [onAddCart] = useAddCartMutation()
     const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
-    const [useEffectHasRun, setUseEffectHasRun] = useState(false);
+    useEffect(() => {
+      setValue("quantity", quantity)
+    }, [setValue, quantity])
     // lay ra productDetailId
     const handleFormProductDetail = async (data: productDetailForm) => {
       try {
@@ -266,20 +273,34 @@ const ProductInfo = () => {
     const onAddCartAsync = async () => {
       try {
         if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
-          await onAddCart({
-            productDetailId: productDetailGetOneId[0]?._id,
-            quantity: quantity,
-            totalMoney: getOneProduct?.price * quantity
-          }).then(() => dispatch(addCartSlice({
-            productDetailId: productDetailGetOneId[0]?._id!,
-            quantity: quantity,
-            totalMoney: getOneProduct?.price * quantity
-          }))).then(() => dispatch(addCartLocalSlice({
-            productDetailId: productDetailGetOneId[0]?._id!,
-            quantity: quantity,
-            totalMoney: getOneProduct?.price * quantity
-          })))
-
+          if (productDetailGetOneId[0].quantity < quantity) {
+            message.error("Sản phẩm đã vượt quá số lượng tồn kho!")
+          } else {
+            await onAddCart({
+              productDetailId: productDetailGetOneId[0]?._id,
+              quantity: quantity,
+              totalMoney: getOneProduct?.price * quantity
+            }).then(() => dispatch(addCartSlice({
+              productDetailId: productDetailGetOneId[0]?._id!,
+              quantity: quantity,
+              totalMoney: getOneProduct?.price * quantity
+            }))).then(() => {
+              const overlayCart = document.querySelector(".overlay-cart")
+              const overlay = document.querySelector(".overlay")
+              overlay?.classList.remove("hidden")
+              overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+              const dropdown = document.querySelector(".dropdown-user")
+              if (!dropdown?.classList.contains("opacity-0")) {
+                dropdown?.classList.add("opacity-0")
+                dropdown?.classList.add("pointer-events-none")
+              }
+            }).then(() => dispatch(addCartLocalSlice({
+              productDetailId: productDetailGetOneId[0]?._id!,
+              quantity: quantity,
+              totalMoney: getOneProduct?.price * quantity
+            })))
+            message.success("Thêm vào giỏ hàng thành công!")
+          }
         }
       } catch (error) {
         console.log(error);
@@ -291,17 +312,7 @@ const ProductInfo = () => {
         setFormProductDetailClicked(false)
       }
     }, [productDetailGetOneId, getOneProduct, formProductDetailClicked])
-    // San pham lien quan
-    useEffect(() => {
-      if (getCategoryById) {
-        dispatch(listProductRelated(getCategoryById?.products))
-      }
-    }, [getCategoryById])
-    useEffect(() => {
-      if (listProductDetailApi) {
-        dispatch(listProductDetailSlice(listProductDetailApi))
-      }
-    }, [isSuccessProductDetail])
+
     // lay ra mau [0]
     useEffect(() => {
       if (productDetailState && getOneProduct) {
@@ -336,18 +347,31 @@ const ProductInfo = () => {
     }, [navigate])
     // cart
     // van de mua ngay k redex sang trang cart
-    const addToCart = () => {
-      const overlayCart = document.querySelector(".overlay-cart")
-      const overlay = document.querySelector(".overlay")
-      overlay?.classList.remove("hidden")
-      overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
-      const dropdown = document.querySelector(".dropdown-user")
-      if (!dropdown?.classList.contains("opacity-0")) {
-        dropdown?.classList.add("opacity-0")
-        dropdown?.classList.add("pointer-events-none")
-      }
-    }
 
+    // const addToCart = () => {
+    //   setTimeout(() => {
+    //     const overlayCart = document.querySelector(".overlay-cart")
+    //     const overlay = document.querySelector(".overlay")
+    //     overlay?.classList.remove("hidden")
+    //     overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+    //     const dropdown = document.querySelector(".dropdown-user")
+    //     if (!dropdown?.classList.contains("opacity-0")) {
+    //       dropdown?.classList.add("opacity-0")
+    //       dropdown?.classList.add("pointer-events-none")
+    //     }
+    //   }, 500)
+    // }
+    // San pham lien quan
+    useEffect(() => {
+      if (getCategoryById) {
+        dispatch(listProductRelated(getCategoryById?.products))
+      }
+    }, [getCategoryById])
+    useEffect(() => {
+      if (listProductDetailApi) {
+        dispatch(listProductDetailSlice(listProductDetailApi))
+      }
+    }, [isSuccessProductDetail])
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
         <div className="flex gap-x-7 mb-10">
@@ -504,7 +528,7 @@ const ProductInfo = () => {
                       <input
                         type="number"
                         id="Quantity"
-                        max={productDetailGetOneId ? productDetailGetOneId[0]?.quantity : ""}
+                        // max={productDetailGetOneId ? productDetailGetOneId[0]?.quantity : ""}
                         value={quantity}
                         className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                       />
@@ -522,7 +546,7 @@ const ProductInfo = () => {
               </div>
               <div className="mb-7">
                 <div className="flex gap-x-[15px] mb-5">
-                  <button onClick={addToCart} className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                  <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
                     Thêm vào giỏ
                   </button>
                   <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">

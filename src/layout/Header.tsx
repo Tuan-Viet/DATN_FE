@@ -8,7 +8,14 @@ import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store
 import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
 import { useFetchListProductQuery } from '../store/product/product.service'
 import { listProductSlice } from '../store/product/productSlice'
-
+import {
+  Breadcrumb,
+  Button,
+  Form,
+  Input,
+  Space,
+  message,
+} from 'antd';
 const Header = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
@@ -51,7 +58,7 @@ const Header = () => {
         const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
         if (isConfirm) {
           await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
-          alert("xoa thanh cong!")
+          message.success("Xóa thành công!")
         }
       }
     } catch (error) {
@@ -59,14 +66,19 @@ const Header = () => {
 
     }
   }
+  const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+  const { data: getOneProductDetail } = useGetOneProductDetailQuery(cartIndex?.productDetailId)
   const decreaseCart = async (_id: string) => {
     try {
-      if (_id) {
-        dispatch(decreaseCartSlice(_id))
-      }
-      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-      if (cartIndex) {
-        await onUpdateCart({ _id, ...cartIndex })
+      if (getOneProductDetail._id == cartIndex.productDetailId) {
+        if (_id) {
+          dispatch(decreaseCartSlice(_id))
+        }
+        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+        if (cartIndex) {
+          await onUpdateCart({ _id, ...cartIndex })
+        }
+      } else {
       }
     } catch (error) {
       console.log(error);
@@ -74,12 +86,16 @@ const Header = () => {
   }
   const increaseCart = async (_id: string) => {
     try {
-      if (_id) {
-        dispatch(increaseCartSlice(_id))
-      }
-      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-      if (cartIndex) {
-        await onUpdateCart({ _id, ...cartIndex })
+      if (getOneProductDetail._id == cartIndex.productDetailId && getOneProductDetail.quantity <= cartIndex.quantity) {
+        message.error("Sản phẩm đã vượt qua số lượng tồn kho!")
+      } else {
+        if (_id) {
+          dispatch(increaseCartSlice(_id))
+        }
+        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+        if (cartIndex) {
+          await onUpdateCart({ _id, ...cartIndex })
+        }
       }
     } catch (error) {
       console.log(error);

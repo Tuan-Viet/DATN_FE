@@ -7,7 +7,7 @@ const orderSlice = createSlice({
     name: "orders",
     initialState: initialOrderState,
     reducers: ({
-        listCartSlice: (state: IOrderState, actions: PayloadAction<IOrder[]>) => {
+        listOrderSlice: (state: IOrderState, actions: PayloadAction<IOrder[]>) => {
             state.orders = actions.payload
         },
         // addCartSlice: (state: IOrderState, actions: PayloadAction<IOrder>) => {
@@ -18,5 +18,5 @@ const orderSlice = createSlice({
 
 
 
-export const { listCartSlice } = orderSlice.actions
+export const { listOrderSlice } = orderSlice.actions
 export default orderSlice.reducer
