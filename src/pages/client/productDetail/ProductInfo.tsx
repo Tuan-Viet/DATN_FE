@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { CartSchema, cartForm } from "../../../Schemas/Cart";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { productDetailForm, productDetailSchema } from "../../../Schemas/ProductDetail";
+import { addCartLocalSlice, addCartSlice } from "../../../store/cart/cartSlice";
+import { useAddCartMutation } from "../../../store/cart/cart.service";
 
 const ProductInfo = () => {
 
@@ -243,16 +245,52 @@ const ProductInfo = () => {
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
     const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
     const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
+    const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
+    const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+    const [onAddCart] = useAddCartMutation()
     const handleFormProductDetail = async (data: productDetailForm) => {
       try {
-        if (data && data.nameColor) {
+        // const cartsLocal = []
+        if (data && data.nameColor && getOneProduct) {
           await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
-
         }
       } catch (error) {
         console.log(error);
       }
     }
+    const onAddCartAsync = async () => {
+      try {
+        if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
+          await onAddCart({
+            productDetailId: productDetailGetOneId[0]?._id,
+            quantity: quantity,
+            totalMoney: getOneProduct?.price * quantity
+          }).then(() => dispatch(addCartSlice({
+            productDetailId: productDetailGetOneId[0]?._id!,
+            quantity: quantity,
+            totalMoney: getOneProduct?.price * quantity
+          }))).then(() => dispatch(addCartLocalSlice({
+            productDetailId: productDetailGetOneId[0]?._id!,
+            quantity: quantity,
+            totalMoney: getOneProduct?.price * quantity
+          })))
+          const overlayCart = document.querySelector(".overlay-cart")
+          const overlay = document.querySelector(".overlay")
+          overlay?.classList.remove("hidden")
+          overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+          const dropdown = document.querySelector(".dropdown-user")
+          if (!dropdown?.classList.contains("opacity-0")) {
+            dropdown?.classList.add("opacity-0")
+            dropdown?.classList.add("pointer-events-none")
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    useEffect(() => {
+      onAddCartAsync()
+    }, [productDetailGetOneId, getOneProduct])
     useEffect(() => {
       if (getCategoryById) {
         dispatch(listProductRelated(getCategoryById?.products))
@@ -266,7 +304,7 @@ const ProductInfo = () => {
     // lay ra mau [0]
     useEffect(() => {
       if (productDetailState && getOneProduct) {
-        const firstColor = productDetailState?.filter((pro) => pro.product_id === getOneProduct._id).map((colors) => colors.nameColor)
+        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
         localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
       }
     }, [productDetailState, getOneProduct])
@@ -309,10 +347,6 @@ const ProductInfo = () => {
                 navigation={true}
                 autoplay={{ delay: 3000 }}
               >
-                {/* {getOneProduct?.images.map((item, index) => {
-                  return <div key={index}>
-                  </div>
-                })} */}
                 <SwiperSlide>
                   <div className="">
                     <img
@@ -423,7 +457,6 @@ const ProductInfo = () => {
                           </label>
                         </div> :
                           <div className="mx-1">
-                            {/* <input type="radio" id={item.size} name="item.size" value={item.size} className="hidden peer" /> */}
                             <label
                               className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
                             >

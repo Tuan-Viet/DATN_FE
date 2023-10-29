@@ -12,7 +12,6 @@ import { listProductDetailSlice } from "../../../store/productDetail/productDeta
 const Product_Collection = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
-  console.log(listCategory);
 
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()

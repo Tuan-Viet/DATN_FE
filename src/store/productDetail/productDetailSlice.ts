@@ -57,7 +57,6 @@ const productDetailIdSlice = createSlice({
             const product_id = actions.payload.product_id.trim()
             const nameColor = actions.payload.nameColor.trim().toLowerCase()
             const sizeTerm = actions.payload.sizeTerm.trim().toLowerCase()
-            console.log(sizeTerm);
             if (nameColor) {
                 const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase().includes(nameColor) && product.product_id.includes(product_id) && product.size.toLowerCase() === sizeTerm)
                 state.productDetails = newListProductDetail
