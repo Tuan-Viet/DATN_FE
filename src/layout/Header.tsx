@@ -21,13 +21,14 @@ const Header = () => {
   const [onRemoveCart] = useDeleteCartMutation()
   const [onUpdateCart] = useUpdateCartMutation()
   const cartStore = JSON.parse(localStorage.getItem("carts")!)
-  const userStore = JSON.parse(localStorage.getItem("user")!)
+  // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0)
+
   useEffect(() => {
     if (listCart) {
       dispatch(listCartSlice(listCart))
     }
-  }, [isSuccessCart])
+  }, [isSuccessCart, listCart])
   useEffect(() => {
     if (listProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail))
@@ -38,18 +39,20 @@ const Header = () => {
       dispatch(listProductSlice(listProduct))
     }
   }, [isSuccessListProduct])
-  useEffect(() => {
-    if (cartStore) {
-      dispatch(listCartLocalSlice(cartStore))
-    }
-  }, [dispatch])
+  // useEffect(() => {
+  //   if (cartStore) {
+  //     dispatch(listCartLocalSlice(cartStore))
+  //   }
+  // }, [dispatch])
   // xu li cart
   const removeCart = async (id: string) => {
     try {
-      const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
-      if (isConfirm) {
-        await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
-        alert("xoa thanh cong!")
+      if (id) {
+        const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
+        if (isConfirm) {
+          await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
+          alert("xoa thanh cong!")
+        }
       }
     } catch (error) {
       console.log(error);

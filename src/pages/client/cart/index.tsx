@@ -9,6 +9,7 @@ import { listProductSlice } from "../../../store/product/productSlice";
 import { useDeleteCartMutation, useListCartQuery, useUpdateCartMutation } from "../../../store/cart/cart.service";
 import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
+import { Link } from "react-router-dom";
 
 const cartPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
@@ -185,7 +186,7 @@ const cartPage = () => {
                             <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart.toLocaleString("vi-VN")}đ</p>
                         </div>
                     </div>
-                    <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
+                    <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/checkout">Thanh toán</Link></button>
                 </div>
             </div >
         </div >

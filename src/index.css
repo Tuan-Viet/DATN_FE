@@ -3,15 +3,17 @@
 @tailwind utilities;
 
 .container {
-  width: 1500px;
+  max-width: 1500px;
   padding: 0 20px;
   margin: 0 auto;
 }
 
+.container-2 {
+  max-width: 1490px;
+  margin: 0 auto;
+}
+
 html {
-  font-family: 'Quicksand', sans-serif;
-  font-size: 16px;
-  font-weight: 400;
   font-family: "Quicksand", sans-serif;
   font-size: 16px;
   font-weight: 400;
@@ -40,6 +42,14 @@ html {
 
 .swiper-button-prev {
   color: white;
+}
+
+.swiper-button-next {
+  color: white;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #fff;
 }
 
 .swiper-button-next {

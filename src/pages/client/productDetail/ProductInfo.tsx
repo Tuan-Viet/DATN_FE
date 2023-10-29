@@ -248,16 +248,21 @@ const ProductInfo = () => {
     const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
     const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
     const [onAddCart] = useAddCartMutation()
+    const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
+    const [useEffectHasRun, setUseEffectHasRun] = useState(false);
+    // lay ra productDetailId
     const handleFormProductDetail = async (data: productDetailForm) => {
       try {
         // const cartsLocal = []
         if (data && data.nameColor && getOneProduct) {
           await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
+          setFormProductDetailClicked(true)
         }
       } catch (error) {
         console.log(error);
       }
     }
+    // addTocart API
     const onAddCartAsync = async () => {
       try {
         if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
@@ -274,23 +279,19 @@ const ProductInfo = () => {
             quantity: quantity,
             totalMoney: getOneProduct?.price * quantity
           })))
-          const overlayCart = document.querySelector(".overlay-cart")
-          const overlay = document.querySelector(".overlay")
-          overlay?.classList.remove("hidden")
-          overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
-          const dropdown = document.querySelector(".dropdown-user")
-          if (!dropdown?.classList.contains("opacity-0")) {
-            dropdown?.classList.add("opacity-0")
-            dropdown?.classList.add("pointer-events-none")
-          }
+
         }
       } catch (error) {
         console.log(error);
       }
     }
     useEffect(() => {
-      onAddCartAsync()
-    }, [productDetailGetOneId, getOneProduct])
+      if (formProductDetailClicked) {
+        onAddCartAsync()
+        setFormProductDetailClicked(false)
+      }
+    }, [productDetailGetOneId, getOneProduct, formProductDetailClicked])
+    // San pham lien quan
     useEffect(() => {
       if (getCategoryById) {
         dispatch(listProductRelated(getCategoryById?.products))
@@ -308,6 +309,7 @@ const ProductInfo = () => {
         localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
       }
     }, [productDetailState, getOneProduct])
+    // lay ra size tuong ung voi color
     const handleColorProductDetail = async (name: string) => {
       setValue("product_id", id)
       setValue("nameColor", name)
@@ -319,6 +321,7 @@ const ProductInfo = () => {
         console.log(error);
       }
     }
+    // lay ra size cua mau dau tien
     const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
     useEffect(() => {
       if (productDetailFilterState.length === 0 && listProductDetailApi) {
@@ -332,6 +335,19 @@ const ProductInfo = () => {
       localStorage.removeItem("firstColor")
     }, [navigate])
     // cart
+    // van de mua ngay k redex sang trang cart
+    const addToCart = () => {
+      const overlayCart = document.querySelector(".overlay-cart")
+      const overlay = document.querySelector(".overlay")
+      overlay?.classList.remove("hidden")
+      overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+      const dropdown = document.querySelector(".dropdown-user")
+      if (!dropdown?.classList.contains("opacity-0")) {
+        dropdown?.classList.add("opacity-0")
+        dropdown?.classList.add("pointer-events-none")
+      }
+    }
+
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
         <div className="flex gap-x-7 mb-10">
@@ -506,12 +522,12 @@ const ProductInfo = () => {
               </div>
               <div className="mb-7">
                 <div className="flex gap-x-[15px] mb-5">
-                  <button className="w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                  <button onClick={addToCart} className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
                     Thêm vào giỏ
                   </button>
-                  <Link to="" className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all">
+                  <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
                     Mua ngay
-                  </Link>
+                  </button>
                 </div>
                 <button className="w-[687px] border h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
                   Click vào đây để nhận ưu đãi

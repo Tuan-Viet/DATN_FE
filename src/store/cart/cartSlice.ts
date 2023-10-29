@@ -14,7 +14,6 @@ const cartSlice = createSlice({
             state.carts = state.carts.filter((cart) => cart._id !== actions.payload)
         },
         addCartSlice: (state: ICartState, actions: PayloadAction<ICart>) => {
-            console.log(actions.payload);
             const cartExistIndex = state.carts.findIndex((cart) => cart.productDetailId === actions.payload.productDetailId)
             if (cartExistIndex !== -1) {
                 state.carts[cartExistIndex].quantity += actions.payload.quantity
@@ -32,15 +31,22 @@ const cartSlice = createSlice({
         increaseCartSlice: (state: ICartState, actions: PayloadAction<string>) => {
             const cartIndex = state.carts.findIndex((state) => state._id === actions.payload)
             state.carts[cartIndex].quantity += 1
-            localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
+            const { quantity, productDetailId, totalMoney } = state.carts[cartIndex]
+            const dataToStore = { quantity, productDetailId, totalMoney }
+            localStorage.setItem("cartIndex", JSON.stringify(dataToStore))
         },
         decreaseCartSlice: (state: ICartState, actions: PayloadAction<string>) => {
             const cartIndex = state.carts.findIndex((state) => state._id === actions.payload)
             if (state.carts[cartIndex].quantity > 1) {
                 state.carts[cartIndex].quantity -= 1
-                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
+                const { quantity, productDetailId, totalMoney } = state.carts[cartIndex]
+                const dataToStore = { quantity, productDetailId, totalMoney }
+                localStorage.setItem("cartIndex", JSON.stringify(dataToStore))
             } else {
                 state.carts[cartIndex].quantity == 1
+                const { quantity, productDetailId, totalMoney } = state.carts[cartIndex]
+                const dataToStore = { quantity, productDetailId, totalMoney }
+                localStorage.setItem("cartIndex", JSON.stringify(dataToStore))
             }
         },
     })

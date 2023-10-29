@@ -7,6 +7,8 @@ import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdRed
 import productDetailAPI from './productDetail/productDetail.service'
 import cartAPI from './cart/cart.service'
 import cartSlice, { cartLocalReducer } from './cart/cartSlice'
+import orderAPI from './order/order.service'
+import orderSlice from './order/orderSlice'
 
 
 
@@ -16,6 +18,7 @@ export const store = configureStore({
         [productAPI.reducerPath]: productAPI.reducer,
         [productDetailAPI.reducerPath]: productDetailAPI.reducer,
         [cartAPI.reducerPath]: cartAPI.reducer,
+        [orderAPI.reducerPath]: orderAPI.reducer,
         // category
         categorySlice: categorySlice,
         // product
@@ -31,10 +34,12 @@ export const store = configureStore({
         productDetailIdReducer: productDetailIdReducer,
         // cart
         cartSlice: cartSlice,
-        cartLocalReducer: cartLocalReducer
+        cartLocalReducer: cartLocalReducer,
+        // order
+        orderSlice: orderSlice
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware),
+        getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware),
 })
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
