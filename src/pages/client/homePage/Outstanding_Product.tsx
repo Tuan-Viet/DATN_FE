@@ -34,13 +34,13 @@ const Outstanding_Product = () => {
       <div className="outstanding-product mb-12 flex gap-x-[25px] flex-wrap gap-y-[30px]">
         {productOutStandState?.map((product, index) => {
           return <div key={index} className="relative group w-[280px] border border-[#000]">
-            <a href={`/products/${product._id}`}>
+            <Link to={`/products/${product._id}`}>
               <img
                 src={product.images?.[0]}
                 className="mx-auto h-[360px] w-full"
                 alt=""
               />
-            </a>
+            </Link>
             <div className="product-info p-[8px] bg-white">
               <div className="text-sm flex justify-between mb-3">
                 <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>

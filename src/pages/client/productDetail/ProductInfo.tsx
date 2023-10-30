@@ -1,7 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { Dispatch, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,9 @@ import {
   Space,
   message,
 } from 'antd';
+
 const ProductInfo = () => {
+
 
   // fetch ProductDetail
   const { id } = useParams()
@@ -254,6 +256,15 @@ const ProductInfo = () => {
     const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
     const [onAddCart] = useAddCartMutation()
     const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
+    function ScrollToTop() {
+      const { pathname } = useLocation();
+
+      useEffect(() => {
+        window.scrollTo(0, 0);
+      }, [pathname]);
+
+      return null;
+    }
     useEffect(() => {
       setValue("quantity", quantity)
     }, [setValue, quantity])
@@ -317,7 +328,13 @@ const ProductInfo = () => {
     useEffect(() => {
       if (productDetailState && getOneProduct) {
         const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
-        localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
+        if (firstColor) {
+          localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
+          const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
+          if (listProductDetailApi && getFirstColor) {
+            dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
+          }
+        }
       }
     }, [productDetailState, getOneProduct])
     // lay ra size tuong ung voi color
@@ -333,34 +350,9 @@ const ProductInfo = () => {
       }
     }
     // lay ra size cua mau dau tien
-    const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
-    useEffect(() => {
-      if (productDetailFilterState.length === 0 && listProductDetailApi) {
-        if (getFirstColor) {
-          dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
-        }
-      }
-    }, [listProductDetailApi, getFirstColor])
-    const navigate = useNavigate()
-    useEffect(() => {
-      localStorage.removeItem("firstColor")
-    }, [navigate])
-    // cart
-    // van de mua ngay k redex sang trang cart
+    // useEffect(() => {
 
-    // const addToCart = () => {
-    //   setTimeout(() => {
-    //     const overlayCart = document.querySelector(".overlay-cart")
-    //     const overlay = document.querySelector(".overlay")
-    //     overlay?.classList.remove("hidden")
-    //     overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
-    //     const dropdown = document.querySelector(".dropdown-user")
-    //     if (!dropdown?.classList.contains("opacity-0")) {
-    //       dropdown?.classList.add("opacity-0")
-    //       dropdown?.classList.add("pointer-events-none")
-    //     }
-    //   }, 500)
-    // }
+    // }, [listProductDetailApi, getFirstColor])
     // San pham lien quan
     useEffect(() => {
       if (getCategoryById) {
@@ -372,10 +364,11 @@ const ProductInfo = () => {
         dispatch(listProductDetailSlice(listProductDetailApi))
       }
     }, [isSuccessProductDetail])
+
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]">
+        <ScrollToTop />
         <div className="flex gap-x-7 mb-10">
-
           <div className="w-[433px]">
             {/* anh to */}
             <div className="product-detail-thumbnail w-[433px] mb-[10px]">
@@ -463,10 +456,7 @@ const ProductInfo = () => {
                     -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
                   </span> : ""}
                 </div>
-                <div>{errors ? errors.product_id?.message : "0"}</div>
-                <div>{errors ? errors.nameColor?.message : "0"}</div>
-                <div>{errors ? errors.size?.message : "0"}</div>
-                <div>{errors ? errors.quantity?.message : "0"}</div>
+                <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                   <div className="flex">
@@ -552,9 +542,9 @@ const ProductInfo = () => {
                     Mua ngay
                   </button>
                 </div>
-                <button className="w-[687px] border h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
+                <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
                   Click vào đây để nhận ưu đãi
-                </button>
+                </div>
               </div>
             </form>
             <div className="policy flex justify-between gap-x-[13px]">
@@ -689,13 +679,13 @@ const ProductInfo = () => {
               {productRelated?.map((product, index) => {
                 return <SwiperSlide key={index}>
                   <div className="relative group">
-                    <a href={`/products/${product._id}`}>
+                    <Link to={`/products/${product._id}`}>
                       <img
                         src={product.images?.[0]}
                         className="mx-auto h-[351px] w-full"
                         alt=""
                       />
-                    </a>
+                    </Link>
                     <div className="product-info p-[8px] bg-white">
                       <div className="text-sm flex justify-between mb-3">
                         <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>

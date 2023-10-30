@@ -81,10 +81,6 @@ const Header = () => {
     }
   }
 
-  // const getIdCartStore = JSON.parse(localStorage.getItem("idCart")!)
-  // if (getIdCartStore) {
-  //   const { data: getOneCart } = useGetOneCartQuery(getIdCartStore)
-  // }
   const increaseCart = async (_id: string) => {
     try {
       // localStorage.setItem("idCart", JSON.stringify(_id))
@@ -402,7 +398,7 @@ const Header = () => {
                                 {/* color and size */}
                                 <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
                                 {/* price product */}
-                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.price.toLocaleString("vi-VN")}đ</p>
+                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
                               </div>
                               <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">

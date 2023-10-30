@@ -97,7 +97,7 @@ const cartPage = () => {
                 <div className="rounded-lg md:w-2/3">
                     <div className="flex justify-between py-4">
                         <h1 className="text-2xl font-bold">Giỏ hàng của bạn</h1>
-                        <p className="text-[14px]">Bạn đang có <strong>1 sản phẩm </strong>trong giỏ hàng</p>
+                        <p className="text-[14px]">Bạn đang có <strong>{cartState?.length} sản phẩm </strong>trong giỏ hàng</p>
                     </div>
                     <hr className="py-4" />
                     <div className="py-4">
