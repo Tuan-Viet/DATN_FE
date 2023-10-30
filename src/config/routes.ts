@@ -7,7 +7,7 @@ const routes = {
     productDetail: "/products/:id",
     cart: "/cart",
     checkout: "/checkout",
-    Billconfirm: "/billconfirm",
+    Billconfirm: "/orders/:id",
     signin: "/signin",
     signup: "/signup",
 

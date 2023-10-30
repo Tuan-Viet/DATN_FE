@@ -2,7 +2,7 @@ import React, { Dispatch, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { RootState } from '../store'
-import { useDeleteCartMutation, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
+import { useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
 import { decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store/productDetail/productDetail.service'
 import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
@@ -46,11 +46,7 @@ const Header = () => {
       dispatch(listProductSlice(listProduct))
     }
   }, [isSuccessListProduct])
-  // useEffect(() => {
-  //   if (cartStore) {
-  //     dispatch(listCartLocalSlice(cartStore))
-  //   }
-  // }, [dispatch])
+
   // xu li cart
   const removeCart = async (id: string) => {
     try {
@@ -84,22 +80,23 @@ const Header = () => {
       console.log(error);
     }
   }
+
+  // const getIdCartStore = JSON.parse(localStorage.getItem("idCart")!)
+  // if (getIdCartStore) {
+  //   const { data: getOneCart } = useGetOneCartQuery(getIdCartStore)
+  // }
   const increaseCart = async (_id: string) => {
     try {
-      if (getOneProductDetail._id == cartIndex.productDetailId && getOneProductDetail.quantity <= cartIndex.quantity) {
-        message.error("Sản phẩm đã vượt qua số lượng tồn kho!")
-      } else {
-        if (_id) {
-          dispatch(increaseCartSlice(_id))
-        }
-        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-        if (cartIndex) {
-          await onUpdateCart({ _id, ...cartIndex })
-        }
+      // localStorage.setItem("idCart", JSON.stringify(_id))
+      if (_id) {
+        dispatch(increaseCartSlice(_id))
+      }
+      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+      if (cartIndex) {
+        onUpdateCart({ _id, ...cartIndex })
       }
     } catch (error) {
       console.log(error);
-
     }
 
   }
@@ -416,10 +413,27 @@ const Header = () => {
                                 <div className="flex items-center">
                                   <p className="font-bold tracking-wide text-[15px]">{cart.totalMoney.toLocaleString("vi-VN")}đ</p>
                                 </div>
-                                <div className="flex items-center border-gray-100">
-                                  <span onClick={() => decreaseCart(cart._id!)} className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
-                                  <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value={cart.quantity} min="1" max={item.quantity} />
-                                  <span onClick={() => increaseCart(cart._id!)} className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
+                                <div className="flex items-center w-[100px] border border-gray-300 rounded">
+                                  <button
+                                    onClick={() => decreaseCart(cart._id!)}
+                                    type="button"
+                                    className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
+                                  >
+                                    &minus;
+                                  </button>
+                                  <input
+                                    type="number"
+                                    id="Quantity"
+                                    value={cart.quantity} min="1" max={item.quantity}
+                                    className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                  />
+                                  <button
+                                    onClick={() => increaseCart(cart._id!)}
+                                    type="button"
+                                    className="w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                  >
+                                    +
+                                  </button>
                                 </div>
                               </div>
                             </div>

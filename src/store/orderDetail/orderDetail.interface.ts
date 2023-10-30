@@ -7,3 +7,7 @@ export interface IOrderDetail {
     size: string
     totalMoney: number
 }
+
+export interface IOrderDetailState {
+    orderDetails: IOrderDetail[]
+}

@@ -10,6 +10,7 @@ import { useDeleteCartMutation, useListCartQuery, useUpdateCartMutation } from "
 import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { Link } from "react-router-dom";
+import { message } from "antd";
 
 const cartPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
@@ -27,7 +28,7 @@ const cartPage = () => {
             const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
             if (isConfirm) {
                 await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
-                alert("xoa thanh cong!")
+                message.success("Xóa thành công!")
             }
         } catch (error) {
             console.log(error);
@@ -128,10 +129,27 @@ const cartPage = () => {
                                                         <div className="flex items-center">
                                                             <p className="font-bold tracking-wide text-[15px]">{cart.totalMoney.toLocaleString("vi-VN")}đ</p>
                                                         </div>
-                                                        <div className="flex items-center border-gray-100">
-                                                            <span onClick={() => decreaseCart(cart._id!)} className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
-                                                            <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value={cart.quantity} min="1" />
-                                                            <span onClick={() => increaseCart(cart._id!)} className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
+                                                        <div className="flex items-center w-[100px] border border-gray-300 rounded">
+                                                            <button
+                                                                onClick={() => decreaseCart(cart._id!)}
+                                                                type="button"
+                                                                className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
+                                                            >
+                                                                &minus;
+                                                            </button>
+                                                            <input
+                                                                type="number"
+                                                                id="Quantity"
+                                                                value={cart.quantity} min="1" max={item.quantity}
+                                                                className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                                            />
+                                                            <button
+                                                                onClick={() => increaseCart(cart._id!)}
+                                                                type="button"
+                                                                className="w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                                            >
+                                                                +
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -142,32 +160,6 @@ const cartPage = () => {
                             }
                         </div>
                     })}
-
-                    {/* <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
-                        <img src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg" alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
-                        <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                            <div className="mt-5 sm:mt-0">
-                                <h2 className="text-lg font-bold text-gray-900">Áo Polo trơn hiệu ứng ESTP041</h2>
-                                <p className="mt-1 text-xs text-gray-700">Trắng - kem đậm / S</p>
-                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">400.000đ</p>
-                            </div>
-                            <div className="absolute right-[10px] top-[10px]">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </div>
-                            <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                                <div className="flex items-center">
-                                    <p className="font-bold tracking-wide text-[15px]">400.000đ</p>
-                                </div>
-                                <div className="flex items-center border-gray-100">
-                                    <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </span>
-                                    <input className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value="2" min="1" />
-                                    <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div> */}
                     <div className="bg-gray-100 w-full p-4">
                         <p className="font-bold text-[14px]">Ghi chú đơn hàng</p>
                         <textarea name="" id="" className="w-full mt-4 focus:outline-none p-4 text-[14px] min-h-[150px]" ></textarea>

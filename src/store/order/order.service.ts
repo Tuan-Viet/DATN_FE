@@ -21,7 +21,7 @@ const orderAPI = createApi({
             }),
             invalidatesTags: ["order"]
         }),
-        getOneOrder: builer.query({
+        getOneOrder: builer.query<IOrder, string>({
             query: (id) => `/orders/` + id,
             providesTags: ["order"]
         }),

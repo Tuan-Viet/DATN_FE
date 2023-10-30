@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
 import { useListCartQuery } from "../../../store/cart/cart.service";
@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form";
 import { orderForm, orderSchema } from "../../../Schemas/Order";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
+import { IOrder } from "../../../store/order/order.interface";
 
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -62,9 +63,13 @@ const CheckoutsPage = () => {
     setValue("status", 1)
     setValue("pay_method", 1)
   }, [setValue])
+  const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
     try {
-      await onAddOrder(data)
+      // console.log(data);
+
+      await onAddOrder(data).then(({ data }: any) => console.log(data)
+      )
     } catch (error) {
       console.log(error);
     }
@@ -73,10 +78,6 @@ const CheckoutsPage = () => {
     <>
       <Header></Header>
       <div className="container-2">
-        <p>{errors.carts?.[0]?.productDetailId?.message}</p>
-        <p>{errors.carts?.[0]?.color?.message}</p>
-        <p>{errors.carts?.[0]?.size?.message}</p>
-
         <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px]">
           <div className="">
             <div className="flex gap-[28px]">
@@ -227,17 +228,17 @@ const CheckoutsPage = () => {
             <div className="pt-7 border-t-[1px] border-b-[1px] h-[430px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
                 return <div key={index}>
-                  <input type="text" value={cart.productDetailId} className="hidden" {...register(`carts.0.productDetailId`)} />
-                  <input type="number" value={cart.quantity} className="hidden" {...register("carts.0.quantity")} />
+                  <input type="text" value={cart.productDetailId} className="hidden" {...register(`carts.${index}.productDetailId`)} />
+                  <input type="number" value={cart.quantity} className="hidden" {...register(`carts.${index}.quantity`)} />
+                  <input type="text" value={cart.totalMoney} className="hidden" {...register(`carts.${index}.totalMoney`)} />
                   {
                     productDetailState?.filter((proDetail, index) => proDetail?._id === cart?.productDetailId).map((item) => {
                       return <div key={index}>
-                        <input type="text" value={item.nameColor} className="hidden" {...register("carts.0.color")} />
-                        <input type="text" value={item.size} className="hidden" {...register("carts.0.size")} />
-                        <input type="text" value={totalCart} className="hidden" {...register("carts.0.totalMoney")} />
+                        <input type="text" value={item.nameColor} className="hidden" {...register(`carts.${index}.color`)} />
+                        <input type="text" value={item.size} className="hidden" {...register(`carts.${index}.size`)} />
                         {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
-                          <input type="text" value={pro.price} className="hidden" {...register("carts.0.price")} />
                           return <div className="mb-6 flex relative gap-x-20">
+                            <input type="text" value={pro.price} className="hidden" {...register(`carts.${index}.price`)} />
                             <div className="border rounded-lg relative w-[125px] h-[185px]">
                               <img
                                 src={item.imageColor}

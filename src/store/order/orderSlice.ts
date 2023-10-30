@@ -10,9 +10,6 @@ const orderSlice = createSlice({
         listOrderSlice: (state: IOrderState, actions: PayloadAction<IOrder[]>) => {
             state.orders = actions.payload
         },
-        // addCartSlice: (state: IOrderState, actions: PayloadAction<IOrder>) => {
-
-        // },
     })
 })
 
