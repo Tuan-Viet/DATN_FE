@@ -178,7 +178,8 @@ const cartPage = () => {
                             <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart.toLocaleString("vi-VN")}đ</p>
                         </div>
                     </div>
-                    <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/checkout">Thanh toán</Link></button>
+                    <Link to="/checkout">
+                        <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button></Link>
                 </div>
             </div >
         </div >

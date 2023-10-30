@@ -17,6 +17,8 @@ const BillConfirm = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { id } = useParams()
   const { data: getOneOrder } = useGetOneOrderQuery(id!)
+  console.log(getOneOrder);
+
   const { data: listOrder, isSuccess: isSuccessOrder } = useListOrderQuery()
   const { data: listOrderDetail, isSuccess: isSuccessOrderDetail } = useListOrderDetailQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()

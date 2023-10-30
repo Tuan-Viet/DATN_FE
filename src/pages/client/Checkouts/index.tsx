@@ -1,10 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
-import { useListCartQuery } from "../../../store/cart/cart.service";
+import { useDeleteCartMutation, useListCartQuery } from "../../../store/cart/cart.service";
 import { Dispatch, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { listCartSlice } from "../../../store/cart/cartSlice";
+import { listCartSlice, removeCartSlice } from "../../../store/cart/cartSlice";
 import { RootState } from "../../../store";
 import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
@@ -15,7 +15,7 @@ import { orderForm, orderSchema } from "../../../Schemas/Order";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
 import { IOrder } from "../../../store/order/order.interface";
-
+import { Spin, message } from 'antd';
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
@@ -26,6 +26,7 @@ const CheckoutsPage = () => {
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const [totalCart, setTotalCart] = useState<number>(0)
   const [onAddOrder] = useAddOrderMutation()
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (listCart) {
       dispatch(listCartSlice(listCart))
@@ -66,19 +67,32 @@ const CheckoutsPage = () => {
   const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
     try {
-      // console.log(data);
 
-      await onAddOrder(data).then(({ data }: any) => console.log(data)
-      )
+      setLoading(true);
+      await onAddOrder(data).then(({ data }: any) => {
+        setTimeout(() => {
+          setLoading(false);
+
+          navigate(`/orders/${data?._id}`)
+        }, 2500)
+      })
     } catch (error) {
       console.log(error);
     }
   }
   return (
     <>
+      {loading && (
+        <div className="fixed top-0 right-0 bottom-0 left-0 flex items-center flex-col justify-center ">
+          <Spin size="large"></Spin>
+          <p className="mt-2">Vui lòng đợi giây lát</p>
+        </div>
+      )}
       <Header></Header>
       <div className="container-2">
         <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px]">
+          {/* {loading && (
+          )} */}
           <div className="">
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
@@ -261,7 +275,7 @@ const CheckoutsPage = () => {
                                 </span>
                               </p>
                             </div>
-                            <button className="absolute right-0 top-0">
+                            {/* <div onClick={() => removeCart(cart._id!)} className="absolute cursor-pointer right-0 top-0">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
@@ -276,7 +290,7 @@ const CheckoutsPage = () => {
                                   d="M6 18L18 6M6 6l12 12"
                                 />
                               </svg>
-                            </button>
+                            </div> */}
                           </div>
                         })}
                       </div>
@@ -291,9 +305,9 @@ const CheckoutsPage = () => {
                 className="p-3 border rounded-lg w-full"
                 placeholder="Nhập mã giảm giá"
               />
-              <button className="p-3 rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
+              <div className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
                 Áp dụng
-              </button>
+              </div>
             </div>
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
@@ -328,7 +342,7 @@ const CheckoutsPage = () => {
                     d="M15.75 19.5L8.25 12l7.5-7.5"
                   />
                 </svg>
-                <span>Quay về giỏ hàng</span>
+                <Link to="/cart">Quay về giỏ hàng</Link>
               </Link>
               <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                 Đặt hàng

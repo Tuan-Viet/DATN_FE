@@ -455,7 +455,9 @@ const Header = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-[10px]">
-              <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
+              <Link to="/checkout">
+                <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
+              </Link>
               <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/cart">Xem giỏ hàng</Link></button>
             </div>
           </div>
