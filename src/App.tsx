@@ -1,13 +1,13 @@
-import './App.css'
-import { Routes, Route } from "react-router-dom"
-import { privateRoutes, publicRoutes } from "./routes"
-import AdminLayout from "./layout/adminLayout"
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import { privateRoutes, publicRoutes } from "./routes";
+import AdminLayout from "./layout/adminLayout";
 import BaseLayout from "./layout/baseLayout";
 import "swiper/css";
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
-
   return (
     <Routes>
       {/* Client */}
@@ -42,7 +42,7 @@ function App() {
         );
       })}
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;
