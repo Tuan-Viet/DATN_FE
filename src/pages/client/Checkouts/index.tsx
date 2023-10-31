@@ -16,6 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
 import { IOrder } from "../../../store/order/order.interface";
 import { Spin, message } from 'antd';
+import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
@@ -26,6 +27,7 @@ const CheckoutsPage = () => {
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const [totalCart, setTotalCart] = useState<number>(0)
   const [onAddOrder] = useAddOrderMutation()
+
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (listCart) {
@@ -67,15 +69,14 @@ const CheckoutsPage = () => {
   const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
     try {
-
       setLoading(true);
-      await onAddOrder(data).then(({ data }: any) => {
-        setTimeout(() => {
+      await onAddOrder(data).then(({ data }: any) =>
+        setTimeout(async () => {
           setLoading(false);
 
           navigate(`/orders/${data?._id}`)
         }, 2500)
-      })
+      )
     } catch (error) {
       console.log(error);
     }
@@ -252,7 +253,7 @@ const CheckoutsPage = () => {
                         <input type="text" value={item.size} className="hidden" {...register(`carts.${index}.size`)} />
                         {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
                           return <div className="mb-6 flex relative gap-x-20">
-                            <input type="text" value={pro.price} className="hidden" {...register(`carts.${index}.price`)} />
+                            <input type="text" value={pro.discount} className="hidden" {...register(`carts.${index}.price`)} />
                             <div className="border rounded-lg relative w-[125px] h-[185px]">
                               <img
                                 src={item.imageColor}

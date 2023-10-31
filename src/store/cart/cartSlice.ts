@@ -3,6 +3,7 @@ import { ICart, ICartState } from "./cart.interface"
 export const initialCartState: ICartState = {
     carts: []
 }
+
 const cartSlice = createSlice({
     name: "carts",
     initialState: initialCartState,
@@ -28,25 +29,23 @@ const cartSlice = createSlice({
                 ]
             }
         },
-        increaseCartSlice: (state: ICartState, actions: PayloadAction<string>) => {
-            const cartIndex = state.carts.findIndex((state) => state._id === actions.payload)
-            state.carts[cartIndex].quantity += 1
-            const { quantity, productDetailId, totalMoney } = state.carts[cartIndex]
-            const dataToStore = { quantity, productDetailId, totalMoney }
-            localStorage.setItem("cartIndex", JSON.stringify(dataToStore))
+        increaseCartSlice: (state: ICartState, actions: PayloadAction<{ _id: string, discount: number }>) => {
+            const cartIndex = state.carts.findIndex((state) => state._id === actions.payload._id)
+            if (cartIndex !== -1) {
+                state.carts[cartIndex].quantity++;
+                state.carts[cartIndex].totalMoney += actions.payload.discount
+                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]));
+            }
         },
-        decreaseCartSlice: (state: ICartState, actions: PayloadAction<string>) => {
-            const cartIndex = state.carts.findIndex((state) => state._id === actions.payload)
+        decreaseCartSlice: (state: ICartState, actions: PayloadAction<{ _id: string, discount: number }>) => {
+            const cartIndex = state.carts.findIndex((state) => state._id === actions.payload._id)
             if (state.carts[cartIndex].quantity > 1) {
                 state.carts[cartIndex].quantity -= 1
-                const { quantity, productDetailId, totalMoney } = state.carts[cartIndex]
-                const dataToStore = { quantity, productDetailId, totalMoney }
-                localStorage.setItem("cartIndex", JSON.stringify(dataToStore))
+                state.carts[cartIndex].totalMoney -= actions.payload.discount
+                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
             } else {
                 state.carts[cartIndex].quantity == 1
-                const { quantity, productDetailId, totalMoney } = state.carts[cartIndex]
-                const dataToStore = { quantity, productDetailId, totalMoney }
-                localStorage.setItem("cartIndex", JSON.stringify(dataToStore))
+                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
             }
         },
     })

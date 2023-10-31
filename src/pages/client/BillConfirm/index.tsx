@@ -17,7 +17,6 @@ const BillConfirm = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { id } = useParams()
   const { data: getOneOrder } = useGetOneOrderQuery(id!)
-  console.log(getOneOrder);
 
   const { data: listOrder, isSuccess: isSuccessOrder } = useListOrderQuery()
   const { data: listOrderDetail, isSuccess: isSuccessOrderDetail } = useListOrderDetailQuery()
@@ -27,7 +26,13 @@ const BillConfirm = () => {
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const [totalCart, setTotalCart] = useState<number>(0)
-
+  useEffect(() => {
+    if (getOneOrder) {
+      getOneOrder.orderDetails.map((cart) => {
+        console.log(cart.quantity)
+      })
+    }
+  }, [getOneOrder])
   useEffect(() => {
     if (listOrder) {
       dispatch(listOrderSlice(listOrder))
@@ -131,10 +136,10 @@ const BillConfirm = () => {
                                       </td>
                                       <td className="px-6 py-4 font-semibold text-gray-900">{cart.quantity}</td>
                                       <td className="px-6 py-4 font-semibold text-gray-900">
-                                        {pro.price.toLocaleString("vi-VN")}đ
+                                        {cart.price.toLocaleString("vi-VN")}đ
                                       </td>
                                       <td className="px-6 py-4 font-semibold text-gray-900">
-                                        {item.nameColor} / {item.size}
+                                        {cart.color} / {cart.size}
                                       </td>
                                       <td className="px-6 py-4 font-semibold text-gray-900 text-right">
                                         {cart.totalMoney.toLocaleString("vi-VN")}đ
@@ -217,15 +222,19 @@ const BillConfirm = () => {
                         <p className="mb-3">Email:</p>
                         <p className="mb-3">Số điện thoại:</p>
                         <p className="mb-3">Hình thức thanh toán:</p>
-                        <p className="">Địa chỉ nhận hàng:</p>
+                        <p className="mb-3">Địa chỉ nhận hàng:</p>
+                        <p className="mb-3">Ghi chú:</p>
                       </div>
                       <div>
                         <p className="mb-3">{getOneOrder?.fullName}</p>
                         <p className="mb-3">{getOneOrder?.email}</p>
                         <p className="mb-3">{getOneOrder?.phoneNumber}</p>
                         <p className="mb-3">Thanh toán khi nhận hàng (COD)</p>
-                        <p className="">
+                        <p className="mb-3">
                           {getOneOrder?.address}
+                        </p>
+                        <p className="mb-3">
+                          {getOneOrder?.note}
                         </p>
                       </div>
                     </div>

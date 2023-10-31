@@ -48,6 +48,7 @@ const Header = () => {
   }, [isSuccessListProduct])
 
   // xu li cart
+
   const removeCart = async (id: string) => {
     try {
       if (id) {
@@ -62,37 +63,33 @@ const Header = () => {
 
     }
   }
-  const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-  const { data: getOneProductDetail } = useGetOneProductDetailQuery(cartIndex?.productDetailId)
-  const decreaseCart = async (_id: string) => {
+  const decreaseCart = async (_id: string, discount: number) => {
     try {
-      if (getOneProductDetail._id == cartIndex.productDetailId) {
-        if (_id) {
-          dispatch(decreaseCartSlice(_id))
-        }
-        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-        if (cartIndex) {
-          await onUpdateCart({ _id, ...cartIndex })
-        }
-      } else {
+
+      if (_id) {
+        dispatch(decreaseCartSlice({ _id: _id, discount: discount }))
+      }
+      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+      if (cartIndex) {
+        await onUpdateCart({ _id, ...cartIndex })
       }
     } catch (error) {
       console.log(error);
     }
   }
 
-  const increaseCart = async (_id: string) => {
+  const increaseCart = async (_id: string, discount: number) => {
     try {
-      // localStorage.setItem("idCart", JSON.stringify(_id))
       if (_id) {
-        dispatch(increaseCartSlice(_id))
-      }
-      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-      if (cartIndex) {
-        onUpdateCart({ _id, ...cartIndex })
+        dispatch(increaseCartSlice({ _id: _id, discount: discount }))
+        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+        if (cartIndex) {
+          await onUpdateCart({ _id, ...cartIndex })
+        }
       }
     } catch (error) {
       console.log(error);
+
     }
 
   }
@@ -385,9 +382,9 @@ const Header = () => {
               {cartState?.map((cart, index) => {
                 return <div key={index}>
                   {
-                    productDetailState?.filter((proDetail, index) => proDetail?._id === cart?.productDetailId).map((item) => {
+                    productDetailState?.filter((proDetail) => proDetail?._id === cart?.productDetailId).map((item) => {
                       return <div key={index}>
-                        {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
+                        {productState?.filter((product) => product._id === item.product_id).map((pro) => {
                           return <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative" key={index}>
                             <Link to={`/products/${pro._id}`}>
                               <img src={item.imageColor} alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
@@ -411,7 +408,7 @@ const Header = () => {
                                 </div>
                                 <div className="flex items-center w-[100px] border border-gray-300 rounded">
                                   <button
-                                    onClick={() => decreaseCart(cart._id!)}
+                                    onClick={() => decreaseCart(cart._id!, pro.discount!)}
                                     type="button"
                                     className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
                                   >
@@ -423,10 +420,12 @@ const Header = () => {
                                     value={cart.quantity} min="1" max={item.quantity}
                                     className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                   />
+
                                   <button
-                                    onClick={() => increaseCart(cart._id!)}
+                                    onClick={() => increaseCart(cart._id!, pro.discount!)}
+                                    disabled={item.quantity === cart.quantity}
                                     type="button"
-                                    className="w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                    className={`${item.quantity === cart.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
                                   >
                                     +
                                   </button>

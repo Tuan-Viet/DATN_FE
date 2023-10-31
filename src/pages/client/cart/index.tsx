@@ -50,10 +50,10 @@ const cartPage = () => {
             dispatch(listProductSlice(listProduct))
         }
     }, [isSuccessListProduct])
-    const decreaseCart = async (_id: string) => {
+    const decreaseCart = async (_id: string, discount: number) => {
         try {
             if (_id) {
-                dispatch(decreaseCartSlice(_id))
+                dispatch(decreaseCartSlice({ _id: _id, discount: discount }))
             }
             const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
             if (cartIndex) {
@@ -63,14 +63,15 @@ const cartPage = () => {
             console.log(error);
         }
     }
-    const increaseCart = async (_id: string) => {
+
+    const increaseCart = async (_id: string, discount: number) => {
         try {
             if (_id) {
-                dispatch(increaseCartSlice(_id))
-            }
-            const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-            if (cartIndex) {
-                await onUpdateCart({ _id, ...cartIndex })
+                dispatch(increaseCartSlice({ _id: _id, discount: discount }))
+                const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+                if (cartIndex) {
+                    await onUpdateCart({ _id, ...cartIndex })
+                }
             }
         } catch (error) {
             console.log(error);
@@ -118,7 +119,7 @@ const cartPage = () => {
                                                         {/* color and size */}
                                                         <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
                                                         {/* price product */}
-                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.price.toLocaleString("vi-VN")}đ</p>
+                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
                                                     </div>
                                                     <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
@@ -131,7 +132,7 @@ const cartPage = () => {
                                                         </div>
                                                         <div className="flex items-center w-[100px] border border-gray-300 rounded">
                                                             <button
-                                                                onClick={() => decreaseCart(cart._id!)}
+                                                                onClick={() => decreaseCart(cart._id!, pro.discount!)}
                                                                 type="button"
                                                                 className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
                                                             >
@@ -144,9 +145,10 @@ const cartPage = () => {
                                                                 className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                                             />
                                                             <button
-                                                                onClick={() => increaseCart(cart._id!)}
+                                                                onClick={() => increaseCart(cart._id!, pro.discount!)}
+                                                                disabled={item.quantity === cart.quantity}
                                                                 type="button"
-                                                                className="w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                                                className={`${item.quantity === cart.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
                                                             >
                                                                 +
                                                             </button>

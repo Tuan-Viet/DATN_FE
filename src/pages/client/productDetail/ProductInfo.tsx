@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { Dispatch, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { useGetOneProductDetailQuery, useListProductDetailQuery, useUpdateProductDetailMutation } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
@@ -255,16 +255,10 @@ const ProductInfo = () => {
     const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
     const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
     const [onAddCart] = useAddCartMutation()
+    const [onUpdateProDetail] = useUpdateProductDetailMutation()
     const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
-    function ScrollToTop() {
-      const { pathname } = useLocation();
+    const navigate = useNavigate()
 
-      useEffect(() => {
-        window.scrollTo(0, 0);
-      }, [pathname]);
-
-      return null;
-    }
     useEffect(() => {
       setValue("quantity", quantity)
     }, [setValue, quantity])
@@ -281,20 +275,32 @@ const ProductInfo = () => {
       }
     }
     // addTocart API
+    useEffect(() => {
+      if (listCartState && productDetailGetOneId && productDetailGetOneId[0]?._id) {
+        const cartId = listCartState.filter((cart) =>
+          cart.productDetailId === productDetailGetOneId[0]._id
+        )
+        console.log(cartId);
+      }
+    }, [listCartState])
+
     const onAddCartAsync = async () => {
       try {
         if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
-          if (productDetailGetOneId[0].quantity < quantity) {
+          const cartId = listCartState?.filter((cart) =>
+            cart.productDetailId === productDetailGetOneId[0]?._id
+          )
+          if (productDetailGetOneId[0].quantity < quantity || cartId[0]?.quantity + quantity > productDetailGetOneId[0].quantity) {
             message.error("Sản phẩm đã vượt quá số lượng tồn kho!")
           } else {
             await onAddCart({
               productDetailId: productDetailGetOneId[0]?._id,
               quantity: quantity,
-              totalMoney: getOneProduct?.price * quantity
+              totalMoney: getOneProduct?.discount * quantity
             }).then(() => dispatch(addCartSlice({
               productDetailId: productDetailGetOneId[0]?._id!,
               quantity: quantity,
-              totalMoney: getOneProduct?.price * quantity
+              totalMoney: getOneProduct?.discount * quantity
             }))).then(() => {
               const overlayCart = document.querySelector(".overlay-cart")
               const overlay = document.querySelector(".overlay")
@@ -310,6 +316,13 @@ const ProductInfo = () => {
               quantity: quantity,
               totalMoney: getOneProduct?.price * quantity
             })))
+
+            // console.log(productDetailGetOneId[0].sold + 1);
+
+            let { _id, sold } = productDetailGetOneId[0]
+            let newProDetail = { sold: sold += 1 }
+
+            onUpdateProDetail({ id: _id, ...newProDetail })
             message.success("Thêm vào giỏ hàng thành công!")
           }
         }
@@ -349,11 +362,6 @@ const ProductInfo = () => {
         console.log(error);
       }
     }
-    // lay ra size cua mau dau tien
-    // useEffect(() => {
-
-    // }, [listProductDetailApi, getFirstColor])
-    // San pham lien quan
     useEffect(() => {
       if (getCategoryById) {
         dispatch(listProductRelated(getCategoryById?.products))
@@ -364,10 +372,12 @@ const ProductInfo = () => {
         dispatch(listProductDetailSlice(listProductDetailApi))
       }
     }, [isSuccessProductDetail])
-
+    useEffect(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, []);
     return (
-      <div className="max-w-[1500px] mx-auto mb-[70px]">
-        <ScrollToTop />
+      <div className="max-w-[1500px] mx-auto mb-[70px]" id="scroller">
+        {/* <ScrollToTop /> */}
         <div className="flex gap-x-7 mb-10">
           <div className="w-[433px]">
             {/* anh to */}
@@ -679,7 +689,9 @@ const ProductInfo = () => {
               {productRelated?.map((product, index) => {
                 return <SwiperSlide key={index}>
                   <div className="relative group">
-                    <Link to={`/products/${product._id}`}>
+                    <Link onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                    }} to={`/products/${product._id}`}>
                       <img
                         src={product.images?.[0]}
                         className="mx-auto h-[351px] w-full"

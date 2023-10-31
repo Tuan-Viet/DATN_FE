@@ -16,8 +16,16 @@ const productDetailAPI = createApi({
             query: (id) => `/productDetails/` + id,
             providesTags: ["productDetail"]
         }),
+        updateProductDetail: builer.mutation({
+            query: ({ id, ...product }) => ({
+                url: `/productDetails/` + id,
+                method: "PATCH",
+                body: product
+            }),
+            invalidatesTags: ["productDetail"]
+        }),
     })
 })
 
-export const { useListProductDetailQuery, useGetOneProductDetailQuery } = productDetailAPI
+export const { useListProductDetailQuery, useGetOneProductDetailQuery, useUpdateProductDetailMutation } = productDetailAPI
 export default productDetailAPI
