@@ -11,12 +11,18 @@ import {
   productSliceReducer,
 } from "./product/productSlice";
 import productDetailSlice, {
-  productDetailFilterSliceReducer,
+  productDetailFilterSliceReducer, productDetailIdReducer,
 } from "./productDetail/productDetailSlice";
 import productDetailAPI from "./productDetail/productDetail.service";
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from 'redux-persist';
 import userSlice from "./user/userSlice";
+import cartAPI from "./cart/cart.service";
+import orderAPI from "./order/order.service";
+import orderDetailAPI from "./orderDetail/orderDetail.service";
+import cartSlice, { cartLocalReducer } from "./cart/cartSlice";
+import orderSlice from "./order/orderSlice";
+import orderDetailSlice from "./orderDetail/orderDetailSlice";
 
 const commonConfig = {
   key: "user",
@@ -33,23 +39,34 @@ export const store = configureStore({
     [categoryApi.reducerPath]: categoryApi.reducer,
     [productAPI.reducerPath]: productAPI.reducer,
     [productDetailAPI.reducerPath]: productDetailAPI.reducer,
+    [cartAPI.reducerPath]: cartAPI.reducer,
+    [orderAPI.reducerPath]: orderAPI.reducer,
+    [orderDetailAPI.reducerPath]: orderDetailAPI.reducer,
+    // category
     categorySlice: categorySlice,
+    // product
     productSlice: productSliceReducer,
-    productDetailSlice: productDetailSlice,
     productFilterSlice: productFilterSliceReducer,
     productSaleSlice: productSaleSliceReducer,
     productSearchReducer: productSearchReducer,
     productOutstandReducer: productOutstandReducer,
     productRelatedSliceReducer: productRelatedSliceReducer,
+    // productDetail
+    productDetailSlice: productDetailSlice,
     productDetailFilterSliceReducer: productDetailFilterSliceReducer,
-    user: persistReducer(userConfig, userSlice)
+    productDetailIdReducer: productDetailIdReducer,
+    user: persistReducer(userConfig, userSlice),
+    // cart
+    cartSlice: cartSlice,
+    cartLocalReducer: cartLocalReducer,
+    // order
+    orderSlice: orderSlice,
+    // orderDetail
+    orderDetailSlice: orderDetailSlice
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .concat(categoryApi.middleware)
-      .concat(productAPI.middleware)
-      .concat(productDetailAPI.middleware),
-});
+    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware),
+})
 
 export const persistor = persistStore(store)
 // Infer the `RootState` and `AppDispatch` types from the store itself

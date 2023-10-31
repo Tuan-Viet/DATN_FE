@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import Banner from "../../../layout/Banner";
 import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
@@ -6,10 +7,19 @@ import Outstanding_Product from "./Outstanding_Product";
 import Policy from "./Policy";
 import Product_Collection from "./Product_Collection";
 import Sale from "./Sale";
+import { useEffect } from "react";
+function ScrollToTop() {
+    const { pathname } = useLocation();
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [pathname]);
+
+    return null;
+}
 const homePage = () => {
     return <>
-
+        <ScrollToTop></ScrollToTop>
         <Header></Header>
         <Banner></Banner>
         <Category></Category>

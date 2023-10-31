@@ -1,26 +1,49 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import { Dispatch, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useGetOneProductDetailQuery, useListProductDetailQuery, useUpdateProductDetailMutation } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
+import { getOneIdProductDetailSlice, listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { useFetchOneCategoryQuery } from "../../../store/category/category.service";
 import { listProductRelated, listProductRelatedSlice } from "../../../store/product/productSlice";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { CartSchema, cartForm } from "../../../Schemas/Cart";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { productDetailForm, productDetailSchema } from "../../../Schemas/ProductDetail";
+import { addCartLocalSlice, addCartSlice } from "../../../store/cart/cartSlice";
+import { useAddCartMutation } from "../../../store/cart/cart.service";
+import {
+  Breadcrumb,
+  Button,
+  Form,
+  Input,
+  Space,
+  message,
+} from 'antd';
 
 const ProductInfo = () => {
+
 
   // fetch ProductDetail
   const { id } = useParams()
   if (id) {
+    const {
+      handleSubmit,
+      register,
+      setValue,
+      formState: { errors }
+    } = useForm<productDetailForm>({
+      resolver: yupResolver(productDetailSchema)
+    })
     const [quantity, setQuantity] = useState(1);
+
     const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
     const { data: getOneProduct } = useFetchOneProductQuery(id)
-    console.log(getOneProduct);
     const renderContent = () => {
       switch (currentTab) {
         case 1:
@@ -218,7 +241,6 @@ const ProductInfo = () => {
     const increaseQuantity = () => {
       setQuantity(quantity + 1);
     };
-
     const decreaseQuantity = () => {
       if (quantity > 1) {
         setQuantity(quantity - 1);
@@ -226,11 +248,120 @@ const ProductInfo = () => {
     };
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
-    console.log(getCategoryById);
-
     const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
-    const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+    const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
+    const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
+    const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
+    const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+    const [onAddCart] = useAddCartMutation()
+    const [onUpdateProDetail] = useUpdateProductDetailMutation()
+    const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
+    const navigate = useNavigate()
+
+    useEffect(() => {
+      setValue("quantity", quantity)
+    }, [setValue, quantity])
+    // lay ra productDetailId
+    const handleFormProductDetail = async (data: productDetailForm) => {
+      try {
+        // const cartsLocal = []
+        if (data && data.nameColor && getOneProduct) {
+          await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
+          setFormProductDetailClicked(true)
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    // addTocart API
+    useEffect(() => {
+      if (listCartState && productDetailGetOneId && productDetailGetOneId[0]?._id) {
+        const cartId = listCartState.filter((cart) =>
+          cart.productDetailId === productDetailGetOneId[0]._id
+        )
+        console.log(cartId);
+      }
+    }, [listCartState])
+
+    const onAddCartAsync = async () => {
+      try {
+        if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
+          const cartId = listCartState?.filter((cart) =>
+            cart.productDetailId === productDetailGetOneId[0]?._id
+          )
+          if (productDetailGetOneId[0].quantity < quantity || cartId[0]?.quantity + quantity > productDetailGetOneId[0].quantity) {
+            message.error("Sản phẩm đã vượt quá số lượng tồn kho!")
+          } else {
+            await onAddCart({
+              productDetailId: productDetailGetOneId[0]?._id,
+              quantity: quantity,
+              totalMoney: getOneProduct?.discount * quantity
+            }).then(() => dispatch(addCartSlice({
+              productDetailId: productDetailGetOneId[0]?._id!,
+              quantity: quantity,
+              totalMoney: getOneProduct?.discount * quantity
+            }))).then(() => {
+              const overlayCart = document.querySelector(".overlay-cart")
+              const overlay = document.querySelector(".overlay")
+              overlay?.classList.remove("hidden")
+              overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+              const dropdown = document.querySelector(".dropdown-user")
+              if (!dropdown?.classList.contains("opacity-0")) {
+                dropdown?.classList.add("opacity-0")
+                dropdown?.classList.add("pointer-events-none")
+              }
+            }).then(() => dispatch(addCartLocalSlice({
+              productDetailId: productDetailGetOneId[0]?._id!,
+              quantity: quantity,
+              totalMoney: getOneProduct?.price * quantity
+            })))
+
+            // console.log(productDetailGetOneId[0].sold + 1);
+
+            let { _id, sold } = productDetailGetOneId[0]
+            let newProDetail = { sold: sold += 1 }
+
+            onUpdateProDetail({ id: _id, ...newProDetail })
+            message.success("Thêm vào giỏ hàng thành công!")
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    useEffect(() => {
+      if (formProductDetailClicked) {
+        onAddCartAsync()
+        setFormProductDetailClicked(false)
+      }
+    }, [productDetailGetOneId, getOneProduct, formProductDetailClicked])
+
+    // lay ra mau [0]
+    useEffect(() => {
+      if (productDetailState && getOneProduct) {
+        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
+        if (firstColor) {
+          localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
+          const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
+          if (listProductDetailApi && getFirstColor) {
+            dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
+          }
+        }
+      }
+    }, [productDetailState, getOneProduct])
+    // lay ra size tuong ung voi color
+    const handleColorProductDetail = async (name: string) => {
+      setValue("product_id", id)
+      setValue("nameColor", name)
+      try {
+        if (listProductDetailApi) {
+          await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: listProductDetailApi }))
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
     useEffect(() => {
       if (getCategoryById) {
         dispatch(listProductRelated(getCategoryById?.products))
@@ -241,38 +372,12 @@ const ProductInfo = () => {
         dispatch(listProductDetailSlice(listProductDetailApi))
       }
     }, [isSuccessProductDetail])
-    // lay ra mau [0]
-
     useEffect(() => {
-      if (productDetailState && getOneProduct) {
-        console.log(2);
-        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
-        localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
-      }
-    }, [productDetailState, getOneProduct])
-    const handleProductDetail = async (name: string) => {
-      try {
-        if (listProductDetailApi) {
-          await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: listProductDetailApi }))
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
-    useEffect(() => {
-      if (productDetailFilterState.length === 0 && listProductDetailApi) {
-        if (getFirstColor) {
-          dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
-        }
-      }
-    }, [listProductDetailApi, getFirstColor])
-    const navigate = useNavigate()
-    // useEffect(() => {
-    //   localStorage.removeItem("firstColor")
-    // }, [navigate])
+      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, []);
     return (
-      <div className="max-w-[1500px] mx-auto mb-[70px]">
+      <div className="max-w-[1500px] mx-auto mb-[70px]" id="scroller">
+        {/* <ScrollToTop /> */}
         <div className="flex gap-x-7 mb-10">
           <div className="w-[433px]">
             {/* anh to */}
@@ -346,7 +451,8 @@ const ProductInfo = () => {
                 </span>
               </div>
             </div>
-            <form>
+            {/* form */}
+            <form onSubmit={handleSubmit(handleFormProductDetail)}>
               <div className="px-4">
                 <div className="flex items-center gap-x-[109px] py-4 mb-2">
                   <span className="text-sm font-bold">Giá:</span>
@@ -360,12 +466,13 @@ const ProductInfo = () => {
                     -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
                   </span> : ""}
                 </div>
+                <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
                 <div className="flex my-6">
                   <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                   <div className="flex">
                     {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
                       return <div className="mx-1">
-                        <input onClick={() => handleProductDetail(nameColor)} type="radio" id={nameColor} name="color" value={nameColor} className="hidden peer" />
+                        <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
                         <label htmlFor={nameColor}
                           className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                         >
@@ -376,12 +483,13 @@ const ProductInfo = () => {
                   </div>
                 </div>
                 <div className="flex my-6">
+                  {/* size */}
                   <div className="w-[13%] text-sm font-bold">Kích thước</div>
                   <div className="flex">
                     {productDetailFilterState?.map((item) => {
                       return <>
-                        {item.quantity > 0 ? <div className="mx-1">
-                          <input type="radio" id={item.size} name="item.size" value={item.size} className="hidden peer" />
+                        {item.quantity > 0 ? <div className="mx-1" key={item._id}>
+                          <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
                           <label htmlFor={item.size}
                             className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                           >
@@ -437,16 +545,16 @@ const ProductInfo = () => {
               </div>
               <div className="mb-7">
                 <div className="flex gap-x-[15px] mb-5">
-                  <button className="w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                  <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
                     Thêm vào giỏ
                   </button>
-                  <button className="w-[336px] border h-[50px] rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all">
+                  <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
                     Mua ngay
                   </button>
                 </div>
-                <button className="w-[687px] border h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
+                <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
                   Click vào đây để nhận ưu đãi
-                </button>
+                </div>
               </div>
             </form>
             <div className="policy flex justify-between gap-x-[13px]">
@@ -516,7 +624,7 @@ const ProductInfo = () => {
             </div>
           </div>
         </div>
-        {/* <div>
+        <div>
           <div className="product-tabs flex gap-x-[60px]">
             <div>
               <button
@@ -564,7 +672,8 @@ const ProductInfo = () => {
             </div>
           </div>
           <div className="mt-[40px]">{renderContent()}</div>
-        </div> */}
+        </div>
+        {/* san pham lien quan */}
         <div>
           <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase">
             Sản phẩm liên quan
@@ -580,13 +689,15 @@ const ProductInfo = () => {
               {productRelated?.map((product, index) => {
                 return <SwiperSlide key={index}>
                   <div className="relative group">
-                    <a href={`/products/${product._id}`}>
+                    <Link onClick={() => {
+                      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+                    }} to={`/products/${product._id}`}>
                       <img
                         src={product.images?.[0]}
                         className="mx-auto h-[351px] w-full"
                         alt=""
                       />
-                    </a>
+                    </Link>
                     <div className="product-info p-[8px] bg-white">
                       <div className="text-sm flex justify-between mb-3">
                         <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
@@ -631,9 +742,9 @@ const ProductInfo = () => {
                           d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                         />
                       </svg>
-                      <span className="uppercase text-xs font-semibold">
+                      <button type="button" className="uppercase text-xs font-semibold">
                         Thêm vào giỏ
-                      </span>
+                      </button>
                     </Link>
                   </div>
                 </SwiperSlide>

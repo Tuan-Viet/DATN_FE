@@ -1,10 +1,24 @@
-import { Form } from "antd";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React, { Dispatch, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../store'
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { register } from "../store/user/userSlice";
 import axios from "axios";
+import { useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
+import { decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
+import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store/productDetail/productDetail.service'
+import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
+import { useFetchListProductQuery } from '../store/product/product.service'
+import { listProductSlice } from '../store/product/productSlice'
+import {
+  Breadcrumb,
+  Button,
+  Form,
+  Input,
+  Space,
+  message,
+} from 'antd';
 
 type FormDataType = {
   email: string;
@@ -12,9 +26,22 @@ type FormDataType = {
 };
 
 const Header = () => {
+  const dispatch: Dispatch<any> = useDispatch()
+  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+  const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+  const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
+  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+  const productState = useSelector((state: RootState) => state.productSlice.products)
+  const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+  const [onRemoveCart] = useDeleteCartMutation()
+  const [onUpdateCart] = useUpdateCartMutation()
+  const cartStore = JSON.parse(localStorage.getItem("carts")!)
+  // const userStore = JSON.parse(localStorage.getItem("user")!)
+  const [totalCart, setTotalCart] = useState<number>(0)
+
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handSubmitSignin = async (data: FormDataType) => {
     try {
@@ -44,6 +71,69 @@ const Header = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (listCart) {
+      dispatch(listCartSlice(listCart))
+    }
+  }, [isSuccessCart, listCart])
+  useEffect(() => {
+    if (listProductDetail) {
+      dispatch(listProductDetailSlice(listProductDetail))
+    }
+  }, [isSuccessProductDetail])
+  useEffect(() => {
+    if (listProduct) {
+      dispatch(listProductSlice(listProduct))
+    }
+  }, [isSuccessListProduct])
+
+  // xu li cart
+
+  const removeCart = async (id: string) => {
+    try {
+      if (id) {
+        const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
+        if (isConfirm) {
+          await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
+          message.success("Xóa thành công!")
+        }
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
+  }
+  const decreaseCart = async (_id: string, discount: number) => {
+    try {
+
+      if (_id) {
+        dispatch(decreaseCartSlice({ _id: _id, discount: discount }))
+      }
+      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+      if (cartIndex) {
+        await onUpdateCart({ _id, ...cartIndex })
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const increaseCart = async (_id: string, discount: number) => {
+    try {
+      if (_id) {
+        dispatch(increaseCartSlice({ _id: _id, discount: discount }))
+        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+        if (cartIndex) {
+          await onUpdateCart({ _id, ...cartIndex })
+        }
+      }
+    } catch (error) {
+      console.log(error);
+
+    }
+
+  }
   // hàm dropdownUser
   const handleDropdown = () => {
     const iconUser = document.querySelector(".icon-user");
@@ -121,9 +211,18 @@ const Header = () => {
       closeDropdownUser();
     });
     overlayCart?.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-  }, []);
+      // e.stopPropagation()
+    })
+  }, [])
+  useEffect(() => {
+    let total = 0
+    if (cartState) {
+      cartState.map((cart) => {
+        total += cart.totalMoney
+      })
+    }
+    setTotalCart(total)
+  }, [cartState])
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -552,298 +651,98 @@ const Header = () => {
                     d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                   />
                 </svg>
-                <span className="w-[20px] h-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]">
-                  1
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+                <span className='w-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]'>{cartState.length}</span>
+              </div >
+            </div >
+          </div >
+        </div >
         {/* overlay-cart */}
-        <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]"></div>
+        <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]" ></div >
         {/* cart */}
-        <div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between">
+        < div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between" >
           {/* list product */}
-          <div className="">
-            <h1 className="font-bold tracking-wide text-[20px] mb-[10px]">
-              Giỏ hàng
-            </h1>
-            <h1 className="tracking-wide py-[10px] text-sm">
-              Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong>{" "}
-              để có thể{" "}
-              <strong className="uppercase">miễn phí vận chuyển</strong>
-            </h1>
-            <hr className="my-[20px]" />
+          < div className="" >
+            <h1 className='font-bold tracking-wide text-[20px] mb-[10px]' >Giỏ hàng</h1>
+            <h1 className="tracking-wide py-[10px] text-sm">Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong> để có thể <strong className="uppercase">miễn phí vận chuyển</strong></h1>
+            <hr className='my-[20px]' />
             <div className="overflow-y-scroll h-[450px]">
-              <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
-                <img
-                  src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg"
-                  alt="product-image"
-                  className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
-                />
-                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                  <div className="mt-5 sm:mt-0">
-                    {/* name */}
-                    <h2 className="text-lg font-bold text-gray-900">
-                      Áo Polo trơn hiệu ứng ESTP041
-                    </h2>
-                    {/* color and size */}
-                    <p className="mt-1 text-xs text-gray-700">
-                      Trắng - kem đậm / S
-                    </p>
-                    {/* price product */}
-                    <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
-                      400.000đ
-                    </p>
-                  </div>
-                  <div className="absolute right-[10px] top-[10px]">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </div>
-                  <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                    <div className="flex items-center">
-                      <p className="font-bold tracking-wide text-[15px]">
-                        400.000đ
-                      </p>
-                    </div>
-                    <div className="flex items-center border-gray-100">
-                      <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        -{" "}
-                      </span>
-                      <input
-                        className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none"
-                        type="number"
-                        value="2"
-                        min="1"
-                      />
-                      <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        +{" "}
-                      </span>
-                    </div>
-                  </div>
+              {cartState?.map((cart, index) => {
+                return <div key={index}>
+                  {
+                    productDetailState?.filter((proDetail) => proDetail?._id === cart?.productDetailId).map((item) => {
+                      return <div key={index}>
+                        {productState?.filter((product) => product._id === item.product_id).map((pro) => {
+                          return <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative" key={index}>
+                            <Link to={`/products/${pro._id}`}>
+                              <img src={item.imageColor} alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
+                            </Link>
+                            <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                              <div className="mt-5 sm:mt-0">
+                                <h2 className="text-lg font-bold text-gray-900" >{pro.title}</h2>
+                                {/* color and size */}
+                                <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
+                                {/* price product */}
+                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
+                              </div>
+                              <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </div>
+                              <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                <div className="flex items-center">
+                                  <p className="font-bold tracking-wide text-[15px]">{cart.totalMoney.toLocaleString("vi-VN")}đ</p>
+                                </div>
+                                <div className="flex items-center w-[100px] border border-gray-300 rounded">
+                                  <button
+                                    onClick={() => decreaseCart(cart._id!, pro.discount!)}
+                                    type="button"
+                                    className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
+                                  >
+                                    &minus;
+                                  </button>
+                                  <input
+                                    type="number"
+                                    id="Quantity"
+                                    value={cart.quantity} min="1" max={item.quantity}
+                                    className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                  />
+
+                                  <button
+                                    onClick={() => increaseCart(cart._id!, pro.discount!)}
+                                    disabled={item.quantity === cart.quantity}
+                                    type="button"
+                                    className={`${item.quantity === cart.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        })}
+                      </div>
+                    })
+                  }
                 </div>
-              </div>
-              <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
-                <img
-                  src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg"
-                  alt="product-image"
-                  className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
-                />
-                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                  <div className="mt-5 sm:mt-0">
-                    {/* name */}
-                    <h2 className="text-lg font-bold text-gray-900">
-                      Áo Polo trơn hiệu ứng ESTP041
-                    </h2>
-                    {/* color and size */}
-                    <p className="mt-1 text-xs text-gray-700">
-                      Trắng - kem đậm / S
-                    </p>
-                    {/* price product */}
-                    <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
-                      400.000đ
-                    </p>
-                  </div>
-                  <div className="absolute right-[10px] top-[10px]">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </div>
-                  <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                    <div className="flex items-center">
-                      <p className="font-bold tracking-wide text-[15px]">
-                        400.000đ
-                      </p>
-                    </div>
-                    <div className="flex items-center border-gray-100">
-                      <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        -{" "}
-                      </span>
-                      <input
-                        className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none"
-                        type="number"
-                        value="2"
-                        min="1"
-                      />
-                      <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        +{" "}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
-                <img
-                  src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg"
-                  alt="product-image"
-                  className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
-                />
-                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                  <div className="mt-5 sm:mt-0">
-                    {/* name */}
-                    <h2 className="text-lg font-bold text-gray-900">
-                      Áo Polo trơn hiệu ứng ESTP041
-                    </h2>
-                    {/* color and size */}
-                    <p className="mt-1 text-xs text-gray-700">
-                      Trắng - kem đậm / S
-                    </p>
-                    {/* price product */}
-                    <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
-                      400.000đ
-                    </p>
-                  </div>
-                  <div className="absolute right-[10px] top-[10px]">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </div>
-                  <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                    <div className="flex items-center">
-                      <p className="font-bold tracking-wide text-[15px]">
-                        400.000đ
-                      </p>
-                    </div>
-                    <div className="flex items-center border-gray-100">
-                      <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        -{" "}
-                      </span>
-                      <input
-                        className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none"
-                        type="number"
-                        value="2"
-                        min="1"
-                      />
-                      <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        +{" "}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
-                <img
-                  src="https://product.hstatic.net/200000690725/product/estp041-3_83014782b53841358a80703e3de20b49_medium.jpg"
-                  alt="product-image"
-                  className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
-                />
-                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                  <div className="mt-5 sm:mt-0">
-                    {/* name */}
-                    <h2 className="text-lg font-bold text-gray-900">
-                      Áo Polo trơn hiệu ứng ESTP041
-                    </h2>
-                    {/* color and size */}
-                    <p className="mt-1 text-xs text-gray-700">
-                      Trắng - kem đậm / S
-                    </p>
-                    {/* price product */}
-                    <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
-                      400.000đ
-                    </p>
-                  </div>
-                  <div className="absolute right-[10px] top-[10px]">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </div>
-                  <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                    <div className="flex items-center">
-                      <p className="font-bold tracking-wide text-[15px]">
-                        400.000đ
-                      </p>
-                    </div>
-                    <div className="flex items-center border-gray-100">
-                      <span className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        -{" "}
-                      </span>
-                      <input
-                        className="appearance-none h-8 w-8 border bg-white text-center text-xs outline-none"
-                        type="number"
-                        value="2"
-                        min="1"
-                      />
-                      <span className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50">
-                        {" "}
-                        +{" "}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              })}
             </div>
           </div>
           {/* pay */}
-          <div className="mt-6  w-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-full">
+          <div className="mt-6 w-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-full">
             <div className="flex justify-between">
               <p className="text-lg font-bold">Tổng tiền:</p>
               <div className="">
-                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">
-                  400.000đ
-                </p>
+                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart.toLocaleString("vi-VN")}đ</p>
               </div>
-            </div>
+            </div >
             <div className="grid grid-cols-2 gap-[10px]">
-              <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">
-                Thanh toán
-              </button>
-              <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">
-                <Link to="/cart">Xem giỏ hàng</Link>
-              </button>
+              <Link to="/checkout">
+                <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
+              </Link>
+              <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/cart">Xem giỏ hàng</Link></button>
             </div>
-          </div>
+          </div >
           <div className="absolute right-[10px] top-[10px] icon-outCart">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -860,8 +759,8 @@ const Header = () => {
               />
             </svg>
           </div>
-        </div>
-      </div>
+        </div >
+      </div >
     </>
   );
 };
