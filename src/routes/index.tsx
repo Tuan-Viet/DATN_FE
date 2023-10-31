@@ -10,6 +10,8 @@ import productUpdate from "../pages/admin/productUpdate";
 import userPage from "../pages/admin/userPage";
 import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
+import BillConfirm from "../pages/client/BillConfirm";
+import CheckoutsPage from "../pages/client/Checkouts";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -22,6 +24,8 @@ export const publicRoutes = [
     { path: routes.about, Component: About },
     { path: routes.productDetail, Component: productDetail },
     { path: routes.cart, Component: cartPage },
+    { path: routes.checkout, Component: CheckoutsPage },
+    { path: routes.Billconfirm, Component: BillConfirm },
     { path: routes.signin, Component: signin },
     { path: routes.signup, Component: signup },
 ]

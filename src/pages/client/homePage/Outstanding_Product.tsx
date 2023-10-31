@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { listProductOutStandSlice, listProductSlice } from "../../../store/product/productSlice";
+import { listProductOutStand, listProductOutStandSlice, listProductSlice } from "../../../store/product/productSlice";
 import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
+import IProduct from "../../../store/product/product.interface";
 
 const Outstanding_Product = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -13,16 +14,37 @@ const Outstanding_Product = () => {
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const productOutStandState = useSelector((state: RootState) => state.productOutstandReducer.products)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+  const productState = useSelector((state: RootState) => state.productSlice.products)
+  console.log(productOutStandState);
+
   useEffect(() => {
     if (isSuccessProduct) {
-      dispatch(listProductOutStandSlice(listProduct))
+      const productOutStand: any = []
+      productDetailState?.filter((proSold) => proSold && proSold.sold >= 1).map((proDetail) => {
+        productState?.filter((productId) => productId._id === proDetail.product_id).map((product) => {
+          return productOutStand?.push(product)
+        })
+      })
+      if (productOutStand) {
+        dispatch(listProductOutStand(productOutStand))
+      }
     }
-  }, [isSuccessProduct])
+  }, [isSuccessProduct, productDetailState, productState])
   useEffect(() => {
     if (isSuccessProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail))
     }
   }, [isSuccessProductDetail])
+  // useEffect(() => {
+  //   if (productDetailState && productState) {
+  //     const productOutStand: any = []
+  //     productDetailState.filter((proSold) => proSold && proSold.sold == 1).map((proDetail) => {
+  //       productState.filter((productId) => productId._id === proDetail.product_id).map((product) => productOutStand.push(product)
+  //       )
+  //     })
+  //     console.log(productOutStand);
+  //   }
+  // }, [])
   return (
     <div className="max-w-[1500px] mx-auto mb-[60px]">
       <div className="text-center mb-[30px]">
@@ -34,13 +56,13 @@ const Outstanding_Product = () => {
       <div className="outstanding-product mb-12 flex gap-x-[25px] flex-wrap gap-y-[30px]">
         {productOutStandState?.map((product, index) => {
           return <div key={index} className="relative group w-[280px] border border-[#000]">
-            <a href={`/products/${product._id}`}>
+            <Link to={`/products/${product._id}`}>
               <img
                 src={product.images?.[0]}
                 className="mx-auto h-[360px] w-full"
                 alt=""
               />
-            </a>
+            </Link>
             <div className="product-info p-[8px] bg-white">
               <div className="text-sm flex justify-between mb-3">
                 <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>

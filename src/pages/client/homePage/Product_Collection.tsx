@@ -12,7 +12,6 @@ import { listProductDetailSlice } from "../../../store/productDetail/productDeta
 const Product_Collection = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
-  console.log(listCategory);
 
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
@@ -61,15 +60,15 @@ const Product_Collection = () => {
         <div className="outstanding-product mb-12 grid grid-cols-5 gap-[10px]">
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <div key={index} className="relative group w-[280px] cursor-pointer">
-              <button type="submit">
-                <a href={`/products/${product._id}`}>
-                  <img
-                    src={`${product?.images?.[0]}`}
-                    className="mx-auto h-[360px] w-full"
-                    alt=""
-                  />
-                </a>
-              </button>
+              {/* <button type="submit"> */}
+              <Link to={`/products/${product._id}`}>
+                <img
+                  src={`${product?.images?.[0]}`}
+                  className="mx-auto h-[360px] w-full"
+                  alt=""
+                />
+              </Link>
+              {/* </button> */}
               <div className="product-info p-[8px] bg-white">
                 <div className="text-sm flex justify-between mb-3">
                   {/* color */}
