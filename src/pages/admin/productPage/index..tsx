@@ -28,7 +28,7 @@ import { useFetchListCategoryQuery } from '../../../store/category/category.serv
 import { ColumnsType, TableProps } from 'antd/es/table';
 
 interface DataType {
-    key: React.Key;
+    _id: React.Key;
     title: string;
     images: any[];
     price: number;
@@ -173,7 +173,7 @@ const productPage = () => {
     ];
 
     const data: DataType[] = productSearchState.map((product: any) => ({
-        key: product._id,
+        _id: product._id,
         title: product.title,
         images: product.images,
         price: product.price,

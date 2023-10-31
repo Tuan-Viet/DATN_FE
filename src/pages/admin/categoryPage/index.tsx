@@ -21,7 +21,7 @@ import { RootState } from '../../../store';
 import { ICategory } from '../../../store/category/category.interface';
 import { ColumnsType, TableProps } from 'antd/es/table';
 interface DataType {
-    key: React.Key;
+    _id: React.Key;
     name: string;
     ICategory: string;
 }
@@ -108,7 +108,7 @@ const categoryPage = () => {
     ];
 
     const data: DataType[] = categoryState.map((category: any) => ({
-        key: category._id,
+        _id: category._id,
         name: category.name,
         ICategory: category.ICategory,
     }));

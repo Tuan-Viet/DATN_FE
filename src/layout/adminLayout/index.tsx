@@ -6,7 +6,8 @@ import {
     PieChartOutlined,
     CodeSandboxOutlined,
     AppstoreAddOutlined,
-    LogoutOutlined
+    LogoutOutlined,
+    UserOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
@@ -39,6 +40,8 @@ const items: MenuItem[] = [
         getItem(<Link to={"/admin/category/add"}>Create New</Link >, '5'),
         getItem(<Link to={"/admin/category"}>View List</Link >, '6'),
     ]),
+    getItem(<Link to={"/admin/user"}>User</Link >, '7', <UserOutlined />),
+
     getItem('Logout', '9', <LogoutOutlined />),
 ];
 
