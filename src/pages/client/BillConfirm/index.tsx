@@ -1,3 +1,4 @@
+
 import React, { Dispatch, useEffect, useState } from "react";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
@@ -62,6 +63,7 @@ const BillConfirm = () => {
     }
     setTotalCart(total)
   }, [getOneOrder])
+
   return (
     <>
       <Header></Header>
@@ -83,6 +85,7 @@ const BillConfirm = () => {
                 xác nhận đơn hàng bằng Email.
               </p>
             </div>
+
             <form action="">
               <Link
                 to="/"
@@ -242,6 +245,7 @@ const BillConfirm = () => {
                 </div>
               </div>
             </form>
+
           </div>
         </div>
       </div>

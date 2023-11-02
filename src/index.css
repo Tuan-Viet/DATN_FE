@@ -3,7 +3,9 @@
 @tailwind utilities;
 
 .container {
-  max-width: 1500px;
+
+  max-width: 1520px;
+
   padding: 0 20px;
   margin: 0 auto;
 }
@@ -14,7 +16,9 @@
 }
 
 html {
-  font-family: "Quicksand", sans-serif;
+
+  font-family: "Roboto", sans-serif;
+
   font-size: 16px;
   font-weight: 400;
 }
@@ -43,11 +47,9 @@ html {
 .swiper-button-prev {
   color: white;
 }
-
 .swiper-button-next {
   color: white;
 }
-
 .swiper-pagination-bullet-active {
   background-color: #fff;
 }
@@ -66,4 +68,8 @@ html {
     0 1px 3px rgba(0, 0, 0, 0.3), 0 3px 5px rgba(0, 0, 0, 0.2),
     0 5px 10px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.2),
     0 20px 20px rgba(0, 0, 0, 0.15);
+}
+.container-2 {
+  max-width: 1490px;
+  margin: 0 auto;
 }

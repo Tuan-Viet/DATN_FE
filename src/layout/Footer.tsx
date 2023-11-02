@@ -30,8 +30,8 @@ const Footer = () => {
                     <div className="">
                         <h3 className="text-[16px] text-[#666666] font-semibold my-[10px]">Phương thức vận chuyển</h3>
                         <div className="flex">
-                            <img src="../../public/images/icon-ship/shipment_1_img.jpg" alt="" />
-                            <img className='ml-3' src="../../public/images/icon-ship/shipment_2_img.jpg" alt="" />
+                            <img src="/images/icon-ship/shipment_1_img.jpg" alt="" />
+                            <img className='ml-3' src="/images/icon-ship/shipment_2_img.jpg" alt="" />
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@ const Footer = () => {
                         <input className='py-3 px-3 border border-gray-300 focus:outline-none' type="text" placeholder='Nhập email của bạn...' />
                         <button className='bg-[#333333] py-3 px-3 text-white'>Đăng kí</button>
                     </form>
-                    <img src="../../public/images/logo-bct/footer_logobct_img.jpg" alt="" />
+                    <img src="/images/logo-bct/footer_logobct_img.jpg" alt="" />
                     {/* <h3 className='text-[#666666] font-bold my-[15px] tracking-wide'>Phương thức thanh toán</h3> */}
                 </div>
             </div>

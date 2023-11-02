@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
@@ -95,6 +96,7 @@ const CheckoutsPage = () => {
           {/* {loading && (
           )} */}
           <div className="">
+
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
                 <div className="mb-3">
@@ -114,21 +116,26 @@ const CheckoutsPage = () => {
                 <div>
                   <div className="mb-3">
                     <input
+
                       {...register("email")}
+
                       type="email"
                       id="email"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Email"
+
                     />
                     <p className="text-red-500 italic text-sm">{errors ? errors.email?.message : ""}</p>
                   </div>
                   <div className="mb-3">
                     <input
                       {...register("fullName")}
+
                       type="text"
                       id="fullName"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Họ và tên"
+
                     />
                     <p className="text-red-500 italic text-sm">{errors ? errors.fullName?.message : ""}</p>
 
@@ -136,10 +143,12 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <input
                       {...register("phoneNumber")}
+
                       type="text"
                       id="phoneNumber"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Số điện thoại"
+
                     />
                     <p className="text-red-500 italic text-sm">{errors ? errors.phoneNumber?.message : ""}</p>
 
@@ -147,16 +156,19 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <input
                       {...register("address")}
+
                       type="text"
                       id="address"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                       placeholder="Địa chỉ"
+
                     />
                     <p className="text-red-500 italic text-sm">{errors ? errors.address?.message : ""}</p>
                   </div>
                   <div className="mb-3">
                     <textarea
                       {...register("note")}
+
                       id="note"
                       rows={4}
                       className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary focus:border-primary"
@@ -239,6 +251,7 @@ const CheckoutsPage = () => {
             </div>
           </div>
           <div className="border-l-[1px] py-5 pl-5 w-full">
+
             <h1 className="text-xl font-bold mb-5">Đơn hàng ({cartState.length} sản phẩm)</h1>
             <div className="pt-7 border-t-[1px] border-b-[1px] h-[430px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
@@ -299,6 +312,7 @@ const CheckoutsPage = () => {
                   }
                 </div>
               })}
+
             </div>
             <div className="py-5 flex gap-3 border-b-[1px]">
               <input
@@ -306,14 +320,18 @@ const CheckoutsPage = () => {
                 className="p-3 border rounded-lg w-full"
                 placeholder="Nhập mã giảm giá"
               />
+
               <div className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
                 Áp dụng
               </div>
+
             </div>
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
+
                 <span className="font-medium">{totalCart.toLocaleString("vi-VN")}₫</span>
+
               </div>
               <div className="flex justify-between">
                 <span>Phí vận chuyển:</span>
@@ -322,7 +340,9 @@ const CheckoutsPage = () => {
             </div>
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
+
               <span className="text-black text-2xl font-bold">{(totalCart + 40000).toLocaleString("vi-VN")}₫</span>
+
             </div>
             <div className="flex justify-between">
               <Link
@@ -343,7 +363,9 @@ const CheckoutsPage = () => {
                     d="M15.75 19.5L8.25 12l7.5-7.5"
                   />
                 </svg>
+
                 <Link to="/cart">Quay về giỏ hàng</Link>
+
               </Link>
               <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                 Đặt hàng
