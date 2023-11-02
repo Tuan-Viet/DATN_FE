@@ -2,15 +2,16 @@ import React, { Dispatch, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../store'
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { register } from "../store/user/userSlice";
-import axios from "axios";
 import { useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
 import { decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store/productDetail/productDetail.service'
 import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
 import { useFetchListProductQuery } from '../store/product/product.service'
 import { listProductSlice } from '../store/product/productSlice'
+import { toast } from "react-toastify";
+import { register } from "../store/user/userSlice";
+import axios from "axios";
+import { logout } from "../store/user/userSlice";
 import {
   Breadcrumb,
   Button,
@@ -71,6 +72,31 @@ const Header = () => {
       }
     }
   };
+
+  const user = useSelector((state: any) => state.user);
+  const isLoggedIn = user?.isLoggedIn;
+  const fullName = user?.current?.fullname;
+  const role = user?.current?.role;
+
+  const logOut = () => {
+    // Gọi action đăng xuất
+    dispatch(logout());
+    toast.success("Bạn đã đăng xuất!");
+    navigate("/signin");
+  };
+
+  // const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+  // const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+  // const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
+  // const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  // const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+  // const productState = useSelector((state: RootState) => state.productSlice.products)
+  // const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+  // const [onRemoveCart] = useDeleteCartMutation()
+  // const [onUpdateCart] = useUpdateCartMutation()
+  // const cartStore = JSON.parse(localStorage.getItem("carts")!)
+  // const [totalCart, setTotalCart] = useState<number>(0)
+  // const userStore = JSON.parse(localStorage.getItem("user")!)
 
   useEffect(() => {
     if (listCart) {
@@ -366,7 +392,7 @@ const Header = () => {
                   <Link to="" className="w-[35%]">
                     <img
                       className="w-full"
-                      src="../../public/images/imgs-menu/mega_menu_3_img.jpg"
+                      src="/images/imgs-menu/mega_menu_3_img.jpg"
                       alt=""
                     />
                   </Link>
@@ -460,7 +486,7 @@ const Header = () => {
                   <Link to="" className="w-[35%]">
                     <img
                       className="w-full"
-                      src="../../public/images/imgs-menu/mega_menu_2_img.jpg"
+                      src="/images/imgs-menu/mega_menu_2_img.jpg"
                       alt=""
                     />
                   </Link>
@@ -523,115 +549,149 @@ const Header = () => {
                     d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
                   />
                 </svg>
-                <div className="w-[350px] h-[400px] top-[190%] right-[-23px] py-[15px] px-[20px] absolute z-50 bg-white shadow-inner tracking-wide before:content-[''] before:absolute before:top-0 before:right-[3rem] before:border-l-[12px]  before:border-r-[10px] before:border-t-[10px] before:border-b-[10px] before:border-l-white before:border-r-white before:border-b-white before:translate-y-[-100%] before:rotate-[180deg] dropdown-user opacity-0 transition-all ease-in-out pointer-events-none cursor-pointer overflow-x-hidden">
-                  <div className="relative">
-                    {/* singin */}
-                    <div className="flex flex-col transition-all ease-in-out signinDropdown absolute left-0 right-0  items-center">
-                      <h1 className="uppercase text-[18px] text-[#333333]">
-                        Đăng nhập tài khoản
-                      </h1>
-                      <p className="text-[#666666]">
-                        Nhập email và mật khẩu của bạn
-                      </p>
-                      <hr className="my-4 w-full" />
-                      <Form
-                        form={form}
-                        onFinish={handSubmitSignin}
-                        initialValues={{
-                          residence: ["zhejiang", "hangzhou", "xihu"],
-                          prefix: "86",
-                        }}
-                        className="w-full"
-                        scrollToFirstError
-                      >
-                        <Form.Item
-                          name="email"
-                          className="mb-1"
-                          rules={[
-                            {
-                              type: "email",
-                              message: "Email không hợp lệ",
-                            },
-                            {
-                              required: true,
-                              message: "Vui lòng nhập email",
-                            },
-                          ]}
-                        >
-                          <input
-                            type="text"
-                            className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
-                            placeholder="Email"
-                          />
-                        </Form.Item>
-                        <Form.Item
-                          name="password"
-                          className="mb-0"
-                          rules={[
-                            {
-                              required: true,
-                              message: "Vui lòng nhâp mật khẩu",
-                            },
-                            {
-                              min: 6,
-                              message: "Mật khẩu tối thiểu 6 kí tự",
-                            },
-                          ]}
-                        >
-                          <input
-                            type="password"
-                            className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
-                            placeholder="Mật khẩu"
-                          />
-                        </Form.Item>
-                        <Form.Item>
-                          <button className="w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg">
-                            Đăng nhập
-                          </button>
-                          <div className="flex text-[#666666] w-full text-[12px] justify-between mt-8">
-                            <p>Bạn đã có tài khoản chưa?</p>
-                            <Link to="/signup" className="hover:text-black">
-                              Tạo tài khoản
-                            </Link>
-                          </div>
-                          <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
-                            <p>Quên mật khẩu?</p>
-                            <button
-                              onClick={forgotPassword}
-                              className="hover:text-black"
-                            >
-                              Khôi phục mật khẩu
-                            </button>
-                          </div>
-                        </Form.Item>
-                      </Form>
-                    </div>
-                    {/* khôi phục mật khẩu */}
-                    <div className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
-                      <h1 className="uppercase text-[18px] text-[#333333]">
-                        Khôi phục mật khẩu
-                      </h1>
-                      <p className="text-[#666666]">Nhập email của bạn</p>
-                      <hr className="my-4 w-full" />
-                      <input
-                        type="text"
-                        className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
-                        placeholder="Email"
-                      />
-                      <button className="w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg">
-                        Khôi phục
-                      </button>
-                      <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
-                        <p>Bạn đã nhớ mật khẩu?</p>
-                        <button
-                          onClick={backSigninDropdown}
-                          className="hover:text-black"
-                        >
-                          Trở về đăng nhập
-                        </button>
+                <div className="top-[190%] right-[-23px] py-[15px] rounded-b-lg px-[20px] absolute z-50 bg-white shadow-lg tracking-wide before:content-[''] before:absolute before:top-0 before:right-[3rem] before:border-l-[12px]  before:border-r-[10px] before:border-t-[10px] before:border-b-[10px] before:border-l-white before:border-r-white before:border-b-white before:translate-y-[-100%] before:rotate-[180deg] dropdown-user opacity-0 transition-all ease-in-out pointer-events-none overflow-x-hidden">
+                  {isLoggedIn ? (
+                    <div className="relative w-[260px] h-[200px]">
+                      <div className="flex flex-col transition-all ease-in-out signinDropdown absolute left-0 right-0">
+                        <h1 className="uppercase text-center pb-2 mb-5 border-b-[1px] text-lg tracking-widest text-[#333333]">
+                          Thông tin tài khoản
+                        </h1>
+                        <div>
+                          <h2 className="mb-2">Xin chào: {fullName}</h2>
+                          <ul className="ml-5 text-sm">
+                            <li className="list-disc font-light mb-1">
+                              <Link to="">Tài khoản của tôi</Link>
+                            </li>
+                            {role == "admin" ? (
+                              <li className="list-disc font-light mb-1">
+                                <Link to="">Quản trị</Link>
+                              </li>
+                            ) : null}
+                            <li className="list-disc font-light mb-1">
+                              <Link to="">Đơn hàng của tôi</Link>
+                            </li>
+                            <li className="list-disc font-light mb-1">
+                              <Link to="">Danh sách địa chỉ</Link>
+                            </li>
+                            <li className="list-disc font-light mb-1">
+                              <button onClick={() => logOut()}>
+                                Đăng xuất
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="relative w-[350px] h-[400px]">
+                      {/* singin */}
+                      <div className="flex flex-col transition-all ease-in-out signinDropdown absolute left-0 right-0  items-center">
+                        <h1 className="uppercase text-[18px] text-[#333333]">
+                          Đăng nhập tài khoản
+                        </h1>
+                        <p className="text-[#666666]">
+                          Nhập email và mật khẩu của bạn
+                        </p>
+                        <hr className="my-4 w-full" />
+                        <Form
+                          form={form}
+                          onFinish={handSubmitSignin}
+                          initialValues={{
+                            residence: ["zhejiang", "hangzhou", "xihu"],
+                            prefix: "86",
+                          }}
+                          className="w-full"
+                          scrollToFirstError
+                        >
+                          <Form.Item
+                            name="email"
+                            className="mb-1"
+                            rules={[
+                              {
+                                type: "email",
+                                message: "Email không hợp lệ",
+                              },
+                              {
+                                required: true,
+                                message: "Vui lòng nhập email",
+                              },
+                            ]}
+                          >
+                            <input
+                              type="text"
+                              className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
+                              placeholder="Email"
+                            />
+                          </Form.Item>
+                          <Form.Item
+                            name="password"
+                            className="mb-0"
+                            rules={[
+                              {
+                                required: true,
+                                message: "Vui lòng nhâp mật khẩu",
+                              },
+                              {
+                                min: 6,
+                                message: "Mật khẩu tối thiểu 6 kí tự",
+                              },
+                            ]}
+                          >
+                            <input
+                              type="password"
+                              className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
+                              placeholder="Mật khẩu"
+                            />
+                          </Form.Item>
+                          <Form.Item>
+                            <button className="w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg">
+                              Đăng nhập
+                            </button>
+                            <div className="flex text-[#666666] w-full text-[12px] justify-between mt-8">
+                              <p>Bạn đã có tài khoản chưa?</p>
+                              <Link to="/signup" className="hover:text-black">
+                                Tạo tài khoản
+                              </Link>
+                            </div>
+                            <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
+                              <p>Quên mật khẩu?</p>
+                              <button
+                                onClick={forgotPassword}
+                                className="hover:text-black"
+                              >
+                                Khôi phục mật khẩu
+                              </button>
+                            </div>
+                          </Form.Item>
+                        </Form>
+                      </div>
+                      {/* khôi phục mật khẩu */}
+                      <div className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
+                        <h1 className="uppercase text-[18px] text-[#333333]">
+                          Khôi phục mật khẩu
+                        </h1>
+                        <p className="text-[#666666]">Nhập email của bạn</p>
+                        <hr className="my-4 w-full" />
+                        <input
+                          type="text"
+                          className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
+                          placeholder="Email"
+                        />
+                        <button className="w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg">
+                          Khôi phục
+                        </button>
+                        <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
+                          <p>Bạn đã nhớ mật khẩu?</p>
+                          <button
+                            onClick={backSigninDropdown}
+                            className="hover:text-black"
+                          >
+                            Trở về đăng nhập
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="left-0 right-0 bottom-0 absolute hidden overlay-dropdownUser bg-[#666666] opacity-30 w-full h-[100vh] top-[100%]"></div>
@@ -651,11 +711,15 @@ const Header = () => {
                     d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                   />
                 </svg>
-                <span className='w-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]'>{cartState.length}</span>
-              </div >
-            </div >
-          </div >
-        </div >
+
+                <span className="w-[20px] h-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]">
+                  {cartState.length}
+                </span>
+
+              </div>
+            </div>
+          </div>
+        </div>
         {/* overlay-cart */}
         <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]" ></div >
         {/* cart */}

@@ -10,7 +10,7 @@ const Policy = () => {
             <p className="mb-3 font-medium">Miễn phí vận chuyển</p>
             <p className="text-sm max-w-[255px]">Áp dụng cho mọi đơn hàng từ 500k</p>
           </div>
-        </div>
+        </div >
         <div className="flex gap-x-[15px] items-center">
           <img src="/images/icon/home_policy_icon_2.png" alt="" className="w-[48px] h-[48px]" />
           <div className="">
@@ -58,8 +58,8 @@ const Policy = () => {
             <p className="text-sm max-w-[255px]">Thanh toán khi nhận hàng, Napas, Visa, Chuyển Khoản</p>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 
