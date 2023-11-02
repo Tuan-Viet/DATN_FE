@@ -53,9 +53,9 @@ const signin = () => {
           userData: response?.data?.user,
         })
       );
-      if(response?.data?.user?.role == "user") {
+      if (response?.data?.user?.role == "user") {
         navigate("/");
-      } else if(response?.data?.user?.role == "admin") {
+      } else if (response?.data?.user?.role == "admin") {
         navigate("/admin");
       }
     } catch (error: any) {

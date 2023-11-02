@@ -432,13 +432,10 @@ const productUpdate = () => {
 
                                                     </Upload>
                                                 </Form.Item>
-
-
                                                 <Form.Item name={[field.name, 'nameColor']}>
                                                     <Input placeholder="Enter Color Image" />
                                                 </Form.Item>
                                             </div>
-
                                             <div className="w-2/3">
                                                 {/* Nest Form.List */}
                                                 <Form.Item label="">

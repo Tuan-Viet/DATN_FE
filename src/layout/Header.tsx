@@ -1,15 +1,17 @@
-const Header = () => {
-  
 import React, { Dispatch, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, useNavigate } from 'react-router-dom'
 import { RootState } from '../store'
+import { Link, useNavigate } from "react-router-dom";
 import { useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
 import { decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store/productDetail/productDetail.service'
 import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
 import { useFetchListProductQuery } from '../store/product/product.service'
 import { listProductSlice } from '../store/product/productSlice'
+import { toast } from "react-toastify";
+import { register } from "../store/user/userSlice";
+import axios from "axios";
+import { logout } from "../store/user/userSlice";
 import {
   Breadcrumb,
   Button,
@@ -18,20 +20,29 @@ import {
   Space,
   message,
 } from 'antd';
-import { toast } from "react-toastify";
-import { register } from "../store/user/userSlice";
-import axios from "axios";
-import { logout } from "../store/user/userSlice";
 
 type FormDataType = {
   email: string;
   password: string;
 };
-    
+
 const Header = () => {
+  const dispatch: Dispatch<any> = useDispatch()
+  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+  const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+  const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
+  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+  const productState = useSelector((state: RootState) => state.productSlice.products)
+  const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+  const [onRemoveCart] = useDeleteCartMutation()
+  const [onUpdateCart] = useUpdateCartMutation()
+  const cartStore = JSON.parse(localStorage.getItem("carts")!)
+  // const userStore = JSON.parse(localStorage.getItem("user")!)
+  const [totalCart, setTotalCart] = useState<number>(0)
+
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const dispatch: Dispatch<any> = useDispatch()
 
   const handSubmitSignin = async (data: FormDataType) => {
     try {
@@ -62,7 +73,7 @@ const Header = () => {
     }
   };
 
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state: any) => state.user);
   const isLoggedIn = user?.isLoggedIn;
   const fullName = user?.current?.fullname;
   const role = user?.current?.role;
@@ -73,19 +84,19 @@ const Header = () => {
     toast.success("Bạn đã đăng xuất!");
     navigate("/signin");
   };
-  
-  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
-  const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
-  const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
-  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
-  const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
-  const productState = useSelector((state: RootState) => state.productSlice.products)
-  const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
-  const [onRemoveCart] = useDeleteCartMutation()
-  const [onUpdateCart] = useUpdateCartMutation()
-  const cartStore = JSON.parse(localStorage.getItem("carts")!)
+
+  // const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+  // const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+  // const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
+  // const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  // const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+  // const productState = useSelector((state: RootState) => state.productSlice.products)
+  // const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+  // const [onRemoveCart] = useDeleteCartMutation()
+  // const [onUpdateCart] = useUpdateCartMutation()
+  // const cartStore = JSON.parse(localStorage.getItem("carts")!)
+  // const [totalCart, setTotalCart] = useState<number>(0)
   // const userStore = JSON.parse(localStorage.getItem("user")!)
-  const [totalCart, setTotalCart] = useState<number>(0)
 
   useEffect(() => {
     if (listCart) {
@@ -211,10 +222,8 @@ const Header = () => {
       overlayCart?.classList.remove("translate-x-[100%]", "opacity-0");
       const dropdown = document.querySelector(".dropdown-user");
       if (!dropdown?.classList.contains("opacity-0")) {
-
-        dropdown?.classList.add("opacity-0")
-        dropdown?.classList.add("pointer-events-none")
-
+        dropdown?.classList.add("opacity-0");
+        dropdown?.classList.add("pointer-events-none");
       }
     });
     iconOutCart?.addEventListener("click", () => {
@@ -228,7 +237,6 @@ const Header = () => {
       closeDropdownUser();
     });
     overlayCart?.addEventListener("click", (e) => {
-
       // e.stopPropagation()
     })
   }, [])
@@ -241,7 +249,6 @@ const Header = () => {
     }
     setTotalCart(total)
   }, [cartState])
-
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -714,12 +721,11 @@ const Header = () => {
           </div>
         </div>
         {/* overlay-cart */}
-        <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]"></div>
+        <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]" ></div >
         {/* cart */}
-        <div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between">
+        < div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between" >
           {/* list product */}
-          <div className="">
-
+          < div className="" >
             <h1 className='font-bold tracking-wide text-[20px] mb-[10px]' >Giỏ hàng</h1>
             <h1 className="tracking-wide py-[10px] text-sm">Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong> để có thể <strong className="uppercase">miễn phí vận chuyển</strong></h1>
             <hr className='my-[20px]' />
@@ -784,7 +790,6 @@ const Header = () => {
                   }
                 </div>
               })}
-
             </div>
           </div>
           {/* pay */}
@@ -792,18 +797,16 @@ const Header = () => {
             <div className="flex justify-between">
               <p className="text-lg font-bold">Tổng tiền:</p>
               <div className="">
-
                 <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart.toLocaleString("vi-VN")}đ</p>
               </div>
-            </div>
+            </div >
             <div className="grid grid-cols-2 gap-[10px]">
               <Link to="/checkout">
                 <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
               </Link>
               <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/cart">Xem giỏ hàng</Link></button>
-
             </div>
-          </div>
+          </div >
           <div className="absolute right-[10px] top-[10px] icon-outCart">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -820,8 +823,8 @@ const Header = () => {
               />
             </svg>
           </div>
-        </div>
-      </div>
+        </div >
+      </div >
     </>
   );
 };

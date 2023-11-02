@@ -25,6 +25,17 @@ import { ICategory } from '../../../store/category/category.interface';
 import { useForm } from "react-hook-form";
 import { listCategorySlice } from '../../../store/category/categorySlice';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
+import { ColumnsType, TableProps } from 'antd/es/table';
+
+interface DataType {
+    _id: React.Key;
+    title: string;
+    images: any[];
+    price: number;
+    discount: number;
+    description: string;
+    categoryId: string;
+}
 
 
 const productPage = () => {
@@ -78,7 +89,7 @@ const productPage = () => {
             console.log(error);
         }
     }
-    const columns = [
+    const columns: ColumnsType<DataType> = [
         {
             title: 'Product Name',
             key: 'name',
@@ -94,20 +105,25 @@ const productPage = () => {
                     <a className='w-full overflow-hidden ml-1'>{record?.title}</a>
                 </div>
             ),
+            sorter: (a, b) => a.title.localeCompare(b.title), // Sắp xếp theo bảng chữ cái
+            sortDirections: ['ascend', 'descend'],
             className: 'w-1/4',
         },
         {
             title: 'Price',
             dataIndex: 'price',
             key: 'price',
-            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+            sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
+            sortDirections: ['ascend', 'descend'],
         },
         {
             title: 'Discount',
             dataIndex: 'discount',
             key: 'discount',
-            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-
+            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+            sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
+            sortDirections: ['ascend', 'descend'],
         },
         {
             title: 'Description',
@@ -120,7 +136,8 @@ const productPage = () => {
             dataIndex: 'categoryId',
             key: 'categoryId',
             render: (cateId: any) => {
-                const category = categoryState.find((cate) => cate._id === cateId._id);
+                const category = categoryState.find((cate) => cate._id === (cateId && cateId._id));
+
                 console.log(category);
 
                 return category ? category.name : 'N/A';
@@ -154,6 +171,19 @@ const productPage = () => {
         },
 
     ];
+
+    const data: DataType[] = productSearchState.map((product: any) => ({
+        _id: product._id,
+        title: product.title,
+        images: product.images,
+        price: product.price,
+        discount: product.discount,
+        description: product.description,
+        categoryId: product.categoryId,
+    }));
+    const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
+        console.log('params', pagination, filters, sorter, extra);
+    };
     return (
         <div className="">
             {contextHolder}
@@ -184,7 +214,7 @@ const productPage = () => {
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={productSearchState} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
             </div>
         </div>
     )

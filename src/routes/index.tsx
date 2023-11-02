@@ -7,6 +7,8 @@ import dashboardPage from "../pages/admin/dashboard";
 import productAdd from "../pages/admin/productAdd";
 import productPage from "../pages/admin/productPage/index.";
 import productUpdate from "../pages/admin/productUpdate";
+import userPage from "../pages/admin/userPage";
+import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
@@ -37,4 +39,6 @@ export const privateRoutes = [
     { path: routes.adminCategorys, Component: categoryPage },
     { path: routes.adminCategoryAdd, Component: categoryAdd },
     { path: routes.adminCategoryUpdate, Component: categoryUpdate },
+    { path: routes.adminUsers, Component: userPage },
+    { path: routes.adminUserUpdate, Component: userUpdate },
 ]

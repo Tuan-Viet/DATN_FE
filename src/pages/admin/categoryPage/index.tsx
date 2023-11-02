@@ -19,6 +19,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteCategorySlice, listCategorySlice } from '../../../store/category/categorySlice';
 import { RootState } from '../../../store';
 import { ICategory } from '../../../store/category/category.interface';
+import { ColumnsType, TableProps } from 'antd/es/table';
+interface DataType {
+    _id: React.Key;
+    name: string;
+    ICategory: string;
+}
 
 const categoryPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
@@ -54,13 +60,12 @@ const categoryPage = () => {
             }
         } catch (error) {
             console.log(error);
-
         }
 
     }
 
 
-    const columns = [
+    const columns: ColumnsType<DataType> = [
         {
             title: 'Category Name',
             key: 'name',
@@ -74,7 +79,9 @@ const categoryPage = () => {
                     /> */}
                     <a className='w-full overflow-hidden'>{record.name}</a>
                 </div>
-            )
+            ),
+            sorter: (a, b) => a.name.localeCompare(b.name), // Sắp xếp theo bảng chữ cái
+            sortDirections: ['ascend', 'descend'],
         },
         {
             title: 'Action',
@@ -100,6 +107,14 @@ const categoryPage = () => {
 
     ];
 
+    const data: DataType[] = categoryState.map((category: any) => ({
+        _id: category._id,
+        name: category.name,
+        ICategory: category.ICategory,
+    }));
+    const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
+        console.log('params', pagination, filters, sorter, extra);
+    };
     return (
         <div className="">
             {contextHolder}
@@ -121,7 +136,7 @@ const categoryPage = () => {
                 </Link>
             </Space>
             <div className="border min-h-[300px] p-3 rounded-lg  bg-white">
-                <Table columns={columns} dataSource={categoryState} pagination={{ pageSize: 20 }} />
+                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
             </div>
         </div>
     )

@@ -7,9 +7,10 @@ import {
   CodeSandboxOutlined,
   AppstoreAddOutlined,
   LogoutOutlined,
-} from "@ant-design/icons";
-import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+  UserOutlined
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { useSelector } from "react-redux";
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -31,24 +32,22 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem(
-    <Link to={"/admin/dashboard"}>Dashboard</Link>,
-    "1",
-    <PieChartOutlined />
-  ),
-  getItem("Products", "sub1", <CodeSandboxOutlined />, [
-    getItem(<Link to={"/admin/product/add"}>Create New</Link>, "3"),
-    getItem(<Link to={"/admin/product"}>View List</Link>, "4"),
+  getItem(<Link to={"/admin/dashboard"}>Dashboard</Link >, '1', <PieChartOutlined />),
+  getItem('Products', 'sub1', <CodeSandboxOutlined />, [
+    getItem(<Link to={"/admin/product/add"}>Create New</Link >, '3'),
+    getItem(<Link to={"/admin/product"}>View List</Link >, '4'),
   ]),
-  getItem("Category", "sub2", <AppstoreAddOutlined />, [
-    getItem(<Link to={"/admin/category/add"}>Create New</Link>, "5"),
-    getItem(<Link to={"/admin/category"}>View List</Link>, "6"),
+  getItem('Category', 'sub2', <AppstoreAddOutlined />, [
+    getItem(<Link to={"/admin/category/add"}>Create New</Link >, '5'),
+    getItem(<Link to={"/admin/category"}>View List</Link >, '6'),
   ]),
-  getItem("Logout", "9", <LogoutOutlined />),
+  getItem(<Link to={"/admin/user"}>User</Link >, '7', <UserOutlined />),
+
+  getItem('Logout', '9', <LogoutOutlined />),
 ];
 
 const AdminLayout = ({ children }: Props) => {
-  const user = useSelector((state) => state.user);
+  const user = useSelector((state: any) => state.user);
   const role = user?.current?.role
   const navigate = useNavigate();
   useEffect(() => {

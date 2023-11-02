@@ -19,7 +19,10 @@ const routes = {
     adminProductUpdate: "/admin/product/update/:id",
     adminCategorys: "/admin/category",
     adminCategoryAdd: "/admin/category/add",
-    adminCategoryUpdate: "/admin/category/update/:id"
+    adminCategoryUpdate: "/admin/category/update/:id",
+    adminUsers: "/admin/user",
+    adminUserUpdate: "/admin/user/update/:id",
+
 
 }
 

@@ -29,38 +29,38 @@ const userConfig = {
 
 export const store = configureStore({
 
-    reducer: {
-        [categoryApi.reducerPath]: categoryApi.reducer,
-        [productAPI.reducerPath]: productAPI.reducer,
-        [productDetailAPI.reducerPath]: productDetailAPI.reducer,
-        [cartAPI.reducerPath]: cartAPI.reducer,
-        [orderAPI.reducerPath]: orderAPI.reducer,
-        [orderDetailAPI.reducerPath]: orderDetailAPI.reducer,
-        // category
-        categorySlice: categorySlice,
-        // product
-        productSlice: productSliceReducer,
-        productFilterSlice: productFilterSliceReducer,
-        productSaleSlice: productSaleSliceReducer,
-        productSearchReducer: productSearchReducer,
-        productOutstandReducer: productOutstandReducer,
-        productRelatedSliceReducer: productRelatedSliceReducer,
-        // productDetail
-        productDetailSlice: productDetailSlice,
-        productDetailFilterSliceReducer: productDetailFilterSliceReducer,
-        productDetailIdReducer: productDetailIdReducer,
-        // cart
-        cartSlice: cartSlice,
-        cartLocalReducer: cartLocalReducer,
-        // order
-        orderSlice: orderSlice,
-        // orderDetail
-        orderDetailSlice: orderDetailSlice
-        // user 
-        user: persistReducer(userConfig, userSlice)
-    },
-    middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware),
+  reducer: {
+    [categoryApi.reducerPath]: categoryApi.reducer,
+    [productAPI.reducerPath]: productAPI.reducer,
+    [productDetailAPI.reducerPath]: productDetailAPI.reducer,
+    [cartAPI.reducerPath]: cartAPI.reducer,
+    [orderAPI.reducerPath]: orderAPI.reducer,
+    [orderDetailAPI.reducerPath]: orderDetailAPI.reducer,
+    // category
+    categorySlice: categorySlice,
+    // product
+    productSlice: productSliceReducer,
+    productFilterSlice: productFilterSliceReducer,
+    productSaleSlice: productSaleSliceReducer,
+    productSearchReducer: productSearchReducer,
+    productOutstandReducer: productOutstandReducer,
+    productRelatedSliceReducer: productRelatedSliceReducer,
+    // productDetail
+    productDetailSlice: productDetailSlice,
+    productDetailFilterSliceReducer: productDetailFilterSliceReducer,
+    productDetailIdReducer: productDetailIdReducer,
+    // cart
+    cartSlice: cartSlice,
+    cartLocalReducer: cartLocalReducer,
+    // order
+    orderSlice: orderSlice,
+    // orderDetail
+    orderDetailSlice: orderDetailSlice,
+    // user 
+    user: persistReducer(userConfig, userSlice)
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware),
 })
 
 
