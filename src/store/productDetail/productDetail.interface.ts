@@ -16,3 +16,10 @@ export interface IProductDetailFilterState {
     nameTerm: string
     productDetails: IProductDetail[]
 }
+
+export interface IGetOneIdProductDetailState {
+    product_id: string,
+    nameColor: string
+    sizeTerm: string
+    productDetails: IProductDetail[]
+}

@@ -1,5 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 import IProduct, { IProductFilterState, IProductSearchState, IProductState } from "./product.interface"
+import { IProductDetail } from "../productDetail/productDetail.interface"
 
 export const initialStateProduct: IProductState = {
     products: []
@@ -85,9 +86,8 @@ const productOutstandSlice = createSlice({
         listProductOutStand: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
             state.products = actions.payload
         },
-        listProductOutStandSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            const productOutStand = actions.payload.filter((product) => product && product.variants)
-            state.products = productOutStand
+        listProductOutStandSlice: (state: IProductState, actions: PayloadAction<IProduct>) => {
+            // state.products = state.products.map((product) => product.s)
         },
     })
 })

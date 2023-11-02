@@ -3,13 +3,22 @@
 @tailwind utilities;
 
 .container {
+
   max-width: 1520px;
+
   padding: 0 20px;
   margin: 0 auto;
 }
 
+.container-2 {
+  max-width: 1490px;
+  margin: 0 auto;
+}
+
 html {
+
   font-family: "Roboto", sans-serif;
+
   font-size: 16px;
   font-weight: 400;
 }
@@ -41,6 +50,14 @@ html {
 .swiper-button-next {
   color: white;
 }
+.swiper-pagination-bullet-active {
+  background-color: #fff;
+}
+
+.swiper-button-next {
+  color: white;
+}
+
 .swiper-pagination-bullet-active {
   background-color: #fff;
 }

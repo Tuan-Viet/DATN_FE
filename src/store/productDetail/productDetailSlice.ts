@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit"
-import { IProductDetail, IProductDetailFilterState, IProductDetailState } from "./productDetail.interface"
+import { IGetOneIdProductDetailState, IProductDetail, IProductDetailFilterState, IProductDetailState } from "./productDetail.interface"
 
 export const initialStateProductDetail: IProductDetailState = {
     productDetails: []
@@ -7,6 +7,12 @@ export const initialStateProductDetail: IProductDetailState = {
 export const initalStateProductDetailFilter: IProductDetailFilterState = {
     _id: "",
     nameTerm: "",
+    productDetails: []
+}
+export const initialGetOneIdProductDetailState: IGetOneIdProductDetailState = {
+    product_id: "",
+    nameColor: "",
+    sizeTerm: "",
     productDetails: []
 }
 
@@ -30,14 +36,29 @@ const productDetailFilterSlice = createSlice({
             state.productDetails = actions.payload
         },
         listProductDetailFilterSlice: (state: IProductDetailFilterState, actions: PayloadAction<IProductDetailFilterState>) => {
-            console.log(actions.payload);
-
             const _id = actions.payload._id.trim()
             const nameColor = actions.payload.nameTerm.trim().toLowerCase()
             if (nameColor) {
                 const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase().includes(nameColor) && product.product_id.includes(_id))
-                console.log(newListProductDetail);
+                state.productDetails = newListProductDetail
 
+            }
+        },
+    })
+})
+const productDetailIdSlice = createSlice({
+    name: "productDetails",
+    initialState: initialGetOneIdProductDetailState,
+    reducers: ({
+        listProductDetailIdFilter: (state: IProductDetailState, actions: PayloadAction<IProductDetail[]>) => {
+            state.productDetails = actions.payload
+        },
+        getOneIdProductDetailSlice: (state: IGetOneIdProductDetailState, actions: PayloadAction<IGetOneIdProductDetailState>) => {
+            const product_id = actions.payload.product_id.trim()
+            const nameColor = actions.payload.nameColor.trim().toLowerCase()
+            const sizeTerm = actions.payload.sizeTerm.trim().toLowerCase()
+            if (nameColor) {
+                const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase().includes(nameColor) && product.product_id.includes(product_id) && product.size.toLowerCase() === sizeTerm)
                 state.productDetails = newListProductDetail
 
             }
@@ -48,6 +69,8 @@ const productDetailFilterSlice = createSlice({
 
 export const { listProductDetailFilter, listProductDetailFilterSlice } = productDetailFilterSlice.actions
 export const { listProductDetailSlice } = productDetailSlice.actions
+export const { listProductDetailIdFilter, getOneIdProductDetailSlice } = productDetailIdSlice.actions
 export const productDetailFilterSliceReducer = productDetailFilterSlice.reducer
+export const productDetailIdReducer = productDetailIdSlice.reducer
 export default productDetailSlice.reducer
 
