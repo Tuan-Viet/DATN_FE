@@ -275,13 +275,13 @@ const ProductInfo = () => {
       }
     }
     // addTocart API
-    useEffect(() => {
-      if (listCartState && productDetailGetOneId && productDetailGetOneId[0]?._id) {
-        const cartId = listCartState.filter((cart) =>
-          cart.productDetailId === productDetailGetOneId[0]._id
-        )
-      }
-    }, [listCartState])
+    // useEffect(() => {
+    //   if (listCartState && productDetailGetOneId && productDetailGetOneId[0]?._id) {
+    //     const cartId = listCartState.filter((cart) =>
+    //       cart.productDetailId === productDetailGetOneId[0]._id
+    //     )
+    //   }
+    // }, [listCartState])
     // const localUserId = JSON.parse(localStorage.getItem("persist:user")!)
     const userStore = useSelector((state: any) => state.user);
     const onAddCartAsync = async () => {
@@ -373,7 +373,7 @@ const ProductInfo = () => {
       }
     }, [isSuccessProductDetail])
     useEffect(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0 });
     }, []);
     return (
       <div className="max-w-[1500px] mx-auto mb-[70px]" id="scroller">

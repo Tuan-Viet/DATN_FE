@@ -6,13 +6,13 @@ export const initialCartState: ICartState = {
 export const initialCartLocalState: ICartLocalState = {
     cartLocals: []
 }
-const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
-
 const cartSlice = createSlice({
     name: "carts",
     initialState: initialCartState,
     reducers: ({
         listCartSlice: (state: ICartState, actions: PayloadAction<ICart[]>) => {
+            const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
+
             if (JSON.parse(userStore)?._id) {
                 const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)._id)
                 state.carts = listCartByUser
@@ -85,6 +85,7 @@ const cartLocalSlice = createSlice({
             state.cartLocals = actions.payload
         },
         removeCartLocalSlice: (state: ICartLocalState, actions: PayloadAction<string>) => {
+            const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
             if (JSON.parse(userStore)?._id) {
                 state.cartLocals = state.cartLocals.filter((cart) => cart._id !== actions.payload)
             } else {
