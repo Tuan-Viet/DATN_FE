@@ -253,7 +253,7 @@ const ProductInfo = () => {
     const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
     const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
     const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
-    const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+    const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
     const [onAddCart] = useAddCartMutation()
     const [onUpdateProDetail] = useUpdateProductDetailMutation()
     const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
@@ -280,13 +280,13 @@ const ProductInfo = () => {
         const cartId = listCartState.filter((cart) =>
           cart.productDetailId === productDetailGetOneId[0]._id
         )
-        console.log(cartId);
       }
     }, [listCartState])
-
+    // const localUserId = JSON.parse(localStorage.getItem("persist:user")!)
+    const userStore = useSelector((state: any) => state.user);
     const onAddCartAsync = async () => {
       try {
-        if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
+        if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct && userStore) {
           const cartId = listCartState?.filter((cart) =>
             cart.productDetailId === productDetailGetOneId[0]?._id
           )
@@ -294,6 +294,7 @@ const ProductInfo = () => {
             message.error("Sản phẩm đã vượt quá số lượng tồn kho!")
           } else {
             await onAddCart({
+              userId: userStore?.current?._id,
               productDetailId: productDetailGetOneId[0]?._id,
               quantity: quantity,
               totalMoney: getOneProduct?.discount * quantity
@@ -311,13 +312,12 @@ const ProductInfo = () => {
                 dropdown?.classList.add("opacity-0")
                 dropdown?.classList.add("pointer-events-none")
               }
-            }).then(() => dispatch(addCartLocalSlice({
-              productDetailId: productDetailGetOneId[0]?._id!,
-              quantity: quantity,
-              totalMoney: getOneProduct?.price * quantity
-            })))
-
-            // console.log(productDetailGetOneId[0].sold + 1);
+            })
+            // then(() => dispatch(addCartLocalSlice({
+            //   productDetailId: productDetailGetOneId[0]?._id!,
+            //   quantity: quantity,
+            //   totalMoney: getOneProduct?.price * quantity
+            // })))
 
             let { _id, sold } = productDetailGetOneId[0]
             let newProDetail = { sold: sold += 1 }
