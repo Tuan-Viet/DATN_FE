@@ -568,7 +568,7 @@ const Header = () => {
                               </li>
                             ) : null}
                             <li className="list-disc font-light mb-1">
-                              <Link to="">Đơn hàng của tôi</Link>
+                              <Link to="/order">Đơn hàng của tôi</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
                               <Link to="">Danh sách địa chỉ</Link>

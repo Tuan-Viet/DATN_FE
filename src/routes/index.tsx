@@ -12,6 +12,8 @@ import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
+import OrderPage from "../pages/client/Order";
+import orderDetail from "../pages/client/OrderDetail";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -28,6 +30,8 @@ export const publicRoutes = [
     { path: routes.Billconfirm, Component: BillConfirm },
     { path: routes.signin, Component: signin },
     { path: routes.signup, Component: signup },
+    { path: routes.order, Component: OrderPage },
+    { path: routes.orderDetail, Component: orderDetail },
 ]
 
 export const privateRoutes = [
