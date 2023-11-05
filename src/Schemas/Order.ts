@@ -2,6 +2,7 @@ import * as yup from "yup"
 
 export const orderSchema = yup.object({
     _id: yup.string(),
+    userId: yup.string(),
     fullName: yup.string().trim("Hãy nhập tên của bạn").required("Trường tên bắt buộc nhập"),
     email: yup.string().trim("Hãy nhập email của bạn").required("Trường email bắt buộc nhập"),
     phoneNumber: yup.string().trim("Hãy nhập số điện thoại của bạn").required("Trường số điện thoại bắt buộc nhập"),
@@ -20,7 +21,8 @@ export const orderSchema = yup.object({
     note: yup.string(),
     status: yup.number().required(),
     pay_method: yup.number().required(),
-    totalMoney: yup.number().required()
+    totalMoney: yup.number().required(),
+    createdAt: yup.date()
 })
 
 export type orderForm = yup.InferType<typeof orderSchema>

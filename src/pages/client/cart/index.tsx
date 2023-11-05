@@ -23,6 +23,7 @@ const cartPage = () => {
     const [onUpdateCart] = useUpdateCartMutation()
     const [onRemoveCart] = useDeleteCartMutation()
     const [totalCart, setTotalCart] = useState<number>(0)
+    const cartStore = JSON.parse(localStorage.getItem("carts")!)
     const removeCart = async (id: string) => {
         try {
             const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
@@ -35,9 +36,14 @@ const cartPage = () => {
 
         }
     }
+    const user = useSelector((state: any) => state?.user);
     useEffect(() => {
         if (listCart) {
-            dispatch(listCartSlice(listCart))
+            if (user?.current?._id) {
+                dispatch(listCartSlice(listCart))
+            } else {
+                dispatch(listCartSlice(cartStore ? cartStore : [])!)
+            }
         }
     }, [isSuccessCart])
     useEffect(() => {

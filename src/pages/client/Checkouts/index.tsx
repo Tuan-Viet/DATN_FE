@@ -18,6 +18,7 @@ import { useAddOrderMutation } from "../../../store/order/order.service";
 import { IOrder } from "../../../store/order/order.interface";
 import { Spin, message } from 'antd';
 import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
+import { toast } from "react-toastify";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
@@ -30,9 +31,17 @@ const CheckoutsPage = () => {
   const [onAddOrder] = useAddOrderMutation()
 
   const [loading, setLoading] = useState(false);
+  const { current } = JSON.parse(localStorage.getItem("persist:user")!)
+  const cartLocal = JSON.parse(localStorage.getItem("carts")!)
   useEffect(() => {
     if (listCart) {
-      dispatch(listCartSlice(listCart))
+      if (JSON.parse(current)?._id) {
+        dispatch(listCartSlice(listCart))
+      } else {
+        if (cartLocal) {
+          dispatch(listCartSlice(cartLocal!))
+        }
+      }
     }
   }, [isSuccessCart])
   useEffect(() => {
@@ -63,25 +72,37 @@ const CheckoutsPage = () => {
   } = useForm<orderForm>({
     resolver: yupResolver(orderSchema)
   })
+  const userStore = useSelector((state: any) => state.user);
   useEffect(() => {
-    setValue("status", 1)
-    setValue("pay_method", 1)
+    if (userStore) {
+      setValue("status", 1)
+      setValue("pay_method", 1)
+      setValue("userId", userStore.current?._id)
+    }
   }, [setValue])
   const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
     try {
-      setLoading(true);
-      await onAddOrder(data).then(({ data }: any) =>
-        setTimeout(async () => {
-          setLoading(false);
+      if (userStore && userStore.current?._id) {
+        setLoading(true);
+        await onAddOrder(data).then(({ data }: any) =>
+          setTimeout(async () => {
+            setLoading(false);
 
-          navigate(`/orders/${data?._id}`)
-        }, 2500)
-      )
+            navigate(`/orders/${data?._id}`)
+          }, 2500)
+        )
+      } else {
+        await navigate("/signin")
+        toast.warning("Bạn cần phải đăng nhập");
+      }
     } catch (error) {
       console.log(error);
     }
   }
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, []);
   return (
     <>
       {loading && (
