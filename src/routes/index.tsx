@@ -30,8 +30,6 @@ export const publicRoutes = [
     { path: routes.Billconfirm, Component: BillConfirm },
     { path: routes.signin, Component: signin },
     { path: routes.signup, Component: signup },
-    { path: routes.order, Component: OrderPage },
-    { path: routes.orderDetail, Component: orderDetail },
 ]
 
 export const privateRoutes = [
