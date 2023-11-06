@@ -1,4 +1,4 @@
-import React, { Dispatch } from 'react'
+import React, { Dispatch, useEffect, useState } from 'react'
 import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
 import { Link, useNavigate } from 'react-router-dom';
@@ -6,19 +6,43 @@ import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { toast } from 'react-toastify';
 import { logout } from '../../../store/user/userSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useListOrderQuery } from '../../../store/order/order.service';
+import { RootState } from '../../../store';
 
 interface DataType {
-    key: string;
     sku: string;
     date: string;
-    price: number;
+    pay_method: string;
+    totalMoney: number;
     status: string;
 }
 
 const OrderPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const navigate = useNavigate();
+
+    const { data: orders } = useListOrderQuery()
+    console.log(orders);
+
+    const userData = localStorage.getItem("persist:user");
+
+    const [orderList, setOrderList] = useState<any[]>([]);
+    useEffect(() => {
+        if (userData) {
+            const user = JSON.parse(userData);
+            const userLocal = user.current
+            const userInfo = JSON.parse(userLocal);
+            console.log(userInfo._id);
+
+
+            if (orders) {
+                const filteredOrders = orders.filter((order: any) => order.userId === userInfo._id);
+                setOrderList(filteredOrders);
+            }
+        }
+    }, [userData, orders]);
+    // console.log("data:", orderList);
     const columns: ColumnsType<DataType> = [
         {
             title: 'Mã đơn hàng',
@@ -33,14 +57,14 @@ const OrderPage = () => {
         },
         {
             title: 'Thành tiền',
-            dataIndex: 'price',
-            key: 'price',
+            dataIndex: 'totalMoney',
+            key: 'totalMoney',
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
         },
         {
             title: 'Trạng thái thanh toán',
-            dataIndex: 'status',
-            key: 'status',
+            dataIndex: 'pay_method',
+            key: 'pay_method',
         },
         {
             title: 'Vận chuyển',
@@ -50,29 +74,24 @@ const OrderPage = () => {
 
     ];
 
-    const data: DataType[] = [
-        {
-            key: '1',
-            sku: '310023',
-            date: '27/10/2023',
-            price: 20000,
-            status: 'Chờ xử lí',
-        },
-        {
-            key: '2',
-            sku: '310027',
-            date: '02/11/2023',
-            price: 20000,
-            status: 'Chờ xử lí',
-        },
-        {
-            key: '3',
-            sku: '310024',
-            date: '03/11/2023',
-            price: 20000,
-            status: 'Chờ xử lí',
-        },
-    ];
+    const data: DataType[] = orderList.map((order: any) => {
+        const orderDate = new Date(order.createdAt);
+
+        const day = orderDate.getDate();
+        const month = orderDate.getMonth() + 1;
+        const year = orderDate.getFullYear();
+
+        const formattedDate = `${day}/${month}/${year}`;
+
+        return {
+            sku: order._id,
+            totalMoney: order.totalMoney,
+            date: formattedDate,
+            pay_method: order.pay_method,
+            status: order.status,
+        };
+    });
+
     const logOut = () => {
         dispatch(logout());
         toast.success("Bạn đã đăng xuất!");

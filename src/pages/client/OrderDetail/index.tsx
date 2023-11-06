@@ -1,13 +1,15 @@
-import React, { Dispatch } from 'react'
+import React, { Dispatch, useEffect, useState } from 'react'
 import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { logout } from '../../../store/user/userSlice';
 import { Space, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import TextArea from 'antd/es/input/TextArea';
+import { useGetOneOrderQuery } from '../../../store/order/order.service';
+import { useFetchOneProductQuery } from '../../../store/product/product.service';
 
 interface DataType {
     key: string;
@@ -22,6 +24,12 @@ interface DataType {
 const orderDetail = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const navigate = useNavigate();
+    const { id } = useParams();
+    if (id) {
+        const { data: orderDetailData } = useGetOneOrderQuery(id);
+        console.log("data:", orderDetailData);
+    }
+
     const columns: ColumnsType<DataType> = [
         {
             title: 'Sản phẩm',
@@ -76,14 +84,6 @@ const orderDetail = () => {
         },
     ];
 
-    // const total = data.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-    // const totalRow: any = {
-    //     key: 'total',
-    //     price: total,
-    // };
-
-    // data.push(totalRow);
 
     const logOut = () => {
         dispatch(logout());
