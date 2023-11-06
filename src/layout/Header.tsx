@@ -2,8 +2,8 @@ import React, { Dispatch, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../store'
 import { Link, useNavigate } from "react-router-dom";
-import { useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
-import { decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
+import { useAddCartMutation, useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
+import { addCartSlice, decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store/productDetail/productDetail.service'
 import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
 import { useFetchListProductQuery } from '../store/product/product.service'
@@ -34,16 +34,16 @@ const Header = () => {
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
-  const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
+  const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
   const [onRemoveCart] = useDeleteCartMutation()
   const [onUpdateCart] = useUpdateCartMutation()
+  const [onAddCart] = useAddCartMutation()
   const cartStore = JSON.parse(localStorage.getItem("carts")!)
   // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0)
-
   const [form] = Form.useForm();
   const navigate = useNavigate();
-
+  // console.log(listCart);
   const handSubmitSignin = async (data: FormDataType) => {
     try {
       const response = await axios.post(
@@ -65,7 +65,7 @@ const Header = () => {
       }
     } catch (error: any) {
       if (error.response) {
-        const serverErrorMessage = error.response.data.messages;
+        const serverErrorMessage = error.response.data?.messages;
         toast.error(`Đăng nhập thất bại: ${serverErrorMessage}`);
       } else {
         console.log(error);
@@ -73,7 +73,7 @@ const Header = () => {
     }
   };
 
-  const user = useSelector((state: any) => state.user);
+  const user = useSelector((state: any) => state?.user);
   const isLoggedIn = user?.isLoggedIn;
   const fullName = user?.current?.fullname;
   const role = user?.current?.role;
@@ -82,25 +82,16 @@ const Header = () => {
     // Gọi action đăng xuất
     dispatch(logout());
     toast.success("Bạn đã đăng xuất!");
+    localStorage.removeItem("carts")
     navigate("/signin");
   };
-
-  // const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
-  // const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
-  // const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
-  // const cartState = useSelector((state: RootState) => state.cartSlice.carts)
-  // const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
-  // const productState = useSelector((state: RootState) => state.productSlice.products)
-  // const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.carts)
-  // const [onRemoveCart] = useDeleteCartMutation()
-  // const [onUpdateCart] = useUpdateCartMutation()
-  // const cartStore = JSON.parse(localStorage.getItem("carts")!)
-  // const [totalCart, setTotalCart] = useState<number>(0)
-  // const userStore = JSON.parse(localStorage.getItem("user")!)
-
   useEffect(() => {
     if (listCart) {
-      dispatch(listCartSlice(listCart))
+      if (user?.current?._id) {
+        dispatch(listCartSlice(listCart))
+      } else {
+        dispatch(listCartSlice(cartStore ? cartStore : [])!)
+      }
     }
   }, [isSuccessCart, listCart])
   useEffect(() => {
@@ -119,10 +110,19 @@ const Header = () => {
   const removeCart = async (id: string) => {
     try {
       if (id) {
-        const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
-        if (isConfirm) {
-          await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
-          message.success("Xóa thành công!")
+        if (user?.current?._id) {
+          const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
+          if (isConfirm) {
+            await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
+            message.success("Xóa thành công!")
+          }
+        } else {
+          console.log(id);
+          const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
+          if (isConfirm) {
+            dispatch(removeCartSlice(id))
+            message.success("Xóa thành công!")
+          }
         }
       }
     } catch (error) {
@@ -132,8 +132,7 @@ const Header = () => {
   }
   const decreaseCart = async (_id: string, discount: number) => {
     try {
-
-      if (_id) {
+      if (_id && discount) {
         dispatch(decreaseCartSlice({ _id: _id, discount: discount }))
       }
       const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
@@ -568,7 +567,7 @@ const Header = () => {
                               </li>
                             ) : null}
                             <li className="list-disc font-light mb-1">
-                              <Link to="">Đơn hàng của tôi</Link>
+                              <Link to="/order">Đơn hàng của tôi</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
                               <Link to="">Danh sách địa chỉ</Link>
@@ -713,7 +712,7 @@ const Header = () => {
                 </svg>
 
                 <span className="w-[20px] h-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]">
-                  {cartState.length}
+                  {cartState?.length > 0 ? cartState.length : 0}
                 </span>
 
               </div>
@@ -738,24 +737,32 @@ const Header = () => {
                         {productState?.filter((product) => product._id === item.product_id).map((pro) => {
                           return <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative" key={index}>
                             <Link to={`/products/${pro._id}`}>
-                              <img src={item.imageColor} alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
+                              <img src={item?.imageColor} alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
                             </Link>
                             <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                               <div className="mt-5 sm:mt-0">
-                                <h2 className="text-lg font-bold text-gray-900" >{pro.title}</h2>
+                                <h2 className="text-lg font-bold text-gray-900" >{pro?.title}</h2>
                                 {/* color and size */}
-                                <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
+                                <p className="mt-1 text-xs text-gray-700">{item?.nameColor} / {item?.size}</p>
                                 {/* price product */}
-                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
+                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro?.discount.toLocaleString("vi-VN")}đ</p>
                               </div>
-                              <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </div>
+                              {user?.current?._id ?
+                                <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart?._id!)}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </div>
+                                :
+                                <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart.productDetailId!)}>
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </div>
+                              }
                               <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                                 <div className="flex items-center">
-                                  <p className="font-bold tracking-wide text-[15px]">{cart.totalMoney.toLocaleString("vi-VN")}đ</p>
+                                  <p className="font-bold tracking-wide text-[15px]">{cart?.totalMoney?.toLocaleString("vi-VN")}đ</p>
                                 </div>
                                 <div className="flex items-center w-[100px] border border-gray-300 rounded">
                                   <button
@@ -768,15 +775,15 @@ const Header = () => {
                                   <input
                                     type="number"
                                     id="Quantity"
-                                    value={cart.quantity} min="1" max={item.quantity}
+                                    value={cart?.quantity} min="1" max={item?.quantity}
                                     className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                   />
 
                                   <button
                                     onClick={() => increaseCart(cart._id!, pro.discount!)}
-                                    disabled={item.quantity === cart.quantity}
+                                    disabled={item?.quantity === cart?.quantity}
                                     type="button"
-                                    className={`${item.quantity === cart.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
+                                    className={`${item?.quantity === cart?.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
                                   >
                                     +
                                   </button>
@@ -797,7 +804,7 @@ const Header = () => {
             <div className="flex justify-between">
               <p className="text-lg font-bold">Tổng tiền:</p>
               <div className="">
-                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart.toLocaleString("vi-VN")}đ</p>
+                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart?.toLocaleString("vi-VN")}đ</p>
               </div>
             </div >
             <div className="grid grid-cols-2 gap-[10px]">
