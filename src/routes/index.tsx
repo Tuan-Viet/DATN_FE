@@ -12,6 +12,10 @@ import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
+import myAccount from "../pages/client/MyAccount";
+import myAddress from "../pages/client/MyAccount/myAddress";
+import myOrders from "../pages/client/MyAccount/myOrders";
+import OrderDetail from "../pages/client/MyAccount/orderDetail";
 import OrderPage from "../pages/client/Order";
 import orderDetail from "../pages/client/OrderDetail";
 import cartPage from "../pages/client/cart";
@@ -19,6 +23,7 @@ import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
 import signin from "../pages/client/signin";
 import signup from "../pages/client/signup";
+
 
 export const publicRoutes = [
     { path: routes.home, Component: homePage },
@@ -30,6 +35,10 @@ export const publicRoutes = [
     { path: routes.Billconfirm, Component: BillConfirm },
     { path: routes.signin, Component: signin },
     { path: routes.signup, Component: signup },
+    { path: routes.myAccount, Component: myAccount },
+  { path: routes.orders, Component: myOrders },
+  { path: routes.addresses, Component: myAddress },
+  { path: routes.orderDetail, Component: OrderDetail },
 ]
 
 export const privateRoutes = [
