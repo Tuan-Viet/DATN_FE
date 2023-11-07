@@ -9,6 +9,7 @@ export interface IOrder {
     voucher_code: string
     note: string
     status: number
+    paymentStatus: string
     pay_method: number
     totalMoney: number
     orderDetails: IOrderDetail[]

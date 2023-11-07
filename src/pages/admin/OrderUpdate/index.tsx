@@ -321,9 +321,11 @@ const orderUpdate = () => {
                         className='mb-10'
                         summary={(pageData) => {
                             let total = 0;
+                            let totalMoney = 0;
                             pageData.forEach((record) => {
                                 total += record.price * record.quantity;
                             });
+                            totalMoney = total + 40000
                             return (
                                 <>
                                     <Table.Summary.Row className='font-bold'>
@@ -335,13 +337,13 @@ const orderUpdate = () => {
                                     <Table.Summary.Row className='font-bold'>
                                         <Table.Summary.Cell index={0} colSpan={3}>Shipping</Table.Summary.Cell>
                                         <Table.Summary.Cell index={1}>
-                                            Free
+                                            40,000
                                         </Table.Summary.Cell>
                                     </Table.Summary.Row>
                                     <Table.Summary.Row className='font-bold'>
                                         <Table.Summary.Cell index={0} colSpan={3}>Total Money</Table.Summary.Cell>
                                         <Table.Summary.Cell index={1}>
-                                            {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            {totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Table.Summary.Cell>
                                     </Table.Summary.Row>
                                 </>

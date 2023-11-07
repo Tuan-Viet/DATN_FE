@@ -20,6 +20,7 @@ import {
   Space,
   message,
 } from 'antd';
+import { ICart } from '../store/cart/cart.interface';
 
 type FormDataType = {
   email: string;
@@ -38,7 +39,7 @@ const Header = () => {
   const [onRemoveCart] = useDeleteCartMutation()
   const [onUpdateCart] = useUpdateCartMutation()
   const [onAddCart] = useAddCartMutation()
-  const cartStore = JSON.parse(localStorage.getItem("carts")!)
+  const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
   // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0)
   const [form] = Form.useForm();
@@ -49,8 +50,11 @@ const Header = () => {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         data
-      );
+      )
       toast.success("Đăng nhập thành công");
+      cartStore?.map((cartItem) => {
+        return onAddCart({ userId: response?.data?.user._id, ...cartItem })
+      })
       dispatch(
         register({
           isLoggedIn: true,
@@ -72,7 +76,6 @@ const Header = () => {
       }
     }
   };
-
   const user = useSelector((state: any) => state?.user);
   const isLoggedIn = user?.isLoggedIn;
   const fullName = user?.current?.fullname;
@@ -106,8 +109,8 @@ const Header = () => {
   }, [isSuccessListProduct])
 
   // xu li cart
-
   const removeCart = async (id: string) => {
+    console.log(id);
     try {
       if (id) {
         if (user?.current?._id) {
@@ -117,17 +120,14 @@ const Header = () => {
             message.success("Xóa thành công!")
           }
         } else {
-          console.log(id);
           const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
           if (isConfirm) {
             dispatch(removeCartSlice(id))
-            message.success("Xóa thành công!")
           }
         }
       }
     } catch (error) {
       console.log(error);
-
     }
   }
   const decreaseCart = async (_id: string, discount: number) => {
@@ -146,11 +146,19 @@ const Header = () => {
 
   const increaseCart = async (_id: string, discount: number) => {
     try {
+      console.log(_id);
       if (_id) {
-        dispatch(increaseCartSlice({ _id: _id, discount: discount }))
-        const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-        if (cartIndex) {
-          await onUpdateCart({ _id, ...cartIndex })
+        if (user.current._id) {
+          console.log(2);
+          dispatch(increaseCartSlice({ _id: _id, discount: discount }))
+          const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+          if (cartIndex) {
+            await onUpdateCart({ _id, ...cartIndex })
+          }
+        } else {
+          console.log(1);
+          dispatch(increaseCartSlice({ _id: _id, discount: discount }))
+          // const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
         }
       }
     } catch (error) {
@@ -559,18 +567,18 @@ const Header = () => {
                           <h2 className="mb-2">Xin chào: {fullName}</h2>
                           <ul className="ml-5 text-sm">
                             <li className="list-disc font-light mb-1">
-                              <Link to="">Tài khoản của tôi</Link>
+                              <Link to="/account">Tài khoản của tôi</Link>
                             </li>
                             {role == "admin" ? (
                               <li className="list-disc font-light mb-1">
-                                <Link to="">Quản trị</Link>
+                                <Link to="/admin">Quản trị</Link>
                               </li>
                             ) : null}
                             <li className="list-disc font-light mb-1">
-                              <Link to="/order">Đơn hàng của tôi</Link>
+                              <Link to="/account/orders">Đơn hàng của tôi</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
-                              <Link to="">Danh sách địa chỉ</Link>
+                              <Link to="/account/addresses">Danh sách địa chỉ</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
                               <button onClick={() => logOut()}>
@@ -747,12 +755,12 @@ const Header = () => {
                                 {/* price product */}
                                 <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro?.discount.toLocaleString("vi-VN")}đ</p>
                               </div>
-                              {user?.current?._id ?
-                                <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart?._id!)}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
-                                </div>
+
+                              {user?.current?._id ? <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </div>
                                 :
                                 <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart.productDetailId!)}>
                                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
@@ -778,7 +786,6 @@ const Header = () => {
                                     value={cart?.quantity} min="1" max={item?.quantity}
                                     className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                   />
-
                                   <button
                                     onClick={() => increaseCart(cart._id!, pro.discount!)}
                                     disabled={item?.quantity === cart?.quantity}

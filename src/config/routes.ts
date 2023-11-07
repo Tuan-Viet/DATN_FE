@@ -10,6 +10,10 @@ const routes = {
     Billconfirm: "/orders/:id",
     signin: "/signin",
     signup: "/signup",
+    myAccount: "/account",
+    orders: "/account/orders",
+    addresses: "/account/addresses",
+    orderDetail: "/account/orders/:id",
 
     // Admin 
     admin: "/admin",
