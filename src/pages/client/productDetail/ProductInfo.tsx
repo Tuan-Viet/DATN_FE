@@ -265,7 +265,6 @@ const ProductInfo = () => {
     // lay ra productDetailId
     const handleFormProductDetail = async (data: productDetailForm) => {
       try {
-        // const cartsLocal = []
         if (data && data.nameColor && getOneProduct) {
           await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
           setFormProductDetailClicked(true)
@@ -274,35 +273,43 @@ const ProductInfo = () => {
         console.log(error);
       }
     }
-    // addTocart API
-    // useEffect(() => {
-    //   if (listCartState && productDetailGetOneId && productDetailGetOneId[0]?._id) {
-    //     const cartId = listCartState.filter((cart) =>
-    //       cart.productDetailId === productDetailGetOneId[0]._id
-    //     )
-    //   }
-    // }, [listCartState])
-    // const localUserId = JSON.parse(localStorage.getItem("persist:user")!)
     const userStore = useSelector((state: any) => state.user);
     const onAddCartAsync = async () => {
       try {
-        if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct && userStore) {
+        if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
           const cartId = listCartState?.filter((cart) =>
             cart.productDetailId === productDetailGetOneId[0]?._id
           )
           if (productDetailGetOneId[0].quantity < quantity || cartId[0]?.quantity + quantity > productDetailGetOneId[0].quantity) {
             message.error("Sản phẩm đã vượt quá số lượng tồn kho!")
           } else {
-            await onAddCart({
-              userId: userStore?.current?._id,
-              productDetailId: productDetailGetOneId[0]?._id,
-              quantity: quantity,
-              totalMoney: getOneProduct?.discount * quantity
-            }).then(() => dispatch(addCartSlice({
-              productDetailId: productDetailGetOneId[0]?._id!,
-              quantity: quantity,
-              totalMoney: getOneProduct?.discount * quantity
-            }))).then(() => {
+            if (userStore?.current?._id) {
+              await onAddCart({
+                userId: userStore?.current?._id,
+                productDetailId: productDetailGetOneId[0]?._id,
+                quantity: quantity,
+                totalMoney: getOneProduct?.discount * quantity
+              }).then(() => dispatch(addCartSlice({
+                productDetailId: productDetailGetOneId[0]?._id!,
+                quantity: quantity,
+                totalMoney: getOneProduct?.discount * quantity
+              }))).then(() => {
+                const overlayCart = document.querySelector(".overlay-cart")
+                const overlay = document.querySelector(".overlay")
+                overlay?.classList.remove("hidden")
+                overlayCart?.classList.remove("translate-x-[100%]", "opacity-0")
+                const dropdown = document.querySelector(".dropdown-user")
+                if (!dropdown?.classList.contains("opacity-0")) {
+                  dropdown?.classList.add("opacity-0")
+                  dropdown?.classList.add("pointer-events-none")
+                }
+              })
+            } else {
+              await dispatch(addCartSlice({
+                productDetailId: productDetailGetOneId[0]?._id!,
+                quantity: quantity,
+                totalMoney: getOneProduct?.discount * quantity
+              }))
               const overlayCart = document.querySelector(".overlay-cart")
               const overlay = document.querySelector(".overlay")
               overlay?.classList.remove("hidden")
@@ -312,18 +319,12 @@ const ProductInfo = () => {
                 dropdown?.classList.add("opacity-0")
                 dropdown?.classList.add("pointer-events-none")
               }
-            })
-            // then(() => dispatch(addCartLocalSlice({
-            //   productDetailId: productDetailGetOneId[0]?._id!,
-            //   quantity: quantity,
-            //   totalMoney: getOneProduct?.price * quantity
-            // })))
+            }
+            // let { _id, sold } = productDetailGetOneId[0]
+            // let newProDetail = { sold: sold += 1 }
 
-            let { _id, sold } = productDetailGetOneId[0]
-            let newProDetail = { sold: sold += 1 }
-
-            onUpdateProDetail({ id: _id, ...newProDetail })
-            message.success("Thêm vào giỏ hàng thành công!")
+            // onUpdateProDetail({ id: _id, ...newProDetail })
+            // message.success("Thêm vào giỏ hàng thành công!")
           }
         }
       } catch (error) {
@@ -341,6 +342,7 @@ const ProductInfo = () => {
     useEffect(() => {
       if (productDetailState && getOneProduct) {
         const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
+        console.log(firstColor);
         if (firstColor) {
           localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
           const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)

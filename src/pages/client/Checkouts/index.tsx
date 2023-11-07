@@ -31,11 +31,12 @@ const CheckoutsPage = () => {
   const [onAddOrder] = useAddOrderMutation()
 
   const [loading, setLoading] = useState(false);
-  const { current } = JSON.parse(localStorage.getItem("persist:user")!)
+  const { current } = useSelector((state: any) => state.user);
+
   const cartLocal = JSON.parse(localStorage.getItem("carts")!)
   useEffect(() => {
     if (listCart) {
-      if (JSON.parse(current)?._id) {
+      if (current?._id) {
         dispatch(listCartSlice(listCart))
       } else {
         if (cartLocal) {
@@ -72,29 +73,30 @@ const CheckoutsPage = () => {
   } = useForm<orderForm>({
     resolver: yupResolver(orderSchema)
   })
-  const userStore = useSelector((state: any) => state.user);
   useEffect(() => {
-    if (userStore) {
+    if (current) {
       setValue("status", 1)
       setValue("pay_method", 1)
-      setValue("userId", userStore.current?._id)
+      setValue("userId", current?._id)
     }
   }, [setValue])
+  useEffect(() => {
+    if (errors.userId) {
+      navigate("/signin")
+      toast.warning("Bạn cần phải đăng nhập");
+    }
+  }, [errors])
   const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
     try {
-      if (userStore && userStore.current?._id) {
+      if (current?._id) {
         setLoading(true);
         await onAddOrder(data).then(({ data }: any) =>
           setTimeout(async () => {
             setLoading(false);
-
             navigate(`/orders/${data?._id}`)
           }, 2500)
         )
-      } else {
-        await navigate("/signin")
-        toast.warning("Bạn cần phải đăng nhập");
       }
     } catch (error) {
       console.log(error);
@@ -124,6 +126,7 @@ const CheckoutsPage = () => {
                   <h3 className="text-lg mb-5 font-bold">
                     Thông tin giao hàng
                   </h3>
+
                   <p className="text-sm">
                     Bạn đã có tài khoản?{" "}
                     <Link
@@ -132,6 +135,7 @@ const CheckoutsPage = () => {
                     >
                       Đăng nhập
                     </Link>
+                    {/* <p className="text-red-500 italic text-sm">{errors ? errors.userId?.message : ""}</p> */}
                   </p>
                 </div>
                 <div>
@@ -139,7 +143,7 @@ const CheckoutsPage = () => {
                     <input
 
                       {...register("email")}
-
+                      defaultValue={current ? current?.email : ""}
                       type="email"
                       id="email"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
@@ -151,6 +155,7 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <input
                       {...register("fullName")}
+                      defaultValue={current ? current?.fullname : ""}
 
                       type="text"
                       id="fullName"
@@ -164,7 +169,6 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <input
                       {...register("phoneNumber")}
-
                       type="text"
                       id="phoneNumber"
                       className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
@@ -310,22 +314,6 @@ const CheckoutsPage = () => {
                                 </span>
                               </p>
                             </div>
-                            {/* <div onClick={() => removeCart(cart._id!)} className="absolute cursor-pointer right-0 top-0">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1.5"
-                                stroke="currentColor"
-                                className="w-6 h-6"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                            </div> */}
                           </div>
                         })}
                       </div>
