@@ -2,7 +2,7 @@ import * as yup from "yup"
 
 export const orderSchema = yup.object({
     _id: yup.string(),
-    userId: yup.string(),
+    userId: yup.string().required("Bạn cần phải đăng nhập"),
     fullName: yup.string().trim("Hãy nhập tên của bạn").required("Trường tên bắt buộc nhập"),
     email: yup.string().trim("Hãy nhập email của bạn").required("Trường email bắt buộc nhập"),
     phoneNumber: yup.string().trim("Hãy nhập số điện thoại của bạn").required("Trường số điện thoại bắt buộc nhập"),

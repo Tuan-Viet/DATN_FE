@@ -16,8 +16,6 @@ import myAccount from "../pages/client/MyAccount";
 import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
-import OrderPage from "../pages/client/Order";
-import orderDetail from "../pages/client/OrderDetail";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
