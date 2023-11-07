@@ -15,7 +15,7 @@ const Outstanding_Product = () => {
   const productOutStandState = useSelector((state: RootState) => state.productOutstandReducer.products)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
-  console.log(productOutStandState);
+  // console.log(productOutStandState);
   useEffect(() => {
     // if (isSuccessProduct) {
     //   const productOutStand: any = []
