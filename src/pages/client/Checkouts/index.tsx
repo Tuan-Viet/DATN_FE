@@ -76,7 +76,7 @@ const CheckoutsPage = () => {
   useEffect(() => {
     if (userStore) {
       setValue("status", 1)
-      setValue("pay_method", 1)
+      setValue("pay_method", 0)
       setValue("userId", userStore.current?._id)
     }
   }, [setValue])
@@ -117,7 +117,6 @@ const CheckoutsPage = () => {
           {/* {loading && (
           )} */}
           <div className="">
-
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
                 <div className="mb-3">

@@ -1,9 +1,11 @@
 import routes from "../config/routes";
 import Banner from "../layout/Banner";
+import orderUpdate from "../pages/admin/OrderUpdate";
 import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
 import dashboardPage from "../pages/admin/dashboard";
+import ordersPage from "../pages/admin/ordersPage";
 import productAdd from "../pages/admin/productAdd";
 import productPage from "../pages/admin/productPage/index.";
 import productUpdate from "../pages/admin/productUpdate";
@@ -12,8 +14,6 @@ import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
-import OrderPage from "../pages/client/Order";
-import orderDetail from "../pages/client/OrderDetail";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -43,4 +43,6 @@ export const privateRoutes = [
     { path: routes.adminCategoryUpdate, Component: categoryUpdate },
     { path: routes.adminUsers, Component: userPage },
     { path: routes.adminUserUpdate, Component: userUpdate },
+    { path: routes.adminOrdersPage, Component: ordersPage },
+    { path: routes.adminOrderUpdate, Component: orderUpdate },
 ]

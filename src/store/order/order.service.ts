@@ -25,8 +25,16 @@ const orderAPI = createApi({
             query: (id) => `/orders/` + id,
             providesTags: ["order"]
         }),
+        updateOrder: builer.mutation({
+            query: ({ id, ...order }) => ({
+                url: `/orders/${id}`,
+                method: "PATCH",
+                body: order
+            }),
+            invalidatesTags: ["order"]
+        }),
     })
 })
 
-export const { useListOrderQuery, useAddOrderMutation, useGetOneOrderQuery } = orderAPI
+export const { useListOrderQuery, useAddOrderMutation, useGetOneOrderQuery, useUpdateOrderMutation } = orderAPI
 export default orderAPI
