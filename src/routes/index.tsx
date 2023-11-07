@@ -14,35 +14,44 @@ import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
+import myAccount from "../pages/client/MyAccount";
+import myAddress from "../pages/client/MyAccount/myAddress";
+import myOrders from "../pages/client/MyAccount/myOrders";
+import OrderDetail from "../pages/client/MyAccount/orderDetail";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
 import signin from "../pages/client/signin";
 import signup from "../pages/client/signup";
 
+
 export const publicRoutes = [
-    { path: routes.home, Component: homePage },
-    { path: routes.banner, Component: Banner },
-    { path: routes.about, Component: About },
-    { path: routes.productDetail, Component: productDetail },
-    { path: routes.cart, Component: cartPage },
-    { path: routes.checkout, Component: CheckoutsPage },
-    { path: routes.Billconfirm, Component: BillConfirm },
-    { path: routes.signin, Component: signin },
-    { path: routes.signup, Component: signup },
+  { path: routes.home, Component: homePage },
+  { path: routes.banner, Component: Banner },
+  { path: routes.about, Component: About },
+  { path: routes.productDetail, Component: productDetail },
+  { path: routes.cart, Component: cartPage },
+  { path: routes.checkout, Component: CheckoutsPage },
+  { path: routes.Billconfirm, Component: BillConfirm },
+  { path: routes.signin, Component: signin },
+  { path: routes.signup, Component: signup },
+  { path: routes.myAccount, Component: myAccount },
+  { path: routes.orders, Component: myOrders },
+  { path: routes.addresses, Component: myAddress },
+  { path: routes.orderDetail, Component: OrderDetail },
 ]
 
 export const privateRoutes = [
-    { path: routes.admin, Component: dashboardPage },
-    { path: routes.adminDashboard, Component: dashboardPage },
-    { path: routes.adminProducts, Component: productPage },
-    { path: routes.adminProductAdd, Component: productAdd },
-    { path: routes.adminProductUpdate, Component: productUpdate },
-    { path: routes.adminCategorys, Component: categoryPage },
-    { path: routes.adminCategoryAdd, Component: categoryAdd },
-    { path: routes.adminCategoryUpdate, Component: categoryUpdate },
-    { path: routes.adminUsers, Component: userPage },
-    { path: routes.adminUserUpdate, Component: userUpdate },
-    { path: routes.adminOrdersPage, Component: ordersPage },
-    { path: routes.adminOrderUpdate, Component: orderUpdate },
+  { path: routes.admin, Component: dashboardPage },
+  { path: routes.adminDashboard, Component: dashboardPage },
+  { path: routes.adminProducts, Component: productPage },
+  { path: routes.adminProductAdd, Component: productAdd },
+  { path: routes.adminProductUpdate, Component: productUpdate },
+  { path: routes.adminCategorys, Component: categoryPage },
+  { path: routes.adminCategoryAdd, Component: categoryAdd },
+  { path: routes.adminCategoryUpdate, Component: categoryUpdate },
+  { path: routes.adminUsers, Component: userPage },
+  { path: routes.adminUserUpdate, Component: userUpdate },
+  { path: routes.adminOrdersPage, Component: ordersPage },
+  { path: routes.adminOrderUpdate, Component: orderUpdate },
 ]

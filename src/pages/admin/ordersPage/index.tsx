@@ -255,7 +255,7 @@ const ordersPage = () => {
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
+                <Table columns={columns} dataSource={data} pagination={{ pageSize: 10 }} onChange={onChange} />
             </div>
         </div>
     )
