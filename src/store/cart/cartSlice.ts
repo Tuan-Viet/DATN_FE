@@ -16,6 +16,8 @@ const cartSlice = createSlice({
             if (JSON.parse(userStore)?._id) {
                 const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)._id)
                 state.carts = listCartByUser
+                console.log(listCartByUser);
+
             } else {
                 state.carts = actions.payload
             }

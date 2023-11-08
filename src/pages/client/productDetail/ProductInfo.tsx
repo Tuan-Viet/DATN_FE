@@ -290,6 +290,7 @@ const ProductInfo = () => {
                 quantity: quantity,
                 totalMoney: getOneProduct?.discount * quantity
               }).then(() => dispatch(addCartSlice({
+                userId: userStore?.current?._id,
                 productDetailId: productDetailGetOneId[0]?._id!,
                 quantity: quantity,
                 totalMoney: getOneProduct?.discount * quantity
@@ -342,7 +343,7 @@ const ProductInfo = () => {
     useEffect(() => {
       if (productDetailState && getOneProduct) {
         const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
-        console.log(firstColor);
+        // console.log(firstColor);
         if (firstColor) {
           localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
           const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)

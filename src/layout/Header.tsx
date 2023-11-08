@@ -33,6 +33,7 @@ const Header = () => {
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
