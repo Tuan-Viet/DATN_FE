@@ -33,6 +33,7 @@ const Header = () => {
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
@@ -567,18 +568,18 @@ const Header = () => {
                           <h2 className="mb-2">Xin chào: {fullName}</h2>
                           <ul className="ml-5 text-sm">
                             <li className="list-disc font-light mb-1">
-                              <Link to="">Tài khoản của tôi</Link>
+                              <Link to="/account">Tài khoản của tôi</Link>
                             </li>
                             {role == "admin" ? (
                               <li className="list-disc font-light mb-1">
-                                <Link to="">Quản trị</Link>
+                                <Link to="/admin">Quản trị</Link>
                               </li>
                             ) : null}
                             <li className="list-disc font-light mb-1">
-                              <Link to="/order">Đơn hàng của tôi</Link>
+                              <Link to="/account/orders">Đơn hàng của tôi</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
-                              <Link to="">Danh sách địa chỉ</Link>
+                              <Link to="/account/addresses">Danh sách địa chỉ</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
                               <button onClick={() => logOut()}>

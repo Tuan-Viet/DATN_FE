@@ -20,7 +20,8 @@ export const orderSchema = yup.object({
     voucher_code: yup.string(),
     note: yup.string(),
     status: yup.number().required(),
-    pay_method: yup.number().required(),
+    paymentStatus: yup.number().default(1),
+    pay_method: yup.string().required(),
     totalMoney: yup.number().required(),
     createdAt: yup.date()
 })

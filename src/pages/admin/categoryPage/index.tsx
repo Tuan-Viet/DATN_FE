@@ -82,6 +82,7 @@ const categoryPage = () => {
             ),
             sorter: (a, b) => a.name.localeCompare(b.name), // Sắp xếp theo bảng chữ cái
             sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
         },
         {
             title: 'Action',

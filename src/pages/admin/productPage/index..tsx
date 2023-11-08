@@ -107,6 +107,7 @@ const productPage = () => {
             ),
             sorter: (a, b) => a.title.localeCompare(b.title), // Sắp xếp theo bảng chữ cái
             sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
             className: 'w-1/4',
         },
         {
@@ -116,6 +117,7 @@ const productPage = () => {
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
             sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
             sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
         },
         {
             title: 'Discount',
@@ -124,6 +126,7 @@ const productPage = () => {
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
             sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
             sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
         },
         {
             title: 'Description',
