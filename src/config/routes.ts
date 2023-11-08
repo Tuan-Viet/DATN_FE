@@ -10,6 +10,10 @@ const routes = {
     Billconfirm: "/orders/:id",
     signin: "/signin",
     signup: "/signup",
+    myAccount: "/account",
+    orders: "/account/orders",
+    addresses: "/account/addresses",
+    orderDetail: "/account/orders/:id",
 
     // Admin 
     admin: "/admin",
@@ -22,8 +26,8 @@ const routes = {
     adminCategoryUpdate: "/admin/category/update/:id",
     adminUsers: "/admin/user",
     adminUserUpdate: "/admin/user/update/:id",
-
-
+    adminOrdersPage: "/admin/order",
+    adminOrderUpdate: "/admin/order/:id",
 }
 
 export default routes;
