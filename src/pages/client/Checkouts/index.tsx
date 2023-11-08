@@ -79,16 +79,11 @@ const CheckoutsPage = () => {
       // data.orderId = orderId
       await onAddOrder(data).then(({ data }: any) => {
         if (data.pay_method === "COD") {
-          console.log(1);
-
           setTimeout(async () => {
-
             setLoading(false);
             navigate(`/orders/${data?._id}`)
           }, 2500)
         } else if (data.pay_method === "VNBANK") {
-          console.log(2);
-
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data.data)
             .then(({ data }) => window.location.href = data)
         }

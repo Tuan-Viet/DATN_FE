@@ -9,9 +9,9 @@ import {
 } from "../../../store/order/order.service";
 import { Result, Spin } from "antd";
 import { listOrderSlice } from "../../../store/order/orderSlice";
-import { RootState } from "@reduxjs/toolkit/query";
 import { Dispatch } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import { RootState } from "../../../store";
 
 function formatDateStringToDisplayDate(dateString: any) {
   const date = new Date(dateString);
@@ -22,7 +22,7 @@ function formatDateStringToDisplayDate(dateString: any) {
     }${month}/${year}`;
 }
 
-function mapStatusPaymentToText(statusCode: any) {
+function mapStatusPaymentToText(statusCode: number) {
   switch (statusCode) {
     case 0:
       return "Chưa thanh toán";
@@ -47,7 +47,7 @@ const myOrders = () => {
   const [cancelOrder] = useUpdateOrderMutation();
   const { data: orders, isLoading, isError } = useListOrderQuery();
 
-  dispatch(listOrderSlice(orders));
+  dispatch(listOrderSlice(orders!));
   const ordersState = useSelector(
     (state: RootState) => state.orderSlice.orders
   );
