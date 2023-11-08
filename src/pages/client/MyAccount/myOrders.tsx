@@ -85,7 +85,9 @@ const myOrders = () => {
 
   const userOrders = ordersState.filter(
     (order: any) => order?.userId === user?.current?._id && order?.status !== 0
+
   );
+
 
   return (
     <>
@@ -206,7 +208,7 @@ const myOrders = () => {
                               {order.totalMoney.toLocaleString("vi-VN")}₫
                             </td>
                             <td className="px-6 py-4">
-                              {mapStatusPaymentToText(order.pay_method)}
+                              {mapStatusPaymentToText(order.paymentStatus)}
                             </td>
                             <td className="px-6 py-4">Chờ xử lý</td>
                             <td className="px-6 py-4">

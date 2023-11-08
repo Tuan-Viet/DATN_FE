@@ -168,7 +168,7 @@ const BillConfirm = () => {
                             {totalCart.toLocaleString("vi-VN")}đ
                           </td>
                         </tr>
-                        <tr className="border-b hover:bg-gray-50">
+                        {/* <tr className="border-b hover:bg-gray-50">
                           <td className="px-6 py-4 font-semibold text-gray-900">
                             Mã giảm giá
                           </td>
@@ -187,16 +187,16 @@ const BillConfirm = () => {
                           <td className="px-6 py-4 font-semibold text-gray-900 text-right">
                             0đ
                           </td>
-                        </tr>
+                        </tr> */}
                         <tr className="border-b hover:bg-gray-50">
                           <td className="px-6 py-4 font-semibold text-gray-900">
-                            Phí giao hàng
+                            Giao hàng tận nơi
                           </td>
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900 text-right">
-                            40.000đ
+                            Miễn phí
                           </td>
                         </tr>
                         <tr className="border-b text-xl bg-black">
@@ -207,7 +207,7 @@ const BillConfirm = () => {
                           <td className="px-6 py-4 font-bold text-white"></td>
                           <td className="px-6 py-4 font-bold text-white"></td>
                           <td className="px-6 py-4 font-bold text-white text-right">
-                            {(totalCart + 40000).toLocaleString("vi-VN")}đ
+                            {(totalCart).toLocaleString("vi-VN")}đ
                           </td>
                         </tr>
                       </tbody>

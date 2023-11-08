@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
@@ -15,10 +14,8 @@ import { useForm } from "react-hook-form";
 import { orderForm, orderSchema } from "../../../Schemas/Order";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
-import { IOrder } from "../../../store/order/order.interface";
 import { Spin, message } from 'antd';
-import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
-import { toast } from "react-toastify";
+import axios from "axios";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
@@ -31,17 +28,9 @@ const CheckoutsPage = () => {
   const [onAddOrder] = useAddOrderMutation()
 
   const [loading, setLoading] = useState(false);
-  const { current } = JSON.parse(localStorage.getItem("persist:user")!)
-  const cartLocal = JSON.parse(localStorage.getItem("carts")!)
   useEffect(() => {
     if (listCart) {
-      if (JSON.parse(current)?._id) {
-        dispatch(listCartSlice(listCart))
-      } else {
-        if (cartLocal) {
-          dispatch(listCartSlice(cartLocal!))
-        }
-      }
+      dispatch(listCartSlice(listCart))
     }
   }, [isSuccessCart])
   useEffect(() => {
@@ -72,37 +61,50 @@ const CheckoutsPage = () => {
   } = useForm<orderForm>({
     resolver: yupResolver(orderSchema)
   })
-  const userStore = useSelector((state: any) => state.user);
+  const { current } = useSelector((state: any) => state.user);
   useEffect(() => {
-    if (userStore) {
+    if (current) {
       setValue("status", 1)
-      setValue("pay_method", 0)
-      setValue("userId", userStore.current?._id)
+      // setValue("pay_method", "VNBANK")
+      setValue("userId", current?._id)
     }
   }, [setValue])
   const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
+    console.log("Value:", data);
     try {
-      if (userStore && userStore.current?._id) {
-        setLoading(true);
-        await onAddOrder(data).then(({ data }: any) =>
-          setTimeout(async () => {
-            setLoading(false);
+      setLoading(true);
+      // const date = new Date()
+      // const orderId = moment(date).format('DDHHmmss')
+      // data.orderId = orderId
+      await onAddOrder(data).then(({ data }: any) => {
+        if (data.pay_method === "COD") {
+          console.log(1);
 
+          setTimeout(async () => {
+
+            setLoading(false);
             navigate(`/orders/${data?._id}`)
           }, 2500)
-        )
-      } else {
-        await navigate("/signin")
-        toast.warning("Bạn cần phải đăng nhập");
+        } else if (data.pay_method === "VNBANK") {
+          console.log(2);
+
+          axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data.data)
+            .then(({ data }) => window.location.href = data)
+        }
       }
+        // console.log(data);
+        //   setTimeout(async () => {
+        //     setLoading(false);
+        //     // navigate(`/orders/${data?._id}`)
+        //   }, 2500)
+      )
+      // const res = await axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`,data)
+      // window.location.href = res.data
     } catch (error) {
       console.log(error);
     }
   }
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0 });
-  }, []);
   return (
     <>
       {loading && (
@@ -117,6 +119,7 @@ const CheckoutsPage = () => {
           {/* {loading && (
           )} */}
           <div className="">
+
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
                 <div className="mb-3">
@@ -138,6 +141,7 @@ const CheckoutsPage = () => {
                     <input
 
                       {...register("email")}
+                      defaultValue={current ? current?.email : ""}
 
                       type="email"
                       id="email"
@@ -150,6 +154,7 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <input
                       {...register("fullName")}
+                      defaultValue={current ? current?.fullname : ""}
 
                       type="text"
                       id="fullName"
@@ -163,6 +168,7 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <input
                       {...register("phoneNumber")}
+                      defaultValue={current ? current?.phoneNumber : ""}
 
                       type="text"
                       id="phoneNumber"
@@ -207,14 +213,8 @@ const CheckoutsPage = () => {
                   <div>
                     <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
                       <div className="flex gap-3 items-center">
-                        <input
-                          type="radio"
-                          className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
-                          required
-                        />
                         Giao hàng tận nơi
                       </div>
-                      <span>40.000₫</span>
                     </div>
                   </div>
                 </div>
@@ -229,40 +229,24 @@ const CheckoutsPage = () => {
                       <div className="flex gap-3 items-center">
                         <input
                           type="radio"
+                          id="cod"
+                          {...register("pay_method")}
                           className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
-                          required
+                          value="COD"
                         />
-                        Thanh toán khi giao hàng
+                        <label htmlFor="cod">Thanh toán khi nhận hàng</label>
                       </div>
                     </div>
                     <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
                       <div className="flex gap-3 items-center">
                         <input
+                          id="vnbank"
+                          {...register("pay_method")}
                           type="radio"
                           className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
-                          required
+                          value="VNBANK"
                         />
-                        Thanh toán bằng ví VN Pay
-                      </div>
-                    </div>
-                    <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
-                      <div className="flex gap-3 items-center">
-                        <input
-                          type="radio"
-                          className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
-                          required
-                        />
-                        Thanh toán bằng PayPal
-                      </div>
-                    </div>
-                    <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
-                      <div className="flex gap-3 items-center">
-                        <input
-                          type="radio"
-                          className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
-                          required
-                        />
-                        Thanh toán bằng MoMo
+                        <label htmlFor="vnbank">Thanh toán bằng ví VN Pay</label>
                       </div>
                     </div>
                   </div>
@@ -354,14 +338,15 @@ const CheckoutsPage = () => {
 
               </div>
               <div className="flex justify-between">
-                <span>Phí vận chuyển:</span>
-                <span className="font-medium">40.000₫</span>
+                <span>Giao hàng tận nơi</span>
+                <span className="font-medium">Miễn phí</span>
+                {/* <span className="font-medium">40.000₫</span> */}
               </div>
             </div>
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
 
-              <span className="text-black text-2xl font-bold">{(totalCart + 40000).toLocaleString("vi-VN")}₫</span>
+              <span className="text-black text-2xl font-bold">{(totalCart).toLocaleString("vi-VN")}₫</span>
 
             </div>
             <div className="flex justify-between">
@@ -383,7 +368,6 @@ const CheckoutsPage = () => {
                     d="M15.75 19.5L8.25 12l7.5-7.5"
                   />
                 </svg>
-
                 <Link to="/cart">Quay về giỏ hàng</Link>
 
               </Link>

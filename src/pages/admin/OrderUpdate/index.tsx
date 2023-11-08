@@ -135,7 +135,7 @@ const orderUpdate = () => {
             address: order?.address,
             phoneNumber: order?.phoneNumber,
             date: date(),
-            pay_method: order?.pay_method && order?.pay_method,
+            paymentStatus: order?.paymentStatus && order?.paymentStatus,
             status: order?.status && order?.status,
         });
 
@@ -277,21 +277,23 @@ const orderUpdate = () => {
                             name="date"
                             label="Date"
                         >
-                            <Input readOnly />
+                            <Input disabled />
                         </Form.Item>
                     </Col>
 
                     <Col className="gutter-row" span={8}>
                         <Form.Item
-                            name="pay_method"
+                            name="paymentStatus"
                             label="Payment"
                         >
                             <Select
                                 allowClear
                                 options={[
-                                    { value: 0, label: 'Unpaid', },
+                                    { value: 0, label: 'Unpaid', disabled: true },
                                     { value: 1, label: 'Paid', },
                                 ]}
+                                disabled={form.getFieldValue('status') === 1}
+
                             ></Select>
                         </Form.Item>
                     </Col>

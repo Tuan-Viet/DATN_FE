@@ -290,6 +290,7 @@ const ProductInfo = () => {
                 quantity: quantity,
                 totalMoney: getOneProduct?.discount * quantity
               }).then(() => dispatch(addCartSlice({
+                userId: userStore?.current?._id,
                 productDetailId: productDetailGetOneId[0]?._id!,
                 quantity: quantity,
                 totalMoney: getOneProduct?.discount * quantity

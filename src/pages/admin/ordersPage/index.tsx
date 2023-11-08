@@ -30,6 +30,7 @@ interface DataType {
     status: number;
     pay_method: number;
     totalMoney: number;
+    paymentStatus: number;
 }
 
 
@@ -124,8 +125,8 @@ const ordersPage = () => {
         },
         {
             title: 'Payment',
-            key: 'pay_method',
-            render: (value: any) => (value.pay_method === 1 ? (
+            key: 'paymentStatus',
+            render: (value: any) => (value.paymentStatus === 1 ? (
                 <span className='border bg-green-500 rounded-lg text-white px-2 py-1 text-xs'>
                     Paid
                 </span>
@@ -134,7 +135,7 @@ const ordersPage = () => {
                     Unpaid
                 </span>
             )),
-            sorter: (a, b) => a.pay_method - b.pay_method, // Sắp xếp theo số
+            sorter: (a, b) => a.paymentStatus - b.paymentStatus, // Sắp xếp theo số
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -226,7 +227,9 @@ const ordersPage = () => {
             fullName: order.fullName,
             status: order.status,
             pay_method: order.pay_method,
+            paymentStatus: order.paymentStatus,
             totalMoney: order.totalMoney,
+
         }));
     }
 
