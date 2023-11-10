@@ -13,6 +13,8 @@ import { useListProductDetailQuery } from "../../../store/productDetail/productD
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { listProductSlice } from "../../../store/product/productSlice";
+import { useListCartQuery } from "../../../store/cart/cart.service";
+import { listCartSlice } from "../../../store/cart/cartSlice";
 
 const BillConfirm = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -23,17 +25,21 @@ const BillConfirm = () => {
   const { data: listOrderDetail, isSuccess: isSuccessOrderDetail } = useListOrderDetailQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
+  const { data: listCart, isSuccess: isSuccessListCart } = useListCartQuery()
+
   // const orderState = useSelector((state: RootState) => state.orderSlice.orders)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
+  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const [totalCart, setTotalCart] = useState<number>(0)
-  useEffect(() => {
-    if (getOneOrder) {
-      getOneOrder.orderDetails.map((cart) => {
-        console.log(cart.quantity)
-      })
-    }
-  }, [getOneOrder])
+
+  // useEffect(() => {
+  //   if (getOneOrder) {
+  //     getOneOrder.orderDetails.map((cart) => {
+  //       console.log(cart.quantity)
+  //     })
+  //   }
+  // }, [getOneOrder])
   useEffect(() => {
     if (listOrder) {
       dispatch(listOrderSlice(listOrder))
@@ -54,6 +60,11 @@ const BillConfirm = () => {
       dispatch(listProductSlice(listProduct))
     }
   }, [isSuccessListProduct])
+  useEffect(() => {
+    if (listCart) {
+      dispatch(listCartSlice([]))
+    }
+  }, [isSuccessListCart])
   useEffect(() => {
     let total = 0
     if (getOneOrder) {
@@ -199,6 +210,17 @@ const BillConfirm = () => {
                             Miễn phí
                           </td>
                         </tr>
+                        <tr className="border-b hover:bg-gray-50">
+                          <td className="px-6 py-4 font-semibold text-gray-900">
+                            Mã giảm giá
+                          </td>
+                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
+                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
+                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
+                          <td className="px-6 py-4 font-semibold text-gray-900 text-right">
+                            {totalCart === (getOneOrder?.totalMoney!) ? "Chưa áp dụng" : "Đã áp dụng"}
+                          </td>
+                        </tr>
                         <tr className="border-b text-xl bg-black">
                           <td className="px-6 py-4 font-bold text-white">
                             Tổng thanh toán
@@ -207,7 +229,7 @@ const BillConfirm = () => {
                           <td className="px-6 py-4 font-bold text-white"></td>
                           <td className="px-6 py-4 font-bold text-white"></td>
                           <td className="px-6 py-4 font-bold text-white text-right">
-                            {(totalCart).toLocaleString("vi-VN")}đ
+                            {getOneOrder?.totalMoney.toLocaleString("vi-VN")}đ
                           </td>
                         </tr>
                       </tbody>

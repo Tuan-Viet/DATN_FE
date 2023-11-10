@@ -33,6 +33,7 @@ const Header = () => {
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  // console.log(listCart);
 
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
@@ -53,9 +54,19 @@ const Header = () => {
         data
       )
       toast.success("Đăng nhập thành công");
-      cartStore?.map((cartItem) => {
-        return onAddCart({ userId: response?.data?.user._id, ...cartItem })
-      })
+      if (cartState) {
+        const cartFilter = cartStore?.map((cartItem) => {
+          return cartState.filter((cart) => {
+            return cartItem.productDetailId !== cart.productDetailId
+          })
+        })
+        console.log(cartFilter);
+
+        cartFilter?.[0]?.map((item) => {
+          onAddCart({ userId: response?.data?.user._id, ...item })
+        })
+
+      }
       dispatch(
         register({
           isLoggedIn: true,

@@ -16,21 +16,32 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
 import { Spin, message } from 'antd';
 import axios from "axios";
+import { useGetOneVoucherQuery, useListVoucherQuery } from "../../../store/vouchers/voucher.service";
+import voucherSlice, { listVoucherSlice } from "../../../store/vouchers/voucherSlice";
+import { IVoucher } from "../../../store/vouchers/voucher.interface";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
+  const navigate = useNavigate()
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
+  const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
+  const voucherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
   const [totalCart, setTotalCart] = useState<number>(0)
   const [onAddOrder] = useAddOrderMutation()
-
+  const user = useSelector((state: any) => state?.user);
+  const cartStore = JSON.parse(localStorage.getItem("carts")!)
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (listCart) {
-      dispatch(listCartSlice(listCart))
+      if (user?.current?._id) {
+        dispatch(listCartSlice(listCart))
+      } else {
+        dispatch(listCartSlice(cartStore ? cartStore : [])!)
+      }
     }
   }, [isSuccessCart])
   useEffect(() => {
@@ -44,15 +55,12 @@ const CheckoutsPage = () => {
     }
   }, [isSuccessListProduct])
   useEffect(() => {
-    let total = 0
-    if (cartState) {
-      cartState.map((cart) => {
-        total += cart.totalMoney
-      })
+    if (listVoucher) {
+      dispatch(listVoucherSlice(listVoucher))
     }
-    setValue("totalMoney", total)
-    setTotalCart(total)
-  }, [cartState])
+  }, [isSuccessVoucher])
+
+
   const {
     register,
     setValue,
@@ -65,22 +73,17 @@ const CheckoutsPage = () => {
   useEffect(() => {
     if (current) {
       setValue("status", 1)
-      // setValue("pay_method", "VNBANK")
       setValue("userId", current?._id)
     }
   }, [setValue])
-  const navigate = useNavigate()
   const onSubmitOrder = async (data: orderForm) => {
-    console.log("Value:", data);
     try {
       setLoading(true);
-      // const date = new Date()
-      // const orderId = moment(date).format('DDHHmmss')
-      // data.orderId = orderId
       await onAddOrder(data).then(({ data }: any) => {
         if (data.pay_method === "COD") {
           setTimeout(async () => {
             setLoading(false);
+            dispatch(listCartSlice([]))
             navigate(`/orders/${data?._id}`)
           }, 2500)
         } else if (data.pay_method === "VNBANK") {
@@ -88,11 +91,6 @@ const CheckoutsPage = () => {
             .then(({ data }) => window.location.href = data)
         }
       }
-        // console.log(data);
-        //   setTimeout(async () => {
-        //     setLoading(false);
-        //     // navigate(`/orders/${data?._id}`)
-        //   }, 2500)
       )
       // const res = await axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`,data)
       // window.location.href = res.data
@@ -100,6 +98,44 @@ const CheckoutsPage = () => {
       console.log(error);
     }
   }
+  const [idVoucher, setIdVoucher] = useState<string>("")
+  const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
+  // console.log(getOneVoucher);
+
+  const handleVoucher = async (voucherId: string) => {
+    if (voucherId) {
+      await setIdVoucher(voucherId)
+      setValue("voucher_code", getOneVoucher?.data?.code)
+    }
+  }
+  const handleVoucherUpdate = async (voucherId: string) => {
+    if (voucherId) {
+      await setIdVoucher("")
+      setValue("voucher_code", "")
+    }
+  }
+  useEffect(() => {
+    let total = 0
+    if (cartState) {
+      cartState.map((cart) => {
+        total += cart.totalMoney
+      })
+    }
+    if (getOneVoucher && getOneVoucher?.data?.type === "percent") {
+      total = total - (total * getOneVoucher?.data?.discount) / 100
+      console.log(1);
+      setValue("totalMoney", total)
+      setTotalCart(total)
+    } else if (getOneVoucher && getOneVoucher?.data?.type === "price") {
+      total = total - getOneVoucher?.data?.discount
+      setValue("totalMoney", total)
+      setTotalCart(total)
+    } else {
+      setValue("totalMoney", total)
+      setTotalCart(total)
+    }
+
+  }, [cartState, getOneVoucher])
   return (
     <>
       {loading && (
@@ -111,8 +147,6 @@ const CheckoutsPage = () => {
       <Header></Header>
       <div className="container-2">
         <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px]">
-          {/* {loading && (
-          )} */}
           <div className="">
 
             <div className="flex gap-[28px]">
@@ -313,13 +347,21 @@ const CheckoutsPage = () => {
               })}
 
             </div>
+            <div className="flex gap-[20px] my-2 w-[700px] flex-nowrap overflow-x-scroll">
+              {voucherState?.map((voucher, index) => {
+                return <div onClick={() => handleVoucher(voucher._id!)} className="border-2 w-[100%] p-3 overflow-hidden h-[120px] hover:border-2 hover:border-[#000] cursor-pointer transition-all ease-linear" key={index}>
+                  <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
+                  <p>{voucher.title}</p>
+                </div>
+              })}
+            </div>
             <div className="py-5 flex gap-3 border-b-[1px]">
               <input
                 type="text"
                 className="p-3 border rounded-lg w-full"
                 placeholder="Nhập mã giảm giá"
+                defaultValue={getOneVoucher ? getOneVoucher?.data?.code : ""}
               />
-
               <div className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
                 Áp dụng
               </div>
@@ -329,7 +371,8 @@ const CheckoutsPage = () => {
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
 
-                <span className="font-medium">{totalCart.toLocaleString("vi-VN")}₫</span>
+                <span className="font-medium">{(totalCart).toLocaleString("vi-VN")}₫</span>
+                {/* <span className="font-medium">{(getOneVoucher?.data && getOneVoucher?.data?.!percent ? (totalCart - (totalCart * getOneVoucher?.data?.discount) / 100).toLocaleString("vi-VN") : totalCart).toLocaleString("vi-VN")}₫</span> */}
 
               </div>
               <div className="flex justify-between">
@@ -338,9 +381,9 @@ const CheckoutsPage = () => {
                 {/* <span className="font-medium">40.000₫</span> */}
               </div>
             </div>
+            {getOneVoucher?.data ? <p onClick={() => handleVoucherUpdate(getOneVoucher?.data?._id)} className="text-red-600 text-[14px] text-right mt-2 font-semibold cursor-pointer hover:font-bold">Xóa mã giảm giá {getOneVoucher?.data?.code}?</p> : ""}
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
-
               <span className="text-black text-2xl font-bold">{(totalCart).toLocaleString("vi-VN")}₫</span>
 
             </div>
@@ -366,9 +409,13 @@ const CheckoutsPage = () => {
                 <Link to="/cart">Quay về giỏ hàng</Link>
 
               </Link>
-              <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
-                Đặt hàng
-              </button>
+
+              <div className="flex flex-col">
+                <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
+                  Đặt hàng
+                </button>
+                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors.userId?.message : ""}</Link>
+              </div>
             </div>
           </div>
         </form>
