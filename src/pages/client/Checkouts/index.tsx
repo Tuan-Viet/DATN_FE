@@ -19,6 +19,7 @@ import axios from "axios";
 import { useGetOneVoucherQuery, useListVoucherQuery } from "../../../store/vouchers/voucher.service";
 import voucherSlice, { listVoucherSlice } from "../../../store/vouchers/voucherSlice";
 import { IVoucher } from "../../../store/vouchers/voucher.interface";
+import { toast } from "react-toastify";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
@@ -78,6 +79,11 @@ const CheckoutsPage = () => {
   }, [setValue])
   const onSubmitOrder = async (data: orderForm) => {
     try {
+      if (cartState?.length === 0) {
+        toast.error("Hiện chưa có sản phẩm nào trong giỏ hàng!")
+        navigate("/")
+        return
+      }
       setLoading(true);
       await onAddOrder(data).then(({ data }: any) => {
         if (data.pay_method === "COD") {
@@ -105,7 +111,7 @@ const CheckoutsPage = () => {
   const handleVoucher = async (voucherId: string) => {
     if (voucherId) {
       await setIdVoucher(voucherId)
-      setValue("voucher_code", getOneVoucher?.data?.code)
+      setValue("voucher_code", getOneVoucher?.code)
     }
   }
   const handleVoucherUpdate = async (voucherId: string) => {
@@ -121,13 +127,13 @@ const CheckoutsPage = () => {
         total += cart.totalMoney
       })
     }
-    if (getOneVoucher && getOneVoucher?.data?.type === "percent") {
-      total = total - (total * getOneVoucher?.data?.discount) / 100
+    if (getOneVoucher && getOneVoucher?.type === "percent") {
+      total = total - (total * getOneVoucher?.discount) / 100
       console.log(1);
       setValue("totalMoney", total)
       setTotalCart(total)
-    } else if (getOneVoucher && getOneVoucher?.data?.type === "price") {
-      total = total - getOneVoucher?.data?.discount
+    } else if (getOneVoucher && getOneVoucher?.type === "price") {
+      total = total - getOneVoucher?.discount
       setValue("totalMoney", total)
       setTotalCart(total)
     } else {
@@ -360,7 +366,7 @@ const CheckoutsPage = () => {
                 type="text"
                 className="p-3 border rounded-lg w-full"
                 placeholder="Nhập mã giảm giá"
-                defaultValue={getOneVoucher ? getOneVoucher?.data?.code : ""}
+                defaultValue={getOneVoucher ? getOneVoucher?.code : ""}
               />
               <div className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
                 Áp dụng
@@ -372,7 +378,7 @@ const CheckoutsPage = () => {
                 <span>Tạm tính:</span>
 
                 <span className="font-medium">{(totalCart).toLocaleString("vi-VN")}₫</span>
-                {/* <span className="font-medium">{(getOneVoucher?.data && getOneVoucher?.data?.!percent ? (totalCart - (totalCart * getOneVoucher?.data?.discount) / 100).toLocaleString("vi-VN") : totalCart).toLocaleString("vi-VN")}₫</span> */}
+                {/* <span className="font-medium">{(getOneVoucher?.data && getOneVoucher?.!percent ? (totalCart - (totalCart * getOneVoucher?.discount) / 100).toLocaleString("vi-VN") : totalCart).toLocaleString("vi-VN")}₫</span> */}
 
               </div>
               <div className="flex justify-between">
@@ -381,7 +387,7 @@ const CheckoutsPage = () => {
                 {/* <span className="font-medium">40.000₫</span> */}
               </div>
             </div>
-            {getOneVoucher?.data ? <p onClick={() => handleVoucherUpdate(getOneVoucher?.data?._id)} className="text-red-600 text-[14px] text-right mt-2 font-semibold cursor-pointer hover:font-bold">Xóa mã giảm giá {getOneVoucher?.data?.code}?</p> : ""}
+            {getOneVoucher ? <p onClick={() => handleVoucherUpdate(getOneVoucher?._id)} className="text-red-600 text-[14px] text-right mt-2 font-semibold cursor-pointer hover:font-bold">Xóa mã giảm giá {getOneVoucher?.code}?</p> : ""}
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
               <span className="text-black text-2xl font-bold">{(totalCart).toLocaleString("vi-VN")}₫</span>

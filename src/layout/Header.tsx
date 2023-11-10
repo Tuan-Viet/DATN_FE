@@ -42,6 +42,7 @@ const Header = () => {
   const [onUpdateCart] = useUpdateCartMutation()
   const [onAddCart] = useAddCartMutation()
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+
   // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0)
   const [form] = Form.useForm();
@@ -54,18 +55,21 @@ const Header = () => {
         data
       )
       toast.success("Đăng nhập thành công");
-      if (cartState) {
-        const cartFilter = cartStore?.map((cartItem) => {
-          return cartState.filter((cart) => {
-            return cartItem.productDetailId !== cart.productDetailId
-          })
-        })
-        console.log(cartFilter);
-
-        cartFilter?.[0]?.map((item) => {
-          onAddCart({ userId: response?.data?.user._id, ...item })
+      if (cartState?.length > 0) {
+        // const cartIndex: ICart | undefined = cartState?.find((cart) => {
+        //   return cartStore?.filter((item) => cart.productDetailId === item.productDetailId)
+        // })
+        // console.log(cartIndex);
+        cartStore?.map((cart) => {
+          return onAddCart({ userId: response?.data?.user._id, ...cart })
         })
 
+      } else {
+        console.log(2);
+
+        cartStore?.map((cart) => {
+          onAddCart({ userId: response?.data?.user._id, ...cart })
+        })
       }
       dispatch(
         register({
