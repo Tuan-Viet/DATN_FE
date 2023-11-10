@@ -21,7 +21,7 @@ export const orderSchema = yup.object({
     note: yup.string(),
     status: yup.number().required(),
     paymentStatus: yup.number().default(1),
-    pay_method: yup.string().required(),
+    pay_method: yup.string().required("Vui lòng chọn phương thức thanh toán"),
     totalMoney: yup.number().required(),
     createdAt: yup.date()
 })

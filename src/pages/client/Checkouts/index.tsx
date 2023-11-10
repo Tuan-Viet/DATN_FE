@@ -259,6 +259,7 @@ const CheckoutsPage = () => {
                       Phương thức thanh toán
                     </h3>
                   </div>
+                  <p className="text-red-500 italic text-[14px]">{errors ? errors.pay_method?.message : ""}</p>
                   <div>
                     <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
                       <div className="flex gap-3 items-center">
