@@ -12,6 +12,7 @@ import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
+import Contact from "../pages/client/Contact";
 import myAccount from "../pages/client/MyAccount";
 import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
@@ -27,6 +28,7 @@ export const publicRoutes = [
     { path: routes.home, Component: homePage },
     { path: routes.banner, Component: Banner },
     { path: routes.about, Component: About },
+    { path: routes.contact, Component: Contact },
     { path: routes.productDetail, Component: productDetail },
     { path: routes.cart, Component: cartPage },
     { path: routes.checkout, Component: CheckoutsPage },
