@@ -16,7 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
 import { Spin, message } from 'antd';
 import axios from "axios";
-import { useGetOneVoucherQuery, useListVoucherQuery } from "../../../store/vouchers/voucher.service";
+import { useGetOneVoucherQuery, useListVoucherQuery, useUpdateVoucherMutation } from "../../../store/vouchers/voucher.service";
 import voucherSlice, { listVoucherSlice } from "../../../store/vouchers/voucherSlice";
 import { IVoucher } from "../../../store/vouchers/voucher.interface";
 import { toast } from "react-toastify";
@@ -77,6 +77,8 @@ const CheckoutsPage = () => {
       setValue("userId", current?._id)
     }
   }, [setValue])
+  const [idVoucher, setIdVoucher] = useState<string>("")
+  const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
   const onSubmitOrder = async (data: orderForm) => {
     try {
       if (cartState?.length === 0) {
@@ -104,8 +106,7 @@ const CheckoutsPage = () => {
       console.log(error);
     }
   }
-  const [idVoucher, setIdVoucher] = useState<string>("")
-  const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
+
   // console.log(getOneVoucher);
 
   const handleVoucher = async (voucherId: string) => {
@@ -132,7 +133,7 @@ const CheckoutsPage = () => {
       console.log(1);
       setValue("totalMoney", total)
       setTotalCart(total)
-    } else if (getOneVoucher && getOneVoucher?.type === "price") {
+    } else if (getOneVoucher && getOneVoucher?.type === "value") {
       total = total - getOneVoucher?.discount
       setValue("totalMoney", total)
       setTotalCart(total)
@@ -356,10 +357,12 @@ const CheckoutsPage = () => {
             </div>
             <div className="flex gap-[20px] my-2 w-[700px] flex-nowrap overflow-x-scroll">
               {voucherState?.map((voucher, index) => {
-                return <div onClick={() => handleVoucher(voucher._id!)} className="border-2 w-[100%] p-3 overflow-hidden h-[120px] hover:border-2 hover:border-[#000] cursor-pointer transition-all ease-linear" key={index}>
-                  <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
-                  <p>{voucher.title}</p>
-                </div>
+                return <>
+                  <div onClick={() => handleVoucher(voucher._id!)} className="border-2 w-[100%] p-3 overflow-hidden h-[120px] hover:border-2 hover:border-[#000] cursor-pointer transition-all ease-linear" key={index}>
+                    <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
+                    <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
+                  </div>
+                </>
               })}
             </div>
             <div className="py-5 flex gap-3 border-b-[1px]">

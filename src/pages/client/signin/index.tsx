@@ -5,8 +5,12 @@ import { useEffect } from "react";
 import { Form } from "antd";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { register } from "../../../store/user/userSlice";
+import { RootState } from "../../../store";
+import { useAddCartMutation, useListCartQuery } from "../../../store/cart/cart.service";
+import { listCartSlice } from "../../../store/cart/cartSlice";
+import { ICart } from "../../../store/cart/cart.interface";
 
 type FormDataType = {
   email: string;
@@ -14,6 +18,14 @@ type FormDataType = {
 };
 
 const signin = () => {
+  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+
+  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  const [onAddCart] = useAddCartMutation()
+
+  const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+  const user = useSelector((state: any) => state?.user);
+
   useEffect(() => {
     const buttonSignin = document.querySelector(".buttonSignin");
     const formSignin = document.querySelector(".formSignin");
@@ -38,7 +50,15 @@ const signin = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  useEffect(() => {
+    if (listCart) {
+      if (user?.current?._id) {
+        dispatch(listCartSlice(listCart))
+      } else {
+        dispatch(listCartSlice(cartStore ? cartStore : [])!)
+      }
+    }
+  }, [isSuccessCart, listCart])
   const handSubmitSignin = async (data: FormDataType) => {
     try {
       const response = await axios.post(
@@ -46,6 +66,22 @@ const signin = () => {
         data
       );
       toast.success("Đăng nhập thành công");
+      if (cartState?.length > 0) {
+        // const cartIndex: ICart | undefined = cartState?.find((cart) => {
+        //   return cartStore?.filter((item) => cart.productDetailId === item.productDetailId)
+        // })
+        // console.log(cartIndex);
+        cartStore?.map((cart) => {
+          return onAddCart({ userId: response?.data?.user._id, ...cart })
+        })
+
+      } else {
+        console.log(2);
+
+        cartStore?.map((cart) => {
+          onAddCart({ userId: response?.data?.user._id, ...cart })
+        })
+      }
       dispatch(
         register({
           isLoggedIn: true,
@@ -53,6 +89,7 @@ const signin = () => {
           userData: response?.data?.user,
         })
       );
+
       if (response?.data?.user?.role == "user") {
         navigate("/");
       } else if (response?.data?.user?.role == "admin") {
