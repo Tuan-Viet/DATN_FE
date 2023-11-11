@@ -12,11 +12,10 @@ const cartSlice = createSlice({
     reducers: ({
         listCartSlice: (state: ICartState, actions: PayloadAction<ICart[]>) => {
             const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
-
             if (JSON.parse(userStore)?._id) {
                 const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)._id)
                 state.carts = listCartByUser
-                console.log(listCartByUser);
+                console.log(state.carts);
 
             } else {
                 state.carts = actions.payload

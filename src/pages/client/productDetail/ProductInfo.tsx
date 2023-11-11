@@ -26,9 +26,6 @@ import {
 } from 'antd';
 
 const ProductInfo = () => {
-
-
-  // fetch ProductDetail
   const { id } = useParams()
   if (id) {
     const {
@@ -259,6 +256,7 @@ const ProductInfo = () => {
     const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
     const navigate = useNavigate()
 
+
     useEffect(() => {
       setValue("quantity", quantity)
     }, [setValue, quantity])
@@ -469,96 +467,102 @@ const ProductInfo = () => {
                     -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
                   </span> : ""}
                 </div>
-                <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
-                <div className="flex my-6">
-                  <div className="w-[13%] text-sm font-bold">Màu sắc</div>
-                  <div className="flex">
-                    {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
-                      return <div className="mx-1">
-                        <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
-                        <label htmlFor={nameColor}
-                          className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        >
-                          {nameColor}
-                        </label>
-                      </div>
-                    })}
-                  </div>
-                </div>
-                <div className="flex my-6">
-                  {/* size */}
-                  <div className="w-[13%] text-sm font-bold">Kích thước</div>
-                  <div className="flex">
-                    {productDetailFilterState?.map((item) => {
-                      return <>
-                        {item.quantity > 0 ? <div className="mx-1" key={item._id}>
-                          <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
-                          <label htmlFor={item.size}
-                            className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                          >
-                            {item.size}
-                          </label>
-                        </div> :
-                          <div className="mx-1">
-                            <label
-                              className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
+                {/* bien the */}
+                <div>
+                  {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
+                    <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
+                    <div className="flex my-6">
+                      <div className="w-[13%] text-sm font-bold">Màu sắc</div>
+                      <div className="flex">
+                        {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
+                          return <div className="mx-1">
+                            <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
+                            <label htmlFor={nameColor}
+                              className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
                             >
-                              {item.size}
+                              {nameColor}
                             </label>
                           </div>
-                        }
-                      </>
-                    })}
-                  </div>
-                </div >
-                <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
-                  <span className="text-sm font-bold">Số lượng:</span>
-                  <div>
-                    <label htmlFor="Quantity" className="sr-only">
-                      {" "}
-                      Quantity{" "}
-                    </label>
-
-                    <div className="flex items-center border border-gray-300 rounded">
-                      <button
-                        onClick={decreaseQuantity}
-                        type="button"
-                        className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                      >
-                        &minus;
-                      </button>
-
-                      <input
-                        type="number"
-                        id="Quantity"
-                        value={quantity}
-                        className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-                      />
-
-                      <button
-                        onClick={increaseQuantity}
-                        type="button"
-                        className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                      >
-                        +
-                      </button>
+                        })}
+                      </div>
                     </div>
-                  </div>
+                    <div className="flex my-6">
+                      {/* size */}
+                      <div className="w-[13%] text-sm font-bold">Kích thước</div>
+                      <div className="flex">
+                        {productDetailFilterState?.map((item) => {
+                          return <>
+                            {item.quantity > 0 ? <div className="mx-1" key={item._id}>
+                              <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
+                              <label htmlFor={item.size}
+                                className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                              >
+                                {item.size}
+                              </label>
+                            </div> :
+                              <div className="mx-1">
+                                <label
+                                  className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
+                                >
+                                  {item.size}
+                                </label>
+                              </div>
+                            }
+                          </>
+                        })}
+                      </div>
+                    </div >
+                    <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
+                      <span className="text-sm font-bold">Số lượng:</span>
+                      <div>
+                        <label htmlFor="Quantity" className="sr-only">
+                          {" "}
+                          Quantity{" "}
+                        </label>
+
+                        <div className="flex items-center border border-gray-300 rounded">
+                          <button
+                            onClick={decreaseQuantity}
+                            type="button"
+                            className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                          >
+                            &minus;
+                          </button>
+
+                          <input
+                            type="number"
+                            id="Quantity"
+                            value={quantity}
+                            className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+
+                          <button
+                            onClick={increaseQuantity}
+                            type="button"
+                            className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mb-7">
+                      <div className="flex gap-x-[15px] mb-5">
+                        <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                          Thêm vào giỏ
+                        </button>
+                        <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
+                          Mua ngay
+                        </button>
+                      </div>
+                      <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
+                        Click vào đây để nhận ưu đãi
+                      </div>
+                    </div>
+                  </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div> : ""}
                 </div>
               </div>
-              <div className="mb-7">
-                <div className="flex gap-x-[15px] mb-5">
-                  <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
-                    Thêm vào giỏ
-                  </button>
-                  <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
-                    Mua ngay
-                  </button>
-                </div>
-                <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
-                  Click vào đây để nhận ưu đãi
-                </div>
-              </div>
+
             </form>
             <div className="policy flex justify-between gap-x-[13px]">
               <div>
