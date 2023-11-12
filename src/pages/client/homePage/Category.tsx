@@ -13,6 +13,8 @@ const Category = () => {
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+  console.log(categoryState);
+
   const productState = useSelector((state: RootState) => state.productSlice.products)
   useEffect(() => {
     if (isSuccessCategory) {
@@ -42,8 +44,7 @@ const Category = () => {
 
                 <Link to="">
                   <img
-                    src="https://product.hstatic.net/200000690725/product/52867307615_31136f5038_o_35df730e699c43b8be0141156f6b61ed_master.jpg"
-                    className="mx-auto transition-all hover:scale-105"
+                    src={cate.images?.url}
                     alt=""
                   />
                 </Link>

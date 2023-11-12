@@ -30,15 +30,13 @@ interface DataType {
 
 const userPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
+    const user = useSelector((state: any) => state.user);
 
-    const userData = localStorage.getItem("persist:user");
     const [userList, setUserList] = useState([]);
-    if (userData) {
-        const user = JSON.parse(userData);
+    if (user) {
         const token = user.token;
-        const cleanedToken = token.substring(1, token.length - 1);
         const config = {
-            headers: { Authorization: `Bearer ${cleanedToken}` }
+            headers: { Authorization: `Bearer ${token}` }
         };
         useEffect(() => {
             axios.get(`http://localhost:8080/api/auth/users`, config)
@@ -51,6 +49,7 @@ const userPage = () => {
                 });
         }, []);
     }
+    const users = userList.filter((user: any) => user.role !== 'admin');
     // const confirm = async (id: string) => {
     //     try {
     //         if (id) {
@@ -66,10 +65,15 @@ const userPage = () => {
 
     // }
 
-
     const columns = [
         {
-            title: 'User Name',
+            title: 'MÃ',
+            dataIndex: '_id',
+            render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
+            className: 'w-1/5'
+        },
+        {
+            title: 'Họ tên',
             key: 'fullname',
             render: (record: any) => (
                 <div className="flex items-center  ">
@@ -84,7 +88,7 @@ const userPage = () => {
             ),
         },
         {
-            title: 'Phone',
+            title: 'Số điện thoai',
             dataIndex: 'phone',
             key: 'phone',
 
@@ -105,16 +109,16 @@ const userPage = () => {
 
         // },
         {
-            title: 'Role',
-            dataIndex: 'role',
+            title: 'Vai trò',
             key: 'role',
+            render: (value: any) => (value.role === 'user' ? 'Thành viên' : '')
 
         },
         {
             title: 'Action',
             key: 'action',
             render: (record: any) => (
-                <Space size="middle">
+                <Space size="middle" className='flex justify-end'>
                     <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
                     </Link>
@@ -137,7 +141,7 @@ const userPage = () => {
 
     ];
 
-    const data: DataType[] = userList.map((user: any) => ({
+    const data: DataType[] = users.map((user: any) => ({
         _id: user._id,
         fullname: user.fullname,
         phone: user.phone,
@@ -154,11 +158,11 @@ const userPage = () => {
             <Space className='flex justify-between mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        User List
+                        QUẢN LÝ KHÁCH HÀNG
                     </span>
-                    <span className="block text-base  text-[#1677ff]">
+                    {/* <span className="block text-base  text-[#1677ff]">
                         Manage your users
-                    </span>
+                    </span> */}
                 </div>
                 {/* <Link to={`add`}>
                     <Button type='primary' className='bg-blue-500'
