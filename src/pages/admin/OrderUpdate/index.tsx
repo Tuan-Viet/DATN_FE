@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import type { FormInstance, UploadProps } from 'antd';
+import type { FormInstance } from 'antd';
 import {
     Button,
     Form,
     Input,
-    InputNumber,
     Select,
     Space,
     message,
@@ -12,24 +11,15 @@ import {
     Spin,
     Row,
     Col,
-    Card,
-    Typography,
-    Image,
-    Badge,
     Breadcrumb,
     Table
 } from 'antd';
 import {
     UploadOutlined,
-    CloseOutlined,
-    CloudUploadOutlined,
-    CloseCircleFilled
 } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { useFetchListProductQuery, useFetchOneProductQuery, useUpdateProductMutation } from '../../../store/product/product.service';
 import axios from 'axios';
 import { useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
-import { useGetOneProductDetailQuery } from '../../../store/productDetail/productDetail.service';
 import { ColumnsType } from 'antd/es/table';
 const { Dragger } = Upload;
 const { TextArea } = Input;
@@ -63,11 +53,10 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
 
     return (
         <Button type="primary" htmlType="submit" disabled={!submittable} className='bg-blue-500'>
-            Submit
+            Cập nhật
         </Button>
     );
 };
-
 interface ProductDetail {
     _id: string;
     product_id: string;
@@ -88,7 +77,6 @@ const orderUpdate = () => {
     if (id) {
         const { data: order } = useGetOneOrderQuery(id);
         const ListOrderDeatils = order?.orderDetails;
-        console.log("order detail", ListOrderDeatils);
 
         const [orderDetail, setOrderDetail] = useState<any[]>([]);
         useEffect(() => {
@@ -97,28 +85,30 @@ const orderUpdate = () => {
                     const productDetails = [];
                     for (const detail of ListOrderDeatils) {
                         try {
-                            // const response = await useGetOneProductDetailQuery(detail.productDetailId)
                             const response = await axios.get(`http://localhost:8080/api/productDetails/${detail.productDetailId}`);
                             const productInfo = response.data;
                             console.log("1", productInfo);
 
+                            const productResponse = await axios.get(`http://localhost:8080/api/products/${productInfo.product_id}`);
+                            const productData = productResponse.data;
+                            console.log("2", productData);
+
                             productDetails.push({
                                 ...detail,
                                 productInfo,
+                                productName: productData.title,
+
                             });
                         } catch (error) {
                             console.log(error);
                         }
                     }
-
                     setOrderDetail(productDetails);
                 };
-
                 fetchData();
             }
         }, [ListOrderDeatils]);
 
-        console.log("data", orderDetail);
         orderDetails = orderDetail
 
         const date = () => {
@@ -137,15 +127,12 @@ const orderUpdate = () => {
             date: date(),
             paymentStatus: order?.paymentStatus && order?.paymentStatus,
             status: order?.status && order?.status,
+            note: order?.note
         });
-
-
-
-
     }
     const columns: ColumnsType<DataType> = [
         {
-            title: 'Items',
+            title: 'Sản phẩm',
             render: (record: any) => (
                 <div className='flex'>
                     <div className='mr-2'>
@@ -159,19 +146,19 @@ const orderUpdate = () => {
             ),
         },
         {
-            title: 'Price',
+            title: 'Giá bán',
             dataIndex: 'price',
             key: 'price',
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
         },
         {
-            title: 'Quanttity',
+            title: 'Số lượng',
             dataIndex: 'quantity',
             key: 'quantity',
         },
         {
+            title: 'Thành tiền',
             key: 'total',
-            title: 'Total',
             render: (record: any) => (record.price * record.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
         },
     ];
@@ -181,7 +168,7 @@ const orderUpdate = () => {
         data = orderDetails.map((order: any) => ({
             key: order._id,
             image: order.productInfo.imageColor,
-            name: order.fullName,
+            name: order.productName,
             colorName: order.color,
             size: order.size,
             quantity: order.quantity,
@@ -196,7 +183,7 @@ const orderUpdate = () => {
 
             await onUpdate({ id, ...values });
 
-            message.success(`Update order successfully`);
+            message.success(`Cập nhật thành công`);
             navigate("/admin/order");
         } catch (error) {
             console.log(error);
@@ -208,16 +195,17 @@ const orderUpdate = () => {
             items={[
 
                 {
-                    title: <Link to={`/admin/order`}>Order</Link>,
+                    title: <Link to={`/admin/order`}>Đơn hàng</Link>,
                 },
                 {
-                    title: 'Update Order',
+                    title: 'Cập nhật',
+                    className: 'uppercase',
                 },
             ]}
         />
         <div className='border p-10 rounded-lg  bg-white'>
-            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff]">
-                Update Order
+            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff] mb-10">
+                Cập nhật đơn hàng
             </h3>
             <Form
                 form={form}
@@ -230,92 +218,107 @@ const orderUpdate = () => {
                 <Form.Item style={{ display: "none" }}>
                     <Input name="_id" />
                 </Form.Item>
-                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-
-                    <Col className="gutter-row" span={8}>
-
-
+                <h3 className='text-lg font-medium text-[#1677ff] border-l-4 px-3 border-[#1677ff] mb-3'>Thông tin người nhận</h3>
+                <div className="flex ">
+                    <div className="w-2/3 px-10">
                         <Form.Item
                             name="fullName"
-                            label="Customer name"
+                            label="Khách hàng"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please input your Title Product!'
                                 }
                             ]}>
                             <Input />
                         </Form.Item>
-                    </Col>
 
-                    <Col className="gutter-row" span={8}>
                         <Form.Item
                             name="phoneNumber"
-                            label="Phone Number"
-                            rules={[{ required: true, message: 'Please input your Phone Number!' }]}
+                            label="Số điện thoại"
+                            rules={[{ required: true }]}
                         >
                             <Input
                                 style={{ width: '100%' }}
                             />
                         </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={8}>
-
                         <Form.Item
                             name="address"
-                            label="Address"
-                            rules={[{ required: true, message: 'Please input your Address!' }]}
+                            label="Địa chỉ"
+                            rules={[{ required: true }]}
                         >
                             <Input />
                         </Form.Item>
-                    </Col>
-                </Row>
-                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-
-                    <Col className="gutter-row" span={8}>
+                        <Form.Item
+                            name="note"
+                            label="Ghi chú"
+                        >
+                            <TextArea rows={4} />
+                        </Form.Item>
+                    </div>
+                    <div className="w-1/3 px-10">
                         <Form.Item
                             name="date"
-                            label="Date"
+                            label="Ngày đặt"
                         >
                             <Input disabled />
                         </Form.Item>
-                    </Col>
 
-                    <Col className="gutter-row" span={8}>
                         <Form.Item
                             name="paymentStatus"
-                            label="Payment"
+                            label="Thanh toán"
                         >
                             <Select
                                 allowClear
                                 options={[
-                                    { value: 0, label: 'Unpaid', disabled: true },
-                                    { value: 1, label: 'Paid', },
+                                    { value: 0, label: 'Chưa thanh toán', disabled: true },
+                                    { value: 1, label: 'Đã thanh toán' },
                                 ]}
-                                disabled={form.getFieldValue('status') === 1}
+                                disabled={form.getFieldValue('paymentStatus') === 1}
 
                             ></Select>
                         </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={8}>
-                        <Form.Item name="status" label="Status">
+                        <Form.Item name="status" label="Trạng thái">
+                            {form.getFieldValue('status') === 0 ? (
+                                <div className='w-full leading-[30px] rounded-md text-center font-semibold bg-red-500 text-white outline-none hover:text-white'>Hủy đơn hàng</div>
+                            ) : form.getFieldValue('status') === 4 ? (
+                                <div className='w-full leading-[30px] rounded-md text-center font-semibold bg-green-500 text-white outline-none hover:text-white' >Đã hoàn thành</div>
+                            ) : (
+                                <Select
+                                    allowClear
+                                    options={[
+                                        { value: 0, label: 'Hủy đơn hành' },
+                                        { value: 1, label: 'Đang xử lí xử lí' },
+                                        { value: 2, label: 'Chuẩn bị hàng' },
+                                        { value: 3, label: 'Đang giao' },
+                                        { value: 4, label: 'Hoàn thành', disabled: true },
+                                    ].filter(option => form.getFieldValue('status') <= option.value)}
+                                    disabled={form.getFieldValue('status') === 0 || form.getFieldValue('status') === 4}
+                                ></Select>
+                            )}
+                        </Form.Item>
+                        {/* <Form.Item name="status" label="Trạng thái">
                             <Select
                                 allowClear
                                 options={[
-                                    { value: 0, label: 'Canceled' },
-                                    { value: 1, label: 'Peding' },
-                                    { value: 2, label: 'Packing' },
-                                    { value: 3, label: 'Shipping' },
-                                    { value: 4, label: 'Completed', disabled: true },
+                                    { value: 0, label: 'Hủy đơn hành' },
+                                    { value: 1, label: 'Đang xử lí xử lí' },
+                                    { value: 2, label: 'Chuẩn bị hàng' },
+                                    { value: 3, label: 'Đang giao' },
+                                    { value: 4, label: 'Hoàn thành', disabled: true },
                                 ].filter(option => form.getFieldValue('status') <= option.value)}
-                                disabled={form.getFieldValue('status') === 0}
+                                disabled={form.getFieldValue('status') === 0 || form.getFieldValue('status') === 4}
                             ></Select>
-                        </Form.Item>
 
-                    </Col>
-                </Row>
+                        </Form.Item> */}
+                    </div>
+                </div>
 
-                <div className="">
+
+
+
+
+                <div className="my-10">
+                    <h3 className='text-lg font-medium text-[#1677ff] border-l-4 px-3 border-[#1677ff] mb-5'>Thông tin giỏ hàng</h3>
                     <Table
                         columns={columns}
                         dataSource={data}
@@ -323,29 +326,27 @@ const orderUpdate = () => {
                         className='mb-10'
                         summary={(pageData) => {
                             let total = 0;
-                            let totalMoney = 0;
                             pageData.forEach((record) => {
                                 total += record.price * record.quantity;
                             });
-                            totalMoney = total + 40000
                             return (
                                 <>
                                     <Table.Summary.Row className='font-bold'>
-                                        <Table.Summary.Cell index={0} colSpan={3}>Total</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={0} colSpan={3}>Tổng sản phẩm</Table.Summary.Cell>
                                         <Table.Summary.Cell index={1}>
                                             {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Table.Summary.Cell>
                                     </Table.Summary.Row>
                                     <Table.Summary.Row className='font-bold'>
-                                        <Table.Summary.Cell index={0} colSpan={3}>Shipping</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={0} colSpan={3}>Giao hàng tận nơi</Table.Summary.Cell>
                                         <Table.Summary.Cell index={1}>
-                                            40,000
+                                            Miễn phí
                                         </Table.Summary.Cell>
                                     </Table.Summary.Row>
                                     <Table.Summary.Row className='font-bold'>
-                                        <Table.Summary.Cell index={0} colSpan={3}>Total Money</Table.Summary.Cell>
+                                        <Table.Summary.Cell index={0} colSpan={3}>Tổng</Table.Summary.Cell>
                                         <Table.Summary.Cell index={1}>
-                                            {totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            {total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                         </Table.Summary.Cell>
                                     </Table.Summary.Row>
                                 </>
@@ -356,7 +357,7 @@ const orderUpdate = () => {
                 <Form.Item className='my-5'>
                     <Space>
                         <SubmitButton form={form} />
-                        <Button htmlType="reset">Reset</Button>
+                        {/* <Button htmlType="reset">Reset</Button> */}
                     </Space>
                 </Form.Item>
             </Form >
