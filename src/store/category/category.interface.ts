@@ -3,12 +3,13 @@ import IProduct from "../product/product.interface"
 export interface ICategory {
     _id?: string
     products: IProduct[]
-    images: url[]
+    images: Url
     name: string
 }
 
-export interface url {
+export interface Url {
     url: string
+    publicId: string
 }
 
 export interface ICategoryState {

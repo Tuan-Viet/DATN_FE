@@ -19,7 +19,8 @@ import {
 import {
     UploadOutlined,
     CloseOutlined,
-    CloudUploadOutlined
+    CloudUploadOutlined,
+    PlusOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from 'react-router-dom';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
@@ -48,7 +49,7 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
 
     return (
         <Button type="primary" htmlType="submit" disabled={!submittable} className='bg-blue-500'>
-            Submit
+            Thêm
         </Button>
     );
 };
@@ -100,7 +101,7 @@ const productAdd = () => {
         console.log("Values Data:", newValues);
 
         await onAdd(newValues)
-        message.success(`Add product successfully!`);
+        message.success(`Tạo mới thành công`);
         navigate("/admin/product");
     };
 
@@ -115,16 +116,16 @@ const productAdd = () => {
             items={[
 
                 {
-                    title: <Link to={`/admin/product`}>Product</Link>,
+                    title: <Link to={`/admin/product`}>Sản phẩm</Link>,
                 },
                 {
-                    title: 'Add Product',
+                    title: 'TẠO MỚI',
                 },
             ]}
         />
         <div className='border p-10 rounded-lg  bg-white'>
-            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff]">
-                Create New Product
+            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff] mb-10">
+                Tạo mới sản phẩm
             </h3>
             <Form
                 form={form}
@@ -140,11 +141,11 @@ const productAdd = () => {
                         {/* Input Title Product */}
                         <Form.Item
                             name="title"
-                            label="Title Product"
+                            label="Tên sản phẩm"
                             rules={[
                                 {
                                     required: true,
-                                    message: 'Please input your Title Product!'
+                                    message: 'Không được để trống!'
                                 }
                             ]}>
                             <Input />
@@ -154,8 +155,8 @@ const productAdd = () => {
                         {/* Input Price */}
                         <Form.Item
                             name="price"
-                            label="Price"
-                            rules={[{ required: true, message: 'Please input your Price!' }]}
+                            label="Giá"
+                            rules={[{ required: true, message: 'Không được để trống!' }]}
                         >
                             <InputNumber
                                 min={0}
@@ -165,7 +166,21 @@ const productAdd = () => {
                         </Form.Item>
                     </Col>
                     <Col className="gutter-row" span={6}>
-                        <Form.Item name="discount" label="Discount">
+                        <Form.Item
+                            name="discount"
+                            label="Giảm giá"
+                            rules={[
+                                {
+                                    validator: async (_, value) => {
+                                        if (value > form.getFieldValue('price')) {
+                                            return Promise.reject('Giảm giá không thể lớn hơn giá');
+                                        } else {
+                                            return Promise.resolve();
+                                        }
+                                    },
+                                },
+                            ]}
+                        >
                             <InputNumber
                                 min={0}
                                 formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -175,9 +190,9 @@ const productAdd = () => {
                     </Col>
                     <Col className="gutter-row" span={6}>
                         {/* Input Category */}
-                        <Form.Item name="categoryId" label="Category" rules={[{ required: true, message: 'Please input your Category!' }]}>
+                        <Form.Item name="categoryId" label="Danh mục" rules={[{ required: true, message: 'Không được để trống!' }]}>
                             <Select
-                                placeholder="Choose category"
+                                // placeholder="Choose category"
                                 allowClear
                                 options={selectOptions}
                             ></Select>
@@ -189,9 +204,9 @@ const productAdd = () => {
                     <div className="flex justify-between">
                         {/* Upload Images */}
                         <Form.Item
-                            label="Images"
+                            label="Ảnh"
                             name="images"
-                            rules={[{ required: true, message: 'Please input your Image!' }]}
+                            rules={[{ required: true, message: 'Không được để trống!' }]}
                             className='w-1/3 mr-10'
                         >
                             <Dragger {...props}>
@@ -202,8 +217,8 @@ const productAdd = () => {
                         {/* Input Desription */}
                         <Form.Item
                             name="description"
-                            label="Description"
-                            rules={[{ required: true, message: 'Please input your Description!' }]}
+                            label="Mô tả"
+                            rules={[{ required: true, message: 'Không được để trống!' }]}
                             className='w-2/3'
                         >
                             <TextArea rows={8} />
@@ -219,7 +234,7 @@ const productAdd = () => {
                                 <Card
                                     className='bg-zinc-50'
                                     size="small"
-                                    title={`Color ${field.name + 1}`}
+                                    title={`Mẫu ${field.name + 1}`}
                                     key={field.key}
                                     extra={
                                         <CloseOutlined
@@ -238,11 +253,14 @@ const productAdd = () => {
                                                     className="avatar-uploader"
                                                     maxCount={1}
                                                 >
-                                                    <CloudUploadOutlined />
+                                                    <div>
+                                                        <PlusOutlined />
+                                                        <div>Upload</div>
+                                                    </div>
                                                 </Upload>
                                             </Form.Item>
-                                            <Form.Item name={[field.name, 'nameColor']} rules={[{ required: true, message: 'Please input your Name Color!' }]}>
-                                                <Input placeholder="Enter Color Image" />
+                                            <Form.Item name={[field.name, 'nameColor']} rules={[{ required: true, message: 'Không được để trống' }]}>
+                                                <Input placeholder="Màu sắc sản phẩm" />
                                             </Form.Item>
                                         </div>
 
@@ -256,13 +274,13 @@ const productAdd = () => {
                                                                 <Space key={subField.key} className='flex justify-between'>
                                                                     <Form.Item noStyle name={[subField.name, 'size']} rules={[{ required: true }]}>
                                                                         <Select
-                                                                            placeholder="Choose Category"
+                                                                            placeholder="Size"
                                                                             style={{ width: 356 }}
                                                                             options={optionSize}
                                                                         />
                                                                     </Form.Item>
                                                                     <Form.Item noStyle name={[subField.name, 'quantity']} rules={[{ required: true }]}>
-                                                                        <Input style={{ width: 360 }} placeholder="Enter quantity" />
+                                                                        <Input style={{ width: 360 }} placeholder="Số lượng" />
                                                                     </Form.Item>
                                                                     <CloseOutlined
                                                                         onClick={() => {
@@ -274,7 +292,7 @@ const productAdd = () => {
                                                             <Button type="primary" onClick={() => subOpt.add()}
                                                                 className='w-32 mx-auto bg-blue-500'
                                                             >
-                                                                + Add Sub Item
+                                                                + Thêm size
                                                             </Button>
                                                         </div>
                                                     )}
@@ -286,9 +304,9 @@ const productAdd = () => {
                             ))}
 
                             <Button type="primary" onClick={() => add()}
-                                className='bg-blue-500 text-white w-20 mx-auto'
+                                className='bg-blue-500 text-white w-[200px] mx-auto'
                             >
-                                + Add
+                                + Thêm mẫu mới
                             </Button>
                         </div >
                     )}
