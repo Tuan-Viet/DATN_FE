@@ -90,7 +90,6 @@ const Sale = () => {
                     <span className="uppercase text-xs font-semibold">Thêm vào giỏ</span>
                   </Link>
                 </div> :
-
                   <div>
                     {/* soldOut */}
                     <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>

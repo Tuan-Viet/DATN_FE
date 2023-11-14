@@ -13,9 +13,8 @@ const Category = () => {
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
-  console.log(categoryState);
 
-  const productState = useSelector((state: RootState) => state.productSlice.products)
+  // const productState = useSelector((state: RootState) => state.productSlice.products)
   useEffect(() => {
     if (isSuccessCategory) {
       dispatch(listCategorySlice(listCategory))
