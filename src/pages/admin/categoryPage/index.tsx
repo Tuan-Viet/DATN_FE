@@ -10,7 +10,8 @@ import {
 import {
     EditFilled,
     DeleteFilled,
-    PlusOutlined
+    PlusOutlined,
+    SearchOutlined
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { Dispatch, useEffect, useState } from 'react';
@@ -23,6 +24,7 @@ import { ColumnsType, TableProps } from 'antd/es/table';
 interface DataType {
     _id: React.Key;
     name: string;
+    images: any;
     ICategory: string;
 }
 
@@ -32,6 +34,7 @@ const categoryPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listCategory, isLoading, isError, isSuccess } = useFetchListCategoryQuery()
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+    const categoryData = categoryState.filter(category => category.name !== 'Chưa phân loại');
 
     useEffect(() => {
         if (isSuccess) {
@@ -48,14 +51,13 @@ const categoryPage = () => {
             </div>
         </>;
     }
-
     const confirm = async (id: string) => {
         try {
             if (id) {
                 await onRemove(id).then(() => dispatch(deleteCategorySlice(id)))
                 messageApi.open({
                     type: 'success',
-                    content: 'Delete category successfully!',
+                    content: 'Xóa thành công',
                 });
             }
         } catch (error) {
@@ -63,20 +65,31 @@ const categoryPage = () => {
         }
 
     }
-
-
     const columns: ColumnsType<DataType> = [
         {
-            title: 'Category Name',
+            title: 'MÃ DANH MỤC',
+            dataIndex: '_id',
+            render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
+            className: 'w-1/5'
+        },
+        {
+            title: 'ẢNH',
+            render: (value: any) => (
+                <Image
+                    width={70}
+                    src={value.images?.url}
+                    alt="Image"
+                    className=""
+                />
+            ),
+            className: 'w-1/5'
+        },
+        {
+            title: ' TÊN DANH MỤC',
             key: 'name',
             render: (record: ICategory) => (
                 <div className="flex items-center  ">
-                    {/* <Image
-                        width={70}
-                        src={record.image}
-                        alt="Category Image"
-                        className=""
-                    /> */}
+
                     <a className='w-full overflow-hidden'>{record.name}</a>
                 </div>
             ),
@@ -85,10 +98,10 @@ const categoryPage = () => {
             showSorterTooltip: false,
         },
         {
-            title: 'Action',
+            title: '',
             key: 'action',
             render: (record: ICategory) => (
-                <Space size="middle">
+                <Space size="middle" className='flex justify-end'>
                     <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
@@ -108,9 +121,10 @@ const categoryPage = () => {
 
     ];
 
-    const data: DataType[] = categoryState.map((category: any) => ({
+    const data: DataType[] = categoryData.map((category: any) => ({
         _id: category._id,
         name: category.name,
+        images: category.images,
         ICategory: category.ICategory,
     }));
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
@@ -122,21 +136,30 @@ const categoryPage = () => {
             <Space className='flex justify-between mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        Category List
+                        QUẢN LÝ DANH MỤC
                     </span>
-                    <span className="block text-base  text-[#1677ff]">
-                        Manage your categorys
-                    </span>
+                    {/* <span className="block text-base  text-[#1677ff]">
+                        Quản lý danh mục
+                    </span> */}
                 </div>
                 <Link to={`add`}>
                     <Button type='primary' className='bg-blue-500'
                         icon={<PlusOutlined />}
                     >
-                        Add New Category
+                        Tạo mới
                     </Button>
                 </Link>
             </Space>
             <div className="border min-h-[300px] p-3 rounded-lg  bg-white">
+                <div className="pb-6 pt-3">
+                    <form >
+                        <input type="text" className='border p-2 w-64 outline-none '
+                            placeholder="" />
+                        <button type="submit" className='p-2 bg-[#1677ff]'>
+                            <SearchOutlined className='text-white' />
+                        </button>
+                    </form>
+                </div>
                 <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
             </div>
         </div>

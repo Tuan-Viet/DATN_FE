@@ -20,7 +20,7 @@ const voucherAPI = createApi({
             }),
             invalidatesTags: ["voucher"]
         }),
-        getOneVoucher: builer.query({
+        getOneVoucher: builer.query<IVoucher, string>({
             query: (id) => `/vouchers/` + id,
             providesTags: ["voucher"]
         }),
@@ -39,7 +39,7 @@ const voucherAPI = createApi({
             invalidatesTags: ["voucher"]
         }),
         updateVoucher: builer.mutation<IVoucher[], IVoucher>({
-            query: ({ _id, ...voucher }) => ({
+            query: ({ _id, quantity, ...voucher }) => ({
                 method: "PATCH",
                 url: `/vouchers/${_id}/edit`,
                 body: voucher

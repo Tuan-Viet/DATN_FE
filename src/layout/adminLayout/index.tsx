@@ -35,16 +35,16 @@ function getItem(
 
 const items: MenuItem[] = [
   getItem(<Link to={"/admin/dashboard"}>Dashboard</Link >, '1', <PieChartOutlined />),
-  getItem('Products', 'sub1', <CodeSandboxOutlined />, [
-    getItem(<Link to={"/admin/product/add"}>Create New</Link >, '3'),
-    getItem(<Link to={"/admin/product"}>View List</Link >, '4'),
+  getItem('Sản phẩm', 'sub1', <CodeSandboxOutlined />, [
+    getItem(<Link to={"/admin/product/add"}>Tạo mới</Link >, '3'),
+    getItem(<Link to={"/admin/product"}>Danh sách</Link >, '4'),
   ]),
-  getItem('Category', 'sub2', <AppstoreAddOutlined />, [
-    getItem(<Link to={"/admin/category/add"}>Create New</Link >, '5'),
-    getItem(<Link to={"/admin/category"}>View List</Link >, '6'),
+  getItem('Danh mục', 'sub2', <AppstoreAddOutlined />, [
+    getItem(<Link to={"/admin/category/add"}>Tạo mới</Link >, '5'),
+    getItem(<Link to={"/admin/category"}>Danh sách</Link >, '6'),
   ]),
-  getItem(<Link to={"/admin/user"}>User</Link >, '7', <UserOutlined />),
-  getItem(<Link to={"/admin/order"}>Order</Link >, '8', <TagOutlined />),
+  getItem(<Link to={"/admin/user"}>Khách hàng</Link >, '7', <UserOutlined />),
+  getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <TagOutlined />),
 ];
 
 const AdminLayout = ({ children }: Props) => {
@@ -65,7 +65,7 @@ const AdminLayout = ({ children }: Props) => {
   const logOut = () => {
     // Gọi action đăng xuất
     dispatch(logout());
-    message.success("Logout successful!");
+    message.info("Đăng xuất thành công");
     localStorage.removeItem("carts")
     navigate("/signin");
   };
@@ -90,7 +90,7 @@ const AdminLayout = ({ children }: Props) => {
         <div className="fixed bottom-0">
           <button className="text-gray-300 bg-gray-800 w-[200px] py-3 hover:text-white" onClick={() => logOut()}>
             <LogoutOutlined className="mr-2" />
-            Logout
+            Đăng xuất
           </button>
         </div>
       </Sider>

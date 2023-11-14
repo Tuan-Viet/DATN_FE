@@ -82,7 +82,7 @@ const productPage = () => {
                 await onRemove(id).then(() => dispatch(deleteProductSearchSlice(id)))
                 messageApi.open({
                     type: 'success',
-                    content: 'Delete product successfully!',
+                    content: 'Xóa thành công',
                 });
             }
         } catch (error) {
@@ -91,7 +91,12 @@ const productPage = () => {
     }
     const columns: ColumnsType<DataType> = [
         {
-            title: 'Product Name',
+            title: 'MÃ SẢN PHẨM',
+            dataIndex: '_id',
+            render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
+        },
+        {
+            title: 'TÊN SẢN PHẨM',
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
@@ -111,7 +116,7 @@ const productPage = () => {
             className: 'w-1/4',
         },
         {
-            title: 'Price',
+            title: 'GIÁ',
             dataIndex: 'price',
             key: 'price',
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -120,7 +125,7 @@ const productPage = () => {
             showSorterTooltip: false,
         },
         {
-            title: 'Discount',
+            title: 'GIẢM GIÁ',
             dataIndex: 'discount',
             key: 'discount',
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
@@ -128,14 +133,13 @@ const productPage = () => {
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
+        // {
+        //     title: 'Description',
+        //     dataIndex: 'description',
+        //     key: 'description',
+        // },
         {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-        },
-
-        {
-            title: 'Category',
+            title: 'DANH MỤC',
             dataIndex: 'categoryId',
             key: 'categoryId',
             render: (cateId: any) => {
@@ -149,10 +153,10 @@ const productPage = () => {
         },
 
         {
-            title: 'Action',
+            title: '',
             key: 'action',
             render: (record: any) => (
-                <Space size="middle">
+                <Space size="middle" className='flex justify-end'>
                     <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
                     </Link>
@@ -193,17 +197,17 @@ const productPage = () => {
             <Space className='flex justify-between mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        Product List
+                        QUẢN LÝ SẢN PHẨM
                     </span>
-                    <span className="block text-base  text-[#1677ff]">
+                    {/* <span className="block text-base  text-[#1677ff]">
                         Manage your products
-                    </span>
+                    </span> */}
                 </div>
                 <Link to={`add`}>
                     <Button type='primary' className='bg-[#1677ff]'
                         icon={<PlusOutlined />}
                     >
-                        Add New Product
+                        Tạo mới
                     </Button>
                 </Link>
             </Space>

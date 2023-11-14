@@ -16,7 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/order/order.service";
 import { Spin, message } from 'antd';
 import axios from "axios";
-import { useGetOneVoucherQuery, useListVoucherQuery } from "../../../store/vouchers/voucher.service";
+import { useGetOneVoucherQuery, useListVoucherQuery, useUpdateVoucherMutation } from "../../../store/vouchers/voucher.service";
 import voucherSlice, { listVoucherSlice } from "../../../store/vouchers/voucherSlice";
 import { IVoucher } from "../../../store/vouchers/voucher.interface";
 import { toast } from "react-toastify";
@@ -29,13 +29,19 @@ const CheckoutsPage = () => {
   const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const voucherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
   const [totalCart, setTotalCart] = useState<number>(0)
   const [onAddOrder] = useAddOrderMutation()
   const user = useSelector((state: any) => state?.user);
   const cartStore = JSON.parse(localStorage.getItem("carts")!)
+  const [onUpdateVoucher] = useUpdateVoucherMutation()
   const [loading, setLoading] = useState(false);
+  const [codeVoucher, setcodeVoucher] = useState<string>("")
+  const [idVoucher, setIdVoucher] = useState<string>("")
+  const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
+
   useEffect(() => {
     if (listCart) {
       if (user?.current?._id) {
@@ -60,8 +66,6 @@ const CheckoutsPage = () => {
       dispatch(listVoucherSlice(listVoucher))
     }
   }, [isSuccessVoucher])
-
-
   const {
     register,
     setValue,
@@ -70,13 +74,17 @@ const CheckoutsPage = () => {
   } = useForm<orderForm>({
     resolver: yupResolver(orderSchema)
   })
+
   const { current } = useSelector((state: any) => state.user);
   useEffect(() => {
     if (current) {
       setValue("status", 1)
       setValue("userId", current?._id)
     }
-  }, [setValue])
+    if (getOneVoucher) {
+      setValue("voucher_code", getOneVoucher?.code)
+    }
+  }, [setValue, current])
   const onSubmitOrder = async (data: orderForm) => {
     try {
       if (cartState?.length === 0) {
@@ -98,28 +106,29 @@ const CheckoutsPage = () => {
         }
       }
       )
-      // const res = await axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`,data)
-      // window.location.href = res.data
+
     } catch (error) {
       console.log(error);
     }
   }
-  const [idVoucher, setIdVoucher] = useState<string>("")
-  const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
-  // console.log(getOneVoucher);
 
   const handleVoucher = async (voucherId: string) => {
     if (voucherId) {
       await setIdVoucher(voucherId)
-      setValue("voucher_code", getOneVoucher?.code)
+      if (getOneVoucher) {
+        setValue("voucher_code", getOneVoucher.code)
+        setcodeVoucher(getOneVoucher.code!)
+      }
     }
   }
-  const handleVoucherUpdate = async (voucherId: string) => {
+  const handleVoucherUpdate = (voucherId: string) => {
     if (voucherId) {
-      await setIdVoucher("")
+      setcodeVoucher("")
+      setIdVoucher("")
       setValue("voucher_code", "")
     }
   }
+
   useEffect(() => {
     let total = 0
     if (cartState) {
@@ -129,19 +138,43 @@ const CheckoutsPage = () => {
     }
     if (getOneVoucher && getOneVoucher?.type === "percent") {
       total = total - (total * getOneVoucher?.discount) / 100
-      console.log(1);
-      setValue("totalMoney", total)
-      setTotalCart(total)
-    } else if (getOneVoucher && getOneVoucher?.type === "price") {
+      if (total) {
+        setValue("totalMoney", total)
+        setTotalCart(total)
+      }
+
+    } else if (getOneVoucher && getOneVoucher?.type === "value") {
       total = total - getOneVoucher?.discount
-      setValue("totalMoney", total)
-      setTotalCart(total)
+      if (total) {
+        setValue("totalMoney", total)
+        setTotalCart(total)
+      }
     } else {
-      setValue("totalMoney", total)
-      setTotalCart(total)
+      if (total) {
+        setValue("totalMoney", total)
+        setTotalCart(total)
+      }
     }
 
   }, [cartState, getOneVoucher])
+
+  const handleFindVoucher = () => {
+    if (codeVoucher && voucherState) {
+      const voucherByCode = voucherState?.find((voucher) => voucher.code === codeVoucher)
+      if (voucherByCode && voucherByCode?._id) {
+        setIdVoucher(voucherByCode._id)
+        setValue("voucher_code", voucherByCode.code)
+      } else {
+        toast.error("Mã giảm giá không hợp lệ!")
+        setcodeVoucher("")
+        setIdVoucher("")
+        setValue("voucher_code", "")
+      }
+    }
+  }
+  useEffect(() => {
+    handleFindVoucher()
+  }, [])
   return (
     <>
       {loading && (
@@ -329,22 +362,6 @@ const CheckoutsPage = () => {
                                 </span>
                               </p>
                             </div>
-                            {/* <div onClick={() => removeCart(cart._id!)} className="absolute cursor-pointer right-0 top-0">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="1.5"
-                                stroke="currentColor"
-                                className="w-6 h-6"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M6 18L18 6M6 6l12 12"
-                                />
-                              </svg>
-                            </div> */}
                           </div>
                         })}
                       </div>
@@ -352,30 +369,40 @@ const CheckoutsPage = () => {
                   }
                 </div>
               })}
-
             </div>
             <div className="flex gap-[20px] mt-5 w-[700px] flex-nowrap overflow-x-auto">
               {voucherState?.map((voucher, index) => {
                 return <div onClick={() => handleVoucher(voucher._id!)} className="border min-w-[300px] pl-6 h-[100px] cursor-pointer rounded-lg hover:text-white hover:bg-black transition-all ease-linear" key={index}>
+                  {/* <input className="hidden" value={voucher.code} type="text"  /> */}
                   <div className="border-dashed border-l-2 h-full p-3">
-                    <div className="text-[14px] font-bold">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
-                    <p>{voucher.title}</p>
+                    <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
+                    <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
                   </div>
                 </div>
               })}
             </div>
-            <div className="py-5 flex gap-3 border-b-[1px]">
+            {/* <div className="flex gap-[20px] my-2 w-[700px] flex-nowrap overflow-x-scroll">
+              {voucherState?.map((voucher, index) => {
+                return <>
+                  <div onClick={() => handleVoucher(voucher._id!)} className="border-2 w-[100%] p-3 overflow-hidden h-[120px] hover:border-2 hover:border-[#000] cursor-pointer transition-all ease-linear" key={index}>
+                    <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
+                    <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
+                  </div>
+                </>
+              })}
+            </div> */}
+            <form className="py-5 flex gap-3 border-b-[1px]">
               <input
                 type="text"
                 className="p-3 border rounded-lg w-full"
                 placeholder="Nhập mã giảm giá"
-                defaultValue={getOneVoucher ? getOneVoucher?.code : ""}
+                value={getOneVoucher && !Array.isArray(getOneVoucher) ? getOneVoucher?.code : codeVoucher}
+                onChange={(e) => setcodeVoucher(e.target.value)}
               />
-              <div className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
+              <div onClick={() => handleFindVoucher()} className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
                 Áp dụng
               </div>
-
-            </div>
+            </form>
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
@@ -390,7 +417,7 @@ const CheckoutsPage = () => {
                 {/* <span className="font-medium">40.000₫</span> */}
               </div>
             </div>
-            {getOneVoucher ? <p onClick={() => handleVoucherUpdate(getOneVoucher?._id)} className="text-red-600 text-[14px] text-right mt-2 font-semibold cursor-pointer hover:font-bold">Xóa mã giảm giá {getOneVoucher?.code}?</p> : ""}
+            {getOneVoucher?.code ? <p onClick={() => handleVoucherUpdate(getOneVoucher?._id!)} className="text-red-600 text-[14px] text-right mt-2 font-semibold cursor-pointer hover:font-bold">Xóa mã giảm giá {getOneVoucher?.code}?</p> : ""}
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
               <span className="text-black text-2xl font-bold">{(totalCart).toLocaleString("vi-VN")}₫</span>
@@ -423,7 +450,7 @@ const CheckoutsPage = () => {
                 <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                   Đặt hàng
                 </button>
-                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors.userId?.message : ""}</Link>
+                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors?.userId?.message : ""}</Link>
               </div>
             </div>
           </div>

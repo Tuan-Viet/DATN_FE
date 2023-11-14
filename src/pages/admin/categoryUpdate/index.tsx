@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import type { FormInstance } from 'antd';
-import { Breadcrumb, Button, Form, Input, Space, message } from 'antd';
+import type { FormInstance, UploadFile, UploadProps } from 'antd';
+import { Breadcrumb, Button, Form, Input, Space, Upload, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ICategory } from '../../../store/category/category.interface';
 import { useFetchOneCategoryQuery, useUpdateCategoryMutation } from '../../../store/category/category.service';
+import {
+    PlusOutlined
+} from "@ant-design/icons";
+import { RcFile } from 'antd/es/upload';
 
 
 const SubmitButton = ({ form }: { form: FormInstance }) => {
@@ -25,10 +28,18 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
 
     return (
         <Button type="primary" htmlType="submit" disabled={!submittable} className='bg-blue-500'>
-            Submit
+            Lưu
         </Button>
     );
 };
+
+const getBase64 = (file: RcFile): Promise<string> =>
+    new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = (error) => reject(error);
+    });
 
 const categoryUpdate = () => {
     const [form] = Form.useForm();
@@ -36,21 +47,83 @@ const categoryUpdate = () => {
     const [onUpdate] = useUpdateCategoryMutation()
     const { id } = useParams();
     const { data: fetchOneCategory, isSuccess: isSuccessOneCategory } = useFetchOneCategoryQuery(id)
+    const [newImage, setNewImage] = useState(false);
 
-    if (fetchOneCategory) {
-        form.setFieldValue("name", fetchOneCategory.name)
+    form.setFieldsValue({
+        _id: fetchOneCategory?._id,
+        name: fetchOneCategory?.name,
+        images: fetchOneCategory?.images,
+
+    });
+
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState('');
+    const [previewTitle, setPreviewTitle] = useState('');
+
+    const [fileList, setFileList] = useState<UploadFile[]>([
+        {
+            uid: `1`,
+            name: 'image',
+            status: 'done',
+            url: (fetchOneCategory && fetchOneCategory.images ? fetchOneCategory.images.url : ''),
+        },
+    ]);
+    console.log(fileList);
+
+    // const [fileList, setFileList] = useState<UploadFile[]>([]);
+
+    // useEffect(() => {
+    //     if (isSuccessOneCategory && fetchOneCategory && Array.isArray(fetchOneCategory.images)) {
+    //         const initialFileList = fetchOneCategory.images.map((image: any, index: any) => ({
+    //             uid: image.publicId,
+    //             name: `image${index}`, // Set the image name here
+    //             status: 'done',
+    //             url: image.url, // Set the image URL here
+    //         }));
+    //         setFileList(initialFileList);
+    //     }
+    // }, [isSuccessOneCategory, fetchOneCategory]);
+
+
+    const handleCancel = () => setPreviewOpen(false);
+
+    const handlePreview = async (file: UploadFile) => {
+        if (!file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj as RcFile);
+        }
+
+        setPreviewImage(file.url || (file.preview as string));
+        setPreviewOpen(true);
+        setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
+    };
+
+    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+        setNewImage(true)
+        // setFileList(newFileList)
+
     }
 
-    const onFinish = async (values: ICategory) => {
+    const onFinish = async (values: any) => {
         try {
             if (id) {
-                await onUpdate({ id, ...values })
-                console.log(
+                if (newImage === true) {
+                    let newImages;
+                    if (values.images && values.images.file) {
+                        newImages = values.images.file.response[0];
+                    } else {
+                        newImages = [];
+                    }
+                    const value = {
+                        ...values,
+                        images: newImages
+                    };
+
+                    await onUpdate({ id, ...value })
+                } else {
                     await onUpdate({ id, ...values })
+                }
 
-                );
-
-                message.success(`Update category successfully!`);
+                message.success(`Cập nhật thành công`);
                 navigate("/admin/category");
             }
         } catch (error) {
@@ -58,21 +131,30 @@ const categoryUpdate = () => {
 
         }
     };
+
+    const props: UploadProps = {
+        listType: "picture-card",
+        name: "images",
+        multiple: true,
+        action: " http://localhost:8080/api/images/upload",
+
+    };
     return <>
         <Breadcrumb className='pb-3'
             items={[
 
                 {
-                    title: <Link to={`/admin/category`}>Category</Link>,
+                    title: <Link to={`/admin/category`}>Danh mục</Link>,
                 },
                 {
-                    title: 'Update Category',
+                    title: 'Cập nhật ',
+                    className: 'uppercase'
                 },
             ]}
         />
         <div className="border p-10 rounded-lg  bg-white">
             <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff]">
-                Update Category
+                Cập nhật danh mục
             </h3>
             <Form
                 form={form}
@@ -85,8 +167,43 @@ const categoryUpdate = () => {
                 <Form.Item name="_id" style={{ display: "none" }}>
                     <Input />
                 </Form.Item>
-                <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                {/* Name Category */}
+                <Form.Item
+                    name="name"
+                    label="Tên danh mục"
+                    rules={[
+                        { required: true, message: '* Không được để trống' },
+                        {
+                            validator: (_, value) => {
+                                if (value && value.trim() === '') {
+                                    return Promise.reject('Không được để khoảng trắng');
+                                }
+                                return Promise.resolve();
+                            },
+                        },
+                        { min: 3, message: 'Tối thiểu 3 kí tự' },
+
+                    ]}
+                >
                     <Input />
+                </Form.Item>
+
+                <Form.Item
+                    label="Ảnh"
+                    name="images"
+                    rules={[{ required: true }]}
+                >
+                    <Upload {...props}
+                        maxCount={1}
+                        defaultFileList={fileList}
+                        onPreview={handlePreview}
+                        onChange={handleChange}
+                    >
+                        <div className=''>
+                            <PlusOutlined />
+                            <div>Upload</div>
+                        </div>
+                    </Upload>
                 </Form.Item>
                 <Form.Item>
                     <Space>

@@ -63,13 +63,13 @@ const ordersPage = () => {
     // }
     const columns: ColumnsType<DataType> = [
         {
-            title: 'Order number',
+            title: 'MÃ ĐƠN HÀNG',
             key: 'key',
-            render: (record: any) => (<Link to={``} className=''>#{record?.key}</Link>),
-            className: 'w-1/4',
+            render: (record: any) => (<Link to={``} className='uppercase'>#{record?.key.slice(0, 10)}</Link>),
+            className: 'w-1/6',
         },
         {
-            title: 'Date',
+            title: 'NGÀY ĐẶT',
             dataIndex: 'date',
             key: 'date',
             sorter: (a, b) => {
@@ -109,13 +109,13 @@ const ordersPage = () => {
             showSorterTooltip: false,
         },
         {
-            title: 'Customer name',
+            title: 'KHÁCH HÀNG',
             dataIndex: 'fullName',
             key: 'fullName',
             className: 'w-1/4',
         },
         {
-            title: 'Total',
+            title: 'TỔNG',
             dataIndex: 'totalMoney',
             key: 'totalMoney',
             sorter: (a, b) => a.totalMoney - b.totalMoney, // Sắp xếp theo số
@@ -124,15 +124,15 @@ const ordersPage = () => {
             render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
         },
         {
-            title: 'Payment',
+            title: 'THANH TOÁN',
             key: 'paymentStatus',
             render: (value: any) => (value.paymentStatus === 1 ? (
                 <span className='border bg-green-500 rounded-lg text-white px-2 py-1 text-xs'>
-                    Paid
+                    Đã thanh toán
                 </span>
             ) : (
                 <span className='border bg-gray-200 rounded-lg text-gray-500 px-2 py-1 text-xs'>
-                    Unpaid
+                    Chưa thanh toán
                 </span>
             )),
             sorter: (a, b) => a.paymentStatus - b.paymentStatus, // Sắp xếp theo số
@@ -140,44 +140,42 @@ const ordersPage = () => {
             showSorterTooltip: false,
         },
         {
-            title: 'Status',
+            title: 'TRẠNG THÁI',
             key: 'status',
             render: (value: any) => {
-                if (value.status === 0) {
-                    return (
-                        <span className='border bg-red-500 rounded-lg text-white px-2 py-1 text-xs'>
-                            Canceled
-                        </span>
-                    )
+                let statusText, statusColor;
+
+                switch (value.status) {
+                    case 0:
+                        statusText = 'Hủy đơn hàng';
+                        statusColor = 'bg-red-500 text-white';
+                        break;
+                    case 1:
+                        statusText = 'Đang xử lí';
+                        statusColor = 'bg-gray-200 text-gray-500';
+                        break;
+                    case 2:
+                        statusText = 'Chuẩn bị hàng';
+                        statusColor = 'bg-yellow-400 text-white';
+                        break;
+                    case 3:
+                        statusText = 'Đang giao';
+                        statusColor = 'bg-blue-500 text-white';
+                        break;
+                    case 4:
+                        statusText = 'Hoàn thành';
+                        statusColor = 'bg-green-500 text-white';
+                        break;
+                    default:
+                        statusText = '';
+                        statusColor = '';
                 }
-                if (value.status === 1) {
-                    return (
-                        <span className='border bg-gray-200 rounded-lg text-gray-500 px-2 py-1 text-xs'>
-                            Pending
-                        </span>
-                    )
-                }
-                if (value.status === 2) {
-                    return (
-                        <span className='border bg-yellow-400 rounded-lg text-white px-2 py-1 text-xs'>
-                            Packing
-                        </span>
-                    )
-                }
-                if (value.status === 3) {
-                    return (
-                        <span className='border bg-blue-500 rounded-lg text-white px-2 py-1 text-xs'>
-                            Shipping
-                        </span>
-                    )
-                }
-                if (value.status === 4) {
-                    return (
-                        <span className='border bg-green-500 rounded-lg text-white px-2 py-1 text-xs'>
-                            Completed
-                        </span>
-                    )
-                }
+
+                return (
+                    <span className={`border rounded-lg px-2 py-1 text-xs ${statusColor}`}>
+                        {statusText}
+                    </span>
+                );
             },
             sorter: (a, b) => {
                 const customOrder = [1, 2, 3, 4, 0];
@@ -192,23 +190,13 @@ const ordersPage = () => {
         },
 
         {
-            title: 'Action',
+            title: '',
             key: 'action',
             render: (record: any) => (
-                <Space size="middle">
+                <Space size="middle" className='flex justify-end'>
                     <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
                     </Link>
-                    <Popconfirm
-                        title="Delete category"
-                        description="Are you sure to delete this category?"
-                        onConfirm={() => confirm(record?._id)}
-                        okText="Yes"
-                        cancelText="No"
-                        okButtonProps={{ className: "text-white bg-blue-400" }}
-                    >
-                        <DeleteFilled className='text-xl text-red-400' />
-                    </Popconfirm>
                     <Link to={`/admin/order/${record?.key}`}>
                         <EditFilled className='text-xl text-yellow-400' />
                     </Link>
@@ -241,11 +229,11 @@ const ordersPage = () => {
             <Space className='mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        Order List
+                        QUẢN LÝ ĐƠN HÀNG
                     </span>
-                    <span className="block text-base  text-[#1677ff]">
+                    {/* <span className="block text-base  text-[#1677ff]">
                         Manage your orders
-                    </span>
+                    </span> */}
                 </div>
             </Space>
             <div className="border p-3 rounded-lg min-h-screen bg-white">
