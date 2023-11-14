@@ -27,8 +27,8 @@ const routes = {
     adminCategoryUpdate: "/admin/category/update/:id",
     adminUsers: "/admin/user",
     adminUserUpdate: "/admin/user/update/:id",
-
-
+    adminOrdersPage: "/admin/order",
+    adminOrderUpdate: "/admin/order/:id",
 }
 
 export default routes;

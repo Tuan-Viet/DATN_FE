@@ -1,9 +1,11 @@
 import routes from "../config/routes";
 import Banner from "../layout/Banner";
+import orderUpdate from "../pages/admin/OrderUpdate";
 import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
 import dashboardPage from "../pages/admin/dashboard";
+import ordersPage from "../pages/admin/ordersPage";
 import productAdd from "../pages/admin/productAdd";
 import productPage from "../pages/admin/productPage/index.";
 import productUpdate from "../pages/admin/productUpdate";
@@ -42,14 +44,16 @@ export const publicRoutes = [
 ]
 
 export const privateRoutes = [
-    { path: routes.admin, Component: dashboardPage },
-    { path: routes.adminDashboard, Component: dashboardPage },
-    { path: routes.adminProducts, Component: productPage },
-    { path: routes.adminProductAdd, Component: productAdd },
-    { path: routes.adminProductUpdate, Component: productUpdate },
-    { path: routes.adminCategorys, Component: categoryPage },
-    { path: routes.adminCategoryAdd, Component: categoryAdd },
-    { path: routes.adminCategoryUpdate, Component: categoryUpdate },
-    { path: routes.adminUsers, Component: userPage },
-    { path: routes.adminUserUpdate, Component: userUpdate },
+  { path: routes.admin, Component: dashboardPage },
+  { path: routes.adminDashboard, Component: dashboardPage },
+  { path: routes.adminProducts, Component: productPage },
+  { path: routes.adminProductAdd, Component: productAdd },
+  { path: routes.adminProductUpdate, Component: productUpdate },
+  { path: routes.adminCategorys, Component: categoryPage },
+  { path: routes.adminCategoryAdd, Component: categoryAdd },
+  { path: routes.adminCategoryUpdate, Component: categoryUpdate },
+  { path: routes.adminUsers, Component: userPage },
+  { path: routes.adminUserUpdate, Component: userUpdate },
+  { path: routes.adminOrdersPage, Component: ordersPage },
+  { path: routes.adminOrderUpdate, Component: orderUpdate },
 ]

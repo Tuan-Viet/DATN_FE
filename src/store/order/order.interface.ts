@@ -13,7 +13,7 @@ export interface IOrder {
     pay_method: number
     totalMoney: number
     orderDetails: IOrderDetail[]
-    createdAt: string
+    createdAt: any
 }
 
 export interface IOrderState {

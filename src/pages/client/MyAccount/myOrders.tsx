@@ -4,16 +4,16 @@ import Header from "../../../layout/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import {
-  useCancelOrderMutation,
   useListOrderQuery,
+  useUpdateOrderMutation,
 } from "../../../store/order/order.service";
 import { Result, Spin } from "antd";
 import { listOrderSlice } from "../../../store/order/orderSlice";
-import { RootState } from "@reduxjs/toolkit/query";
 import { Dispatch } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import { RootState } from "../../../store";
 
-function formatDateStringToDisplayDate(dateString) {
+function formatDateStringToDisplayDate(dateString: any) {
   const date = new Date(dateString);
   const day = date.getDate();
   const month = date.getMonth() + 1;
@@ -23,11 +23,11 @@ function formatDateStringToDisplayDate(dateString) {
   }${month}/${year}`;
 }
 
-function mapStatusPaymentToText(statusCode) {
+function mapStatusPaymentToText(statusCode: number) {
   switch (statusCode) {
-    case "0":
+    case 0:
       return "Chưa thanh toán";
-    case "1":
+    case 1:
       return "Đã thanh toán";
     default:
       return "Trạng thái không xác định";
@@ -45,9 +45,10 @@ const myOrders = () => {
     }
   }, [navigate]);
 
-  const [cancelOrder] = useCancelOrderMutation();
+  const [cancelOrder] = useUpdateOrderMutation();
   const { data: orders, isLoading, isError } = useListOrderQuery();
-  dispatch(listOrderSlice(orders));
+
+  dispatch(listOrderSlice(orders!));
   const ordersState = useSelector(
     (state: RootState) => state.orderSlice.orders
   );
@@ -69,22 +70,22 @@ const myOrders = () => {
     );
   }
 
-  const handleCancelOrder = async (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này")) {
-      try {
-        const order = ordersState.find((o) => o._id === id);
-        const updatedOrder = { ...order, status: 0 };
-        await cancelOrder({ id: id, ...updatedOrder });
-        toast.success("Hủy đơn hàng thành công");
-      } catch (error) {
-        // Xử lý trường hợp lỗi
-        console.error("Lỗi khi thực hiện hủy đơn hàng: ", error);
-      }
-    }
-  };
+  // const handleCancelOrder = async (id: string) => {
+  //   if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này")) {
+  //     try {
+  //       const order = ordersState.find((o: any) => o._id === id);
+  //       const updatedOrder = { ...order, status: 0 };
+  //       await cancelOrder({ id: id, ...updatedOrder });
+  //       toast.success("Hủy đơn hàng thành công");
+  //     } catch (error) {
+  //       // Xử lý trường hợp lỗi
+  //       console.error("Lỗi khi thực hiện hủy đơn hàng: ", error);
+  //     }
+  //   }
+  // };
 
   const userOrders = ordersState.filter(
-    (order) => order?.userId === user?.current?._id && order?.status !== 0
+    (order: any) => order?.userId === user?.current?._id
   );
 
   return (
@@ -186,7 +187,7 @@ const myOrders = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {userOrders.map((order) => (
+                        {userOrders.map((order: any) => (
                           <tr className="bg-white border-b">
                             <th
                               scope="row"
@@ -209,13 +210,14 @@ const myOrders = () => {
                               {mapStatusPaymentToText(order.paymentStatus)}
                             </td>
                             <td className="px-6 py-4">Chờ xử lý</td>
-                            <td className="px-6 py-4">
-                              <button
-                                onClick={() => handleCancelOrder(order._id)}
-                                className="font-medium text-red-600 hover:underline"
-                              >
-                                Hủy đơn hàng
-                              </button>
+                            <td className="px-6 py-4 text-blue-500">
+                              {order.status == 0 ? (
+                                "Bạn đã hủy đơn hàng này"
+                              ) : (
+                                <Link to={`/account/orders/${order._id}`}>
+                                  Xem chi tiết
+                                </Link>
+                              )}
                             </td>
                           </tr>
                         ))}
