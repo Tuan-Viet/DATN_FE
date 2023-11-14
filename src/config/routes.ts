@@ -3,6 +3,7 @@ const routes = {
     home: "/",
     banner: "/",
     about: "/about",
+    contact: "/contact",
     products: "/products",
     productDetail: "/products/:id",
     cart: "/cart",
