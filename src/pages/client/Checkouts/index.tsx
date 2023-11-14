@@ -74,16 +74,17 @@ const CheckoutsPage = () => {
   } = useForm<orderForm>({
     resolver: yupResolver(orderSchema)
   })
-  if (getOneVoucher) {
-    setValue("voucher_code", getOneVoucher?.code)
-  }
+
   const { current } = useSelector((state: any) => state.user);
   useEffect(() => {
     if (current) {
       setValue("status", 1)
       setValue("userId", current?._id)
     }
-  }, [setValue])
+    if (getOneVoucher) {
+      setValue("voucher_code", getOneVoucher?.code)
+    }
+  }, [setValue, current])
   const onSubmitOrder = async (data: orderForm) => {
     try {
       if (cartState?.length === 0) {
@@ -111,12 +112,13 @@ const CheckoutsPage = () => {
     }
   }
 
-
   const handleVoucher = async (voucherId: string) => {
     if (voucherId) {
       await setIdVoucher(voucherId)
-      setValue("voucher_code", getOneVoucher?.code)
-      setcodeVoucher(getOneVoucher?.code!)
+      if (getOneVoucher) {
+        setValue("voucher_code", getOneVoucher.code)
+        setcodeVoucher(getOneVoucher.code!)
+      }
     }
   }
   const handleVoucherUpdate = (voucherId: string) => {
@@ -126,6 +128,7 @@ const CheckoutsPage = () => {
       setValue("voucher_code", "")
     }
   }
+
   useEffect(() => {
     let total = 0
     if (cartState) {
@@ -135,27 +138,32 @@ const CheckoutsPage = () => {
     }
     if (getOneVoucher && getOneVoucher?.type === "percent") {
       total = total - (total * getOneVoucher?.discount) / 100
-      setValue("totalMoney", total)
-      setTotalCart(total)
+      if (total) {
+        setValue("totalMoney", total)
+        setTotalCart(total)
+      }
+
     } else if (getOneVoucher && getOneVoucher?.type === "value") {
       total = total - getOneVoucher?.discount
-      setValue("totalMoney", total)
-      setTotalCart(total)
+      if (total) {
+        setValue("totalMoney", total)
+        setTotalCart(total)
+      }
     } else {
-      setValue("totalMoney", total)
-      setTotalCart(total)
+      if (total) {
+        setValue("totalMoney", total)
+        setTotalCart(total)
+      }
     }
 
   }, [cartState, getOneVoucher])
 
-  const handleFindVoucher = async () => {
-    if (codeVoucher) {
+  const handleFindVoucher = () => {
+    if (codeVoucher && voucherState) {
       const voucherByCode = voucherState?.find((voucher) => voucher.code === codeVoucher)
-      if (voucherByCode) {
-        if (voucherByCode?._id) {
-          setIdVoucher(voucherByCode?._id)
-        }
-        setValue("voucher_code", voucherByCode?.code)
+      if (voucherByCode && voucherByCode?._id) {
+        setIdVoucher(voucherByCode._id)
+        setValue("voucher_code", voucherByCode.code)
       } else {
         toast.error("Mã giảm giá không hợp lệ!")
         setcodeVoucher("")
@@ -164,7 +172,9 @@ const CheckoutsPage = () => {
       }
     }
   }
-
+  useEffect(() => {
+    handleFindVoucher()
+  }, [])
   return (
     <>
       {loading && (
@@ -440,7 +450,7 @@ const CheckoutsPage = () => {
                 <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                   Đặt hàng
                 </button>
-                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors.userId?.message : ""}</Link>
+                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors?.userId?.message : ""}</Link>
               </div>
             </div>
           </div>
