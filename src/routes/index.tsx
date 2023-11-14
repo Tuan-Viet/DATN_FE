@@ -1,6 +1,9 @@
 import routes from "../config/routes";
 import Banner from "../layout/Banner";
 import orderUpdate from "../pages/admin/OrderUpdate";
+import VoucherAdd from "../pages/admin/VoucherAdd";
+import VoucherPage from "../pages/admin/VoucherPage";
+import VoucherUpdate from "../pages/admin/VoucherUpdate";
 import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
@@ -54,4 +57,7 @@ export const privateRoutes = [
   { path: routes.adminUserUpdate, Component: userUpdate },
   { path: routes.adminOrdersPage, Component: ordersPage },
   { path: routes.adminOrderUpdate, Component: orderUpdate },
+  { path: routes.adminVoucherPage, Component: VoucherPage },
+  { path: routes.adminVoucherAdd, Component: VoucherAdd },
+  { path: routes.adminVoucherUpdate, Component: VoucherUpdate },
 ]

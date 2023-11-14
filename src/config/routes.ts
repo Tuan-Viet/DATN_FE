@@ -28,6 +28,9 @@ const routes = {
     adminUserUpdate: "/admin/user/update/:id",
     adminOrdersPage: "/admin/order",
     adminOrderUpdate: "/admin/order/:id",
+    adminVoucherPage: "/admin/voucher",
+    adminVoucherAdd: "/admin/voucher/add",
+    adminVoucherUpdate: "/admin/voucher/update/:id",
 }
 
 export default routes;
