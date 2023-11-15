@@ -8,7 +8,8 @@ import {
   AppstoreAddOutlined,
   LogoutOutlined,
   UserOutlined,
-  TagOutlined
+  TagOutlined,
+  SolutionOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, message, theme } from 'antd';
@@ -44,7 +45,8 @@ const items: MenuItem[] = [
     getItem(<Link to={"/admin/category"}>Danh sách</Link >, '6'),
   ]),
   getItem(<Link to={"/admin/user"}>Khách hàng</Link >, '7', <UserOutlined />),
-  getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <TagOutlined />),
+  getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <SolutionOutlined />),
+  getItem(<Link to={"/admin/voucher"}>Voucher</Link >, '9', <TagOutlined />),
 ];
 
 const AdminLayout = ({ children }: Props) => {

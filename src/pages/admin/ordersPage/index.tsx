@@ -63,9 +63,15 @@ const ordersPage = () => {
     // }
     const columns: ColumnsType<DataType> = [
         {
+            title: 'STT',
+            dataIndex: 'key',
+            render: (value: any) => <Link to={``} className='uppercase font-bold '>{value}</Link>,
+            className: 'w-[100px]'
+        },
+        {
             title: 'MÃ ĐƠN HÀNG',
-            key: 'key',
-            render: (record: any) => (<Link to={``} className='uppercase'>#{record?.key.slice(0, 10)}</Link>),
+            key: '_id',
+            render: (record: any) => (<Link to={``} className='uppercase'>#{record?._id.slice(0, 10)}</Link>),
             className: 'w-1/6',
         },
         {
@@ -209,8 +215,9 @@ const ordersPage = () => {
     let data: DataType[] = [];
 
     if (orders) {
-        data = orders.map((order: any) => ({
-            key: order._id,
+        data = orders.map((order: any, index) => ({
+            key: index + 1,
+            _id: order._id,
             date: order.createdAt,
             fullName: order.fullName,
             status: order.status,

@@ -18,8 +18,9 @@ function formatDateStringToDisplayDate(dateString: any) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  return `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
-    }${month}/${year}`;
+  return `${day < 10 ? "0" : ""}${day}/${
+    month < 10 ? "0" : ""
+  }${month}/${year}`;
 }
 
 function mapStatusPaymentToText(statusCode: number) {
@@ -69,25 +70,23 @@ const myOrders = () => {
     );
   }
 
-  const handleCancelOrder = async (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này")) {
-      try {
-        const order = ordersState.find((o: any) => o._id === id);
-        const updatedOrder = { ...order, status: 0 };
-        await cancelOrder({ id: id, ...updatedOrder });
-        toast.success("Hủy đơn hàng thành công");
-      } catch (error) {
-        // Xử lý trường hợp lỗi
-        console.error("Lỗi khi thực hiện hủy đơn hàng: ", error);
-      }
-    }
-  };
+  // const handleCancelOrder = async (id: string) => {
+  //   if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này")) {
+  //     try {
+  //       const order = ordersState.find((o: any) => o._id === id);
+  //       const updatedOrder = { ...order, status: 0 };
+  //       await cancelOrder({ id: id, ...updatedOrder });
+  //       toast.success("Hủy đơn hàng thành công");
+  //     } catch (error) {
+  //       // Xử lý trường hợp lỗi
+  //       console.error("Lỗi khi thực hiện hủy đơn hàng: ", error);
+  //     }
+  //   }
+  // };
 
   const userOrders = ordersState.filter(
-    (order: any) => order?.userId === user?.current?._id && order?.status !== 0
-
+    (order: any) => order?.userId === user?.current?._id
   );
-
 
   return (
     <>
@@ -211,13 +210,14 @@ const myOrders = () => {
                               {mapStatusPaymentToText(order.paymentStatus)}
                             </td>
                             <td className="px-6 py-4">Chờ xử lý</td>
-                            <td className="px-6 py-4">
-                              <button
-                                onClick={() => handleCancelOrder(order._id)}
-                                className="font-medium text-red-600 hover:underline"
-                              >
-                                Hủy đơn hàng
-                              </button>
+                            <td className="px-6 py-4 text-blue-500">
+                              {order.status == 0 ? (
+                                "Bạn đã hủy đơn hàng này"
+                              ) : (
+                                <Link to={`/account/orders/${order._id}`}>
+                                  Xem chi tiết
+                                </Link>
+                              )}
                             </td>
                           </tr>
                         ))}

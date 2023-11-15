@@ -232,7 +232,7 @@ const productUpdate = () => {
 
                 await onUpdate({ id, ...newValues })
                     .then(() =>
-                        message.success(`Update product successfully!`)
+                        message.success(`Cập nhật thành công`)
                     ).then(() =>
                         navigate("/admin/product")
                     )
@@ -282,7 +282,7 @@ const productUpdate = () => {
 
                             {/* Input Title Product */}
                             <Form.Item
-                                name="title"
+                                name="Tên sản phẩm"
                                 label="Title Product"
                                 rules={[
                                     {
@@ -297,7 +297,7 @@ const productUpdate = () => {
                             {/* Input Price */}
                             <Form.Item
                                 name="price"
-                                label="Price"
+                                label="Giá"
                                 rules={[{ required: true, message: 'Please input your Price!' }]}
                             >
                                 <InputNumber
@@ -308,7 +308,7 @@ const productUpdate = () => {
                             </Form.Item>
                         </Col>
                         <Col className="gutter-row" span={6}>
-                            <Form.Item name="discount" label="Discount">
+                            <Form.Item name="discount" label="Giảm giá">
                                 <InputNumber
                                     min={0}
                                     formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
@@ -318,7 +318,7 @@ const productUpdate = () => {
                         </Col>
                         <Col className="gutter-row" span={6}>
                             {/* Input Category */}
-                            <Form.Item name="categoryId" label="Category" rules={[{ required: true, message: 'Please input your Category!' }]}>
+                            <Form.Item name="categoryId" label="Danh mục" rules={[{ required: true, message: 'Please input your Category!' }]}>
                                 <Select
                                     placeholder="Choose category"
                                     allowClear
@@ -333,7 +333,7 @@ const productUpdate = () => {
                             {/* Upload Images */}
                             <div className="w-1/3 mr-10">
                                 <Form.Item
-                                    label="Images"
+                                    label="Ảnh"
                                     name="images"
                                     rules={[{ required: true, message: 'Please input your Image!' }]}
                                 >
@@ -365,7 +365,7 @@ const productUpdate = () => {
                             {/* Input Desription */}
                             <Form.Item
                                 name="description"
-                                label="Description"
+                                label="Mô tả"
                                 rules={[{ required: true, message: 'Please input your Description!' }]}
                                 className='w-2/3'
                             >
@@ -381,7 +381,7 @@ const productUpdate = () => {
                                     <Card
                                         className='bg-zinc-50'
                                         size="small"
-                                        title={`Color ${field.name + 1}`}
+                                        title={`Mẫu ${field.name + 1}`}
                                         key={field.key}
                                         extra={
                                             <CloseOutlined
@@ -433,7 +433,7 @@ const productUpdate = () => {
                                                     </Upload>
                                                 </Form.Item>
                                                 <Form.Item name={[field.name, 'nameColor']}>
-                                                    <Input placeholder="Enter Color Image" />
+                                                    <Input placeholder="Màu sắc sản phẩm" />
                                                 </Form.Item>
                                             </div>
                                             <div className="w-2/3">
@@ -446,13 +446,13 @@ const productUpdate = () => {
                                                                     <Space key={subField.key} className='flex justify-between'>
                                                                         <Form.Item noStyle name={[subField.name, 'size']}>
                                                                             <Select
-                                                                                placeholder="Choose Category"
+                                                                                placeholder="Size"
                                                                                 style={{ width: 356 }}
                                                                                 options={optionSize}
                                                                             />
                                                                         </Form.Item>
                                                                         <Form.Item noStyle name={[subField.name, 'quantity']} >
-                                                                            <Input style={{ width: 360 }} placeholder="Enter quantity" />
+                                                                            <Input style={{ width: 360 }} placeholder="Số lượng" />
                                                                         </Form.Item>
                                                                         <CloseOutlined
                                                                             onClick={() => {
@@ -464,7 +464,7 @@ const productUpdate = () => {
                                                                 <Button type="primary" onClick={() => subOpt.add()}
                                                                     className='w-32 mx-auto bg-blue-500'
                                                                 >
-                                                                    + Add Sub Item
+                                                                    + Thêm size
                                                                 </Button>
                                                             </div>
                                                         )}
@@ -479,9 +479,9 @@ const productUpdate = () => {
                                 ))}
 
                                 <Button type="primary" onClick={() => add()}
-                                    className='bg-blue-500 text-white w-20 mx-auto'
+                                    className='bg-blue-500 text-white w-[200px] mx-auto'
                                 >
-                                    + Add
+                                    + Thêm mẫu mới
                                 </Button>
                             </div >
                         )}

@@ -94,6 +94,8 @@ const CheckoutsPage = () => {
       }
       setLoading(true);
       await onAddOrder(data).then(({ data }: any) => {
+        console.log(data);
+
         if (data.pay_method === "COD") {
           setTimeout(async () => {
             setLoading(false);
@@ -101,7 +103,8 @@ const CheckoutsPage = () => {
             navigate(`/orders/${data?._id}`)
           }, 2500)
         } else if (data.pay_method === "VNBANK") {
-          axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data.data)
+
+          axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
             .then(({ data }) => window.location.href = data)
         }
       }
@@ -185,7 +188,7 @@ const CheckoutsPage = () => {
       )}
       <Header></Header>
       <div className="container-2">
-        <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px]">
+        <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px] mt-10 mb-10">
           <div className="">
 
             <div className="flex gap-[28px]">
@@ -323,10 +326,10 @@ const CheckoutsPage = () => {
               </div>
             </div>
           </div>
-          <div className="border-l-[1px] py-5 pl-5 w-full">
+          <div className="border-l-[1px] pl-5 w-full">
 
             <h1 className="text-xl font-bold mb-5">Đơn hàng ({cartState.length} sản phẩm)</h1>
-            <div className="pt-7 border-t-[1px] border-b-[1px] h-[430px] overflow-auto pb-2">
+            <div className="pt-7 border-t-[1px] border-b-[1px] h-[250px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
                 return <div key={index}>
                   <input type="text" value={cart.productDetailId} className="hidden" {...register(`carts.${index}.productDetailId`)} />
