@@ -4,7 +4,7 @@ const routes = {
     banner: "/",
     about: "/about",
     contact: "/contact",
-    products: "/products",
+    products: "/collections/:id?",
     productDetail: "/products/:id",
     cart: "/cart",
     checkout: "/checkout",
@@ -29,6 +29,9 @@ const routes = {
     adminUserUpdate: "/admin/user/update/:id",
     adminOrdersPage: "/admin/order",
     adminOrderUpdate: "/admin/order/:id",
+    adminVoucherPage: "/admin/voucher",
+    adminVoucherAdd: "/admin/voucher/add",
+    adminVoucherUpdate: "/admin/voucher/update/:id",
 }
 
 export default routes;
