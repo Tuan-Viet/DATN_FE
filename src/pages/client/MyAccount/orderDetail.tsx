@@ -1,7 +1,10 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
-import { useGetOneOrderQuery } from "../../../store/order/order.service";
+import {
+  useGetOneOrderQuery,
+  useUpdateOrderMutation,
+} from "../../../store/order/order.service";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
@@ -11,6 +14,8 @@ import { useListProductDetailQuery } from "../../../store/productDetail/productD
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { listProductSlice } from "../../../store/product/productSlice";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 function formatDateStringToDisplayDate(dateString) {
   const originalDate = new Date(dateString);
@@ -37,13 +42,15 @@ function formatDateStringToDisplayDate(dateString) {
 function mapStatusToText(statusCode) {
   switch (statusCode) {
     case 0:
-      return "Chờ xử lý";
+      return "Bạn đã hủy đơn hàng này";
     case 1:
-      return "Đang chuẩn bị hàng";
+      return "Chờ xử lý";
     case 2:
-      return "Đã giao cho đơn vị vận chuyển";
+      return "Đã chuẩn bị hàng";
     case 3:
-      return "Hoàn thành";
+      return "Đơn hàng đang được giao đến bạn";
+    case 4:
+      return "Đã nhận hàng";
     default:
       return "Trạng thái không xác định";
   }
@@ -79,6 +86,9 @@ const OrderDetail = () => {
   dispatch(listOrderDetailSlice(listOrderDetail));
   dispatch(listProductDetailSlice(listProductDetail));
   dispatch(listProductSlice(listProduct));
+
+  const [updateOrder] = useUpdateOrderMutation();
+
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
   );
@@ -101,6 +111,45 @@ const OrderDetail = () => {
   productsInOrder?.forEach((product) => {
     totalProductPrice += product.totalMoney;
   });
+
+  const handleCancelOrder = async (id: string) => {
+    if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này")) {
+      try {
+        const updatedOrder = { ...order, status: 0 };
+        await updateOrder({ id: id, ...updatedOrder });
+        toast.success("Hủy đơn hàng thành công");
+      } catch (error) {
+        console.error("Lỗi khi thực hiện hủy đơn hàng: ", error);
+      }
+    }
+  };
+
+  const handleConfirmReceived = async () => {
+    Swal.fire({
+      title: "Bạn đã nhận được hàng chưa?",
+      showCancelButton: true,
+      confirmButtonText: "Đã nhận hàng",
+      cancelButtonText: "Chưa nhận hàng",
+      icon: "question",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const updatedOrder = { ...order, status: 4 };
+          await updateOrder({ id: id, ...updatedOrder });
+          toast.success("Xác thực đơn hàng thành công");
+        } catch (error) {
+          console.error("Lỗi khi xác thực đơn hàng: ", error);
+        }
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        try {
+          const updatedOrder = { ...order, status: 3 };
+          await updateOrder({ id: id, ...updatedOrder });
+        } catch (error) {
+          console.error("Lỗi khi chuyển trạng thái về chưa nhận hàng: ", error);
+        }
+      }
+    });
+  };
 
   return (
     <>
@@ -177,19 +226,40 @@ const OrderDetail = () => {
                       Đặt lúc —{" "}
                       {formatDateStringToDisplayDate(order?.createdAt)}
                     </p>
-                    <h1 className="">
+                    <h1 className="mb-3">
                       Trạng thái đơn hàng:{" "}
                       <span className="text-lg font-bold">
                         {mapStatusToText(order?.status)}
                       </span>
                     </h1>
+                    {order?.status !== 0 && order?.status !== 1 && order?.status !== 2 && (
+                      <p>
+                        Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
+                        <button
+                          onClick={handleConfirmReceived}
+                          className="text-blue-500 underline"
+                        >
+                          xác thực đơn hàng
+                        </button>
+                      </p>
+                    )}
                   </div>
-                  <Link
-                    to="/account"
-                    className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-                  >
-                    Quay lại trang tài khoản
-                  </Link>
+                  <div className="text-right">
+                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 && (
+                      <button
+                        onClick={() => handleCancelOrder(id)}
+                        className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+                      >
+                        Hủy đơn hàng
+                      </button>
+                    )}
+                    <Link
+                      to="/account"
+                      className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+                    >
+                      Quay lại trang tài khoản
+                    </Link>
+                  </div>
                 </div>
                 <div className="relative overflow-x-auto mb-9 shadow-md sm:rounded-lg">
                   <table className="w-full text-[15px] text-left border-8 border-[#d9edf7]">
@@ -313,8 +383,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {(totalProductPrice + 40000).toLocaleString("vi-VN")}
-                          ₫
+                          {(totalProductPrice + 40000).toLocaleString("vi-VN")}₫
                         </td>
                       </tr>
                     </tbody>
@@ -325,7 +394,10 @@ const OrderDetail = () => {
                     Địa chỉ nhận hàng
                   </h2>
                   <div className="bg-[#d9edf7] text-[#31708f] border border-[#bce8f1] p-3 mb-5 rounded-lg">
-                    <p className="mb-2">Tình trạng thanh toán: {mapStatusPaymentToText(order?.paymentStatus)}</p>
+                    <p className="mb-2">
+                      Tình trạng thanh toán:{" "}
+                      {mapStatusPaymentToText(order?.paymentStatus)}
+                    </p>
                     <p>Vận chuyển: Chờ xử lý</p>
                   </div>
                   <div>

@@ -1,6 +1,9 @@
 import routes from "../config/routes";
 import Banner from "../layout/Banner";
 import orderUpdate from "../pages/admin/OrderUpdate";
+import VoucherAdd from "../pages/admin/VoucherAdd";
+import VoucherPage from "../pages/admin/VoucherPage";
+import VoucherUpdate from "../pages/admin/VoucherUpdate";
 import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
@@ -14,10 +17,12 @@ import userUpdate from "../pages/admin/userUpdate";
 import About from "../pages/client/About";
 import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
+import Contact from "../pages/client/Contact";
 import myAccount from "../pages/client/MyAccount";
 import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
+import ProductPage from "../pages/client/Products";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -29,6 +34,7 @@ export const publicRoutes = [
   { path: routes.home, Component: homePage },
   { path: routes.banner, Component: Banner },
   { path: routes.about, Component: About },
+  { path: routes.contact, Component: Contact },
   { path: routes.productDetail, Component: productDetail },
   { path: routes.cart, Component: cartPage },
   { path: routes.checkout, Component: CheckoutsPage },
@@ -39,6 +45,8 @@ export const publicRoutes = [
   { path: routes.orders, Component: myOrders },
   { path: routes.addresses, Component: myAddress },
   { path: routes.orderDetail, Component: OrderDetail },
+  { path: routes.products, Component: ProductPage },
+
 ]
 
 export const privateRoutes = [
@@ -54,4 +62,7 @@ export const privateRoutes = [
   { path: routes.adminUserUpdate, Component: userUpdate },
   { path: routes.adminOrdersPage, Component: ordersPage },
   { path: routes.adminOrderUpdate, Component: orderUpdate },
+  { path: routes.adminVoucherPage, Component: VoucherPage },
+  { path: routes.adminVoucherAdd, Component: VoucherAdd },
+  { path: routes.adminVoucherUpdate, Component: VoucherUpdate },
 ]

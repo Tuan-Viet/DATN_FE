@@ -1,26 +1,36 @@
-import React, { Dispatch, useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '../store'
+import React, { Dispatch, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../store";
 import { Link, useNavigate } from "react-router-dom";
-import { useAddCartMutation, useDeleteCartMutation, useGetOneCartQuery, useListCartQuery, useUpdateCartMutation } from '../store/cart/cart.service'
-import { addCartSlice, decreaseCartSlice, increaseCartSlice, listCartLocalSlice, listCartSlice, removeCartSlice } from '../store/cart/cartSlice'
-import { useGetOneProductDetailQuery, useListProductDetailQuery } from '../store/productDetail/productDetail.service'
-import { listProductDetailSlice } from '../store/productDetail/productDetailSlice'
-import { useFetchListProductQuery } from '../store/product/product.service'
-import { listProductSlice } from '../store/product/productSlice'
+import {
+  useAddCartMutation,
+  useDeleteCartMutation,
+  useGetOneCartQuery,
+  useListCartQuery,
+  useUpdateCartMutation,
+} from "../store/cart/cart.service";
+import {
+  addCartSlice,
+  decreaseCartSlice,
+  increaseCartSlice,
+  listCartLocalSlice,
+  listCartSlice,
+  removeCartSlice,
+} from "../store/cart/cartSlice";
+import {
+  useGetOneProductDetailQuery,
+  useListProductDetailQuery,
+} from "../store/productDetail/productDetail.service";
+import { listProductDetailSlice } from "../store/productDetail/productDetailSlice";
+import { useFetchListProductQuery } from "../store/product/product.service";
+import { listProductSlice } from "../store/product/productSlice";
 import { toast } from "react-toastify";
 import { register } from "../store/user/userSlice";
 import axios from "axios";
 import { logout } from "../store/user/userSlice";
-import {
-  Breadcrumb,
-  Button,
-  Form,
-  Input,
-  Space,
-  message,
-} from 'antd';
-import { ICart } from '../store/cart/cart.interface';
+import { Breadcrumb, Button, Form, Input, Space, message } from "antd";
+import { ICart } from "../store/cart/cart.interface";
+import Search from "./Search";
 
 type FormDataType = {
   email: string;
@@ -28,23 +38,31 @@ type FormDataType = {
 };
 
 const Header = () => {
-  const dispatch: Dispatch<any> = useDispatch()
-  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
-  const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
-  const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
-  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  const dispatch: Dispatch<any> = useDispatch();
+  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery();
+  const { data: listProductDetail, isSuccess: isSuccessProductDetail } =
+    useListProductDetailQuery();
+  const { data: listProduct, isSuccess: isSuccessListProduct } =
+    useFetchListProductQuery();
+  const cartState = useSelector((state: RootState) => state.cartSlice.carts);
   // console.log(listCart);
 
-  const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
-  const productState = useSelector((state: RootState) => state.productSlice.products)
-  const cartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
-  const [onRemoveCart] = useDeleteCartMutation()
-  const [onUpdateCart] = useUpdateCartMutation()
-  const [onAddCart] = useAddCartMutation()
-  const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+  const productDetailState = useSelector(
+    (state: RootState) => state.productDetailSlice.productDetails
+  );
+  const productState = useSelector(
+    (state: RootState) => state.productSlice.products
+  );
+  const cartLocalState = useSelector(
+    (state: RootState) => state.cartLocalReducer.cartLocals
+  );
+  const [onRemoveCart] = useDeleteCartMutation();
+  const [onUpdateCart] = useUpdateCartMutation();
+  const [onAddCart] = useAddCartMutation();
+  const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!);
 
   // const userStore = JSON.parse(localStorage.getItem("user")!)
-  const [totalCart, setTotalCart] = useState<number>(0)
+  const [totalCart, setTotalCart] = useState<number>(0);
   const [form] = Form.useForm();
   const navigate = useNavigate();
   // console.log(listCart);
@@ -53,19 +71,18 @@ const Header = () => {
       const response = await axios.post(
         "http://localhost:8080/api/auth/login",
         data
-      )
+      );
       toast.success("Đăng nhập thành công");
       if (cartState?.length > 0) {
         cartStore?.map((cart) => {
-          return onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
-
+          return onAddCart({ userId: response?.data?.user._id, ...cart });
+        });
       } else {
         console.log(2);
 
         cartStore?.map((cart) => {
-          onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
+          onAddCart({ userId: response?.data?.user._id, ...cart });
+        });
       }
       dispatch(
         register({
@@ -97,28 +114,28 @@ const Header = () => {
     // Gọi action đăng xuất
     dispatch(logout());
     toast.success("Bạn đã đăng xuất!");
-    localStorage.removeItem("carts")
+    localStorage.removeItem("carts");
     navigate("/signin");
   };
   useEffect(() => {
     if (listCart) {
       if (user?.current?._id) {
-        dispatch(listCartSlice(listCart))
+        dispatch(listCartSlice(listCart));
       } else {
-        dispatch(listCartSlice(cartStore ? cartStore : [])!)
+        dispatch(listCartSlice(cartStore ? cartStore : [])!);
       }
     }
-  }, [isSuccessCart, listCart])
+  }, [isSuccessCart, listCart]);
   useEffect(() => {
     if (listProductDetail) {
-      dispatch(listProductDetailSlice(listProductDetail))
+      dispatch(listProductDetailSlice(listProductDetail));
     }
-  }, [isSuccessProductDetail])
+  }, [isSuccessProductDetail]);
   useEffect(() => {
     if (listProduct) {
-      dispatch(listProductSlice(listProduct))
+      dispatch(listProductSlice(listProduct));
     }
-  }, [isSuccessListProduct])
+  }, [isSuccessListProduct]);
 
   // xu li cart
   const removeCart = async (id: string) => {
@@ -126,35 +143,35 @@ const Header = () => {
     try {
       if (id) {
         if (user?.current?._id) {
-          const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
+          const isConfirm = window.confirm("Ban co chac chan muon xoa khong?");
           if (isConfirm) {
-            await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
-            message.success("Xóa thành công!")
+            await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)));
+            message.success("Xóa thành công!");
           }
         } else {
-          const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
+          const isConfirm = window.confirm("Ban co chac chan muon xoa khong?");
           if (isConfirm) {
-            dispatch(removeCartSlice(id))
+            dispatch(removeCartSlice(id));
           }
         }
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
   const decreaseCart = async (_id: string, discount: number) => {
     try {
       if (_id && discount) {
-        dispatch(decreaseCartSlice({ _id: _id, discount: discount }))
+        dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
       }
-      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
       if (cartIndex) {
-        await onUpdateCart({ _id, ...cartIndex })
+        await onUpdateCart({ _id, ...cartIndex });
       }
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const increaseCart = async (_id: string, discount: number) => {
     try {
@@ -162,23 +179,21 @@ const Header = () => {
       if (_id) {
         if (user.current._id) {
           console.log(2);
-          dispatch(increaseCartSlice({ _id: _id, discount: discount }))
-          const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+          dispatch(increaseCartSlice({ _id: _id, discount: discount }));
+          const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
           if (cartIndex) {
-            await onUpdateCart({ _id, ...cartIndex })
+            await onUpdateCart({ _id, ...cartIndex });
           }
         } else {
           console.log(1);
-          dispatch(increaseCartSlice({ _id: _id, discount: discount }))
+          dispatch(increaseCartSlice({ _id: _id, discount: discount }));
           // const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
         }
       }
     } catch (error) {
       console.log(error);
-
     }
-
-  }
+  };
   // hàm dropdownUser
   const handleDropdown = () => {
     const iconUser = document.querySelector(".icon-user");
@@ -257,17 +272,25 @@ const Header = () => {
     });
     overlayCart?.addEventListener("click", (e) => {
       // e.stopPropagation()
-    })
-  }, [])
+    });
+  }, []);
   useEffect(() => {
-    let total = 0
+    let total = 0;
     if (cartState) {
       cartState.map((cart) => {
-        total += cart.totalMoney
-      })
+        total += cart.totalMoney;
+      });
     }
-    setTotalCart(total)
-  }, [cartState])
+    setTotalCart(total);
+  }, [cartState]);
+
+  // search
+  const [showSearch, setShowSearch] = useState(false);
+
+  const toggleSearch = () => {
+    setShowSearch(!showSearch);
+  };
+
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -537,20 +560,24 @@ const Header = () => {
             </ul>
             {/* icon */}
             <div className="flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                className="w-[32px] h-[26px] mr-[15px] cursor-pointer"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
+              {/* icon search */}
+              <div className="">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="w-[32px] h-[26px] mr-[15px] cursor-pointer"
+                  onClick={toggleSearch}
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </div>
               {/* icon user */}
               <div className="relative">
                 <svg
@@ -590,7 +617,9 @@ const Header = () => {
                               <Link to="/account/orders">Đơn hàng của tôi</Link>
                             </li>
                             <li className="list-disc font-light mb-1">
-                              <Link to="/account/addresses">Danh sách địa chỉ</Link>
+                              <Link to="/account/addresses">
+                                Danh sách địa chỉ
+                              </Link>
                             </li>
                             <li className="list-disc font-light mb-1">
                               <button onClick={() => logOut()}>
@@ -734,87 +763,269 @@ const Header = () => {
                 <span className="w-[20px] h-[20px] flex items-center justify-center rounded-[50%] bg-red-600 text-white absolute top-[-5px] right-[-5px]">
                   {cartState?.length > 0 ? cartState.length : 0}
                 </span>
-
               </div>
             </div>
           </div>
         </div>
+        {/* search */}
+        <div
+          className={`bg-white absolute z-50 transition-all w-full duration-500 ${
+            showSearch ? "top-0" : "-top-[1000%]"
+          }`}
+        >
+          <div className="container">
+            <form className="flex justify-between py-8">
+              <Link to="/">
+                <img
+                  src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173"
+                  alt=""
+                  className="w-[220px]"
+                />
+              </Link>
+              <div>
+                <div className="flex items-center gap-x-5 justify-between border border-[#e2e2e2] focus:border-black rounded w-[714px] h-[45px] px-3">
+                  <input
+                    type="text"
+                    className="outline-none w-full px-3 placeholder:text-black placeholder:text-[15px]"
+                    placeholder="Tìm kiếm sản phẩm ..."
+                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                    />
+                  </svg>
+                </div>
+                <div className="">
+                  <div>
+                    <div className="flex justify-between border-b mt-4 pb-4">
+                      <div>
+                        <h3 className="font-bold text-sm">
+                          Áo Polo monogram TRN DSTP650
+                        </h3>
+                        <span className="text-[13px]">450,000₫</span>
+                      </div>
+                      <img
+                        src="/images/img-product/polo-hoa-tiet.jpg"
+                        alt=""
+                        className="w-[40px] h-[52px]"
+                      />
+                    </div>
+                    <div className="flex justify-between border-b mt-4 pb-4">
+                      <div>
+                        <h3 className="font-bold text-sm">
+                          Áo Polo monogram TRN DSTP650
+                        </h3>
+                        <span className="text-[13px]">450,000₫</span>
+                      </div>
+                      <img
+                        src="/images/img-product/polo-hoa-tiet.jpg"
+                        alt=""
+                        className="w-[40px] h-[52px]"
+                      />
+                    </div>
+                  </div>
+                  <Link to="" className="text-center block mt-4 text-sm">Xem thêm 11 sản phẩm</Link>
+                </div>
+              </div>
+              <div className="w-[120px]">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-8 h-8 ml-auto cursor-pointer"
+                  onClick={toggleSearch}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div
+          className={`fixed top-0 left-0 w-full h-full bg-black opacity-50 transition-opacity duration-500 ${
+            showSearch ? "block" : "hidden"
+          }`}
+          onClick={toggleSearch}
+        ></div>
         {/* overlay-cart */}
-        <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]" ></div >
+        <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]"></div>
         {/* cart */}
-        < div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between" >
+        <div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between">
           {/* list product */}
-          < div className="" >
-            <h1 className='font-bold tracking-wide text-[20px] mb-[10px]' >Giỏ hàng</h1>
-            <h1 className="tracking-wide py-[10px] text-sm">Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong> để có thể <strong className="uppercase">miễn phí vận chuyển</strong></h1>
-            <hr className='my-[20px]' />
+          <div className="">
+            <h1 className="font-bold tracking-wide text-[20px] mb-[10px]">
+              Giỏ hàng
+            </h1>
+            <h1 className="tracking-wide py-[10px] text-sm">
+              Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong>{" "}
+              để có thể{" "}
+              <strong className="uppercase">miễn phí vận chuyển</strong>
+            </h1>
+            <hr className="my-[20px]" />
             <div className="overflow-y-scroll h-[450px]">
               {cartState?.map((cart, index) => {
-                return <div key={index}>
-                  {
-                    productDetailState?.filter((proDetail) => proDetail?._id === cart?.productDetailId).map((item) => {
-                      return <div key={index}>
-                        {productState?.filter((product) => product._id === item.product_id).map((pro) => {
-                          return <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative" key={index}>
-                            <Link to={`/products/${pro._id}`}>
-                              <img src={item?.imageColor} alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
-                            </Link>
-                            <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                              <div className="mt-5 sm:mt-0">
-                                <h2 className="text-lg font-bold text-gray-900" >{pro?.title}</h2>
-                                {/* color and size */}
-                                <p className="mt-1 text-xs text-gray-700">{item?.nameColor} / {item?.size}</p>
-                                {/* price product */}
-                                <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro?.discount.toLocaleString("vi-VN")}đ</p>
-                              </div>
+                return (
+                  <div key={index}>
+                    {productDetailState
+                      ?.filter(
+                        (proDetail) => proDetail?._id === cart?.productDetailId
+                      )
+                      .map((item) => {
+                        return (
+                          <div key={index}>
+                            {productState
+                              ?.filter(
+                                (product) => product._id === item.product_id
+                              )
+                              .map((pro) => {
+                                return (
+                                  <div
+                                    className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative"
+                                    key={index}
+                                  >
+                                    <Link to={`/products/${pro._id}`}>
+                                      <img
+                                        src={item?.imageColor}
+                                        alt="product-image"
+                                        className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
+                                      />
+                                    </Link>
+                                    <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                      <div className="mt-5 sm:mt-0">
+                                        <h2 className="text-lg font-bold text-gray-900">
+                                          {pro?.title}
+                                        </h2>
+                                        {/* color and size */}
+                                        <p className="mt-1 text-xs text-gray-700">
+                                          {item?.nameColor} / {item?.size}
+                                        </p>
+                                        {/* price product */}
+                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
+                                          {pro?.discount.toLocaleString(
+                                            "vi-VN"
+                                          )}
+                                          đ
+                                        </p>
+                                      </div>
 
-                              {user?.current?._id ? <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                              </div>
-                                :
-                                <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart.productDetailId!)}>
-                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                  </svg>
-                                </div>
-                              }
-                              <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                                <div className="flex items-center">
-                                  <p className="font-bold tracking-wide text-[15px]">{cart?.totalMoney?.toLocaleString("vi-VN")}đ</p>
-                                </div>
-                                <div className="flex items-center w-[100px] border border-gray-300 rounded">
-                                  <button
-                                    onClick={() => decreaseCart(cart._id!, pro.discount!)}
-                                    type="button"
-                                    className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
-                                  >
-                                    &minus;
-                                  </button>
-                                  <input
-                                    type="number"
-                                    id="Quantity"
-                                    value={cart?.quantity} min="1" max={item?.quantity}
-                                    className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-                                  />
-                                  <button
-                                    onClick={() => increaseCart(cart._id!, pro.discount!)}
-                                    disabled={item?.quantity === cart?.quantity}
-                                    type="button"
-                                    className={`${item?.quantity === cart?.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
+                                      {user?.current?._id ? (
+                                        <div
+                                          className="absolute right-[10px] top-[10px]"
+                                          onClick={() => removeCart(cart._id!)}
+                                        >
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                          >
+                                            <path
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="M6 18L18 6M6 6l12 12"
+                                            />
+                                          </svg>
+                                        </div>
+                                      ) : (
+                                        <div
+                                          className="absolute right-[10px] top-[10px]"
+                                          onClick={() =>
+                                            removeCart(cart.productDetailId!)
+                                          }
+                                        >
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                          >
+                                            <path
+                                              stroke-linecap="round"
+                                              stroke-linejoin="round"
+                                              d="M6 18L18 6M6 6l12 12"
+                                            />
+                                          </svg>
+                                        </div>
+                                      )}
+                                      <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                        <div className="flex items-center">
+                                          <p className="font-bold tracking-wide text-[15px]">
+                                            {cart?.totalMoney?.toLocaleString(
+                                              "vi-VN"
+                                            )}
+                                            đ
+                                          </p>
+                                        </div>
+                                        <div className="flex items-center w-[100px] border border-gray-300 rounded">
+                                          <button
+                                            onClick={() =>
+                                              decreaseCart(
+                                                cart._id!,
+                                                pro.discount!
+                                              )
+                                            }
+                                            type="button"
+                                            className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
+                                          >
+                                            &minus;
+                                          </button>
+                                          <input
+                                            type="number"
+                                            id="Quantity"
+                                            value={cart?.quantity}
+                                            min="1"
+                                            max={item?.quantity}
+                                            className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                          />
+                                          <button
+                                            onClick={() =>
+                                              increaseCart(
+                                                cart._id!,
+                                                pro.discount!
+                                              )
+                                            }
+                                            disabled={
+                                              item?.quantity === cart?.quantity
+                                            }
+                                            type="button"
+                                            className={`${
+                                              item?.quantity === cart?.quantity
+                                                ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                                : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                            } `}
+                                          >
+                                            +
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })}
                           </div>
-                        })}
-                      </div>
-                    })
-                  }
-                </div>
+                        );
+                      })}
+                  </div>
+                );
               })}
             </div>
           </div>
@@ -823,16 +1034,22 @@ const Header = () => {
             <div className="flex justify-between">
               <p className="text-lg font-bold">Tổng tiền:</p>
               <div className="">
-                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">{totalCart?.toLocaleString("vi-VN")}đ</p>
+                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">
+                  {totalCart?.toLocaleString("vi-VN")}đ
+                </p>
               </div>
-            </div >
+            </div>
             <div className="grid grid-cols-2 gap-[10px]">
               <Link to="/checkout">
-                <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">Thanh toán</button>
+                <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">
+                  Thanh toán
+                </button>
               </Link>
-              <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600"><Link to="/cart">Xem giỏ hàng</Link></button>
+              <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">
+                <Link to="/cart">Xem giỏ hàng</Link>
+              </button>
             </div>
-          </div >
+          </div>
           <div className="absolute right-[10px] top-[10px] icon-outCart">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -849,8 +1066,8 @@ const Header = () => {
               />
             </svg>
           </div>
-        </div >
-      </div >
+        </div>
+      </div>
     </>
   );
 };

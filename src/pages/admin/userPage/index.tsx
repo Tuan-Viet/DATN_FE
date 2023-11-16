@@ -22,7 +22,7 @@ import axios from 'axios';
 interface DataType {
     _id: React.Key;
     fullname: string;
-    phone: number;
+    // phone: number;
     email: string;
     address: string;
     role: string;
@@ -67,6 +67,12 @@ const userPage = () => {
 
     const columns = [
         {
+            title: 'STT',
+            dataIndex: 'key',
+            render: (value: any) => <Link to={``} className='uppercase font-bold '>{value}</Link>,
+            className: 'w-[100px]'
+        },
+        {
             title: 'MÃ',
             dataIndex: '_id',
             render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
@@ -87,12 +93,12 @@ const userPage = () => {
                 </div>
             ),
         },
-        {
-            title: 'Số điện thoai',
-            dataIndex: 'phone',
-            key: 'phone',
+        // {
+        //     title: 'Số điện thoai',
+        //     dataIndex: 'phone',
+        //     key: 'phone',
 
-        },
+        // },
         {
             title: 'Email',
             dataIndex: 'email',
@@ -141,10 +147,11 @@ const userPage = () => {
 
     ];
 
-    const data: DataType[] = users.map((user: any) => ({
+    const data: DataType[] = users.map((user: any, index) => ({
+        key: index + 1,
         _id: user._id,
         fullname: user.fullname,
-        phone: user.phone,
+        // phone: user.phone,
         email: user.email,
         address: user.address,
         role: user.role,

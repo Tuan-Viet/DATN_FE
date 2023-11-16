@@ -91,6 +91,12 @@ const productPage = () => {
     }
     const columns: ColumnsType<DataType> = [
         {
+            title: 'STT',
+            dataIndex: 'key',
+            render: (value: any) => <Link to={``} className='uppercase font-bold '>{value}</Link>,
+            className: 'w-[100px]'
+        },
+        {
             title: 'MÃ SẢN PHẨM',
             dataIndex: '_id',
             render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
@@ -107,7 +113,7 @@ const productPage = () => {
                         />
                     </Image.PreviewGroup>
 
-                    <a className='w-full overflow-hidden ml-1'>{record?.title}</a>
+                    <a className='w-full overflow-hidden ml-2'>{record?.title}</a>
                 </div>
             ),
             sorter: (a, b) => a.title.localeCompare(b.title), // Sắp xếp theo bảng chữ cái
@@ -179,7 +185,8 @@ const productPage = () => {
 
     ];
 
-    const data: DataType[] = productSearchState.map((product: any) => ({
+    const data: DataType[] = productSearchState.map((product: any, index) => ({
+        key: index + 1,
         _id: product._id,
         title: product.title,
         images: product.images,
