@@ -22,6 +22,7 @@ import myAccount from "../pages/client/MyAccount";
 import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
+import ProductPage from "../pages/client/Products";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -30,20 +31,22 @@ import signup from "../pages/client/signup";
 
 
 export const publicRoutes = [
-    { path: routes.home, Component: homePage },
-    { path: routes.banner, Component: Banner },
-    { path: routes.about, Component: About },
-    { path: routes.contact, Component: Contact },
-    { path: routes.productDetail, Component: productDetail },
-    { path: routes.cart, Component: cartPage },
-    { path: routes.checkout, Component: CheckoutsPage },
-    { path: routes.Billconfirm, Component: BillConfirm },
-    { path: routes.signin, Component: signin },
-    { path: routes.signup, Component: signup },
-    { path: routes.myAccount, Component: myAccount },
+  { path: routes.home, Component: homePage },
+  { path: routes.banner, Component: Banner },
+  { path: routes.about, Component: About },
+  { path: routes.contact, Component: Contact },
+  { path: routes.productDetail, Component: productDetail },
+  { path: routes.cart, Component: cartPage },
+  { path: routes.checkout, Component: CheckoutsPage },
+  { path: routes.Billconfirm, Component: BillConfirm },
+  { path: routes.signin, Component: signin },
+  { path: routes.signup, Component: signup },
+  { path: routes.myAccount, Component: myAccount },
   { path: routes.orders, Component: myOrders },
   { path: routes.addresses, Component: myAddress },
   { path: routes.orderDetail, Component: OrderDetail },
+  { path: routes.products, Component: ProductPage },
+
 ]
 
 export const privateRoutes = [
