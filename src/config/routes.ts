@@ -4,7 +4,7 @@ const routes = {
     banner: "/",
     about: "/about",
     contact: "/contact",
-    products: "/products",
+    products: "/collections/:id?",
     productDetail: "/products/:id",
     cart: "/cart",
     checkout: "/checkout",
