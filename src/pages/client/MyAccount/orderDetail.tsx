@@ -144,7 +144,6 @@ const OrderDetail = () => {
         try {
           const updatedOrder = { ...order, status: 3 };
           await updateOrder({ id: id, ...updatedOrder });
-          toast.success("Đã chuyển trạng thái về chưa nhận hàng");
         } catch (error) {
           console.error("Lỗi khi chuyển trạng thái về chưa nhận hàng: ", error);
         }
@@ -233,7 +232,7 @@ const OrderDetail = () => {
                         {mapStatusToText(order?.status)}
                       </span>
                     </h1>
-                    {order?.status !== 0 && (
+                    {order?.status !== 0 && order?.status !== 1 && order?.status !== 2 && (
                       <p>
                         Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
                         <button
@@ -246,7 +245,7 @@ const OrderDetail = () => {
                     )}
                   </div>
                   <div className="text-right">
-                    {order?.status !== 4 && order?.status !== 3 && (
+                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 && (
                       <button
                         onClick={() => handleCancelOrder(id)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
