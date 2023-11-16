@@ -56,10 +56,6 @@ const Header = () => {
       )
       toast.success("Đăng nhập thành công");
       if (cartState?.length > 0) {
-        // const cartIndex: ICart | undefined = cartState?.find((cart) => {
-        //   return cartStore?.filter((item) => cart.productDetailId === item.productDetailId)
-        // })
-        // console.log(cartIndex);
         cartStore?.map((cart) => {
           return onAddCart({ userId: response?.data?.user._id, ...cart })
         })
