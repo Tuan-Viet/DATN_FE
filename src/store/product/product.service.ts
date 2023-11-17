@@ -38,8 +38,15 @@ const productAPI = createApi({
             }),
             invalidatesTags: ["products"]
         }),
+        searchProduct: builer.query<IProduct[], string>({
+            query: (name) => ({
+                url: "/products?_search=" + name,
+                method: "get",
+                invalidatesTags: ["products"]
+            }),
+        }),
     })
 })
 
-export const { useFetchListProductQuery, useFetchOneProductQuery, useRemoveProductMutation, useAddProductMutation, useUpdateProductMutation } = productAPI
+export const { useFetchListProductQuery, useFetchOneProductQuery, useRemoveProductMutation, useAddProductMutation, useUpdateProductMutation, useSearchProductQuery } = productAPI
 export default productAPI

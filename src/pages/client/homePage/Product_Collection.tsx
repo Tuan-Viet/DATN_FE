@@ -188,9 +188,7 @@ const Product_Collection = () => {
                   </div>
                 </div>
                 : ""}
-
             </>
-
           }) : <div className="text-center w-full">Hiện chưa có sản phẩm nào</div>}
         </div>
         <div className="text-center">

@@ -41,7 +41,7 @@ const Category = () => {
           {categoryState?.map((cate, index) => {
             return <SwiperSlide key={index}>
               <div className="relative">
-                <a href={`collections/${cate._id}`}>
+                <Link to={`collections/${cate._id}`}>
                   <img
                     src={cate.images?.url}
                     alt=""
@@ -72,7 +72,7 @@ const Category = () => {
                       </svg>
                     </span>
                   </div>
-                </a>
+                </Link>
 
               </div>
             </SwiperSlide>

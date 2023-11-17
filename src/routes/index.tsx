@@ -23,6 +23,7 @@ import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
 import ProductPage from "../pages/client/Products";
+import SearchResult from "../pages/client/SearchResult";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
@@ -46,6 +47,7 @@ export const publicRoutes = [
   { path: routes.addresses, Component: myAddress },
   { path: routes.orderDetail, Component: OrderDetail },
   { path: routes.products, Component: ProductPage },
+  { path: routes.searchResult, Component: SearchResult },
 
 ]
 
