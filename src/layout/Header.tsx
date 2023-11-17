@@ -22,15 +22,15 @@ import {
   useListProductDetailQuery,
 } from "../store/productDetail/productDetail.service";
 import { listProductDetailSlice } from "../store/productDetail/productDetailSlice";
-import { useFetchListProductQuery } from "../store/product/product.service";
-import { listProductSlice } from "../store/product/productSlice";
+import { useFetchListProductQuery, useSearchProductQuery } from "../store/product/product.service";
+import { listProductSearchSlice, listProductSlice } from "../store/product/productSlice";
 import { toast } from "react-toastify";
 import { register } from "../store/user/userSlice";
 import axios from "axios";
 import { logout } from "../store/user/userSlice";
 import { Breadcrumb, Button, Form, Input, Space, message } from "antd";
 import { ICart } from "../store/cart/cart.interface";
-import Search from "./Search";
+import { useForm } from "react-hook-form";
 
 type FormDataType = {
   email: string;
@@ -45,7 +45,6 @@ const Header = () => {
   const { data: listProduct, isSuccess: isSuccessListProduct } =
     useFetchListProductQuery();
   const cartState = useSelector((state: RootState) => state.cartSlice.carts);
-  // console.log(listCart);
 
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
@@ -286,11 +285,36 @@ const Header = () => {
 
   // search
   const [showSearch, setShowSearch] = useState(false);
-
+  const [searchTerms, setSearchTerm] = useState<string>("")
+  const {
+    handleSubmit
+  } = useForm()
+  const productSearch = useSelector((state: RootState) => state.productSearchReducer.products)
+  useEffect(() => {
+    if (listProduct && searchTerms) {
+      if (searchTerms.trim() !== "") {
+        dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: listProduct }))
+      } else {
+        dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: [] }))
+      }
+    }
+  }, [searchTerms])
   const toggleSearch = () => {
     setShowSearch(!showSearch);
   };
-
+  const handleSearch = () => {
+    if (listProduct && searchTerms) {
+      localStorage.setItem("searchTerm", JSON.stringify(searchTerms))
+      dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: listProduct }))
+      navigate(`/search`)
+      //   if (searchTerms.trim() === "") {
+      //     localStorage.setItem("searchTerm", JSON.stringify(searchTerms))
+      //     navigate("/search")
+      //     dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: [] }))
+      //   } else {
+      // }
+    }
+  }
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -769,9 +793,8 @@ const Header = () => {
         </div>
         {/* search */}
         <div
-          className={`bg-white absolute z-50 transition-all w-full duration-500 ${
-            showSearch ? "top-0" : "-top-[1000%]"
-          }`}
+          className={`bg-white absolute z-50 transition-all w-full duration-500 ${showSearch ? "top-0" : "-top-[1000%]"
+            }`}
         >
           <div className="container">
             <form className="flex justify-between py-8">
@@ -782,58 +805,50 @@ const Header = () => {
                   className="w-[220px]"
                 />
               </Link>
-              <div>
-                <div className="flex items-center gap-x-5 justify-between border border-[#e2e2e2] focus:border-black rounded w-[714px] h-[45px] px-3">
+              <div >
+                <form onClick={handleSubmit(handleSearch)} className="flex items-center gap-x-5 justify-between border border-[#e2e2e2] focus:border-black rounded w-[714px] h-[45px] px-3">
                   <input
                     type="text"
                     className="outline-none w-full px-3 placeholder:text-black placeholder:text-[15px]"
                     placeholder="Tìm kiếm sản phẩm ..."
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                    />
-                  </svg>
-                </div>
+                  <button type="submit">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                      />
+                    </svg>
+                  </button>
+                </form>
                 <div className="">
                   <div>
-                    <div className="flex justify-between border-b mt-4 pb-4">
-                      <div>
-                        <h3 className="font-bold text-sm">
-                          Áo Polo monogram TRN DSTP650
-                        </h3>
-                        <span className="text-[13px]">450,000₫</span>
-                      </div>
-                      <img
-                        src="/images/img-product/polo-hoa-tiet.jpg"
-                        alt=""
-                        className="w-[40px] h-[52px]"
-                      />
-                    </div>
-                    <div className="flex justify-between border-b mt-4 pb-4">
-                      <div>
-                        <h3 className="font-bold text-sm">
-                          Áo Polo monogram TRN DSTP650
-                        </h3>
-                        <span className="text-[13px]">450,000₫</span>
-                      </div>
-                      <img
-                        src="/images/img-product/polo-hoa-tiet.jpg"
-                        alt=""
-                        className="w-[40px] h-[52px]"
-                      />
-                    </div>
+                    {productSearch?.slice(0, 3).map((product, index) => {
+                      return <Link to={`products/${product._id}`} className="flex justify-between border-b mt-4 pb-4 cursor-pointer">
+                        <div>
+                          <h3 className="font-bold text-sm">
+                            {product.title}
+                          </h3>
+                          <span className="text-[13px]">{product.price.toLocaleString("vi-VN")}₫</span>
+                        </div>
+                        <img
+                          src={product.images?.[0]}
+                          alt=""
+                          className="w-[40px] h-[52px]"
+                        />
+                      </Link>
+                    })}
                   </div>
-                  <Link to="" className="text-center block mt-4 text-sm">Xem thêm 11 sản phẩm</Link>
+                  {productSearch && productSearch?.length > 3 ? <Link to="" className="text-center block mt-4 text-sm">Xem thêm {productSearch?.length - 3} sản phẩm</Link> : ""}
                 </div>
               </div>
               <div className="w-[120px]">
@@ -857,9 +872,8 @@ const Header = () => {
           </div>
         </div>
         <div
-          className={`fixed top-0 left-0 w-full h-full bg-black opacity-50 transition-opacity duration-500 ${
-            showSearch ? "block" : "hidden"
-          }`}
+          className={`fixed top-0 left-0 w-full h-full bg-black opacity-50 transition-opacity duration-500 ${showSearch ? "block" : "hidden"
+            }`}
           onClick={toggleSearch}
         ></div>
         {/* overlay-cart */}
@@ -1007,11 +1021,10 @@ const Header = () => {
                                               item?.quantity === cart?.quantity
                                             }
                                             type="button"
-                                            className={`${
-                                              item?.quantity === cart?.quantity
-                                                ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
-                                                : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
-                                            } `}
+                                            className={`${item?.quantity === cart?.quantity
+                                              ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                              : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                              } `}
                                           >
                                             +
                                           </button>

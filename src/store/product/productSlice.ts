@@ -68,9 +68,12 @@ const productSearchSlice = createSlice({
             state.products = actions.payload
         },
         listProductSearchSlice: (state: IProductFilterState, actions: PayloadAction<IProductSearchState>) => {
-            const nameTerm = actions.payload.searchTerm.trim()
+            const nameTerm = actions?.payload?.searchTerm?.trim().toLowerCase()
             if (nameTerm) {
-                const listProductFilter = actions.payload?.products?.filter((product) => product.title && product.title.toLowerCase().includes(nameTerm))
+                const listProductFilter = actions.payload?.products?.filter(
+                    (product) => { return product.title && product.title.trim().toLowerCase().includes(nameTerm) }
+                );
+
                 state.products = listProductFilter
             }
         },

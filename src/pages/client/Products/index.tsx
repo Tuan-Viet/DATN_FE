@@ -1,5 +1,3 @@
-
-
 import { Dispatch, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { InputNumber, List, Select, Slider, message } from "antd";
@@ -147,6 +145,9 @@ const ProductPage = () => {
         default:
             break;
     }
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0 });
+    }, []);
     return (
         <div className="">
             <Header />
