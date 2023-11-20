@@ -282,8 +282,8 @@ const productUpdate = () => {
 
                             {/* Input Title Product */}
                             <Form.Item
-                                name="Tên sản phẩm"
-                                label="Title Product"
+                                name="title"
+                                label="Tên sản phẩm"
                                 rules={[
                                     {
                                         required: true,

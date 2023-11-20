@@ -833,7 +833,7 @@ const Header = () => {
                 <div className="">
                   <div>
                     {productSearch?.slice(0, 3).map((product, index) => {
-                      return <Link to={`products/${product._id}`} className="flex justify-between border-b mt-4 pb-4 cursor-pointer">
+                      return <Link to={`/products/${product._id}`} className="flex justify-between border-b mt-4 pb-4 cursor-pointer">
                         <div>
                           <h3 className="font-bold text-sm">
                             {product.title}

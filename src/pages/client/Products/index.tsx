@@ -372,7 +372,7 @@ const ProductPage = () => {
                             }
                             }
                             dataSource={sortedProducts}
-                            renderItem={(product: any, index) => (
+                            renderItem={(product: IProduct, index) => (
                                 <List.Item style={{ marginLeft: 10, marginRight: 10, marginBottom: 30, paddingLeft: 8, paddingRight: 8 }}>
                                     <div key={index} className="relative group w-full border">
                                         {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <div className="relative group">
@@ -390,16 +390,16 @@ const ProductPage = () => {
                                                         <p className="ml-1">Kích thước</p>
                                                     </div>
                                                 </div>
-                                                <Link to="" className="font-medium">
+                                                <Link to="" className="block font-medium h-12">
                                                     {product.title}
                                                 </Link>
                                                 <div className="price flex gap-x-[8px] items-baseline">
                                                     <span className="text-sm text-[#FF2C26] font-semibold">
-                                                        {product.discount.toLocaleString("vi-VN")}đ
+                                                        {product.discount ? product.discount.toLocaleString("vi-VN") + 'đ' : product.price.toLocaleString("vi-VN")}đ
                                                     </span>
-                                                    <span className="text-[13px] text-[#878C8F]">
+                                                    {!product.discount ? "" : <span className="text-[13px] text-[#878C8F] ">
                                                         <del>{product.price.toLocaleString("vi-VN")}đ</del>
-                                                    </span>
+                                                    </span>}
                                                 </div>
                                             </div>
                                             <div>
@@ -443,7 +443,7 @@ const ProductPage = () => {
                                                                 <p className="ml-1">Kích thước</p>
                                                             </div>
                                                         </div>
-                                                        <Link to="" className="font-medium">
+                                                        <Link to="" className="block font-medium h-12">
                                                             {product.title}
                                                         </Link>
                                                         <div className="price flex gap-x-[8px] items-baseline">

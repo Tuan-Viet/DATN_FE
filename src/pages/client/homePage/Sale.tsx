@@ -39,7 +39,8 @@ const Sale = () => {
             pagination={{ clickable: true, dynamicBullets: true }}
           >
             {productSaleState?.map((product, index) => {
-              return <SwiperSlide key={index}>
+              return <SwiperSlide key={index}
+              >
                 {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <div className="relative group">
                   <Link to={`/products/${product._id}`}>
                     <img
@@ -55,7 +56,7 @@ const Sale = () => {
                         <p className="ml-1">Kích thước</p>
                       </div>
                     </div>
-                    <Link to="" className="font-medium">
+                    <Link to="" className="block font-medium h-12">
                       {product.title}
                     </Link>
                     <div className="price flex gap-x-[8px] items-baseline">

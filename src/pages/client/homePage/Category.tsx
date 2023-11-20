@@ -45,6 +45,7 @@ const Category = () => {
                   <img
                     src={cate.images?.url}
                     alt=""
+                    className="h-[470px] w-full object-cover"
                   />
                   <div className="flex justify-between items-center w-[352.5px] bg-gray-200 bg-opacity-40 p-5 absolute bottom-0">
                     <span
