@@ -24,8 +24,19 @@ import {
   Space,
   message,
 } from 'antd';
+import ProductViewed from "./ProductViewed";
 
 const ProductInfo = () => {
+  const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
+  const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
+  const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
+  const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
+  const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
+  // const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
+  const [onAddCart] = useAddCartMutation()
+  // const [onUpdateProDetail] = useUpdateProductDetailMutation()
+  const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
+  const navigate = useNavigate()
   const { id } = useParams()
   if (id) {
     const {
@@ -40,9 +51,15 @@ const ProductInfo = () => {
 
     const [currentTab, setCurrentTab] = useState(1);
     const dispatch: Dispatch<any> = useDispatch()
-    const { data: getOneProduct } = useFetchOneProductQuery(id)
+    const { data: listProduct } = useFetchListProductQuery()
+    const { data: getOneProduct, isSuccess: isSuccessGetOneProduct, isLoading: productLoading } = useFetchOneProductQuery(id)
+    const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
+
+    const categoryId = getOneProduct?.categoryId?._id;
+    const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
+
     const renderContent = () => {
-      switch (currentTab) {
+      switch (currentTab && currentTab) {
         case 1:
           return (
             <div className="mb-[40px]">
@@ -243,19 +260,6 @@ const ProductInfo = () => {
         setQuantity(quantity - 1);
       }
     };
-    const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
-    const { data: getCategoryById } = useFetchOneCategoryQuery(getOneProduct?.categoryId?._id)
-    const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
-    const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
-    const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
-    const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
-    const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
-    const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
-    const [onAddCart] = useAddCartMutation()
-    const [onUpdateProDetail] = useUpdateProductDetailMutation()
-    const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
-    const navigate = useNavigate()
-
 
     useEffect(() => {
       setValue("quantity", quantity)
@@ -263,6 +267,7 @@ const ProductInfo = () => {
     // lay ra productDetailId
     const handleFormProductDetail = async (data: productDetailForm) => {
       try {
+
         if (data && data.nameColor && getOneProduct) {
           await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
           setFormProductDetailClicked(true)
@@ -339,11 +344,10 @@ const ProductInfo = () => {
 
     // lay ra mau [0]
     useEffect(() => {
-      if (productDetailState && getOneProduct) {
+      if (productDetailState?.length > 0 && getOneProduct) {
         const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
-        // console.log(firstColor);
         if (firstColor) {
-          localStorage.setItem("firstColor", JSON.stringify(firstColor?.[0]))
+          localStorage.setItem("firstColor", JSON.stringify(firstColor[0]))
           const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
           if (listProductDetailApi && getFirstColor) {
             dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
@@ -369,7 +373,7 @@ const ProductInfo = () => {
       }
     }, [getCategoryById])
     useEffect(() => {
-      if (listProductDetailApi) {
+      if (isSuccessProductDetail) {
         dispatch(listProductDetailSlice(listProductDetailApi))
       }
     }, [isSuccessProductDetail])
@@ -474,7 +478,7 @@ const ProductInfo = () => {
                     <div className="flex my-6">
                       <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                       <div className="flex">
-                        {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item.nameColor))].map((nameColor) => {
+                        {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item?.nameColor))].map((nameColor) => {
                           return <div className="mx-1">
                             <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
                             <label htmlFor={nameColor}
@@ -760,6 +764,8 @@ const ProductInfo = () => {
             </Swiper>
           </div>
         </div>
+        {/* Sản phẩm đã xem */}
+        <ProductViewed idProduct={id} listProductDetail={productDetailState}></ProductViewed>
       </div>
     );
 

@@ -18,9 +18,8 @@ function formatDateStringToDisplayDate(dateString: any) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  return `${day < 10 ? "0" : ""}${day}/${
-    month < 10 ? "0" : ""
-  }${month}/${year}`;
+  return `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
+    }${month}/${year}`;
 }
 
 function mapStatusPaymentToText(statusCode: number) {
@@ -29,6 +28,22 @@ function mapStatusPaymentToText(statusCode: number) {
       return "Chưa thanh toán";
     case 1:
       return "Đã thanh toán";
+    default:
+      return "Trạng thái không xác định";
+  }
+}
+function orderStatus(satus: number) {
+  switch (satus) {
+    case 0:
+      return "Hủy đơn hàng";
+    case 1:
+      return "Đang xử lí";
+    case 2:
+      return "Đang chuản bị hàng";
+    case 3:
+      return "Đang giao";
+    case 4:
+      return "Hoàn thành"
     default:
       return "Trạng thái không xác định";
   }
@@ -179,7 +194,7 @@ const myOrders = () => {
                             Trạng thái thanh toán
                           </th>
                           <th scope="col" className="px-6 py-3">
-                            Vận chuyển
+                            Trạng thái
                           </th>
                           <th scope="col" className="px-6 py-3">
                             Hành động
@@ -209,7 +224,9 @@ const myOrders = () => {
                             <td className="px-6 py-4">
                               {mapStatusPaymentToText(order.paymentStatus)}
                             </td>
-                            <td className="px-6 py-4">Chờ xử lý</td>
+                            <td className="px-6 py-4">
+                              {orderStatus(order.status)}
+                            </td>
                             <td className="px-6 py-4 text-blue-500">
                               {order.status == 0 ? (
                                 "Bạn đã hủy đơn hàng này"

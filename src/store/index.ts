@@ -3,7 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import categoryApi from './category/category.service'
 import productAPI from './product/product.service'
 import categorySlice from './category/categorySlice'
-import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer } from './product/productSlice'
+import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer, productViewedSliceReducer } from './product/productSlice'
 import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdReducer } from './productDetail/productDetailSlice'
 import productDetailAPI from './productDetail/productDetail.service'
 import cartAPI from './cart/cart.service'
@@ -48,6 +48,7 @@ export const store = configureStore({
     productSearchReducer: productSearchReducer,
     productOutstandReducer: productOutstandReducer,
     productRelatedSliceReducer: productRelatedSliceReducer,
+    productViewedSliceReducer: productViewedSliceReducer,
     // productDetail
     productDetailSlice: productDetailSlice,
     productDetailFilterSliceReducer: productDetailFilterSliceReducer,

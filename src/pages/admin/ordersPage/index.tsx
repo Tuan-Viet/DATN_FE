@@ -203,7 +203,7 @@ const ordersPage = () => {
                     <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
                     </Link>
-                    <Link to={`/admin/order/${record?.key}`}>
+                    <Link to={`/admin/order/${record?._id}`}>
                         <EditFilled className='text-xl text-yellow-400' />
                     </Link>
                 </Space>

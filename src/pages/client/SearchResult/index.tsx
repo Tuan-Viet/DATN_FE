@@ -11,18 +11,24 @@ import { useListProductDetailQuery } from "../../../store/productDetail/productD
 
 const SearchResult = () => {
     const dispatch: Dispatch<any> = useDispatch()
-    // const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
+    const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
     const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const productSearch = useSelector((state: RootState) => state.productSearchReducer.products)
+
+    // const productState = useSelector((state: RootState) => state.productSlice.products)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
     const searchStore = JSON.parse(localStorage.getItem("searchTerm")!)
-    const { data: searchAPI } = useSearchProductQuery(searchStore && searchStore)
-    console.log(searchAPI);
+    // const { data: searchAPI } = useSearchProductQuery(searchStore && searchStore)
     useEffect(() => {
         if (listProductDetail) {
             dispatch(listProductDetailSlice(listProductDetail))
         }
     }, [isSuccessProductDetail])
+    useEffect(() => {
+        if (listProduct && searchStore) {
+            dispatch(listProductSearchSlice({ searchTerm: searchStore, products: listProduct }))
+        }
+    }, [isSuccessProduct])
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0 });
     }, []);
@@ -32,13 +38,13 @@ const SearchResult = () => {
             <div className="text-center mt-[35px] relative mb-[30px] pb-5">
                 <h1 className="text-[30px] font-bold mb-2">Tìm kiếm</h1>
                 <p>
-                    Có <span className="font-bold">{searchAPI ? searchAPI?.length : 0} sản phẩm</span> cho tìm kiếm
+                    Có <span className="font-bold">{productSearch ? productSearch?.length : 0} sản phẩm</span> cho tìm kiếm
                 </p>
                 <div className="absolute w-[60px] h-1 bg-black bottom-0 left-1/2 transform -translate-x-1/2"></div>
             </div>
             <p className="mb-5">Kết quả tìm kiếm cho "{searchStore ? searchStore : ""}"</p>
-            <div className="outstanding-product mb-12 flex gap-x-[25px] flex-wrap gap-y-[30px]">
-                {searchAPI && searchAPI?.length > 0 ? searchAPI?.map((product, index) => {
+            <div className="outstanding-product mb-12 grid grid-cols-5 gap-5">
+                {productSearch && productSearch?.length > 0 ? productSearch?.map((product, index) => {
                     return <>
                         {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length != 0 ?
                             <div key={index} className="relative group w-[280px] cursor-pointer">

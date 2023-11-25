@@ -46,12 +46,13 @@ const Product_Collection = () => {
       }
     }
   }, [isSuccessProduct])
-
+  const listCate = categoryState.filter((cate) => cate.name !== "Chưa phân loại")
   return (
-    <div className="py-[60px] mb-[60px]">
+    <div className="py-[60px] mb-[60px]" >
+
       <div className="max-w-[1500px] mx-auto">
         <div className="tabs flex justify-center items-center gap-[40px] mb-[50px]">
-          {categoryState?.map((cate, index) => {
+          {listCate?.map((cate, index) => {
             return <div onClick={() => onHandleFilter(cate._id!)} key={index} className="tab-item text-[30px] font-medium hover:text-black hover:underline transition-all cursor-pointer">
               {cate.name}
             </div>
@@ -200,7 +201,7 @@ const Product_Collection = () => {
           </Link>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

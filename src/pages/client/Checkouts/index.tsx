@@ -117,6 +117,7 @@ const CheckoutsPage = () => {
 
   const handleVoucher = async (voucherId: string) => {
     if (voucherId) {
+
       await setIdVoucher(voucherId)
       if (getOneVoucher) {
         setValue("voucher_code", getOneVoucher.code)
