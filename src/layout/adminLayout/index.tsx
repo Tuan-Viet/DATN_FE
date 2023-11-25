@@ -37,16 +37,19 @@ function getItem(
 const items: MenuItem[] = [
   getItem(<Link to={"/admin/dashboard"}>Dashboard</Link >, '1', <PieChartOutlined />),
   getItem('Sản phẩm', 'sub1', <CodeSandboxOutlined />, [
-    getItem(<Link to={"/admin/product/add"}>Tạo mới</Link >, '3'),
-    getItem(<Link to={"/admin/product"}>Danh sách</Link >, '4'),
+    getItem(<Link to={"/admin/product/add"}>Tạo mới sản phẩm</Link >, '3'),
+    getItem(<Link to={"/admin/product"}>Quản lý sản phẩm</Link >, '4'),
   ]),
   getItem('Danh mục', 'sub2', <AppstoreAddOutlined />, [
-    getItem(<Link to={"/admin/category/add"}>Tạo mới</Link >, '5'),
-    getItem(<Link to={"/admin/category"}>Danh sách</Link >, '6'),
+    getItem(<Link to={"/admin/category/add"}>Tạo mới danh mục</Link >, '5'),
+    getItem(<Link to={"/admin/category"}>Quản lý danh mục</Link >, '6'),
   ]),
-  getItem(<Link to={"/admin/user"}>Khách hàng</Link >, '7', <UserOutlined />),
+  getItem(<Link to={"/admin/user"}>Quản lý người dùng</Link >, '7', <UserOutlined />),
   getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <SolutionOutlined />),
-  getItem(<Link to={"/admin/voucher"}>Voucher</Link >, '9', <TagOutlined />),
+  getItem('Khuyến mại', 'sub3', <TagOutlined />, [
+    getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
+    getItem(<Link to={"/admin/voucher"}>Quản lý Voucher</Link >, '10'),
+  ]),
 ];
 
 const AdminLayout = ({ children }: Props) => {
