@@ -107,6 +107,33 @@ const productRelatedSlice = createSlice({
         },
     })
 })
+const productViewedSlice = createSlice({
+    name: "products",
+    initialState: initialStateProduct,
+    reducers: ({
+        listProductViewed: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
+            state.products = actions.payload
+        },
+        addProductViewed: (state: IProductState, actions: PayloadAction<IProduct>) => {
+            const productExist = state.products.some((product) => product._id === actions.payload._id);
+            const productViewedLocal: IProduct[] = JSON.parse(sessionStorage.getItem("productViewed") || "[]");
+            const productViewedLocalExist = productViewedLocal.some((product) => product._id === actions.payload._id);
+
+            if (!productExist) {
+                state.products.push(actions.payload);
+                productViewedLocal.push(actions.payload);
+
+                if (!productViewedLocalExist) {
+                    sessionStorage.setItem("productViewed", JSON.stringify(productViewedLocal));
+                }
+            }
+        },
+        // listProductRelatedSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
+        //     const productOutStand = actions.payload.filter((product) => product && product.variants)
+        //     state.products = productOutStand
+        // },
+    })
+})
 // product
 export const { listProductSlice, deleteProductSlice } = productSlice.actions
 // productbyCategory
@@ -118,8 +145,9 @@ export const { listProductSearch, listProductSearchSlice, deleteProductSearchSli
 // productOutStand
 export const { listProductOutStand, listProductOutStandSlice } = productOutstandSlice.actions
 // productRelated
-
 export const { listProductRelated, listProductRelatedSlice } = productRelatedSlice.actions
+// productViewed
+export const { listProductViewed, addProductViewed } = productViewedSlice.actions
 // reducer
 export const productSliceReducer = productSlice.reducer
 export const productFilterSliceReducer = productFilterSlice.reducer
@@ -127,4 +155,5 @@ export const productSaleSliceReducer = productSaleSlice.reducer
 export const productSearchReducer = productSearchSlice.reducer
 export const productOutstandReducer = productOutstandSlice.reducer
 export const productRelatedSliceReducer = productRelatedSlice.reducer
+export const productViewedSliceReducer = productViewedSlice.reducer
 
