@@ -9,6 +9,7 @@ export interface IVoucher {
     minOrderValue: number
     validFrom: number
     validTo: number
+    description: string
 }
 
 export interface IVoucherState {

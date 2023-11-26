@@ -4,7 +4,8 @@ import {
     Popconfirm,
     Button,
     message,
-    Spin
+    Spin,
+    Steps
 } from 'antd';
 import {
     EditFilled,
@@ -19,8 +20,8 @@ import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { ColumnsType, TableProps } from 'antd/es/table';
-import { useListVoucherQuery } from '../../../store/vouchers/voucher.service';
-import { listVoucherSlice } from '../../../store/vouchers/voucherSlice';
+import { useDeleteVoucherMutation, useListVoucherQuery } from '../../../store/vouchers/voucher.service';
+import { deleteVoucherSlice, listVoucherSlice } from '../../../store/vouchers/voucherSlice';
 
 interface DataType {
     _id: React.Key;
@@ -32,9 +33,9 @@ interface DataType {
     discount: number;
 }
 
-
 const VoucherPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
+    const [onRemove] = useDeleteVoucherMutation()
     const { data: listVochers, isLoading, isError, isSuccess } = useListVoucherQuery()
     const vocherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
 
@@ -61,61 +62,82 @@ const VoucherPage = () => {
             className: 'w-[100px]'
         },
         {
+            title: 'HẠN SỬ DỤNG',
+            render: (value: any) => (
+                <div className="">
+                    <span className={`bg-${statusValid(value.validFrom, value.validTo) === 'Sắp diễn ra' ? 'blue' : statusValid(value.validFrom, value.validTo) === 'Đang diễn ra' ? 'green' : 'red'}-500 text-white px-2 py-1 rounded-lg`}>
+                        {statusValid(value.validFrom, value.validTo)}
+                    </span>
+                    <Steps
+                        progressDot
+                        direction="vertical"
+                        items={[
+                            {
+                                title: 'Bắt đầu',
+                                description: formatDateString(value.validFrom)
+                            },
+                            {
+                                title: 'Kết thúc',
+                                description: formatDateString(value.validTo)
+                            },
+                        ]}
+                    />
+                </div>
+            )
+        },
+        {
+            title: 'TÊN',
+            dataIndex: 'title',
+            key: 'title',
+        },
+        {
             title: 'MÃ GIẢM GIÁ',
             dataIndex: 'code',
             key: 'code',
         },
-
         {
             title: 'SỐ LƯỢNG',
             dataIndex: 'quantity',
             key: 'quantity',
         },
         {
-            title: 'SL NGƯỜI DÙNG',
-            dataIndex: 'used',
-            key: 'user',
+            title: 'LOẠI',
+            dataIndex: 'type',
+            key: 'type',
         },
         {
-            title: 'THỜI GIAN ÁP DỤNG',
-            dataIndex: '',
-            key: '',
+            title: 'GIẢM GIÁ',
+            render: (value: any) => (
+                <div>
+                    {value.type === 'value' ? (
+                        <span>{value.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ</span>
+                    ) : (
+                        <span>{value.discount} %</span>
+                    )}
+                </div>
+            )
         },
         // {
-        //     title: 'GIÁ',
-        //     dataIndex: 'price',
-        //     key: 'price',
-        //     render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        //     sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
-        //     sortDirections: ['ascend', 'descend'],
-        //     showSorterTooltip: false,
+        //     title: 'MÔ TẢ',
+        //     dataIndex: 'description',
+        //     key: 'description',
         // },
-        // {
-        //     title: 'GIẢM GIÁ',
-        //     dataIndex: 'discount',
-        //     key: 'discount',
-        //     render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        //     sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
-        //     sortDirections: ['ascend', 'descend'],
-        //     showSorterTooltip: false,
-        // },
-
         {
             title: '',
             key: 'action',
-            render: (record: any) => (
+            render: (value: any) => (
                 <Space size="middle" className='flex justify-end'>
                     <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
-                        onConfirm={() => confirm(record?._id)}
+                        onConfirm={() => confirm(value?._id)}
                         okText="Yes"
                         cancelText="No"
                         okButtonProps={{ className: "text-white bg-blue-400" }}
                     >
                         <DeleteFilled className='text-xl text-red-400' />
                     </Popconfirm>
-                    <Link to={`/admin/voucher/update/${record?._id}`}>
+                    <Link to={`/admin/voucher/update/${value?._id}`}>
                         <EditFilled className='text-xl text-yellow-400' />
                     </Link>
                 </Space>
@@ -123,6 +145,31 @@ const VoucherPage = () => {
         },
 
     ];
+    const formatDateString = (dateString: any) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    };
+    const statusValid = (validFrom: any, validTo: any) => {
+        const currentDate = new Date();
+        const startDate = new Date(validFrom);
+        const endDate = new Date(validTo);
+
+        currentDate.setHours(0, 0, 0, 0);
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(0, 0, 0, 0);
+
+        if (currentDate >= startDate && currentDate <= endDate) {
+            return 'Đang diễn ra';
+        } else if (currentDate < startDate) {
+            return 'Sắp diễn ra';
+        } else if (currentDate > endDate) {
+            return 'Hết hạn';
+        }
+    };
 
     const data: DataType[] = vocherState.map((voucher: any, index) => ({
         key: index + 1,
@@ -132,17 +179,33 @@ const VoucherPage = () => {
         price: voucher.price,
         quantity: voucher.quantity,
         used: voucher.used,
+        type: voucher.type,
         discount: voucher.discount,
+        validFrom: voucher.validFrom,
+        validTo: voucher.validTo,
+        description: voucher.description
     }));
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
+
+    const confirm = async (id: string) => {
+        try {
+            if (id) {
+                await onRemove(id).then(() => dispatch(deleteVoucherSlice(id)))
+                message.success("Xóa thành công")
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
     return (
         <div className="">
             <Space className='flex justify-between mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        QUẢN LÝ
+                        QUẢN LÝ VOUCHER
                     </span>
                     {/* <span className="block text-base  text-[#1677ff]">
                         Manage your products
@@ -166,7 +229,7 @@ const VoucherPage = () => {
                         </button>
                     </form>
                 </div>
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
+                <Table columns={columns} dataSource={data} pagination={{ pageSize: 10 }} onChange={onChange} />
             </div>
         </div>
     )
