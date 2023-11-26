@@ -53,7 +53,7 @@ const productPage = () => {
     // const productState = useSelector((state: RootState) => state.productSlice.products)
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
 
-    // console.log("data :", productSearchState);
+    console.log("data :", productSearchState);
 
     useEffect(() => {
         if (listProduct) {
