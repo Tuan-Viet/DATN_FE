@@ -33,6 +33,14 @@ const routes = {
     adminVoucherPage: "/admin/voucher",
     adminVoucherAdd: "/admin/voucher/add",
     adminVoucherUpdate: "/admin/voucher/update/:id",
+    adminStatistic: "/admin/statistic",
+    adminProductRevanue: "/admin/statistic/by_product",
+    adminOrderRevanue: "/admin/statistic/by_order",
+    adminOrderRevanueByDate: "/admin/statistic/by_date",
+    adminOrderRevanueByWeek: "/admin/statistic/by_week",
+    adminOrderRevanueByMonth: "/admin/statistic/by_month",
+    adminOrderRevanueByQuarter: "/admin/statistic/by_quarter",
+
 }
 
 export default routes;
