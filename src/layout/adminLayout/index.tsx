@@ -47,7 +47,7 @@ const items: MenuItem[] = [
   getItem(<Link to={"/admin/user"}>Quản lý người dùng</Link >, '7', <UserOutlined />),
   getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <SolutionOutlined />),
   getItem('Khuyến mại', 'sub3', <TagOutlined />, [
-    getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
+    // getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
     getItem(<Link to={"/admin/voucher"}>Quản lý Voucher</Link >, '10'),
   ]),
 ];

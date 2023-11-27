@@ -62,7 +62,6 @@ const ProductPage = () => {
             return false;
         }
         // Lọc theo giá
-        // const productPrice = product.discount || 0;
         const productPrice = (product.discount === 0 ? product.price : product.discount);
         if ((minPrice > 0 && productPrice < minPrice) || (maxPrice > 0 && productPrice > maxPrice)) {
             return false;

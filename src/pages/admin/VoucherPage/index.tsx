@@ -5,19 +5,20 @@ import {
     Button,
     message,
     Spin,
-    Steps
+    Steps,
+    Select
 } from 'antd';
 import {
     EditFilled,
     DeleteFilled,
     PlusOutlined,
     EyeOutlined,
-    SearchOutlined
+    SearchOutlined,
+    DownOutlined
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
+import { Dispatch, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
-import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import { useDeleteVoucherMutation, useListVoucherQuery } from '../../../store/vouchers/voucher.service';
@@ -38,6 +39,9 @@ const VoucherPage = () => {
     const [onRemove] = useDeleteVoucherMutation()
     const { data: listVochers, isLoading, isError, isSuccess } = useListVoucherQuery()
     const vocherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
+    const [eventFilter, setEventFilter] = useState<any>(null);
+    const [sortOption, setSortOption] = useState<Number>(1);
+
 
     useEffect(() => {
         if (isSuccess) {
@@ -171,20 +175,56 @@ const VoucherPage = () => {
         }
     };
 
-    const data: DataType[] = vocherState.map((voucher: any, index) => ({
-        key: index + 1,
-        _id: voucher._id,
-        code: voucher.code,
-        title: voucher.title,
-        price: voucher.price,
-        quantity: voucher.quantity,
-        used: voucher.used,
-        type: voucher.type,
-        discount: voucher.discount,
-        validFrom: voucher.validFrom,
-        validTo: voucher.validTo,
-        description: voucher.description
-    }));
+    const sortVoucher = [...vocherState];
+
+    switch (sortOption) {
+        case 1:
+            // Mới nhất
+            sortVoucher.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+        case 2:
+            // Cũ nhất
+            sortVoucher.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            break;
+        case 3:
+            // Tên: A - Z
+            sortVoucher.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+        case 4:
+            // Tên: Z - A
+            sortVoucher.sort((a, b) => b.title.localeCompare(a.title));
+            break;
+        default:
+            break;
+    }
+
+    const data: DataType[] = sortVoucher
+        .filter((voucher) => {
+            switch (eventFilter) {
+                case 'upcoming':
+                    return statusValid(voucher.validFrom, voucher.validTo) === 'Sắp diễn ra';
+                case 'ongoing':
+                    return statusValid(voucher.validFrom, voucher.validTo) === 'Đang diễn ra';
+                case 'expired':
+                    return statusValid(voucher.validFrom, voucher.validTo) === 'Hết hạn';
+                default:
+                    return true;
+            }
+        })
+        .map((voucher: any, index) => ({
+            key: index + 1,
+            _id: voucher._id,
+            code: voucher.code,
+            title: voucher.title,
+            price: voucher.price,
+            quantity: voucher.quantity,
+            used: voucher.used,
+            type: voucher.type,
+            discount: voucher.discount,
+            validFrom: voucher.validFrom,
+            validTo: voucher.validTo,
+            description: voucher.description,
+        }));
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
@@ -200,6 +240,8 @@ const VoucherPage = () => {
         }
 
     }
+
+
     return (
         <div className="">
             <Space className='flex justify-between mb-5'>
@@ -219,17 +261,124 @@ const VoucherPage = () => {
                     </Button>
                 </Link>
             </Space>
-            <div className="border p-3 rounded-lg min-h-screen bg-white">
-                <div className="pb-6 pt-3">
-                    <form >
-                        <input type="text" className='border p-2 w-64 outline-none '
-                            placeholder="" />
-                        <button type="submit" className='p-2 bg-[#1677ff]'>
-                            <SearchOutlined className='text-white' />
-                        </button>
+            <div className="border p-3 rounded-lg min-h-screen bg-white relative" >
+                <div className="flex pb-6 pt-3 justify-between">
+                    <form
+                        //  onSubmit={handleSubmit(handleSearch)} 
+                        className='w-[500px]'>
+                        <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+                        <div className="relative">
+                            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                </svg>
+                            </div>
+                            <input
+                                //  onChange={(e) => setSearch(e.target.value)} 
+                                type="text" id="default-search" className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                            <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
+                        </div>
                     </form>
+
+
                 </div>
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 10 }} onChange={onChange} />
+                <div className="flex justify-between items-start">
+                    <div className="flex items-start  space-x-3 ">
+
+
+                        <details className="z-50 overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidden">
+                            <summary
+                                className="flex w-[300px] cursor-pointer items-center justify-between gap-2 bg-white px-3 py-2 text-gray-900 transition"
+                            >
+                                <span className="text-sm "> Lọc theo sự kiện </span>
+                                <DownOutlined className='text-xs text-gray-300' />
+                            </summary>
+
+                            <div className="border-t border-gray-200 bg-white">
+                                <header className="flex items-center justify-between p-4">
+                                    {/* <span className="text-sm text-gray-700"> đã chọn </span> */}
+
+                                    <button
+                                        type="button"
+                                        className="text-sm text-gray-900 underline underline-offset-4"
+                                        onClick={() => { setEventFilter(null) }}
+                                    >
+                                        Reset
+                                    </button>
+                                </header>
+                                <ul className="space-y-1 border-t border-gray-200 p-4">
+                                    <li>
+                                        <label htmlFor="filterDate" className="inline-flex items-center gap-2">
+                                            <input
+                                                name="filterDate"
+                                                type="radio"
+                                                id="filterDate"
+                                                className="h-5 w-5 rounded border-gray-300"
+                                                onChange={() => setEventFilter('upcoming')}
+                                                checked={eventFilter === 'upcoming'}
+                                            />
+
+                                            <span className="text-sm font-medium text-gray-700">
+                                                Sắp diễn ra
+                                            </span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label htmlFor="filterDate" className="inline-flex items-center gap-2">
+                                            <input
+                                                name="filterDate"
+                                                type="radio"
+                                                id="filterDate"
+                                                className="h-5 w-5 rounded border-gray-300"
+                                                onChange={() => setEventFilter('ongoing')}
+                                                checked={eventFilter === 'ongoing'}
+                                            />
+                                            <span className="text-sm font-medium text-gray-700">
+                                                Đang diễn ra
+                                            </span>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <label htmlFor="filterDate" className="inline-flex items-center gap-2">
+                                            <input
+                                                name="filterDate"
+                                                type="radio"
+                                                id="filterDate"
+                                                className="h-5 w-5 rounded border-gray-300"
+                                                onChange={() => setEventFilter('expired')}
+                                                checked={eventFilter === 'expired'}
+
+                                            />
+
+                                            <span className="text-sm font-medium text-gray-700">
+                                                Hết hạn
+                                            </span>
+                                        </label>
+                                    </li>
+
+
+                                </ul>
+                            </div>
+                        </details>
+                    </div>
+                    <div className="flex items-center">
+                        <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
+                        <Select
+                            defaultValue={1}
+                            style={{ width: 200, height: 36 }}
+                            options={[
+                                { value: 1, label: 'Mới nhất' },
+                                { value: 2, label: 'Cũ nhất' },
+                                { value: 3, label: 'Tên: A - Z' },
+                                { value: 4, label: 'Tên: Z - A' },
+
+                            ]}
+                            onChange={(value: Number) => setSortOption(value)}
+                        />
+                    </div>
+                </div>
+                <Table columns={columns} dataSource={data} pagination={{ pageSize: 10 }} onChange={onChange}
+                    className='absolute top-40 right-3 left-3' />
             </div>
         </div>
     )
