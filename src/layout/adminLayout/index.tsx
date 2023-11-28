@@ -9,7 +9,8 @@ import {
   LogoutOutlined,
   UserOutlined,
   TagOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  BarChartOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, message, theme } from 'antd';
@@ -49,6 +50,12 @@ const items: MenuItem[] = [
   getItem('Khuyến mại', 'sub3', <TagOutlined />, [
     // getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
     getItem(<Link to={"/admin/voucher"}>Quản lý Voucher</Link >, '10'),
+  ]),
+  getItem('Thống kê', 'sub4', <BarChartOutlined />, [
+    getItem(<Link to={"/admin/statistic"}>Báo cáo bán hàng</Link >, '9'),
+    // getItem(<Link to={"/admin/statistic/product"}>Thống kê theo sản phẩm</Link >, '10'),
+    // getItem(<Link to={"/admin/statistic/order"}>Thống kê theo quý</Link >, '11'),
+
   ]),
 ];
 

@@ -4,8 +4,50 @@ import {
     SkinOutlined,
     BarChartOutlined
 } from '@ant-design/icons';
+import { useGetOrderRevenueByMonthQuery } from '../../../store/statistic/statistic.service';
+import Highcharts from 'highcharts';
+import { MonthlyStatistics } from '../../../store/statistic/statistic.interface';
+import HighchartsReact from 'highcharts-react-official';
 
-const dashboardPage = () => {
+const DashboardPage = () => {
+    const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueMonth } = useGetOrderRevenueByMonthQuery()
+    let filledData: MonthlyStatistics[] = [];
+    const caculateAvgRevalueByMonth = (data: MonthlyStatistics[])=>{
+        if(data){
+            const total = data.reduce((acc,item)=> acc+= item.totalRevenue,0)/12;
+            return total.toFixed()
+        }
+    }
+    const generateAllMonths = () => {
+        const allMonths = [];
+        const currentDate = new Date();
+        for (let i = 0; i < 12; i++) {
+            const month = currentDate.getMonth() - i;
+            const year = currentDate.getFullYear();
+            allMonths.unshift(`${year}-${String(month + 1).padStart(2, '0')}`);
+        }
+        return allMonths;
+    };
+    const fillMissingMonths = (data: MonthlyStatistics[], allMonths: string[]) => {
+        const filledData = allMonths.map(month => {
+            const matchingData = data.find(entry => entry.month === month);
+            return matchingData || {
+                month, 
+                totalOrders: 0,
+                totalOrderValue: 0,
+                totalRevenue: 0,
+                totalProfit: 0,
+                totalCostPrice: 0,
+                totalQuantitySold: 0,
+            };
+        });
+        return filledData;
+    };
+        if (orderRevanueMonth) {
+            const allMonths = generateAllMonths();
+            filledData = fillMissingMonths(orderRevanueMonth, allMonths);
+        }
+
     return <>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
             <div
@@ -51,129 +93,52 @@ const dashboardPage = () => {
             </div>
 
             <div
-                className="bg-yellow-300 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-yellow-600 dark:border-gray-600 text-white font-medium group"
+                className="bg-lime-500 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-lime-600 dark:border-gray-600 text-white font-medium group"
             >
                 <div
                     className="flex justify-center items-center w-14 h-14 bg-white rounded-full transition-all duration-300 transform group-hover:rotate-12"
                 >
-                    <BarChartOutlined className='text-yellow-500 text-3xl transform transition-transform duration-500 ease-in-out' />
+                    <BarChartOutlined className='text-lime-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">75,257,000</p>
+                    <p className="text-2xl">{orderRevanueMonth?caculateAvgRevalueByMonth(orderRevanueMonth)?.toLocaleString("vi-VN"):''}đ</p>
                     <p>Doanh số / tháng</p>
                 </div>
             </div>
         </div>
 
-        {/*  Chart  */}
-        <div className="flex flex-col justify-center py-20 px-10 text-gray-700 bg-gray-100">
-            <div className="flex flex-col items-center mx-auto w-full max-w-screen-md p-6 pb-6 bg-white rounded-lg shadow-xl sm:p-8">
-                <h2 className="text-xl font-bold">Doanh thu hàng tháng</h2>
-                <span className="text-sm font-semibold text-gray-500">2023</span>
-                <div className="flex items-end flex-grow w-full mt-2 space-x-2 sm:space-x-3">
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">37,500,000</span>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-6 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-16 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 1</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">45,000,000</span>
-                        <div className="relative flex justify-center w-full h-10 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-6 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-20 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 2</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">47,500,000</span>
-                        <div className="relative flex justify-center w-full h-10 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-20 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 3</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">50,000,000</span>
-                        <div className="relative flex justify-center w-full h-10 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-6 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-24 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 4</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">47,500,000</span>
-                        <div className="relative flex justify-center w-full h-10 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-20 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 5</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">55,986,000</span>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-24 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 6</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">66,212,100</span>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-16 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-20 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 7</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">57,500,900</span>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-10 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-24 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 8</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">67,520,500</span>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-10 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-32 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 9</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">65,000,800</span>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full bg-indigo-400 h-28"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 10</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">70,060,300</span>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-40 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 11</span>
-                    </div>
-                    <div className="relative flex flex-col items-center flex-grow pb-5 group">
-                        <span className="absolute top-0 hidden -mt-6 text-xs font-bold group-hover:block">75,100,600</span>
-                        <div className="relative flex justify-center w-full h-12 bg-indigo-200"></div>
-                        <div className="relative flex justify-center w-full h-8 bg-indigo-300"></div>
-                        <div className="relative flex justify-center w-full h-40 bg-indigo-400"></div>
-                        <span className="absolute bottom-0 text-xs font-bold">Th. 12</span>
-                    </div>
-                </div>
-                <div className="flex w-full mt-3">
-                    <div className="flex items-center ml-auto">
-                        <span className="block w-4 h-4 bg-indigo-400"></span>
-                        <span className="ml-1 text-xs font-medium">Existing</span>
-                    </div>
-                    <div className="flex items-center ml-4">
-                        <span className="block w-4 h-4 bg-indigo-300"></span>
-                        <span className="ml-1 text-xs font-medium">Upgrades</span>
-                    </div>
-                    <div className="flex items-center ml-4">
-                        <span className="block w-4 h-4 bg-indigo-200"></span>
-                        <span className="ml-1 text-xs font-medium">New</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+        <HighchartsReact
+            highcharts={Highcharts}
+            options={{
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Biểu đồ doanh thu'
+                },
+                xAxis: {
+                    categories: filledData?.map(entry => entry.month) || []
+                },
+                yAxis: {
+                    title: {
+                        text: 'Doanh thu (đơn vị)'
+                    }
+                },
+                series: [{
+                    name: 'Doanh thu',
+                    data: filledData?.map(entry => entry.totalRevenue) || []
+                },
+                {
+                    name: 'Lợi nhuận',
+                    data: filledData?.map(entry => entry.totalProfit) || []
+                },
+            ]
+            }}
+        />
+
     </>
 
 };
 
-export default dashboardPage;
+export default DashboardPage;
