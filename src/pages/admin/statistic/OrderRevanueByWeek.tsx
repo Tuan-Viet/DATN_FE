@@ -1,10 +1,10 @@
 import React from 'react'
 import LayoutStatistic from './LayoutStatistic'
-import { WeeklyStatistics } from '../../../store/statistic/statistic.interface';
+// import { WeeklyStatistics } from '../../../store/statistic/statistic.interface';
 import { useGetOrderRevenueByMonthQuery, useGetOrderRevenueByWeekQuery } from '../../../store/statistic/statistic.service';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { Table } from 'antd';
+import { Spin, Table } from 'antd';
 
 interface DataType {
   key: string;
@@ -26,31 +26,37 @@ const columns = [
   {
     title: 'Tổng số đơn',
     dataIndex: 'totalOrders',
+    render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalOrders',
   },
   {
     title: 'Tiền vốn',
     dataIndex: 'totalCostPrice',
+    render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalCostPrice',
   },
   {
     title: 'Tiền hàng',
     dataIndex: 'totalOrderValue',
+    render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalOrderValue',
   },
   {
     title: 'Số sản phẩm bán được',
     dataIndex: 'totalQuantitySold',
+    render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalQuantitySold',
   },
   {
     title: 'Tổng doanh thu',
     dataIndex: 'totalRevenue',
+    render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalRevenue',
   },
   {
     title: 'Tổng lợi nhuận',
     dataIndex: 'totalProfit',
+    render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalProfit',
   },
 
@@ -58,24 +64,31 @@ const columns = [
 ];
 const OrderRevanueByWeek = () => {
   const { data: orderRevanueWeek, isSuccess: isSuccessGetRevanueWeek } = useGetOrderRevenueByWeekQuery()
-  let filledData: WeeklyStatistics[] = [];
+  if (!isSuccessGetRevanueWeek) {
+    return <>
+      <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
+        <Spin size='large' />
+      </div>
+    </>;
+  }
+  let filledData = [];
 
   const generateLast7Days = () => {
     const last7Days = [];
     const currentDate = new Date();
-  
+
     for (let i = 6; i >= 0; i--) {
       const date = new Date(currentDate);
       date.setDate(currentDate.getDate() - i);
       const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
       last7Days.push(formattedDate);
     }
-    
+
     return last7Days;
   };
-  const fillMissingDays = (data: WeeklyStatistics[], allDays: string[]) => {
+  const fillMissingDays = (data: any, allDays: string[]) => {
     const filledData = allDays.map(day => {
-      const matchingData = data.find(entry => entry.day === day);
+      const matchingData = data.find((entry: any) => entry.day === day);
       return matchingData || {
         day: day,
         totalOrders: 0,
@@ -144,27 +157,27 @@ const OrderRevanueByWeek = () => {
           dataSource={data}
           pagination={{ size: 'small', pageSize: 5 }}
           summary={() => (
-            <Table.Summary.Row>
+            <Table.Summary.Row className='h-20 bg-blue-50'>
               <Table.Summary.Cell index={0} colSpan={1}>
                 <strong>Tổng</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={0} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalOrders, 0)}</strong>
+                <strong>{data.reduce((acc, current) => acc + current.totalOrders, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={2} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalOrderValue, 0)}</strong>
+                <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={3} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0)}</strong>
+                <strong>{data.reduce((acc, current) => acc + current.totalOrderValue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={4} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0)}</strong>
+                <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={5} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0)}</strong>
+                <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={6} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0)}</strong>
+                <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}

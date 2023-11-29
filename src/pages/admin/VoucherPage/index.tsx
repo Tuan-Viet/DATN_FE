@@ -53,7 +53,7 @@ const VoucherPage = () => {
     }
     if (isLoading) {
         return <>
-            <div className="flex justify-center items-center h-[600px]">
+            <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
                 <Spin size='large' />
             </div>
         </>;

@@ -8,13 +8,26 @@ import { useGetOrderRevenueByMonthQuery } from '../../../store/statistic/statist
 import Highcharts from 'highcharts';
 import { MonthlyStatistics } from '../../../store/statistic/statistic.interface';
 import HighchartsReact from 'highcharts-react-official';
+import { Spin } from 'antd';
+import { useFetchListProductQuery } from '../../../store/product/product.service';
+import { useListOrderQuery } from '../../../store/order/order.service';
 
 const DashboardPage = () => {
-    const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueMonth } = useGetOrderRevenueByMonthQuery()
+    const { data: orderRevanueMonth, isSuccess } = useGetOrderRevenueByMonthQuery()
+    const { data: listProduct } = useFetchListProductQuery()
+    const { data: listOrder } = useListOrderQuery()
+
+    if (!isSuccess) {
+        return <>
+            <div className="flex justify-center items-center h-[600px]">
+                <Spin size='large' />
+            </div>
+        </>;
+    }
     let filledData: MonthlyStatistics[] = [];
-    const caculateAvgRevalueByMonth = (data: MonthlyStatistics[])=>{
-        if(data){
-            const total = data.reduce((acc,item)=> acc+= item.totalRevenue,0)/12;
+    const caculateAvgRevalueByMonth = (data: MonthlyStatistics[]) => {
+        if (data) {
+            const total = data.reduce((acc, item) => acc += item.totalRevenue, 0) / 12;
             return total.toFixed()
         }
     }
@@ -32,7 +45,7 @@ const DashboardPage = () => {
         const filledData = allMonths.map(month => {
             const matchingData = data.find(entry => entry.month === month);
             return matchingData || {
-                month, 
+                month,
                 totalOrders: 0,
                 totalOrderValue: 0,
                 totalRevenue: 0,
@@ -43,10 +56,10 @@ const DashboardPage = () => {
         });
         return filledData;
     };
-        if (orderRevanueMonth) {
-            const allMonths = generateAllMonths();
-            filledData = fillMissingMonths(orderRevanueMonth, allMonths);
-        }
+    if (orderRevanueMonth) {
+        const allMonths = generateAllMonths();
+        filledData = fillMissingMonths(orderRevanueMonth, allMonths);
+    }
 
     return <>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
@@ -73,7 +86,7 @@ const DashboardPage = () => {
                     <SolutionOutlined className='text-orange-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">557</p>
+                    <p className="text-2xl">{listOrder?.length}</p>
                     <p>Đơn hàng</p>
                 </div>
             </div>
@@ -87,7 +100,7 @@ const DashboardPage = () => {
                     <SkinOutlined className='text-blue-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">236</p>
+                    <p className="text-2xl">{listProduct?.length}</p>
                     <p>Sản phẩm</p>
                 </div>
             </div>
@@ -101,7 +114,7 @@ const DashboardPage = () => {
                     <BarChartOutlined className='text-lime-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">{orderRevanueMonth?caculateAvgRevalueByMonth(orderRevanueMonth)?.toLocaleString("vi-VN"):''}đ</p>
+                    <p className="text-2xl">{orderRevanueMonth ? caculateAvgRevalueByMonth(orderRevanueMonth)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''}đ</p>
                     <p>Doanh số / tháng</p>
                 </div>
             </div>
@@ -133,7 +146,7 @@ const DashboardPage = () => {
                     name: 'Lợi nhuận',
                     data: filledData?.map(entry => entry.totalProfit) || []
                 },
-            ]
+                ]
             }}
         />
 
