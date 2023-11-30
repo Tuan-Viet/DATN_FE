@@ -17,6 +17,7 @@ import { persistReducer, persistStore } from 'redux-persist';
 import userSlice from "./user/userSlice";
 import voucherAPI from './vouchers/voucher.service'
 import voucherSlice from './vouchers/voucherSlice'
+import authApi from './user/user.service'
 
 
 const commonConfig = {
@@ -39,6 +40,7 @@ export const store = configureStore({
     [orderAPI.reducerPath]: orderAPI.reducer,
     [orderDetailAPI.reducerPath]: orderDetailAPI.reducer,
     [voucherAPI.reducerPath]: voucherAPI.reducer,
+    [authApi.reducerPath]: authApi.reducer,
     // category
     categorySlice: categorySlice,
     // product
@@ -62,11 +64,13 @@ export const store = configureStore({
     orderDetailSlice: orderDetailSlice,
     // user 
     user: persistReducer(userConfig, userSlice),
+    userSlice: userSlice,
     // voucher
+
     voucherSlice: voucherSlice
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware).concat(voucherAPI.middleware),
+    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware).concat(authApi.middleware).concat(voucherAPI.middleware),
 })
 
 

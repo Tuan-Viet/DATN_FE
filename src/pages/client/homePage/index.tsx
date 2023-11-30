@@ -8,6 +8,7 @@ import Policy from "./Policy";
 import Product_Collection from "./Product_Collection";
 import Sale from "./Sale";
 import { useEffect } from "react";
+import Vouchers from "./Vourcher";
 function ScrollToTop() {
     const { pathname } = useLocation();
 
@@ -22,6 +23,7 @@ const homePage = () => {
         <ScrollToTop></ScrollToTop>
         <Header></Header>
         <Banner></Banner>
+        <Vouchers></Vouchers>
         <Category></Category>
         <Sale></Sale>
         <Outstanding_Product></Outstanding_Product>
