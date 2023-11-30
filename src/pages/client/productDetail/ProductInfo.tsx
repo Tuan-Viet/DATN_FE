@@ -1,6 +1,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
+import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
 import { Navigation, Autoplay } from "swiper/modules";
-import { Dispatch, useEffect, useState } from "react";
+import React, { Dispatch, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useGetOneProductDetailQuery, useListProductDetailQuery, useUpdateProductDetailMutation } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
@@ -17,27 +18,41 @@ import { productDetailForm, productDetailSchema } from "../../../Schemas/Product
 import { addCartLocalSlice, addCartSlice } from "../../../store/cart/cartSlice";
 import { useAddCartMutation } from "../../../store/cart/cart.service";
 import {
+  Avatar,
   Breadcrumb,
   Button,
   Form,
   Input,
+  List,
+  Rate,
   Space,
   message,
 } from 'antd';
 import ProductViewed from "./ProductViewed";
+import { useFetchListReviewsQuery } from "../../../store/reviews/review.service";
+import { listReviewSlice } from "../../../store/reviews/reviewSlice";
 
 const ProductInfo = () => {
+  const dispatch: Dispatch<any> = useDispatch()
+  const { id } = useParams()
+
   const productRelated = useSelector((state: RootState) => state.productRelatedSliceReducer.products)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
   const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
   const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
-  // const listCartLocalState = useSelector((state: RootState) => state.cartLocalReducer.cartLocals)
   const [onAddCart] = useAddCartMutation()
-  // const [onUpdateProDetail] = useUpdateProductDetailMutation()
   const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
+  const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
+  console.log(listReview)
+  const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
+  useEffect(() => {
+    if (listReview && id) {
+      const listReviewByProductId = listReview?.filter((review) => review?.productId && review?.productId?.includes(id))
+      dispatch(listReviewSlice(listReviewByProductId))
+    }
+  }, [isSuccessReview, id])
   const navigate = useNavigate()
-  const { id } = useParams()
   if (id) {
     const {
       handleSubmit,
@@ -50,14 +65,13 @@ const ProductInfo = () => {
     const [quantity, setQuantity] = useState(1);
 
     const [currentTab, setCurrentTab] = useState(1);
-    const dispatch: Dispatch<any> = useDispatch()
     const { data: listProduct } = useFetchListProductQuery()
     const { data: getOneProduct, isSuccess: isSuccessGetOneProduct, isLoading: productLoading } = useFetchOneProductQuery(id)
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
 
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
-
+    const userStore = useSelector((state: any) => state.user);
     const renderContent = () => {
       switch (currentTab && currentTab) {
         case 1:
@@ -69,7 +83,49 @@ const ProductInfo = () => {
             </div>
           );
         case 2:
-          return <div className="mb-[40px]">Nội dung của tab 2</div>;
+          return <>
+
+            <List
+              itemLayout="vertical"
+              size="large"
+              pagination={{
+                onChange: (page) => {
+                  console.log(page);
+                },
+                pageSize: 3,
+              }}
+              dataSource={reviewState && reviewState}
+
+              renderItem={(item) => (
+                <List.Item
+                  key={item.productId}
+
+                >
+
+                  {/* <div>{item.createdAt}</div> */}
+                  <div className="flex w-[200px] items-center">
+                    <p className="mr-3">{item.userId?.fullname}</p>
+                    <Rate disabled value={item?.rating} className="text-sm" />
+                  </div>
+                  <div className="flex">
+                    {item?.images?.map((url) =>
+                      <img
+                        width={80}
+                        alt="logo"
+                        src={url?.url}
+                        className="mt-3 ml-2"
+                      />
+                    )}
+                  </div>
+
+
+                  <div className="mt-4">
+                    {item?.comment}
+                  </div>
+                </List.Item>
+              )}
+            />
+          </>
         case 3:
           return (
             <div className="text-sm mb-[40px]">
@@ -276,7 +332,6 @@ const ProductInfo = () => {
         console.log(error);
       }
     }
-    const userStore = useSelector((state: any) => state.user);
     const onAddCartAsync = async () => {
       try {
         if (productDetailGetOneId && productDetailGetOneId[0]?._id && getOneProduct) {
@@ -344,17 +399,24 @@ const ProductInfo = () => {
 
     // lay ra mau [0]
     useEffect(() => {
-      if (productDetailState?.length > 0 && getOneProduct) {
-        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors.nameColor)
-        if (firstColor) {
-          localStorage.setItem("firstColor", JSON.stringify(firstColor[0]))
-          const getFirstColor = JSON.parse(localStorage.getItem("firstColor")!)
+      if (productDetailState && getOneProduct) {
+        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors?.nameColor);
+        if (firstColor && firstColor.length > 0) {
+          const firstColorString = JSON.stringify(firstColor[0]);
+          localStorage.setItem("firstColor", firstColorString);
+
+          const getFirstColor = localStorage.getItem("firstColor");
           if (listProductDetailApi && getFirstColor) {
-            dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: getFirstColor, productDetails: listProductDetailApi }))
+            const parsedFirstColor = JSON.parse(getFirstColor);
+            dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: parsedFirstColor, productDetails: listProductDetailApi }));
           }
         }
+      } else {
+        console.log(1);
       }
-    }, [productDetailState, getOneProduct])
+    }, [productDetailState, getOneProduct]);
+
+
     // lay ra size tuong ung voi color
     const handleColorProductDetail = async (name: string) => {
       setValue("product_id", id)
