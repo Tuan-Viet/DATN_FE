@@ -61,10 +61,10 @@ const Sale = () => {
                     </Link>
                     <div className="price flex gap-x-[8px] items-baseline">
                       <span className="text-sm text-[#FF2C26] font-semibold">
-                        {product.discount.toLocaleString("vi-VN")}đ
+                        {product.discount?.toLocaleString("vi-VN")}đ
                       </span>
                       <span className="text-[13px] text-[#878C8F]">
-                        <del>{product.price.toLocaleString("vi-VN")}đ</del>
+                        <del>{product.price?.toLocaleString("vi-VN")}đ</del>
                       </span>
                     </div>
                   </div>
@@ -114,10 +114,10 @@ const Sale = () => {
                         </Link>
                         <div className="price flex gap-x-[8px] items-baseline">
                           <span className="text-sm text-[#FF2C26] font-semibold">
-                            {product.discount.toLocaleString("vi-VN")}đ
+                            {product.discount?.toLocaleString("vi-VN")}đ
                           </span>
                           <span className="text-[13px] text-[#878C8F]">
-                            <del>{product.price.toLocaleString("vi-VN")}đ</del>
+                            <del>{product.price?.toLocaleString("vi-VN")}đ</del>
                           </span>
                         </div>
                       </div>

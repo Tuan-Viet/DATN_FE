@@ -28,6 +28,15 @@ const authApi = createApi({
     tagTypes: ["auth"],
     endpoints: (builer) => ({
 
+        updateAccount: builer.mutation<IAuth[], IAuth>({
+            query: ({ _id, ...auth }) => ({
+                url: `/auth/user/${_id}/update`,
+                method: "PATCH",
+                body: auth
+            }),
+            invalidatesTags: ["auth"]
+        }),
+
         changePassword: builer.mutation<IPassword[], IPassword>({
             query: (auth) => ({
                 url: "/auth/user/change/password",
@@ -39,5 +48,5 @@ const authApi = createApi({
     })
 })
 
-export const { useChangePasswordMutation } = authApi
+export const { useChangePasswordMutation, useUpdateAccountMutation } = authApi
 export default authApi

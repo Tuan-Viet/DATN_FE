@@ -8,3 +8,11 @@ export const PasswordSchema = yup.object({
 
 export type PasswordForm = yup.InferType<typeof PasswordSchema>
 
+export const AccountSchema = yup.object({
+    _id: yup.string().required(),
+    fullname: yup.string().required(),
+    email: yup.string().required(),
+})
+
+export type AccountForm = yup.InferType<typeof AccountSchema>
+
