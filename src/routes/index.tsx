@@ -23,6 +23,7 @@ import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
 import ProductPage from "../pages/client/Products";
+import Resetpassword from "../pages/client/ResetPassword";
 import SearchResult from "../pages/client/SearchResult";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
@@ -41,6 +42,7 @@ export const publicRoutes = [
   { path: routes.checkout, Component: CheckoutsPage },
   { path: routes.Billconfirm, Component: BillConfirm },
   { path: routes.signin, Component: signin },
+  { path: routes.resetPassword, Component: Resetpassword },
   { path: routes.signup, Component: signup },
   { path: routes.myAccount, Component: myAccount },
   { path: routes.orders, Component: myOrders },
