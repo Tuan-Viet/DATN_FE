@@ -12,7 +12,7 @@ const productDetailAPI = createApi({
             query: () => `/productDetails`,
             providesTags: ["productDetail"]
         }),
-        getOneProductDetail: builer.query({
+        getOneProductDetail: builer.query<IProductDetail, string>({
             query: (id) => `/productDetails/` + id,
             providesTags: ["productDetail"]
         }),

@@ -3,19 +3,21 @@ import { ICategory } from "../category/category.interface";
 export interface IProduct {
     _id?: string;
     title: string;
+    sku: string;
     price: number;
     discount: number;
+    costPrice: number;
     description: string;
     images: any[];
+    colors: any[];
+    sizes: any[];
     thumnail: string;
     quantity: number;
     variants: IVariants[];
     categoryId?: ICategory;
-    // categoryId: {
-    //     _id: string;
-    // };
     createdAt: Date;
     updatedAt: Date;
+    hide: boolean;
     deleted: boolean;
 }
 

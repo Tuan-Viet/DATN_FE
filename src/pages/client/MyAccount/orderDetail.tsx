@@ -10,7 +10,7 @@ import { Dispatch, useEffect, useState } from "react";
 import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
 import { listOrderDetailSlice } from "../../../store/orderDetail/orderDetailSlice";
 import { RootState } from "@reduxjs/toolkit/query";
-import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { listProductSlice } from "../../../store/product/productSlice";
@@ -178,12 +178,14 @@ const OrderDetail = () => {
     });
   };
   const [idProduct, setIdProduct] = useState<string>("")
+  const [idProductDetail, setIdProductDetail] = useState<string>("")
   const { data: getOneProduct } = useFetchOneProductQuery(idProduct!)
-  const showModal = (id: string) => {
+  const { data: getOneProductDetail } = useGetOneProductDetailQuery(idProductDetail!)
+  const showModal = (id: string, idProDetail: string) => {
     if (id) {
       setIdProduct(id)
+      setIdProductDetail(idProDetail)
       setValue("product_id", id)
-
     }
     setIsModalOpen(true);
   };
@@ -202,8 +204,8 @@ const OrderDetail = () => {
       publicId: file.response[0].publicId
     }));
     values.images = imageObjects;
-    if (idProduct && user?.current?._id) {
-      const valuesData = { ...values, userId: user.current._id, productId: idProduct }
+    if (idProduct && user?.current?._id && getOneProductDetail) {
+      const valuesData = { ...values, color: getOneProductDetail.nameColor, size: getOneProductDetail.size, userId: user.current._id, productId: idProduct }
       await onaddReviews(valuesData)
       message.success("Cảm ơn bạn đã đánh giá!")
       setIsModalOpen(false);
@@ -381,21 +383,23 @@ const OrderDetail = () => {
                                         <tr className="bg-white">
                                           <th
                                             scope="row"
-                                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                            className="font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
                                           >
-                                            <img
-                                              src={item.imageColor}
-                                              alt={pro.title}
-                                              className="w-[58px] h-[78px] object-cover"
-                                            />
-                                            <div>
-                                              <p className="mb-4 max-w-[340px]">
-                                                {pro.title}
-                                              </p>
-                                              <p>
-                                                {product.color} / {product.size}
-                                              </p>
-                                            </div>
+                                            <Link to={`/products/${pro._id!}`} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5">
+                                              <img
+                                                src={item.imageColor}
+                                                alt={pro.title}
+                                                className="w-[58px] h-[78px] object-cover"
+                                              />
+                                              <div>
+                                                <p className="mb-4 max-w-[340px]">
+                                                  {pro.title}
+                                                </p>
+                                                <p>
+                                                  {product.color} / {product.size}
+                                                </p>
+                                              </div>
+                                            </Link>
                                           </th>
                                           <td className="px-6 py-4">
                                             ESTP03872PE00SB_BL-XXL
@@ -416,7 +420,7 @@ const OrderDetail = () => {
                                             ₫
                                           </td>
                                           <td className="buttonReview">
-                                            {order && order.status === 4 && <div onClick={() => showModal(pro._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
+                                            {order && order.status === 4 && <div onClick={() => showModal(pro._id!, product.productDetailId!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
                                           </td>
                                         </tr>
                                       ))}
@@ -515,14 +519,32 @@ const OrderDetail = () => {
                   style={{ maxWidth: 600 }}
                   onFinish={onFinish}
                 >
-                  <Form.Item
-                    label="Đánh giá"
-                    name="rating"
-                    className="text-xl"
-                    rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
-                  >
-                    <Rate className="text-2xl" />
-                  </Form.Item>
+                  {getOneProduct && getOneProductDetail &&
+                    <div className="">
+                      <div className="flex pb-3">
+                        <img className="" width={80} src={getOneProduct.images?.[0]} alt="" />
+                        <div className="flex flex-col p-2">
+                          <p>{getOneProduct?.title}</p>
+                          <div className="bg-gray-300 px-2 flex items-center w-auto rounded-sm text-sm my-1">
+                            {getOneProductDetail.nameColor} / {getOneProductDetail.size}
+                          </div>
+                          <div className="flex ">
+                            <del className="text-gray-400">{getOneProduct?.price?.toLocaleString("vi-VN")}đ</del>
+                            <p className="ml-2">{getOneProduct?.discount?.toLocaleString("vi-VN")}đ</p>
+                          </div>
+                        </div>
+                      </div>
+                      <Form.Item
+                        label="Đánh giá"
+                        name="rating"
+                        className="text-xl"
+                        rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
+                      >
+                        <Rate className="text-2xl" />
+                      </Form.Item>
+                    </div>
+                  }
+
                   <Form.Item
                     label="Bình luận"
                     name="comment"

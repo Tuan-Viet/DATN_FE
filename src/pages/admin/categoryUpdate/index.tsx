@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { FormInstance, UploadFile, UploadProps } from 'antd';
-import { Breadcrumb, Button, Form, Input, Space, Upload, message } from 'antd';
+import { Breadcrumb, Button, Form, Input, Space, Spin, Upload, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useFetchOneCategoryQuery, useUpdateCategoryMutation } from '../../../store/category/category.service';
 import {
@@ -46,8 +46,16 @@ const categoryUpdate = () => {
     const navigate = useNavigate();
     const [onUpdate] = useUpdateCategoryMutation()
     const { id } = useParams();
-    const { data: fetchOneCategory, isSuccess: isSuccessOneCategory } = useFetchOneCategoryQuery(id)
+    const { data: fetchOneCategory, isSuccess } = useFetchOneCategoryQuery(id)
     const [newImage, setNewImage] = useState(false);
+
+    // if (!isSuccess) {
+    //     return <>
+    //         <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
+    //             <Spin size='large' />
+    //         </div>
+    //     </>;
+    // }
 
     form.setFieldsValue({
         _id: fetchOneCategory?._id,
@@ -68,7 +76,6 @@ const categoryUpdate = () => {
             url: (fetchOneCategory && fetchOneCategory.images ? fetchOneCategory.images.url : ''),
         },
     ]);
-    console.log(fileList);
 
     // const [fileList, setFileList] = useState<UploadFile[]>([]);
 
@@ -99,8 +106,6 @@ const categoryUpdate = () => {
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
         setNewImage(true)
-        // setFileList(newFileList)
-
     }
 
     const onFinish = async (values: any) => {

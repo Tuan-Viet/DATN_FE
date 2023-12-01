@@ -9,7 +9,8 @@ import {
   LogoutOutlined,
   UserOutlined,
   TagOutlined,
-  SolutionOutlined
+  SolutionOutlined,
+  BarChartOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, message, theme } from 'antd';
@@ -47,8 +48,14 @@ const items: MenuItem[] = [
   getItem(<Link to={"/admin/user"}>Quản lý người dùng</Link >, '7', <UserOutlined />),
   getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <SolutionOutlined />),
   getItem('Khuyến mại', 'sub3', <TagOutlined />, [
-    getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
+    // getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
     getItem(<Link to={"/admin/voucher"}>Quản lý Voucher</Link >, '10'),
+  ]),
+  getItem('Thống kê', 'sub4', <BarChartOutlined />, [
+    getItem(<Link to={"/admin/statistic"}>Báo cáo bán hàng</Link >, '9'),
+    // getItem(<Link to={"/admin/statistic/product"}>Thống kê theo sản phẩm</Link >, '10'),
+    // getItem(<Link to={"/admin/statistic/order"}>Thống kê theo quý</Link >, '11'),
+
   ]),
 ];
 
@@ -102,7 +109,7 @@ const AdminLayout = ({ children }: Props) => {
       <Layout style={{ marginLeft: 200 }}>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
         <Content className="">
-          <div className="bg-slate-50" style={{ padding: 24, minHeight: 360 }}>
+          <div className="bg-stone-50" style={{ padding: 24, minHeight: 360 }}>
             {children}
           </div>
         </Content>
