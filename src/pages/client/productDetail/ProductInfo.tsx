@@ -45,6 +45,7 @@ const ProductInfo = () => {
   const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
   const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
   const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
+  // console.log())
   const reviewStateVer = reviewState?.slice().reverse()
   useEffect(() => {
     if (listReview && id) {
@@ -71,6 +72,19 @@ const ProductInfo = () => {
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
     const userStore = useSelector((state: any) => state.user);
+    const [rateAver, setRateAver] = useState<number>(0)
+    useEffect(() => {
+      if (reviewState) {
+        const rates = reviewState?.map((review) => review.rating)
+        let totalRating = 0
+        rates.forEach(rating => {
+          totalRating += rating
+        });
+        let rateAverage = totalRating / rates.length
+        setRateAver(rateAverage)
+      }
+    }, [reviewState, rateAver])
+    // const totalRatingTbc = sum(totalRating)
     const renderContent = () => {
       switch (currentTab && currentTab) {
         case 1:
@@ -83,7 +97,22 @@ const ProductInfo = () => {
           );
         case 2:
           return <>
-
+            <div className="bg-[#fffbf8] px-[24px] py-4 flex">
+              <div className="">
+                <div className="flex items-center text-yellow-500">
+                  <p className="text-[24px]"> {rateAver.toFixed(1)}</p><span className="ml-2">trên 5 sao</span>
+                </div>
+                <Rate value={rateAver} disabled className="text-2xl " />
+              </div>
+              <div className="flex ml-10">
+                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Tất cả</div>
+                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">5 sao</div>
+                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">4 sao</div>
+                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">3 sao</div>
+                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">2 sao</div>
+                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">1 sao</div>
+              </div>
+            </div>
             <List
               itemLayout="vertical"
               size="large"
@@ -106,20 +135,22 @@ const ProductInfo = () => {
                     <p className="mr-3">{item.userId?.fullname}</p>
                     <Rate disabled value={item?.rating} className="text-sm" />
                   </div>
-                  <div className="flex">
+                  <p className="text-[10px] bg-gray-300 w-[80px] rounded-sm flex items-center justify-center my-2">{item.color} / {item.size}</p>
+
+
+
+                  <div className="mt-4">
+                    {item?.comment}
+                  </div>
+                  <div className="flex ml-[-8px]">
                     {item?.images?.map((url) =>
                       <img
                         width={80}
                         alt="logo"
                         src={url?.url}
-                        className="mt-3 ml-2"
+                        className="mt-3 ml-2 border border-1"
                       />
                     )}
-                  </div>
-
-
-                  <div className="mt-4">
-                    {item?.comment}
                   </div>
                 </List.Item>
               )}

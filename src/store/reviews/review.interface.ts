@@ -4,6 +4,8 @@ export interface IReview {
         _id: string
         fullname: string
     }
+    color: string
+    size: string
     rating: number
     comment: string
     images: Types[]
