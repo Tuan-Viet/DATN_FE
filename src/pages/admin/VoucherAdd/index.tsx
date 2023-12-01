@@ -54,15 +54,8 @@ const VoucherAdd = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [onAdd] = useAddVoucherMutation()
-    const { data: listVochers, isLoading, isError, isSuccess } = useListVoucherQuery()
     const vocherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
     const voucherCodes = vocherState.map((voucher) => voucher.code);
-
-    useEffect(() => {
-        if (isSuccess) {
-            dispatch(listVoucherSlice(listVochers))
-        }
-    }, [isSuccess])
 
     const [discountType, setDiscountType] = React.useState(undefined);
     const handleTypeChange = (value: any) => {
@@ -94,17 +87,22 @@ const VoucherAdd = () => {
         }
     };
 
-    const onFinish = (values: any) => {
-        const rangeValue = values['validFrom'];
-        const voucherData = {
-            ...values,
-            validFrom: rangeValue[0].format('YYYY-MM-DD'),
-            validTo: rangeValue[1].format('YYYY-MM-DD')
-        };
+    const onFinish = async (values: any) => {
+        try {
+            const rangeValue = values['validFrom'];
+            const voucherData = {
+                ...values,
+                validFrom: rangeValue[0].format('YYYY-MM-DD'),
+                validTo: rangeValue[1].format('YYYY-MM-DD')
+            };
 
-        onAdd(voucherData)
-        message.success(`Tạo mới thành công`);
-        navigate("/admin/voucher");
+            await onAdd(voucherData)
+            message.success(`Tạo mới thành công`);
+            navigate("/admin/voucher");
+        } catch (error) {
+            console.log(error);
+
+        }
     };
 
     return <>

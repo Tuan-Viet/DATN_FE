@@ -10,6 +10,7 @@ export interface IVoucher {
     validFrom: number
     validTo: number
     description: string
+    createdAt: Date;
 }
 
 export interface IVoucherState {

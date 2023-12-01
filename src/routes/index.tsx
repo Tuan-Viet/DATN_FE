@@ -8,6 +8,7 @@ import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
 import dashboardPage from "../pages/admin/dashboard";
+import ProductRevanue from "../pages/admin/statistic/ProductStatistic";
 import ordersPage from "../pages/admin/ordersPage";
 import productAdd from "../pages/admin/productAdd";
 import productPage from "../pages/admin/productPage/index.";
@@ -30,6 +31,9 @@ import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
 import signin from "../pages/client/signin";
 import signup from "../pages/client/signup";
+import OrderRevanue from "../pages/admin/statistic/OrderRevanueByMonth";
+import OrderRevanueByMonth from "../pages/admin/statistic/OrderRevanueByMonth";
+import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
 
 
 export const publicRoutes = [
@@ -69,4 +73,12 @@ export const privateRoutes = [
   { path: routes.adminVoucherPage, Component: VoucherPage },
   { path: routes.adminVoucherAdd, Component: VoucherAdd },
   { path: routes.adminVoucherUpdate, Component: VoucherUpdate },
+  { path: routes.adminVoucherUpdate, Component: VoucherUpdate },
+  { path: routes.adminStatistic, Component: LayoutStatistic },
+  { path: routes.adminProductRevanue, Component: ProductRevanue },
+  { path: routes.adminOrderRevanue, Component: OrderRevanue },
+  { path: routes.adminOrderRevanueByMonth, Component: OrderRevanueByMonth },
+
+
+
 ]

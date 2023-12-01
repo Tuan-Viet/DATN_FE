@@ -53,7 +53,10 @@ const productPage = () => {
     // const productState = useSelector((state: RootState) => state.productSlice.products)
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
 
-    console.log("data :", productSearchState);
+    const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
+    const [sortOption, setSortOption] = useState<Number>(1);
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState(0);
 
     useEffect(() => {
         if (listProduct) {
@@ -75,7 +78,7 @@ const productPage = () => {
     }
     if (isLoading) {
         return <>
-            <div className="flex justify-center items-center h-[600px]">
+            <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
                 <Spin size='large' />
             </div>
         </>;
@@ -155,9 +158,6 @@ const productPage = () => {
             key: 'categoryId',
             render: (cateId: any) => {
                 const category = categoryState.find((cate) => cate._id === (cateId && cateId._id));
-
-                console.log(category);
-
                 return category ? category.name : 'N/A';
             },
             className: 'w-[150px]',
@@ -192,10 +192,8 @@ const productPage = () => {
 
 
 
-    const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
 
-    const [minPrice, setMinPrice] = useState(0);
-    const [maxPrice, setMaxPrice] = useState(0);
+
 
     const toggleCategory = (categoryId: any) => {
         if (selectedCategories.includes(categoryId)) {
@@ -234,7 +232,6 @@ const productPage = () => {
 
     const sortedProducts = [...filteredProducts];
 
-    const [sortOption, setSortOption] = useState<Number>(1);
     switch (sortOption) {
         case 1:
             // Mới nhất
@@ -360,6 +357,7 @@ const productPage = () => {
 
                                                     <span className="text-sm font-medium text-gray-700">
                                                         {cate.name}
+                                                        {/* ({cate.products.length - 1}) */}
                                                     </span>
                                                 </label>
                                             </li>

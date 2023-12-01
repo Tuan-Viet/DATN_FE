@@ -5,7 +5,7 @@ export const initialVoucherState: IVoucherState = {
     vouchers: []
 }
 
-const categorySlice = createSlice({
+const voucherSlice = createSlice({
     name: "vouchers",
     initialState: initialVoucherState,
     reducers: ({
@@ -18,6 +18,6 @@ const categorySlice = createSlice({
     })
 })
 
-export const { listVoucherSlice, deleteVoucherSlice } = categorySlice.actions
-export default categorySlice.reducer
+export const { listVoucherSlice, deleteVoucherSlice } = voucherSlice.actions
+export default voucherSlice.reducer
 
