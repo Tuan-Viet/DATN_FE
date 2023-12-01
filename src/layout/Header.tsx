@@ -31,6 +31,8 @@ import { logout } from "../store/user/userSlice";
 import { Breadcrumb, Button, Form, Input, Space, message } from "antd";
 import { ICart } from "../store/cart/cart.interface";
 import { useForm } from "react-hook-form";
+import { ForgotAccountForm, ForgotAccountSchema } from "../Schemas/forgotAccount";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type FormDataType = {
   email: string;
@@ -289,6 +291,7 @@ const Header = () => {
   const {
     handleSubmit
   } = useForm()
+
   const productSearch = useSelector((state: RootState) => state.productSearchReducer.products)
   useEffect(() => {
     if (listProduct && searchTerms) {
@@ -314,6 +317,21 @@ const Header = () => {
       //   } else {
       // }
     }
+  }
+  // forgotPassword
+  const {
+    handleSubmit: handleSubmitAccount,
+    register,
+    formState: { errors }
+  } = useForm<ForgotAccountForm>({
+    resolver: yupResolver(ForgotAccountSchema)
+  })
+  const handleForgotAccount = async (data: ForgotAccountForm) => {
+    await axios.post(
+      "http://localhost:8080/api/auth/user/forgotPassword",
+      data
+    );
+    message.success("Mã token đã gửi về email của bạn")
   }
   return (
     <>
@@ -727,41 +745,43 @@ const Header = () => {
                             </div>
                             <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
                               <p>Quên mật khẩu?</p>
-                              <button
+                              <p
                                 onClick={forgotPassword}
-                                className="hover:text-black"
+                                className="hover:text-black cursor-pointer"
                               >
                                 Khôi phục mật khẩu
-                              </button>
+                              </p>
                             </div>
                           </Form.Item>
                         </Form>
                       </div>
                       {/* khôi phục mật khẩu */}
-                      <div className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
+                      <form onSubmit={handleSubmitAccount(handleForgotAccount)} className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
                         <h1 className="uppercase text-[18px] text-[#333333]">
                           Khôi phục mật khẩu
                         </h1>
                         <p className="text-[#666666]">Nhập email của bạn</p>
                         <hr className="my-4 w-full" />
                         <input
-                          type="text"
+                          type="email"
+                          {...register("email")}
                           className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
                           placeholder="Email"
                         />
+                        <p className="italic text-red-500 text-sm">{errors ? errors.email?.message : ""}</p>
                         <button className="w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg">
                           Khôi phục
                         </button>
                         <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
                           <p>Bạn đã nhớ mật khẩu?</p>
-                          <button
+                          <p
                             onClick={backSigninDropdown}
-                            className="hover:text-black"
+                            className="hover:text-black cursor-pointer"
                           >
                             Trở về đăng nhập
-                          </button>
+                          </p>
                         </div>
-                      </div>
+                      </form>
                     </div>
                   )}
                 </div>

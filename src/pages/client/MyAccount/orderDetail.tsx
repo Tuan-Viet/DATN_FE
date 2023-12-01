@@ -183,7 +183,7 @@ const OrderDetail = () => {
     if (id) {
       setIdProduct(id)
       setValue("product_id", id)
-
+      console.log(id)
     }
     setIsModalOpen(true);
   };
@@ -381,21 +381,23 @@ const OrderDetail = () => {
                                         <tr className="bg-white">
                                           <th
                                             scope="row"
-                                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                            className="font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
                                           >
-                                            <img
-                                              src={item.imageColor}
-                                              alt={pro.title}
-                                              className="w-[58px] h-[78px] object-cover"
-                                            />
-                                            <div>
-                                              <p className="mb-4 max-w-[340px]">
-                                                {pro.title}
-                                              </p>
-                                              <p>
-                                                {product.color} / {product.size}
-                                              </p>
-                                            </div>
+                                            <Link to={`/products/${pro._id!}`} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5">
+                                              <img
+                                                src={item.imageColor}
+                                                alt={pro.title}
+                                                className="w-[58px] h-[78px] object-cover"
+                                              />
+                                              <div>
+                                                <p className="mb-4 max-w-[340px]">
+                                                  {pro.title}
+                                                </p>
+                                                <p>
+                                                  {product.color} / {product.size}
+                                                </p>
+                                              </div>
+                                            </Link>
                                           </th>
                                           <td className="px-6 py-4">
                                             ESTP03872PE00SB_BL-XXL
@@ -515,14 +517,26 @@ const OrderDetail = () => {
                   style={{ maxWidth: 600 }}
                   onFinish={onFinish}
                 >
-                  <Form.Item
-                    label="Đánh giá"
-                    name="rating"
-                    className="text-xl"
-                    rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
-                  >
-                    <Rate className="text-2xl" />
-                  </Form.Item>
+                  <div className="">
+                    <div className="flex pb-3">
+                      <img className="" width={80} src={getOneProduct ? getOneProduct.images?.[0] : ""} alt="" />
+                      <div className="flex flex-col p-2">
+                        <p>{getOneProduct ? getOneProduct?.title : ""}</p>
+                        <div className="flex">
+                          <del className="text-gray-400">{getOneProduct ? getOneProduct?.price?.toLocaleString("vi-VN") : ""}đ</del>
+                          <p className="ml-2">{getOneProduct ? getOneProduct?.discount?.toLocaleString("vi-VN") : ""}đ</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Form.Item
+                      label="Đánh giá"
+                      name="rating"
+                      className="text-xl"
+                      rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
+                    >
+                      <Rate className="text-2xl" />
+                    </Form.Item>
+                  </div>
                   <Form.Item
                     label="Bình luận"
                     name="comment"

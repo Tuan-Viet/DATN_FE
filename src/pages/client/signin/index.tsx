@@ -203,7 +203,6 @@ const signin = () => {
         </Form>
         {/* forgot password */}
         <ForgotPassword></ForgotPassword>
-        {/* <ResetPassword></ResetPassword> */}
       </div>
       <Footer></Footer>
     </>

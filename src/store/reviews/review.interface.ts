@@ -1,11 +1,15 @@
 export interface IReview {
     productId: string
-    userId: string
+    userId: {
+        _id: string
+        fullname: string
+    }
     rating: number
     comment: string
     images: Types[]
     createdAt: String
 }
+
 
 export interface Types {
     url: string

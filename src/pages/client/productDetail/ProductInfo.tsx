@@ -44,8 +44,8 @@ const ProductInfo = () => {
   const [onAddCart] = useAddCartMutation()
   const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
   const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
-  console.log(listReview)
   const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
+  const reviewStateVer = reviewState?.slice().reverse()
   useEffect(() => {
     if (listReview && id) {
       const listReviewByProductId = listReview?.filter((review) => review?.productId && review?.productId?.includes(id))
@@ -68,7 +68,6 @@ const ProductInfo = () => {
     const { data: listProduct } = useFetchListProductQuery()
     const { data: getOneProduct, isSuccess: isSuccessGetOneProduct, isLoading: productLoading } = useFetchOneProductQuery(id)
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
-
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
     const userStore = useSelector((state: any) => state.user);
@@ -94,7 +93,7 @@ const ProductInfo = () => {
                 },
                 pageSize: 3,
               }}
-              dataSource={reviewState && reviewState}
+              dataSource={reviewStateVer && reviewStateVer}
 
               renderItem={(item) => (
                 <List.Item
