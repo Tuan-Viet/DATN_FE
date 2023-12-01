@@ -18,7 +18,8 @@ import userSlice from "./user/userSlice";
 import voucherAPI from './vouchers/voucher.service'
 import voucherSlice from './vouchers/voucherSlice'
 import statisticsApi from './statistic/statistic.service'
-
+import ReviewApi from './reviews/review.service'
+import reviewSlice from './reviews/reviewSlice'
 
 const commonConfig = {
   key: "user",
@@ -42,6 +43,7 @@ export const store = configureStore({
     [voucherAPI.reducerPath]: voucherAPI.reducer,
     [statisticsApi.reducerPath]: statisticsApi.reducer,
 
+    [ReviewApi.reducerPath]: ReviewApi.reducer,
     // category
     categorySlice: categorySlice,
     // product
@@ -66,7 +68,9 @@ export const store = configureStore({
     // user 
     user: persistReducer(userConfig, userSlice),
     // voucher
-    voucherSlice: voucherSlice
+    voucherSlice: voucherSlice,
+    // reivew
+    reviewSlice: reviewSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
@@ -77,8 +81,12 @@ export const store = configureStore({
       orderAPI.middleware,
       orderDetailAPI.middleware,
       voucherAPI.middleware,
-      statisticsApi.middleware
-])   
+      statisticsApi.middleware,
+      ReviewApi.middleware
+
+    ])
+  // getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware).concat(voucherAPI.middleware)
+  //   .concat(ReviewApi.middleware),
 })
 
 
