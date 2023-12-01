@@ -109,7 +109,7 @@ const AdminLayout = ({ children }: Props) => {
       <Layout style={{ marginLeft: 200 }}>
         {/* <Header style={{ padding: 0, background: colorBgContainer }} /> */}
         <Content className="">
-          <div className="bg-slate-50" style={{ padding: 24, minHeight: 360 }}>
+          <div className="bg-stone-50" style={{ padding: 24, minHeight: 360 }}>
             {children}
           </div>
         </Content>
