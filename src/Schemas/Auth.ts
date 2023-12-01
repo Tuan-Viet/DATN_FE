@@ -16,3 +16,11 @@ export const AccountSchema = yup.object({
 
 export type AccountForm = yup.InferType<typeof AccountSchema>
 
+export const AddressSchema = yup.object({
+    fullname: yup.string().required(),
+    phone: yup.string().required(),
+    address: yup.string().required(),
+})
+
+export type AddressForm = yup.InferType<typeof AddressSchema>
+

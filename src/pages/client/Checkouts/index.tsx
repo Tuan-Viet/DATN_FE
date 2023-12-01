@@ -20,6 +20,7 @@ import { useGetOneVoucherQuery, useListVoucherQuery, useUpdateVoucherMutation } 
 import voucherSlice, { listVoucherSlice } from "../../../store/vouchers/voucherSlice";
 import { IVoucher } from "../../../store/vouchers/voucher.interface";
 import { toast } from "react-toastify";
+import { useGetInfoUserQuery } from "../../../store/user/user.service";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
@@ -41,6 +42,7 @@ const CheckoutsPage = () => {
   const [codeVoucher, setcodeVoucher] = useState<string>("")
   const [idVoucher, setIdVoucher] = useState<string>("")
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
+  const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
 
   useEffect(() => {
     if (listCart) {
@@ -67,11 +69,17 @@ const CheckoutsPage = () => {
     }
   }, [isSuccessVoucher])
 
+
   // console.log(user);
 
   // // console.log(myVoucher);
   // let userVoucher: any[] = []
-  const myVoucher = user.current.voucherwallet
+  useEffect(() => {
+    const myVoucher = InfoUser?.voucherwallet
+  }, [InfoUser])
+
+  const myVoucher = InfoUser?.voucherwallet
+  console.log(myVoucher);
 
   // myVoucher.map((item: any) => {
   //   const voucher = voucherSlice.find((vourcher) => vou)
@@ -397,21 +405,26 @@ const CheckoutsPage = () => {
               })}
             </div>
             <div className="flex gap-[20px] mt-5 w-[700px] flex-nowrap overflow-x-auto">
-              {voucherState?.map((voucher, index) => {
-                for (let i = 0; i < myVoucher.length; i++) {
-                  if (voucher._id === myVoucher[i]) {
-                    return (
-                      <div onClick={() => handleVoucher(voucher._id!)} className="border min-w-[300px] pl-6 h-[100px] cursor-pointer rounded-lg hover:text-white hover:bg-black transition-all ease-linear" key={index}>
-                        {/* <input className="hidden" value={voucher.code} type="text"  /> */}
-                        <div className="border-dashed border-l-2 h-full p-3">
-                          <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn 1)</span></div>
-                          <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
+              {myVoucher ?
+                (voucherState?.map((voucher, index) => {
+
+                  for (let i = 0; i < myVoucher.length; i++) {
+                    if (voucher._id === myVoucher[i]) {
+                      return (
+                        <div onClick={() => handleVoucher(voucher._id!)} className="border min-w-[300px] pl-6 h-[100px] cursor-pointer rounded-lg hover:text-white hover:bg-black transition-all ease-linear" key={index}>
+                          {/* <input className="hidden" value={voucher.code} type="text"  /> */}
+                          <div className="border-dashed border-l-2 h-full p-3">
+                            <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn 1)</span></div>
+                            <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
+                          </div>
                         </div>
-                      </div>
-                    )
+                      )
+                    }
                   }
-                }
-              })}
+                }))
+
+                : ""}
+
             </div>
             {/* <div className="flex gap-[20px] my-2 w-[700px] flex-nowrap overflow-x-scroll">
               {voucherState?.map((voucher, index) => {
