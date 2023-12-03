@@ -325,7 +325,7 @@ const Header = () => {
   // forgotPassword
   const {
     handleSubmit: handleSubmitAccount,
-    register,
+    register: registerAccount,
     formState: { errors }
   } = useForm<ForgotAccountForm>({
     resolver: yupResolver(ForgotAccountSchema)
@@ -768,7 +768,7 @@ const Header = () => {
                         <hr className="my-4 w-full" />
                         <input
                           type="email"
-                          {...register("email")}
+                          {...registerAccount("email")}
                           className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
                           placeholder="Email"
                         />
