@@ -65,30 +65,56 @@ const cartSlice = createSlice({
         },
         increaseCartSlice: (state: ICartState, actions: PayloadAction<{ _id: string, discount: number }>) => {
             const cartIndex = state.carts.findIndex((state) => state._id === actions.payload._id)
-            if (cartIndex !== -1) {
-                state.carts[cartIndex].quantity++;
-                state.carts[cartIndex].totalMoney += actions.payload.discount
-                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]));
+            const { current } = JSON.parse(localStorage.getItem("persist:user")!)
+            if (JSON.parse(current)?._id) {
+                if (cartIndex !== -1) {
+                    state.carts[cartIndex].quantity++;
+                    state.carts[cartIndex].totalMoney += actions.payload.discount
+                    localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]));
+                }
+            } else {
+                console.log(2)
+                const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+                if (cartStore) {
+                    const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
+                    if (cartStoreIndex !== -1) {
+                        const updatedCartStore = [...cartStore]
+                        updatedCartStore[cartStoreIndex] = {
+                            ...updatedCartStore[cartStoreIndex],
+                            quantity: updatedCartStore[cartStoreIndex].quantity + 1,
+                            totalMoney: updatedCartStore[cartStoreIndex].totalMoney + actions.payload.discount
+                        }
+                        localStorage.setItem("carts", JSON.stringify(updatedCartStore))
+                    }
+                }
             }
-            // const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
-            // if (cartStore) {
-            //     const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
-            //     if (cartStoreIndex !== -1) {
-            //         cartStore[cartStoreIndex].quantity++
-            //         cartStore[cartStoreIndex].totalMoney += actions.payload.discount
-            //         localStorage.setItem("carts", JSON.stringify(cartStore[cartStoreIndex]))
-            //     }
-            // }
         },
         decreaseCartSlice: (state: ICartState, actions: PayloadAction<{ _id: string, discount: number }>) => {
             const cartIndex = state.carts.findIndex((state) => state._id === actions.payload._id)
-            if (state.carts[cartIndex].quantity > 1) {
-                state.carts[cartIndex].quantity -= 1
-                state.carts[cartIndex].totalMoney -= actions.payload.discount
-                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
+            const { current } = JSON.parse(localStorage.getItem("persist:user")!)
+            if (JSON.parse(current)?._id) {
+                if (state.carts[cartIndex].quantity > 1) {
+                    state.carts[cartIndex].quantity -= 1
+                    state.carts[cartIndex].totalMoney -= actions.payload.discount
+                    localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
+                } else {
+                    state.carts[cartIndex].quantity == 1
+                    localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
+                }
             } else {
-                state.carts[cartIndex].quantity == 1
-                localStorage.setItem("cartIndex", JSON.stringify(state.carts[cartIndex]))
+                const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+                if (cartStore) {
+                    const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
+                    if (cartStoreIndex !== -1) {
+                        const updatedCartStore = [...cartStore]
+                        updatedCartStore[cartStoreIndex] = {
+                            ...updatedCartStore[cartStoreIndex],
+                            quantity: updatedCartStore[cartStoreIndex].quantity - 1,
+                            totalMoney: updatedCartStore[cartStoreIndex].totalMoney - actions.payload.discount
+                        }
+                        localStorage.setItem("carts", JSON.stringify(updatedCartStore))
+                    }
+                }
             }
         },
     })

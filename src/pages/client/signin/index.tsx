@@ -27,7 +27,7 @@ const signin = () => {
   const [onAddCart] = useAddCartMutation()
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
   const user = useSelector((state: any) => state?.user);
-
+  console.log(cartState)
   useEffect(() => {
     const buttonSignin = document.querySelector(".buttonSignin");
     const formSignin = document.querySelector(".formSignin");
@@ -69,20 +69,9 @@ const signin = () => {
       );
       toast.success("Đăng nhập thành công");
       if (cartState?.length > 0) {
-        // const cartIndex: ICart | undefined = cartState?.find((cart) => {
-        //   return cartStore?.filter((item) => cart.productDetailId === item.productDetailId)
-        // })
-        // console.log(cartIndex);
         cartStore?.map((cart) => {
-          return onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
-
-      } else {
-        console.log(2);
-
-        cartStore?.map((cart) => {
-          onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
+          onAddCart({ userId: response?.data?.user?._id, ...cart });
+        });
       }
       dispatch(
         register({

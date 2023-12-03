@@ -26,10 +26,20 @@ const cartPage = () => {
     const cartStore = JSON.parse(localStorage.getItem("carts")!)
     const removeCart = async (id: string) => {
         try {
-            const isConfirm = window.confirm("Ban co chac chan muon xoa khong?")
-            if (isConfirm) {
-                await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)))
-                message.success("Xóa thành công!")
+            if (id) {
+                if (user?.current?._id) {
+                    const isConfirm = window.confirm("Ban co chac chan muon xoa khong?");
+                    if (isConfirm) {
+                        await onRemoveCart(id).then(() => dispatch(removeCartSlice(id)));
+                        message.success("Xóa thành công!");
+                    }
+                } else {
+                    const isConfirm = window.confirm("Ban co chac chan muon xoa khong?");
+                    if (isConfirm) {
+                        dispatch(removeCartSlice(id));
+                        message.success("Xóa thành công!");
+                    }
+                }
             }
         } catch (error) {
             console.log(error);
@@ -56,35 +66,52 @@ const cartPage = () => {
             dispatch(listProductSlice(listProduct))
         }
     }, [isSuccessListProduct])
+    const [decCart, setDecCart] = useState<boolean>(false)
+    const [increCart, setIncreCart] = useState<boolean>(false)
+
     const decreaseCart = async (_id: string, discount: number) => {
         try {
-            if (_id) {
-                dispatch(decreaseCartSlice({ _id: _id, discount: discount }))
-            }
-            const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-            if (cartIndex) {
-                await onUpdateCart({ _id, ...cartIndex })
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    const increaseCart = async (_id: string, discount: number) => {
-        try {
-            if (_id) {
-                dispatch(increaseCartSlice({ _id: _id, discount: discount }))
-                const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
-                if (cartIndex) {
-                    await onUpdateCart({ _id, ...cartIndex })
+            if (_id && discount) {
+                if (user?.current?._id) {
+                    dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
+                    const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
+                    if (cartIndex) {
+                        await onUpdateCart({ _id, ...cartIndex });
+                    }
+                } else {
+                    dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
+                    setDecCart(true)
                 }
             }
         } catch (error) {
             console.log(error);
-
         }
+    };
 
-    }
+    const increaseCart = async (_id: string, discount: number) => {
+        try {
+            console.log(_id);
+            if (_id) {
+                if (user?.current?._id) {
+                    dispatch(increaseCartSlice({ _id: _id, discount: discount }));
+                    const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
+                    if (cartIndex) {
+                        await onUpdateCart({ _id, ...cartIndex });
+                    }
+                } else {
+                    dispatch(increaseCartSlice({ _id: _id, discount: discount }));
+                    setIncreCart(true)
+                }
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    useEffect(() => {
+        dispatch(listCartSlice(cartStore ? cartStore : [])!);
+        setIncreCart(false)
+        setDecCart(false)
+    }, [increCart, decCart])
     useEffect(() => {
         let total = 0
         if (cartState) {
@@ -127,37 +154,131 @@ const cartPage = () => {
                                                         {/* price product */}
                                                         <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
                                                     </div>
-                                                    <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
+                                                    {user?.current?._id ? (
+                                                        <div
+                                                            className="absolute right-[10px] top-[10px]"
+                                                            onClick={() => removeCart(cart._id!)}
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke-width="1.5"
+                                                                stroke="currentColor"
+                                                                className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                                            >
+                                                                <path
+                                                                    stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    d="M6 18L18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            className="absolute right-[10px] top-[10px]"
+                                                            onClick={() =>
+                                                                removeCart(cart.productDetailId!)
+                                                            }
+                                                        >
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg"
+                                                                fill="none"
+                                                                viewBox="0 0 24 24"
+                                                                stroke-width="1.5"
+                                                                stroke="currentColor"
+                                                                className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                                            >
+                                                                <path
+                                                                    stroke-linecap="round"
+                                                                    stroke-linejoin="round"
+                                                                    d="M6 18L18 6M6 6l12 12"
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                    )}
+                                                    {/* <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
                                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                                         </svg>
-                                                    </div>
+                                                    </div> */}
                                                     <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                                                         <div className="flex items-center">
                                                             <p className="font-bold tracking-wide text-[15px]">{cart.totalMoney.toLocaleString("vi-VN")}đ</p>
                                                         </div>
                                                         <div className="flex items-center w-[100px] border border-gray-300 rounded">
-                                                            <button
-                                                                onClick={() => decreaseCart(cart._id!, pro.discount!)}
+                                                            {user?.current?._id ? <button
+                                                                onClick={() =>
+                                                                    decreaseCart(
+                                                                        cart._id!,
+                                                                        pro.discount!
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    cart?.quantity == 1
+                                                                }
                                                                 type="button"
-                                                                className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
+                                                                className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
                                                             >
-                                                                &minus;
-                                                            </button>
+                                                                +
+                                                            </button> : <button
+                                                                onClick={() =>
+                                                                    decreaseCart(
+                                                                        cart.productDetailId!,
+                                                                        pro.discount!
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    cart?.quantity == 1
+                                                                }
+                                                                type="button"
+                                                                className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
+                                                            >
+                                                                +
+                                                            </button>}
                                                             <input
                                                                 type="number"
                                                                 id="Quantity"
-                                                                value={cart.quantity} min="1" max={item.quantity}
+                                                                value={cart?.quantity}
+                                                                min="1"
+                                                                max={item?.quantity}
                                                                 className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                                             />
-                                                            <button
-                                                                onClick={() => increaseCart(cart._id!, pro.discount!)}
-                                                                disabled={item.quantity === cart.quantity}
+                                                            {user?.current?._id ? <button
+                                                                onClick={() =>
+                                                                    increaseCart(
+                                                                        cart._id!,
+                                                                        pro.discount!
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    item?.quantity === cart?.quantity
+                                                                }
                                                                 type="button"
-                                                                className={`${item.quantity === cart.quantity ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"} `}
+                                                                className={`${item?.quantity === cart?.quantity
+                                                                    ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                                                    : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                                                    } `}
                                                             >
                                                                 +
-                                                            </button>
+                                                            </button> : <button
+                                                                onClick={() =>
+                                                                    increaseCart(
+                                                                        cart.productDetailId!,
+                                                                        pro.discount!
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    item?.quantity === cart?.quantity
+                                                                }
+                                                                type="button"
+                                                                className={`${item?.quantity === cart?.quantity
+                                                                    ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                                                    : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                                                    } `}
+                                                            >
+                                                                +
+                                                            </button>}
                                                         </div>
                                                     </div>
                                                 </div>
