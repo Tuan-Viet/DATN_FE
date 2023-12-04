@@ -6,7 +6,7 @@ import {
   useUpdateOrderMutation,
 } from "../../../store/order/order.service";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
 import { listOrderDetailSlice } from "../../../store/orderDetail/orderDetailSlice";
 import { RootState } from "@reduxjs/toolkit/query";
@@ -16,6 +16,12 @@ import { listProductDetailSlice } from "../../../store/productDetail/productDeta
 import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import { Button, Modal } from "antd";
+import { useForm } from "react-hook-form";
+import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useAddOrderMutation } from "../../../store/orderReturn/order.service";
+import { current } from "@reduxjs/toolkit";
 
 function formatDateStringToDisplayDate(dateString) {
   const originalDate = new Date(dateString);
@@ -31,11 +37,9 @@ function formatDateStringToDisplayDate(dateString) {
     amPm = "CH";
   }
 
-  const formattedDate = `${day < 10 ? "0" : ""}${day}/${
-    month < 10 ? "0" : ""
-  }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${
-    minutes < 10 ? "0" : ""
-  }${minutes}${amPm}`;
+  const formattedDate = `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
+    }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? "0" : ""
+    }${minutes}${amPm}`;
   return formattedDate;
 }
 
@@ -151,6 +155,31 @@ const OrderDetail = () => {
     });
   };
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<orderReturnForm>({
+    resolver: yupResolver(orderReturnSchema)
+  })
+
+  const [addOrderreturn] = useAddOrderMutation()
+
+  const onAddOrderReturn = async (data: orderReturnForm) => {
+    await addOrderreturn(data)
+    toast.success('Trả hàng thành công vui lòng đợi xác nhận')
+    setIsModalOpen(false);
+  }
+
   return (
     <>
       <Header></Header>
@@ -233,17 +262,153 @@ const OrderDetail = () => {
                       </span>
                     </h1>
                     {order?.status !== 0 && order?.status !== 1 && order?.status !== 2 && (
-                      <p>
-                        Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
-                        <button
-                          onClick={handleConfirmReceived}
-                          className="text-blue-500 underline"
-                        >
-                          xác thực đơn hàng
-                        </button>
-                      </p>
+                      <>
+                        <p>
+                          Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
+                          <button
+                            onClick={handleConfirmReceived}
+                            className="text-blue-500 underline"
+                          >
+                            xác thực đơn hàng
+                          </button>
+                        </p>
+                        <Button type="primary" onClick={showModal} className="text-white bg-blue-700"  >
+                          Trả hàng
+                        </Button>
+                      </>
                     )}
                   </div>
+                  <Modal
+                    title="Trả hàng"
+                    centered
+                    open={isModalOpen}
+                    onOk={handleSubmit(onAddOrderReturn)}
+                    onCancel={(handleCancel)}
+                    width={1000}
+                  >
+
+                    <form className=" mx-auto" onSubmit={handleSubmit(onAddOrderReturn)}>
+                      <input type="hidden" value={user.current._id} {...register("userId")} id="userId" />
+                      <div className="mb-5">
+                        <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Họ tên người gửi</label>
+                        <input {...register("fullName")} type="text" id="fullName" className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="base-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Số điện thoại người gửi</label>
+                        <input type="text" {...register("phoneNumber")} id="phoneNumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Địa chỉ gửi</label>
+                        <input type="text" {...register("address")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do trả hàng</label>
+                        <input type="text" {...register("reason")} id="reason" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Sản phẩm trả hàng</label>
+                        <div className="relative overflow-x-auto">
+                          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                            <thead className="text-sm uppercase border-b-2 border-black bg-gray-50">
+                              <tr>
+                                <th scope="col" className="px-6 py-3">
+                                  Sản phẩm
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                  Đơn giá
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                  Số lượng
+                                </th>
+                                <th scope="col" className="px-6 py-3">
+                                  Thành tiền
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {productsInOrder?.map((product, index) => {
+                                return (
+                                  <>
+                                    {productDetailState
+                                      ?.filter(
+                                        (proDetail) =>
+                                          proDetail._id === product.productDetailId
+                                      )
+                                      .map((item) => {
+                                        return (
+                                          <>
+                                            {productState
+                                              ?.filter(
+                                                (prod) => prod._id === item.product_id
+                                              )
+                                              .map((pro) => (
+
+                                                <tr className="bg-white ">
+                                                  <input type="hidden" {...register(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
+                                                  <input type="hidden" {...register(`orderDetailIds.${index}.color`)} value={product.color} className="" />
+                                                  <input type="hidden" {...register(`orderDetailIds.${index}.size`)} value={product.size} className="" />
+                                                  <input type="hidden" {...register(`orderDetailIds.${index}.price`)} value={product.price} className="" />
+                                                  <th
+                                                    scope="row"
+                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                                  >
+                                                    <img
+                                                      src={item.imageColor}
+                                                      alt={pro.title}
+                                                      className="w-[58px] h-[78px] object-cover"
+                                                    />
+                                                    <div>
+                                                      <p className="mb-4 max-w-[340px]">
+                                                        {pro.title}
+                                                      </p>
+                                                      <p>
+                                                        {product.color} / {product.size}
+                                                      </p>
+                                                    </div>
+                                                  </th>
+                                                  <td className="px-6 py-4">
+                                                    {product.price.toLocaleString(
+                                                      "vi-VN"
+                                                    )}
+                                                    ₫
+                                                  </td>
+                                                  <td className="px-6 py-4">
+
+                                                    <div className="relative flex items-center max-w-[8rem]">
+                                                      <input type="number" {...register(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} placeholder="0" required min={0} max={product.quantity} />
+                                                      /{product.quantity}
+                                                    </div>
+                                                  </td>
+                                                  <td className="px-6 py-4">
+                                                    {product.totalMoney.toLocaleString(
+                                                      "vi-VN"
+                                                    )}
+                                                    ₫
+                                                  </td>
+                                                </tr>
+                                              ))}
+                                          </>
+                                        );
+                                      })}
+                                  </>
+                                );
+                              })}
+                            </tbody>
+                            <tfoot>
+                              <tr className="font-semibold text-gray-900 dark:text-gray">
+                                <th scope="row" className="px-6 py-3 text-base">Total</th>
+                                <td className="px-6 py-3">3</td>
+                                <td className="px-6 py-3">21,000</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+
+                      </div>
+                    </form>
+
+
+                  </Modal>
                   <div className="text-right">
                     {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 && (
                       <button
@@ -419,7 +584,7 @@ const OrderDetail = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div >
       <Footer></Footer>
     </>
   );

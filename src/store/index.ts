@@ -10,6 +10,7 @@ import cartAPI from './cart/cart.service'
 import cartSlice, { cartLocalReducer } from './cart/cartSlice'
 import orderAPI from './order/order.service'
 import orderSlice from './order/orderSlice'
+import orderReturnSlice from './orderReturn/orderSlice'
 import orderDetailAPI from './orderDetail/orderDetail.service'
 import orderDetailSlice from './orderDetail/orderDetailSlice'
 import storage from "redux-persist/lib/storage";
@@ -18,6 +19,7 @@ import userSlice from "./user/userSlice";
 import voucherAPI from './vouchers/voucher.service'
 import voucherSlice from './vouchers/voucherSlice'
 import authApi from './user/user.service'
+import orderReturnAPI from './orderReturn/order.service'
 
 
 const commonConfig = {
@@ -38,6 +40,7 @@ export const store = configureStore({
     [productDetailAPI.reducerPath]: productDetailAPI.reducer,
     [cartAPI.reducerPath]: cartAPI.reducer,
     [orderAPI.reducerPath]: orderAPI.reducer,
+    [orderReturnAPI.reducerPath]: orderReturnAPI.reducer,
     [orderDetailAPI.reducerPath]: orderDetailAPI.reducer,
     [voucherAPI.reducerPath]: voucherAPI.reducer,
     [authApi.reducerPath]: authApi.reducer,
@@ -60,6 +63,7 @@ export const store = configureStore({
     cartLocalReducer: cartLocalReducer,
     // order
     orderSlice: orderSlice,
+    orderReturnSlice: orderReturnSlice,
     // orderDetail
     orderDetailSlice: orderDetailSlice,
     // user 
@@ -70,7 +74,7 @@ export const store = configureStore({
     voucherSlice: voucherSlice
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware).concat(authApi.middleware).concat(voucherAPI.middleware),
+    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderReturnAPI.middleware).concat(orderDetailAPI.middleware).concat(authApi.middleware).concat(voucherAPI.middleware),
 })
 
 
