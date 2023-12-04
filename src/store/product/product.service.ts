@@ -1,9 +1,17 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import IProduct from "./product.interface"
+import { RootState } from '../index';
 const productAPI = createApi({
     reducerPath: "products",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "http://localhost:8080/api",
+        prepareHeaders(headers, {getState}) {
+            const token = (getState() as RootState).user.token
+            if (token) {
+                headers.set('Authorization', `Bearer ${token}`)
+              }
+              return headers
+        }, 
     }),
     tagTypes: ["products"],
     endpoints: (builer) => ({
@@ -13,6 +21,14 @@ const productAPI = createApi({
         }),
         fetchOneProduct: builer.query<IProduct, string>({
             query: (id) => `/products/` + id,
+            providesTags: ["products"]
+        }),
+        fetchListProductByAdmin: builer.query<IProduct[], void>({
+            query: () => `/products/admin`,
+            providesTags: ["products"]
+        }),
+        fetchOneProductByAdmin: builer.query<IProduct, string>({
+            query: (id) => `/products/admin/` + id,
             providesTags: ["products"]
         }),
         removeProduct: builer.mutation({
@@ -48,5 +64,5 @@ const productAPI = createApi({
     })
 })
 
-export const { useFetchListProductQuery, useFetchOneProductQuery, useRemoveProductMutation, useAddProductMutation, useUpdateProductMutation, useSearchProductQuery } = productAPI
+export const { useFetchListProductQuery, useFetchOneProductQuery, useRemoveProductMutation, useAddProductMutation, useUpdateProductMutation, useSearchProductQuery, useFetchListProductByAdminQuery, useFetchOneProductByAdminQuery } = productAPI
 export default productAPI

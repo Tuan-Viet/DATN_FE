@@ -1,3 +1,5 @@
+import { IReview, IReviewDashboard } from "../reviews/review.interface";
+
 export interface Statistics {
     month?: string;
     day?: string;
@@ -27,5 +29,19 @@ export interface Statistics {
     totalRevenue: number;
     totalProfit: number;
     totalCostPrice: number;
+  }
+  export interface DashboardStatistic{
+    revenue: string;
+    profit: string;
+    newReviews: IReviewDashboard[];
+    newUsersCount: number;
+    newOrdersCount: number;
+    bestSellingProduct: {
+      _id: string;
+      title: string ;
+      totalQuantitySold: number
+    }[];
+
+
   }
   

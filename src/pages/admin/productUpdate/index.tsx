@@ -27,7 +27,7 @@ import {
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ICategory } from '../../../store/category/category.interface';
-import { useFetchListProductQuery, useFetchOneProductQuery, useUpdateProductMutation } from '../../../store/product/product.service';
+import { useFetchListProductQuery, useFetchOneProductByAdminQuery, useFetchOneProductQuery, useUpdateProductMutation } from '../../../store/product/product.service';
 import IProduct from '../../../store/product/product.interface';
 import axios from 'axios';
 const { Dragger } = Upload;
@@ -76,7 +76,7 @@ const productUpdate = () => {
     const { id } = useParams();
     // const product = products?.find((product: IProduct) => product._id === id);
     if (id) {
-        const { data: product } = useFetchOneProductQuery(id)
+        const { data: product } = useFetchOneProductByAdminQuery(id)
         const [productDetails, setProductDetails] = useState<ProductDetail[]>([]); // State để lưu thông tin sản phẩm chi tiết
 
         // const product = fetchOneProduct?.data
