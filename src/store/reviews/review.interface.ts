@@ -1,7 +1,7 @@
 import IProduct from "../product/product.interface"
 
 export interface IReview {
-    productId: IProduct| string;
+    productId: string
     userId: {
         _id: string
         fullname: string
