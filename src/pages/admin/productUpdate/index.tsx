@@ -82,6 +82,8 @@ interface ProductDetail {
 
 const productUpdate = () => {
     const navigate = useNavigate();
+    const [form] = Form.useForm();
+
     const { data: categories } = useFetchListCategoryQuery();
     // const { data: products } = useFetchListProductQuery();
     const { id } = useParams();
@@ -108,12 +110,7 @@ const productUpdate = () => {
     const [valueSize, setValueSize] = useState('');
     const [sizes, setSizes] = useState<any[]>([]);
 
-    useEffect(() => {
-        if (product) {
-            setColors(product.colors || []);
-            setSizes(product.sizes || []);
-        }
-    }, [product]);
+
 
     useEffect(() => {
         if (product?.variants) {
@@ -157,22 +154,37 @@ const productUpdate = () => {
     // Chuyển dữ liệu từ Map thành mảng variants
     const variants = Array.from(variantsMap.values());
 
-    const [form] = Form.useForm();
+    useEffect(() => {
+        if (product) {
+            setColors(product.colors || []);
+            setSizes(product.sizes || []);
+            form.setFieldsValue({
+                _id: product?._id,
+                title: product?.title,
+                sku: product?.sku,
+                discount: product?.discount,
+                costPrice: product?.costPrice,
+                price: product?.price,
+                images: product?.images,
+                variants: variants,
+                description: product?.description,
+                categoryId: product?.categoryId?._id && product?.categoryId._id,
+            });
+        }
+    }, [product, form]);
     form.setFieldsValue({
-        _id: product?._id,
-        title: product?.title,
-        sku: product?.sku,
-        discount: product?.discount,
-        costPrice: product?.costPrice,
-        price: product?.price,
-        images: product?.images,
         variants: variants,
-        description: product?.description,
-        categoryId: product?.categoryId?._id && product?.categoryId._id,
     });
 
-    const [onUpdate] = useUpdateProductMutation()
+    const [onUpdate, isSuccess] = useUpdateProductMutation()
 
+    if (!isSuccess) {
+        return <>
+            <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
+                <Spin size='large' />
+            </div>
+        </>;
+    }
     const selectOptions = categories
         ?.filter((cate: ICategory) => cate.name !== "Chưa phân loại")
         .map((cate: ICategory) => ({
@@ -251,11 +263,8 @@ const productUpdate = () => {
             const newValues = { ...values, hide: valueHide, description: description, images: updatedImageList, colors: colors, sizes: sizes };
 
             await onUpdate({ id, ...newValues })
-                .then(() =>
-                    message.success(`Cập nhật thành công`)
-                ).then(() =>
-                    navigate("/admin/product")
-                )
+            message.success(`Cập nhật thành công`)
+            navigate("/admin/product")
         } catch (error) {
             console.log(error);
 

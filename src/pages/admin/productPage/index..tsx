@@ -190,11 +190,6 @@ const productPage = () => {
 
     ];
 
-
-
-
-
-
     const toggleCategory = (categoryId: any) => {
         if (selectedCategories.includes(categoryId)) {
             setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
@@ -283,6 +278,10 @@ const productPage = () => {
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
+
+    // useEffect(() => {
+    //     window.scrollTo({ top: 0, left: 0 });
+    // }, []);
     return (
         <div className="">
             {contextHolder}

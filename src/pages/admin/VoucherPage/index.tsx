@@ -66,26 +66,30 @@ const VoucherPage = () => {
             className: 'w-[100px]'
         },
         {
-            title: 'HẠN SỬ DỤNG',
+            title: 'HIỆU LỰC',
             render: (value: any) => (
                 <div className="">
-                    <span className={`bg-${statusValid(value.validFrom, value.validTo) === 'Sắp diễn ra' ? 'blue' : statusValid(value.validFrom, value.validTo) === 'Đang diễn ra' ? 'green' : 'red'}-500 text-white px-2 py-1 rounded-lg`}>
+
+                    {/* <span className={`bg-${statusValid(value.validFrom, value.validTo) === 'Sắp diễn ra' ? 'blue' : statusValid(value.validFrom, value.validTo) === 'Đang diễn ra' ? 'green' : 'red'}-500 text-white px-2 py-1 rounded-lg`}>
                         {statusValid(value.validFrom, value.validTo)}
-                    </span>
+                    </span> */}
                     <Steps
                         progressDot
                         direction="vertical"
-                        items={[
-                            {
-                                title: 'Bắt đầu',
-                                description: formatDateString(value.validFrom)
-                            },
-                            {
-                                title: 'Kết thúc',
-                                description: formatDateString(value.validTo)
-                            },
-                        ]}
+                        items={
+                            [
+                                {
+                                    title: 'Bắt đầu',
+                                    description: formatDateString(value.validFrom),
+                                },
+                                {
+                                    title: 'Kết thúc',
+                                    description: value.validTo ? formatDateString(value.validTo) : 'Không giới hạn',
+                                },
+                            ]
+                        }
                     />
+
                 </div>
             )
         },
@@ -103,12 +107,16 @@ const VoucherPage = () => {
             title: 'SỐ LƯỢNG',
             dataIndex: 'quantity',
             key: 'quantity',
+            render: (value: any) => !value ? (
+                <span dangerouslySetInnerHTML={{
+                    __html: `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" style="width: 24px; height: 24px; color: rgb(163, 168, 175);">
+                  <path d="M17.313 7a4.673 4.673 0 0 0-3.36 1.42l-1.136 1.166 1.227 1.261 1.17-1.201a2.922 2.922 0 0 1 2.098-.888 2.933 2.933 0 0 1 2.93 2.93 2.933 2.933 0 0 1-2.93 2.93 2.92 2.92 0 0 1-2.099-.889l-5.165-5.31a4.688 4.688 0 1 0 0 6.537l1.135-1.166-1.228-1.262-1.168 1.201a2.92 2.92 0 0 1-2.1.889 2.933 2.933 0 0 1-2.93-2.93 2.933 2.933 0 0 1 2.93-2.93c.823 0 1.567.34 2.1.888l5.165 5.31A4.688 4.688 0 1 0 17.312 7Z" fill="currentColor"></path>
+                </svg>
+              ` }} />
+            ) : value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
         },
-        {
-            title: 'LOẠI',
-            dataIndex: 'type',
-            key: 'type',
-        },
+
         {
             title: 'GIẢM GIÁ',
             render: (value: any) => (
@@ -121,11 +129,14 @@ const VoucherPage = () => {
                 </div>
             )
         },
-        // {
-        //     title: 'MÔ TẢ',
-        //     dataIndex: 'description',
-        //     key: 'description',
-        // },
+        {
+            title: 'TRẠNG THÁI',
+            render: (value: any) => value.status ? (
+                <span className='bg-green-500 text-white rounded-lg px-3 py-1 text-xs'>Đang chạy</span>
+            ) : (
+                <span className='bg-gray-200 text-gray-500 rounded-lg px-3 py-1 text-xs'>Tạm ngừng</span>
+            )
+        },
         {
             title: '',
             key: 'action',
@@ -199,18 +210,18 @@ const VoucherPage = () => {
     }
 
     const data: DataType[] = sortVoucher
-        .filter((voucher) => {
-            switch (eventFilter) {
-                case 'upcoming':
-                    return statusValid(voucher.validFrom, voucher.validTo) === 'Sắp diễn ra';
-                case 'ongoing':
-                    return statusValid(voucher.validFrom, voucher.validTo) === 'Đang diễn ra';
-                case 'expired':
-                    return statusValid(voucher.validFrom, voucher.validTo) === 'Hết hạn';
-                default:
-                    return true;
-            }
-        })
+        // .filter((voucher) => {
+        //     switch (eventFilter) {
+        //         case 'upcoming':
+        //             return statusValid(voucher.validFrom, voucher.validTo) === 'Sắp diễn ra';
+        //         case 'ongoing':
+        //             return statusValid(voucher.validFrom, voucher.validTo) === 'Đang diễn ra';
+        //         case 'expired':
+        //             return statusValid(voucher.validFrom, voucher.validTo) === 'Hết hạn';
+        //         default:
+        //             return true;
+        //     }
+        // })
         .map((voucher: any, index) => ({
             key: index + 1,
             _id: voucher._id,
@@ -224,6 +235,7 @@ const VoucherPage = () => {
             validFrom: voucher.validFrom,
             validTo: voucher.validTo,
             description: voucher.description,
+            status: voucher.status,
         }));
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
@@ -241,6 +253,9 @@ const VoucherPage = () => {
 
     }
 
+    // useEffect(() => {
+    //     window.scrollTo({ top: 0, left: 0 });
+    // }, []);
 
     return (
         <div className="">
@@ -282,10 +297,8 @@ const VoucherPage = () => {
 
 
                 </div>
-                <div className="flex justify-between items-start">
-                    <div className="flex items-start  space-x-3 ">
-
-
+                <div className="flex justify-end items-start">
+                    {/* <div className="flex items-start  space-x-3 ">
                         <details className="z-50 overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidden">
                             <summary
                                 className="flex w-[300px] cursor-pointer items-center justify-between gap-2 bg-white px-3 py-2 text-gray-900 transition"
@@ -296,7 +309,6 @@ const VoucherPage = () => {
 
                             <div className="border-t border-gray-200 bg-white">
                                 <header className="flex items-center justify-between p-4">
-                                    {/* <span className="text-sm text-gray-700"> đã chọn </span> */}
 
                                     <button
                                         type="button"
@@ -360,7 +372,7 @@ const VoucherPage = () => {
                                 </ul>
                             </div>
                         </details>
-                    </div>
+                    </div> */}
                     <div className="flex items-center">
                         <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
                         <Select
