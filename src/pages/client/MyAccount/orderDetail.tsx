@@ -99,7 +99,7 @@ const OrderDetail = () => {
   const { data: listOrderDetail, isSuccess: isSuccessListOrder } = useListOrderDetailQuery();
   const { data: listProductDetail, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery();
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery();
-  const [productsInOrderState, setProductsInOrder] = useState<any>([])
+  // const [productsInOrderState, setProductsInOrder] = useState<any>([])
   const [onaddReviews] = useAddReviewMutation()
   useEffect(() => {
     if (listOrderDetail) {
@@ -222,11 +222,11 @@ const OrderDetail = () => {
       setIsModalOpen(false);
     }
   };
-  useEffect(() => {
-    if (productsInOrder) {
-      setProductsInOrder(productsInOrder)
-    }
-  }, [listOrderDetailState, isModalOpen])
+  // useEffect(() => {
+  //   if (productsInOrder) {
+  //     setProductsInOrder(productsInOrder)
+  //   }
+  // }, [listOrderDetailState, isModalOpen])
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
     setFileList(newFileList);
   const handleRemoveImage = async (file: UploadFile) => {
@@ -378,7 +378,7 @@ const OrderDetail = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {productsInOrderState?.map((product: any) => {
+                      {productsInOrder?.map((product: any) => {
                         return (
                           <>
                             {productDetailState

@@ -19,7 +19,7 @@ import voucherAPI from './vouchers/voucher.service'
 import voucherSlice from './vouchers/voucherSlice'
 import statisticsApi from './statistic/statistic.service'
 import ReviewApi from './reviews/review.service'
-import reviewSlice from './reviews/reviewSlice'
+import reviewSlice, { reviewByRatingReducer, reviewByUserReducer } from './reviews/reviewSlice'
 
 const commonConfig = {
   key: "user",
@@ -70,7 +70,9 @@ export const store = configureStore({
     // voucher
     voucherSlice: voucherSlice,
     // reivew
-    reviewSlice: reviewSlice
+    reviewSlice: reviewSlice,
+    reviewByRatingReducer: reviewByRatingReducer,
+    // reviewByUserReducer: reviewByUserReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([
