@@ -138,6 +138,7 @@ const CheckoutsPage = () => {
         total += cart.totalMoney
       })
     }
+
     if (getOneVoucher && getOneVoucher?.type === "percent") {
       total = total - (total * getOneVoucher?.discount) / 100
       if (total) {
@@ -383,16 +384,6 @@ const CheckoutsPage = () => {
                 </div>
               })}
             </div>
-            {/* <div className="flex gap-[20px] my-2 w-[700px] flex-nowrap overflow-x-scroll">
-              {voucherState?.map((voucher, index) => {
-                return <>
-                  <div onClick={() => handleVoucher(voucher._id!)} className="border-2 w-[100%] p-3 overflow-hidden h-[120px] hover:border-2 hover:border-[#000] cursor-pointer transition-all ease-linear" key={index}>
-                    <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
-                    <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
-                  </div>
-                </>
-              })}
-            </div> */}
             <form className="py-5 flex gap-3 border-b-[1px]">
               <input
                 type="text"
@@ -408,10 +399,7 @@ const CheckoutsPage = () => {
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
-
                 <span className="font-medium">{(totalCart).toLocaleString("vi-VN")}₫</span>
-                {/* <span className="font-medium">{(getOneVoucher?.data && getOneVoucher?.!percent ? (totalCart - (totalCart * getOneVoucher?.discount) / 100).toLocaleString("vi-VN") : totalCart).toLocaleString("vi-VN")}₫</span> */}
-
               </div>
               <div className="flex justify-between">
                 <span>Giao hàng tận nơi</span>

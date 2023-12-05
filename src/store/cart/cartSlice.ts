@@ -11,6 +11,7 @@ const cartSlice = createSlice({
     initialState: initialCartState,
     reducers: ({
         listCartSlice: (state: ICartState, actions: PayloadAction<ICart[]>) => {
+            console.log(actions.payload)
             const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
             if (JSON.parse(userStore)?._id) {
                 const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)._id)
@@ -29,6 +30,7 @@ const cartSlice = createSlice({
             }
         },
         addCartSlice: (state: ICartState, actions: PayloadAction<ICart>) => {
+            console.log(actions.payload.totalMoney)
             const cartExistIndex = state.carts.findIndex((cart) => cart.productDetailId === actions.payload.productDetailId)
             const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
             if (JSON.parse(userStore)?._id) {
@@ -106,6 +108,7 @@ const cartSlice = createSlice({
                 if (cartStore) {
                     const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
                     if (cartStoreIndex !== -1) {
+
                         const updatedCartStore = [...cartStore]
                         updatedCartStore[cartStoreIndex] = {
                             ...updatedCartStore[cartStoreIndex],

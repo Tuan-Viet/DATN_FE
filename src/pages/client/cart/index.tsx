@@ -15,6 +15,7 @@ import { message } from "antd";
 const cartPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+    console.log(listCart)
     const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
     const cartState = useSelector((state: RootState) => state.cartSlice.carts)
@@ -152,7 +153,7 @@ const cartPage = () => {
                                                         {/* color and size */}
                                                         <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
                                                         {/* price product */}
-                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
+                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount == 0 ? pro.price?.toLocaleString("vi-VN") : pro.discount?.toLocaleString("vi-VN")}đ</p>
                                                     </div>
                                                     {user?.current?._id ? (
                                                         <div

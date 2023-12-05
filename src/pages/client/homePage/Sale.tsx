@@ -59,19 +59,23 @@ const Sale = () => {
                     <Link to="" className="block font-medium h-12">
                       {product.title}
                     </Link>
-                    <div className="price flex gap-x-[8px] items-baseline">
+                    {product.discount === 0 ? <div className="price flex gap-x-[8px] items-baseline">
+                      <span className="text-[13px] text-[#878C8F]">
+                        <span className="font-bold">{product.price.toLocaleString("vi-VN")}đ</span>
+                      </span>
+                    </div> : <div className="price flex gap-x-[8px] items-baseline">
                       <span className="text-sm text-[#FF2C26] font-semibold">
                         {product.discount?.toLocaleString("vi-VN")}đ
                       </span>
                       <span className="text-[13px] text-[#878C8F]">
                         <del>{product.price.toLocaleString("vi-VN")}đ</del>
                       </span>
-                    </div>
+                    </div>}
                   </div>
                   <div>
-                    {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                    {product.discount === 0 ? "" : (product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
                       -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
-                    </span> : ""}
+                    </span> : "")}
                   </div>
                   <Link to="" className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all">
                     <svg
@@ -112,19 +116,23 @@ const Sale = () => {
                         <Link to="" className="font-medium">
                           {product.title}
                         </Link>
-                        <div className="price flex gap-x-[8px] items-baseline">
+                        {product.discount === 0 ? <div className="price flex gap-x-[8px] items-baseline">
+                          <span className="text-[13px] text-[#878C8F]">
+                            <span className="font-bold">{product.price.toLocaleString("vi-VN")}đ</span>
+                          </span>
+                        </div> : <div className="price flex gap-x-[8px] items-baseline">
                           <span className="text-sm text-[#FF2C26] font-semibold">
                             {product.discount?.toLocaleString("vi-VN")}đ
                           </span>
                           <span className="text-[13px] text-[#878C8F]">
-                            <del>{product.price?.toLocaleString("vi-VN")}đ</del>
+                            <del>{product.price.toLocaleString("vi-VN")}đ</del>
                           </span>
-                        </div>
+                        </div>}
                       </div>
                       <div>
-                        {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                        {product.discount === 0 ? "" : (product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
                           -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
-                        </span> : ""}
+                        </span> : "")}
                       </div>
                       {/* <Link to="" className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all">
                         <svg

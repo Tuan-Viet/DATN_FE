@@ -103,7 +103,6 @@ const Header = () => {
   const isLoggedIn = user?.isLoggedIn;
   const fullName = user?.current?.fullname;
   const role = user?.current?.role;
-
   const logOut = () => {
     // Gọi action đăng xuất
     dispatch(logout());
@@ -113,7 +112,6 @@ const Header = () => {
   };
   useEffect(() => {
     if (listCart) {
-      console.log(1)
       if (user?.current?._id) {
         dispatch(listCartSlice(listCart));
       } else {
@@ -164,7 +162,10 @@ const Header = () => {
           if (cartIndex) {
             await onUpdateCart({ _id, ...cartIndex });
           }
+          console.log(2)
+
         } else {
+          console.log(1)
           dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
           setDecCart(true)
         }
@@ -314,12 +315,6 @@ const Header = () => {
       localStorage.setItem("searchTerm", JSON.stringify(searchTerms))
       dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: listProduct }))
       navigate(`/search`)
-      //   if (searchTerms.trim() === "") {
-      //     localStorage.setItem("searchTerm", JSON.stringify(searchTerms))
-      //     navigate("/search")
-      //     dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: [] }))
-      //   } else {
-      // }
     }
   }
   // forgotPassword
@@ -954,13 +949,10 @@ const Header = () => {
                                         </p>
                                         {/* price product */}
                                         <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
-                                          {pro?.discount.toLocaleString(
-                                            "vi-VN"
-                                          )}
+                                          {pro.discount == 0 ? pro.price?.toLocaleString("vi-VN") : pro.discount?.toLocaleString("vi-VN")}
                                           đ
                                         </p>
                                       </div>
-
                                       {user?.current?._id ? (
                                         <div
                                           className="absolute right-[10px] top-[10px]"
@@ -1018,7 +1010,7 @@ const Header = () => {
                                             onClick={() =>
                                               decreaseCart(
                                                 cart._id!,
-                                                pro.discount!
+                                                pro.discount == 0 ? pro.price : pro.discount
                                               )
                                             }
                                             disabled={
@@ -1032,7 +1024,7 @@ const Header = () => {
                                             onClick={() =>
                                               decreaseCart(
                                                 cart.productDetailId!,
-                                                pro.discount!
+                                                pro.discount == 0 ? pro.price : pro.discount
                                               )
                                             }
                                             disabled={
@@ -1055,7 +1047,7 @@ const Header = () => {
                                             onClick={() =>
                                               increaseCart(
                                                 cart._id!,
-                                                pro.discount!
+                                                pro.discount == 0 ? pro.price : pro.discount
                                               )
                                             }
                                             disabled={
@@ -1072,7 +1064,7 @@ const Header = () => {
                                             onClick={() =>
                                               increaseCart(
                                                 cart.productDetailId!,
-                                                pro.discount!
+                                                pro.discount == 0 ? pro.price : pro.discount
                                               )
                                             }
                                             disabled={
