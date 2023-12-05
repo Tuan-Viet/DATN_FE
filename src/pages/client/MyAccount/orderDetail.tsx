@@ -7,7 +7,7 @@ import {
 } from "../../../store/order/order.service";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, useEffect, useState } from "react";
-import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
+import { useListOrderDetailQuery, useUpdateOrderDetailMutation } from "../../../store/orderDetail/orderDetail.service";
 import { listOrderDetailSlice } from "../../../store/orderDetail/orderDetailSlice";
 import { RootState } from "@reduxjs/toolkit/query";
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
@@ -99,12 +99,13 @@ const OrderDetail = () => {
   const { data: listOrderDetail, isSuccess: isSuccessListOrder } = useListOrderDetailQuery();
   const { data: listProductDetail, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery();
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery();
+  // const [productsInOrderState, setProductsInOrder] = useState<any>([])
   const [onaddReviews] = useAddReviewMutation()
   useEffect(() => {
     if (listOrderDetail) {
       dispatch(listOrderDetailSlice(listOrderDetail));
     }
-  }, [isSuccessListOrder])
+  }, [isSuccessListOrder, isModalOpen])
   useEffect(() => {
     if (listProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail));
@@ -131,10 +132,10 @@ const OrderDetail = () => {
   const orderDetailIds = order?.orderDetails.map(
     (orderDetail: any) => orderDetail?._id
   );
-
   const productsInOrder = listOrderDetailState?.filter((orderDetail: any) =>
     orderDetailIds?.includes(orderDetail._id)
   );
+
   let totalProductPrice = 0;
   productsInOrder?.forEach((product: any) => {
     totalProductPrice += product.totalMoney;
@@ -181,9 +182,13 @@ const OrderDetail = () => {
   const [idProductDetail, setIdProductDetail] = useState<string>("")
   const { data: getOneProduct } = useFetchOneProductQuery(idProduct!)
   const { data: getOneProductDetail } = useGetOneProductDetailQuery(idProductDetail!)
-  const showModal = (id: string, idProDetail: string) => {
+  const [orderDetailId, setOrderDetailId] = useState<string>("")
+  const showModal = (id: string, idProDetail: string, orderDetailId: string) => {
     if (id) {
       setIdProduct(id)
+      if (orderDetailId) {
+        setOrderDetailId(orderDetailId)
+      }
       setIdProductDetail(idProDetail)
       setValue("product_id", id)
     }
@@ -197,6 +202,8 @@ const OrderDetail = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+  const [onupdateOrderDetail] = useUpdateOrderDetailMutation()
+
   const onFinish = async (values: any) => {
     // console.log('Uploaded files:', fileList);
     const imageObjects = fileList.map(file => ({
@@ -207,12 +214,19 @@ const OrderDetail = () => {
     if (idProduct && user?.current?._id && getOneProductDetail) {
       const valuesData = { ...values, color: getOneProductDetail.nameColor, size: getOneProductDetail.size, userId: user.current._id, productId: idProduct }
       await onaddReviews(valuesData)
+      if (orderDetailId) {
+        await onupdateOrderDetail({ _id: orderDetailId, order: { isReviewed: true } })
+      }
+      navigate(`/products/${idProduct}`)
       message.success("Cảm ơn bạn đã đánh giá!")
       setIsModalOpen(false);
     }
-
-
   };
+  // useEffect(() => {
+  //   if (productsInOrder) {
+  //     setProductsInOrder(productsInOrder)
+  //   }
+  // }, [listOrderDetailState, isModalOpen])
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
     setFileList(newFileList);
   const handleRemoveImage = async (file: UploadFile) => {
@@ -419,8 +433,9 @@ const OrderDetail = () => {
                                             )}
                                             ₫
                                           </td>
-                                          <td className="buttonReview">
-                                            {order && order.status === 4 && <div onClick={() => showModal(pro._id!, product.productDetailId!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
+                                          <td>
+                                            {order && order.status === 4 && product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
+                                            {order && order.status === 4 && product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
                                           </td>
                                         </tr>
                                       ))}

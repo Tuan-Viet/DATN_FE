@@ -56,15 +56,15 @@ const LayoutStatistic
     const renderComponent = () => {
       switch (value) {
         case 'week':
-          return <OrderRevanueByWeek />;
+          return <OrderRevanueByWeek showTable ={true} />;
         case 'month':
-          return <OrderRevanueByMonth />;
+          return <OrderRevanueByMonth showTable ={true}/>;
         case 'quarter':
-          return <OrderRevanueByQuarter />;
+          return <OrderRevanueByQuarter showTable ={true} />;
         case 'product':
-          return <ProductRevanue />;
+          return <ProductRevanue showTable ={true} />;
         case 'order':
-          return <OrderStatistic />;
+          return <OrderStatistic showTable ={true} />;
         default:
           return null;
       }

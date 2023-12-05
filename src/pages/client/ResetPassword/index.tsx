@@ -6,6 +6,7 @@ import { ResetPasswordForm, ResetPasswordSchema } from '../../../Schemas/ResetPa
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import axios from 'axios'
+import { message } from 'antd'
 const Resetpassword = () => {
     let params = new URLSearchParams(document.location.search)
     let token = params.get("token");
@@ -20,6 +21,7 @@ const Resetpassword = () => {
                     `http://localhost:8080/api/auth/reset-password/${token}`,
                     data
                 );
+                message.success("Đăng kí thành công!")
                 navigate("/signin")
             }
         } catch (error) {

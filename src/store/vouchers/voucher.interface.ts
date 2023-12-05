@@ -18,3 +18,7 @@ export interface IVoucher {
 export interface IVoucherState {
     vouchers: IVoucher[]
 }
+export interface IVoucherSearchState {
+    searchTerm: string
+    vouchers: IVoucher[]
+}

@@ -22,6 +22,8 @@ import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import { useListOrderQuery } from '../../../store/order/order.service';
+import { listOrderSearchSlice, listOrderSlice } from '../../../store/order/orderSlice';
+import { useForm } from 'react-hook-form';
 
 interface DataType {
     key: React.Key;
@@ -37,9 +39,28 @@ interface DataType {
 const ordersPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: orders, isLoading, isError, isSuccess } = useListOrderQuery()
+    const { handleSubmit } = useForm();
+    const [search, setSearch] = useState<string>("")
+    const orderState = useSelector((state: RootState) => state.orderSlice.orders)
+    // const [onRemove] = useRemoveProductMutation()
+    useEffect(() => {
+        if (orders) {
+            if (search === "" || !search) {
+                dispatch(listOrderSlice(orders))
+            }
+        }
+    }, [isSuccess, search])
 
-    const [onRemove] = useRemoveProductMutation()
-
+    const handleSearch = () => {
+        if (orders) {
+            dispatch(listOrderSearchSlice({ searchTerm: search, orders: orders }))
+        }
+    }
+    // useEffect(() => {
+    //     if (orderState?.length === 0 && orders) {
+    //         dispatch(listOrderSearchSlice({ searchTerm: search, orders: orders }))
+    //     }
+    // }, [orderState.length === 0])
     if (isError) {
         return <>error</>;
     }
@@ -50,17 +71,6 @@ const ordersPage = () => {
             </div>
         </>;
     }
-
-    // const confirm = async (id: string) => {
-    //     try {
-    //         if (id) {
-    //             await onRemove(id).then(() => dispatch(deleteProductSearchSlice(id)))
-    //             message.success('Delete order successfully!',);
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
     const columns: ColumnsType<DataType> = [
         {
             title: 'STT',
@@ -214,8 +224,8 @@ const ordersPage = () => {
 
     let data: DataType[] = [];
 
-    if (orders) {
-        data = orders.map((order: any, index) => ({
+    if (orderState) {
+        data = orderState?.map((order: any, index) => ({
             key: index + 1,
             _id: order._id,
             date: order.createdAt,
@@ -246,7 +256,7 @@ const ordersPage = () => {
             <div className="border p-3 rounded-lg min-h-screen bg-white">
                 <div className="flex pb-6 pt-3 justify-between">
                     <form
-                        //  onSubmit={handleSubmit(handleSearch)} 
+                        onSubmit={handleSubmit(handleSearch)}
                         className='w-[500px]'>
                         <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
                         <div className="relative">
@@ -256,7 +266,7 @@ const ordersPage = () => {
                                 </svg>
                             </div>
                             <input
-                                //  onChange={(e) => setSearch(e.target.value)} 
+                                onChange={(e) => setSearch(e.target.value)}
                                 type="text" id="default-search" className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
                         </div>
