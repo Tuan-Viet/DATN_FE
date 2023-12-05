@@ -17,10 +17,11 @@ import { Link } from "react-router-dom";
 import { Dispatch, useEffect, useState } from 'react';
 import { useFetchListCategoryQuery, useRemoveCategoryMutation } from '../../../store/category/category.service';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCategorySlice, listCategorySlice } from '../../../store/category/categorySlice';
+import { deleteCategorySlice, listCategorySearchSlice, listCategorySlice } from '../../../store/category/categorySlice';
 import { RootState } from '../../../store';
 import { ICategory } from '../../../store/category/category.interface';
 import { ColumnsType, TableProps } from 'antd/es/table';
+import { useForm } from 'react-hook-form';
 interface DataType {
     _id: React.Key;
     name: string;
@@ -35,12 +36,20 @@ const categoryPage = () => {
     const { data: listCategory, isLoading, isError, isSuccess } = useFetchListCategoryQuery()
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     const categoryData = categoryState.filter(category => category.name !== 'Chưa phân loại');
-
+    const { handleSubmit } = useForm()
+    const [search, setSearch] = useState<string>("")
     useEffect(() => {
-        if (isSuccess) {
-            dispatch(listCategorySlice(listCategory))
+        if (listCategory) {
+            if (search === "" || !search) {
+                dispatch(listCategorySlice(listCategory))
+            }
         }
-    }, [isSuccess])
+    }, [isSuccess, search])
+    const handleSearch = () => {
+        if (listCategory) {
+            dispatch(listCategorySearchSlice({ searchTerm: search, categories: listCategory }))
+        }
+    }
     if (isError) {
         return <>error</>;
     }
@@ -154,7 +163,7 @@ const categoryPage = () => {
             <div className="border min-h-[300px] p-3 rounded-lg  bg-white">
                 <div className="flex pb-6 pt-3 justify-between">
                     <form
-                        //  onSubmit={handleSubmit(handleSearch)} 
+                        onSubmit={handleSubmit(handleSearch)}
                         className='w-[500px]'>
                         <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
                         <div className="relative">
@@ -164,7 +173,7 @@ const categoryPage = () => {
                                 </svg>
                             </div>
                             <input
-                                //  onChange={(e) => setSearch(e.target.value)} 
+                                onChange={(e) => setSearch(e.target.value)}
                                 type="text" id="default-search" className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
                         </div>

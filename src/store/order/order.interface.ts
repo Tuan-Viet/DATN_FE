@@ -19,3 +19,8 @@ export interface IOrder {
 export interface IOrderState {
     orders: IOrder[]
 }
+
+export interface IOrderSearchState {
+    searchTerm: string
+    orders: IOrder[]
+}

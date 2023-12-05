@@ -56,8 +56,10 @@ const columns: ColumnsType<DataType> = [
     key: 'profit',
   },
 ];
-
-const ProductStatistic = () => {
+interface OrderRevanueByMonthProps {
+  showTable?: boolean; 
+}
+const ProductStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})) => {
   const { data: productRevanue, isSuccess } = useGetProductRevenueQuery();
   if (!isSuccess) {
     return <>
@@ -82,6 +84,7 @@ const ProductStatistic = () => {
 
   return (
     <div>
+      {props.showTable && (
       <Table
         sticky
         showHeader={true}
@@ -107,7 +110,7 @@ const ProductStatistic = () => {
             </Table.Summary.Cell>
           </Table.Summary.Row>
         )}
-      />
+      />)}
 
     </div>
   );
