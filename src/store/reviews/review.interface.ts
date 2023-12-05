@@ -19,3 +19,11 @@ export interface Types {
 export interface IReviewState {
     reviews: IReview[]
 }
+export interface IReviewByRateState {
+    rating: number | null
+    reviews: IReview[]
+}
+export interface IReviewByUserState {
+    userId: string
+    reviews: IReview[]
+}

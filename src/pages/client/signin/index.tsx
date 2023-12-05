@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ForgotAccountForm, ForgotAccountSchema } from "../../../Schemas/forgotAccount";
 import ForgotPassword from "./ForgotPassword";
+import Swal from "sweetalert2";
 
 type FormDataType = {
   email: string;
@@ -27,7 +28,7 @@ const signin = () => {
   const [onAddCart] = useAddCartMutation()
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
   const user = useSelector((state: any) => state?.user);
-
+  console.log(cartState)
   useEffect(() => {
     const buttonSignin = document.querySelector(".buttonSignin");
     const formSignin = document.querySelector(".formSignin");
@@ -69,20 +70,9 @@ const signin = () => {
       );
       toast.success("Đăng nhập thành công");
       if (cartState?.length > 0) {
-        // const cartIndex: ICart | undefined = cartState?.find((cart) => {
-        //   return cartStore?.filter((item) => cart.productDetailId === item.productDetailId)
-        // })
-        // console.log(cartIndex);
         cartStore?.map((cart) => {
-          return onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
-
-      } else {
-        console.log(2);
-
-        cartStore?.map((cart) => {
-          onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
+          onAddCart({ userId: response?.data?.user?._id, ...cart });
+        });
       }
       dispatch(
         register({
@@ -106,10 +96,24 @@ const signin = () => {
       }
     }
   };
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
   }, []);
-
+  useEffect(() => {
+    let params = new URLSearchParams(document.location.search)
+    let token = params.get("confirmationCode");
+    if (token) {
+      axios.post(
+        `http://localhost:8080/api/auth/confirm-registration/${token}`
+      ).then(({ data }) =>
+        Swal.fire({
+          title: data.message,
+          icon: "success",
+        })
+      );
+    }
+  }, [])
   return (
     <>
       <Header></Header>

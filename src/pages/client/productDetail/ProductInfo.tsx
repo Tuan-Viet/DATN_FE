@@ -30,7 +30,7 @@ import {
 } from 'antd';
 import ProductViewed from "./ProductViewed";
 import { useFetchListReviewsQuery } from "../../../store/reviews/review.service";
-import { listReviewSlice } from "../../../store/reviews/reviewSlice";
+import { listReviewByRate, listReviewByRateFilterSlice, listReviewByRateSlice, listReviewByUserFilterSlice, listReviewSlice } from "../../../store/reviews/reviewSlice";
 
 const ProductInfo = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -45,14 +45,19 @@ const ProductInfo = () => {
   const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
   const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
   const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
+  const reviewByRateState = useSelector((state: RootState) => state.reviewByRatingReducer.reviews)
   // console.log())
-  const reviewStateVer = reviewState?.slice().reverse()
+  const reviewByRateStateVer = reviewByRateState?.slice().reverse()
   useEffect(() => {
     if (listReview && id) {
       const listReviewByProductId = listReview?.filter((review) => review?.productId && review?.productId?.includes(id))
       dispatch(listReviewSlice(listReviewByProductId))
+      dispatch(listReviewByRateSlice(listReviewByProductId))
     }
   }, [isSuccessReview, id])
+  // useEffect(() => {
+
+  // }, [dispatch])
   const navigate = useNavigate()
   if (id) {
     const {
@@ -72,6 +77,7 @@ const ProductInfo = () => {
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
     const userStore = useSelector((state: any) => state.user);
+    // console.log()
     const [rateAver, setRateAver] = useState<number>(0)
     useEffect(() => {
       if (reviewState) {
@@ -84,7 +90,6 @@ const ProductInfo = () => {
         setRateAver(rateAverage)
       }
     }, [reviewState, rateAver])
-    // const totalRatingTbc = sum(totalRating)
     const renderContent = () => {
       switch (currentTab && currentTab) {
         case 1:
@@ -100,17 +105,19 @@ const ProductInfo = () => {
             <div className="bg-[#fffbf8] px-[24px] py-4 flex">
               <div className="">
                 <div className="flex items-center text-yellow-500">
-                  <p className="text-[24px]"> {rateAver.toFixed(1)}</p><span className="ml-2">trên 5 sao</span>
+                  <p className="text-[24px]"> {rateAver ? rateAver.toFixed(1) : 0}</p><span className="ml-2">trên 5 sao</span>
                 </div>
                 <Rate value={rateAver} disabled className="text-2xl " />
               </div>
               <div className="flex ml-10">
-                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Tất cả</div>
-                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">5 sao</div>
-                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">4 sao</div>
-                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">3 sao</div>
-                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">2 sao</div>
-                <div className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">1 sao</div>
+                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 0, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Tất cả</div>
+                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 5, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">5 sao</div>
+                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 4, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">4 sao</div>
+                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 3, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">3 sao</div>
+                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 2, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">2 sao</div>
+                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 1, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">1 sao</div>
+                {userStore?.current?._id && <div onClick={() => dispatch(listReviewByUserFilterSlice({ userId: userStore.current._id, reviews: reviewState && reviewState }))} className="border border-1 w-[150px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Đánh giá của tôi</div>}
+
               </div>
             </div>
             <List
@@ -122,7 +129,7 @@ const ProductInfo = () => {
                 },
                 pageSize: 3,
               }}
-              dataSource={reviewStateVer && reviewStateVer}
+              dataSource={reviewByRateStateVer && reviewByRateStateVer}
 
               renderItem={(item) => (
                 <List.Item
