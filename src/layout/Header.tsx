@@ -121,6 +121,17 @@ const Header = () => {
       }
     }
   }, [isSuccessCart, listCart]);
+
+  useEffect(() => {
+    if (listCart) {
+      console.log(1)
+      if (user?.current?._id) {
+        dispatch(listCartSlice(listCart));
+      } else {
+        dispatch(listCartSlice(cartStore ? cartStore : [])!);
+      }
+    }
+  }, []);
   useEffect(() => {
     if (listProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail));
@@ -917,6 +928,8 @@ const Header = () => {
             <hr className="my-[20px]" />
             <div className="overflow-y-scroll h-[450px]">
               {cartState?.map((cart, index) => {
+                console.log(cartState);
+
                 return (
                   <div key={index}>
                     {productDetailState
