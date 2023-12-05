@@ -5,7 +5,7 @@ import {
     BarChartOutlined,
     InboxOutlined
 } from '@ant-design/icons';
-import { useGetDashboardStatisticQuery, useGetOrderRevenueByMonthQuery, useGetOrderRevenueByQuarterQuery, useGetOrderRevenueByWeekQuery } from '../../../store/statistic/statistic.service';
+import { useGetDashboardStatisticQuery, useGetOrderRevenueByMonthQuery, useGetOrderRevenueByQuarterQuery, useGetOrderRevenueByWeekQuery, useGetOrderRevenueQuery, useGetProductRevenueQuery } from '../../../store/statistic/statistic.service';
 import Highcharts from 'highcharts';
 import { MonthlyStatistics, DashboardStatistic } from '../../../store/statistic/statistic.interface';
 import HighchartsReact from 'highcharts-react-official';
@@ -24,7 +24,8 @@ const DashboardPage = () => {
     const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueByMonth } = useGetOrderRevenueByMonthQuery()
     const { data: orderRevanueQuarter, isSuccess: isSuccessGetRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
   const { data: orderRevanueWeek, isSuccess: isSuccessGetRevanueWeek } = useGetOrderRevenueByWeekQuery()
-
+  const { data: productRevanue } = useGetProductRevenueQuery();
+  const { data: productRevanue, isSuccess } = useGetOrderRevenueQuery();
 
     // const { data: listProduct } = useFetchListProductQuery()
     // const { data: listOrder } = useListOrderQuery()
