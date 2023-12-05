@@ -15,3 +15,7 @@ export interface Url {
 export interface ICategoryState {
     categories: ICategory[]
 }
+export interface ICategorySearchState {
+    searchTerm: string
+    categories: ICategory[]
+}

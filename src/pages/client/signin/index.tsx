@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ForgotAccountForm, ForgotAccountSchema } from "../../../Schemas/forgotAccount";
 import ForgotPassword from "./ForgotPassword";
+import Swal from "sweetalert2";
 
 type FormDataType = {
   email: string;
@@ -95,10 +96,24 @@ const signin = () => {
       }
     }
   };
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
   }, []);
-
+  useEffect(() => {
+    let params = new URLSearchParams(document.location.search)
+    let token = params.get("confirmationCode");
+    if (token) {
+      axios.post(
+        `http://localhost:8080/api/auth/confirm-registration/${token}`
+      ).then(({ data }) =>
+        Swal.fire({
+          title: data.message,
+          icon: "success",
+        })
+      );
+    }
+  }, [])
   return (
     <>
       <Header></Header>
