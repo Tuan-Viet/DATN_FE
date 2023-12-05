@@ -33,6 +33,7 @@ import { ColumnsType, TableProps } from 'antd/es/table';
 
 interface DataType {
     _id: React.Key;
+    sku: string;
     title: string;
     images: any[];
     price: number;
@@ -106,8 +107,7 @@ const productPage = () => {
         },
         {
             title: 'MÃ SẢN PHẨM',
-            dataIndex: '_id',
-            render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
+            dataIndex: 'sku',
         },
         {
             title: 'TÊN SẢN PHẨM',
@@ -268,6 +268,7 @@ const productPage = () => {
     const data: DataType[] = sortedProducts.map((product: any, index) => ({
         key: index + 1,
         _id: product._id!,
+        sku: product.sku,
         title: product.title,
         images: product.images,
         price: product.price,

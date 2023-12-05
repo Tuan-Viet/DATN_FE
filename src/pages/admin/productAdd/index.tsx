@@ -10,8 +10,6 @@ import {
     message,
     Upload,
     Spin,
-    Row,
-    Col,
     Card,
     Typography,
     Breadcrumb,
@@ -20,11 +18,7 @@ import {
     Tooltip
 } from 'antd';
 import {
-    UploadOutlined,
-    CloseOutlined,
-    CloudUploadOutlined,
     PlusOutlined,
-    DownOutlined,
     InfoCircleOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from 'react-router-dom';
@@ -57,7 +51,7 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
 
     return (
         <Button type="primary" htmlType="submit"
-            disabled={!submittable}
+            // disabled={!submittable}
             className='bg-blue-500'>
             Thêm
         </Button>
@@ -185,10 +179,16 @@ const productAdd = () => {
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0 });
     }, []);
+
+    const handleFormKeyPress = (event: any) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+        }
+    };
+
     return <>
         <Breadcrumb className='pb-3'
             items={[
-
                 {
                     title: <Link to={`/admin/product`}>Sản phẩm</Link>,
                 },
@@ -262,18 +262,25 @@ const productAdd = () => {
                                             <CKEditor
                                                 editor={ClassicEditor}
                                                 onReady={editor => {
-                                                    console.log('Editor is ready to use!', editor);
+                                                    // console.log('Editor is ready to use!', editor);
+                                                    editor.editing.view.change((writer) => {
+                                                        writer.setStyle(
+                                                            "height",
+                                                            "300px",
+                                                            editor.editing.view.document.getRoot()
+                                                        )
+                                                    })
                                                 }}
                                                 onChange={(event, editor) => {
                                                     const data = editor.getData();
                                                     setDescription(data);
-                                                    console.log({ event, editor, data });
+                                                    // console.log({ event, editor, data });
                                                 }}
                                                 onBlur={(event, editor) => {
-                                                    console.log('Blur.', editor);
+                                                    // console.log('Blur.', editor);
                                                 }}
                                                 onFocus={(event, editor) => {
-                                                    console.log('Focus.', editor);
+                                                    // console.log('Focus.', editor);
                                                 }}
                                             />
                                         </Form.Item>
@@ -364,7 +371,6 @@ const productAdd = () => {
                                     <Form.Item
                                         label="Màu sắc"
                                         name='colors'
-                                        rules={[{ required: true, message: 'Không được để trống!' }]}
                                         className='w-1/2'
                                     >
                                         <div className="border rounded-md hover:border-blue-500 ">
@@ -381,12 +387,12 @@ const productAdd = () => {
                                                 onChange={handleInputColor}
                                                 onPressEnter={handleInputColorEnter}
                                                 className='py-2'
+                                                onKeyPress={handleFormKeyPress}
                                             />
                                         </div>
                                     </Form.Item>
                                     <Form.Item label="Kích thước"
                                         name="sizes"
-                                        rules={[{ required: true }]}
                                         className='w-1/2'>
                                         <div className="border rounded-md hover:border-blue-500 ">
                                             {sizes.map(size => (
@@ -402,6 +408,7 @@ const productAdd = () => {
                                                 onChange={handleInputSize}
                                                 onPressEnter={handleInputSizeEnter}
                                                 className='py-2'
+                                                onKeyPress={handleFormKeyPress}
                                             />
                                         </div>
 
@@ -417,13 +424,6 @@ const productAdd = () => {
                                                         size="small"
                                                         title={`Mẫu ${field.name + 1}`}
                                                         key={field.key}
-                                                    // extra={
-                                                    //     <CloseOutlined
-                                                    //         onClick={() => {
-                                                    //             remove(field.name);
-                                                    //         }}
-                                                    //     />
-                                                    // }
                                                     >
                                                         <div className="flex justify-between px-10 py-3">
                                                             <div className="text-center w-[300]">
