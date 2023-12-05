@@ -34,3 +34,11 @@ export interface IReviewDashboard {
     images: Types[]
     createdAt: string
 }
+export interface IReviewByRateState {
+    rating: number | null
+    reviews: IReview[]
+}
+export interface IReviewByUserState {
+    userId: string
+    reviews: IReview[]
+}

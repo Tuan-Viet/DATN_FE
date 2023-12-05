@@ -1,4 +1,5 @@
 export interface IOrderDetail {
+    _id: string
     orderId: string
     productDetailId: string
     price: number
@@ -6,6 +7,7 @@ export interface IOrderDetail {
     color: string
     size: string
     totalMoney: number
+    isReviewed: boolean
 }
 
 export interface IOrderDetailState {

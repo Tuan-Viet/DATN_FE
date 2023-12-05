@@ -24,7 +24,7 @@ import { useFetchListProductByAdminQuery, useFetchListProductQuery, useRemovePro
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchSlice } from '../../../store/product/productSlice';
+import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchBySkuSlice, listProductSearchSlice } from '../../../store/product/productSlice';
 import { ICategory } from '../../../store/category/category.interface';
 import { useForm } from "react-hook-form";
 import { listCategorySlice } from '../../../store/category/categorySlice';
@@ -34,6 +34,7 @@ import { ColumnsType, TableProps } from 'antd/es/table';
 interface DataType {
     _id: React.Key;
     title: string;
+    sku: string;
     images: any[];
     price: number;
     discount: number;
@@ -57,7 +58,6 @@ const productPage = () => {
     const [sortOption, setSortOption] = useState<Number>(1);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(0);
-
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
@@ -69,10 +69,17 @@ const productPage = () => {
         }
     }, [isSuccess, search, listCategory])
     const handleSearch = () => {
-        if (listProduct) {
-            dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }))
+        if (listProduct && search) {
+            dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }));
         }
-    }
+    };
+    useEffect(() => {
+        if (productSearchState?.length === 0 && listProduct) {
+            if (search) {
+                dispatch(listProductSearchBySkuSlice({ searchTerm: search, products: listProduct }));
+            }
+        }
+    }, [productSearchState.length === 0]);
     if (isError) {
         return <>error</>;
     }
@@ -106,15 +113,14 @@ const productPage = () => {
         },
         {
             title: 'MÃ SẢN PHẨM',
-            dataIndex: '_id',
-            render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
+            dataIndex: 'sku',
         },
         {
             title: 'TÊN SẢN PHẨM',
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
-                    <Image.PreviewGroup items={record?.images.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
+                    <Image.PreviewGroup items={record?.images?.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
                         <Image
                             width={70}
                             src={record?.images[0]}
@@ -156,8 +162,8 @@ const productPage = () => {
             title: 'DANH MỤC',
             dataIndex: 'categoryId',
             key: 'categoryId',
-            render: (cateId: any) => {
-                const category = categoryState.find((cate) => cate._id === (cateId && cateId._id));
+            render: (cateId: string) => {
+                const category = categoryState.find((cate) => cate._id === (cateId && cateId?._id));
                 return category ? category.name : 'N/A';
             },
             className: 'w-[150px]',
@@ -203,7 +209,7 @@ const productPage = () => {
         }
     };
 
-    const filteredProducts = productSearchState.filter((product: any) => {
+    const filteredProducts = productSearchState?.filter((product: any) => {
         // Lọc theo danh mục đã chọn
         if (selectedCategories.length > 0 && !selectedCategories.includes(product.categoryId._id)) {
             return false;
@@ -270,9 +276,10 @@ const productPage = () => {
         default:
             break;
     }
-    const data: DataType[] = sortedProducts.map((product: any, index) => ({
+    const data: DataType[] = sortedProducts?.map((product: any, index) => ({
         key: index + 1,
         _id: product._id!,
+        sku: product.sku,
         title: product.title,
         images: product.images,
         price: product.price,
@@ -331,7 +338,7 @@ const productPage = () => {
                             </summary>
                             <div className="border-t border-gray-200 bg-white">
                                 <header className="flex items-center justify-between p-4">
-                                    <span className="text-sm text-gray-700"> {selectedCategories.length} đã chọn </span>
+                                    <span className="text-sm text-gray-700"> {selectedCategories?.length} đã chọn </span>
 
                                     <button
                                         type="button"
@@ -343,25 +350,24 @@ const productPage = () => {
                                 </header>
 
                                 <ul className="space-y-1 border-t border-gray-200 p-4">
-                                    {categoryState
-                                        .map((cate: any) => (
-                                            <li key={cate._id}>
-                                                <label htmlFor="FilterPrice" className="inline-flex items-center gap-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        id="FilterPrice"
-                                                        className="h-5 w-5 rounded border-gray-300"
-                                                        checked={selectedCategories.includes(cate._id)}
-                                                        onChange={() => toggleCategory(cate._id)}
-                                                    />
+                                    {categoryState?.map((cate: any) => (
+                                        <li key={cate._id}>
+                                            <label htmlFor="FilterPrice" className="inline-flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    id="FilterPrice"
+                                                    className="h-5 w-5 rounded border-gray-300"
+                                                    checked={selectedCategories?.includes(cate._id)}
+                                                    onChange={() => toggleCategory(cate._id)}
+                                                />
 
-                                                    <span className="text-sm font-medium text-gray-700">
-                                                        {cate.name}
-                                                        {/* ({cate.products.length - 1}) */}
-                                                    </span>
-                                                </label>
-                                            </li>
-                                        ))}
+                                                <span className="text-sm font-medium text-gray-700">
+                                                    {cate.name}
+                                                    {/* ({cate.products.length - 1}) */}
+                                                </span>
+                                            </label>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </details>
@@ -504,7 +510,7 @@ const productPage = () => {
                         />
                     </div>
                 </div>
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange}
+                <Table columns={columns} dataSource={data && data} pagination={{ pageSize: 20 }} onChange={onChange}
                     className='absolute top-40 right-3 left-3' />
             </div>
         </div>

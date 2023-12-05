@@ -73,7 +73,15 @@ const productSearchSlice = createSlice({
                 const listProductFilter = actions.payload?.products?.filter(
                     (product) => { return product.title && product.title.trim().toLowerCase().includes(nameTerm) }
                 );
-
+                state.products = listProductFilter
+            }
+        },
+        listProductSearchBySkuSlice: (state: IProductFilterState, actions: PayloadAction<IProductSearchState>) => {
+            const nameTerm = actions?.payload?.searchTerm?.trim().toLowerCase()
+            if (nameTerm) {
+                const listProductFilter = actions.payload?.products?.filter(
+                    (product) => { return product.sku && product.sku.trim().toLowerCase().includes(nameTerm) }
+                );
                 state.products = listProductFilter
             }
         },
@@ -141,7 +149,7 @@ export const { listProductFilterSlice, listProductCategorySlice } = productFilte
 // productBySale
 export const { listProductSale, listProductSaleSlice } = productSaleSlice.actions
 // productSearch By name
-export const { listProductSearch, listProductSearchSlice, deleteProductSearchSlice } = productSearchSlice.actions
+export const { listProductSearch, listProductSearchSlice, deleteProductSearchSlice, listProductSearchBySkuSlice } = productSearchSlice.actions
 // productOutStand
 export const { listProductOutStand, listProductOutStandSlice } = productOutstandSlice.actions
 // productRelated
