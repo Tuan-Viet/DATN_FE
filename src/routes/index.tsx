@@ -8,6 +8,7 @@ import categoryAdd from "../pages/admin/categoryAdd";
 import categoryPage from "../pages/admin/categoryPage";
 import categoryUpdate from "../pages/admin/categoryUpdate";
 import dashboardPage from "../pages/admin/dashboard";
+import ProductRevanue from "../pages/admin/statistic/ProductStatistic";
 import ordersPage from "../pages/admin/ordersPage";
 import productAdd from "../pages/admin/productAdd";
 import productPage from "../pages/admin/productPage/index.";
@@ -24,12 +25,17 @@ import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
 import ProductPage from "../pages/client/Products";
+import Resetpassword from "../pages/client/ResetPassword";
 import SearchResult from "../pages/client/SearchResult";
 import cartPage from "../pages/client/cart";
 import homePage from "../pages/client/homePage";
 import productDetail from "../pages/client/productDetail";
 import signin from "../pages/client/signin";
 import signup from "../pages/client/signup";
+import OrderRevanue from "../pages/admin/statistic/OrderRevanueByMonth";
+import OrderRevanueByMonth from "../pages/admin/statistic/OrderRevanueByMonth";
+import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
+import productById from "../pages/admin/productById";
 
 
 export const publicRoutes = [
@@ -42,6 +48,7 @@ export const publicRoutes = [
   { path: routes.checkout, Component: CheckoutsPage },
   { path: routes.Billconfirm, Component: BillConfirm },
   { path: routes.signin, Component: signin },
+  { path: routes.resetPassword, Component: Resetpassword },
   { path: routes.signup, Component: signup },
   { path: routes.myAccount, Component: myAccount },
   { path: routes.orders, Component: myOrders },
@@ -59,6 +66,7 @@ export const privateRoutes = [
   { path: routes.adminProducts, Component: productPage },
   { path: routes.adminProductAdd, Component: productAdd },
   { path: routes.adminProductUpdate, Component: productUpdate },
+  { path: routes.adminProductById, Component: productById },
   { path: routes.adminCategorys, Component: categoryPage },
   { path: routes.adminCategoryAdd, Component: categoryAdd },
   { path: routes.adminCategoryUpdate, Component: categoryUpdate },
@@ -69,4 +77,12 @@ export const privateRoutes = [
   { path: routes.adminVoucherPage, Component: VoucherPage },
   { path: routes.adminVoucherAdd, Component: VoucherAdd },
   { path: routes.adminVoucherUpdate, Component: VoucherUpdate },
+  { path: routes.adminVoucherUpdate, Component: VoucherUpdate },
+  { path: routes.adminStatistic, Component: LayoutStatistic },
+  { path: routes.adminProductRevanue, Component: ProductRevanue },
+  { path: routes.adminOrderRevanue, Component: OrderRevanue },
+  { path: routes.adminOrderRevanueByMonth, Component: OrderRevanueByMonth },
+
+
+
 ]

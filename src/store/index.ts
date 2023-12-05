@@ -21,6 +21,9 @@ import voucherSlice from './vouchers/voucherSlice'
 import authApi from './user/user.service'
 import orderReturnAPI from './orderReturn/order.service'
 
+import statisticsApi from './statistic/statistic.service'
+import ReviewApi from './reviews/review.service'
+import reviewSlice, { reviewByRatingReducer, reviewByUserReducer } from './reviews/reviewSlice'
 
 const commonConfig = {
   key: "user",
@@ -44,6 +47,9 @@ export const store = configureStore({
     [orderDetailAPI.reducerPath]: orderDetailAPI.reducer,
     [voucherAPI.reducerPath]: voucherAPI.reducer,
     [authApi.reducerPath]: authApi.reducer,
+    [statisticsApi.reducerPath]: statisticsApi.reducer,
+
+    [ReviewApi.reducerPath]: ReviewApi.reducer,
     // category
     categorySlice: categorySlice,
     // product
@@ -71,10 +77,32 @@ export const store = configureStore({
     userSlice: userSlice,
     // voucher
 
-    voucherSlice: voucherSlice
+    voucherSlice: voucherSlice,
+    // },
+    // middleware: (getDefaultMiddleware) =>
+    //   getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderReturnAPI.middleware).concat(orderDetailAPI.middleware).concat(authApi.middleware).concat(voucherAPI.middleware),
+    //   voucherSlice: voucherSlice,
+    // reivew
+    reviewSlice: reviewSlice,
+    reviewByRatingReducer: reviewByRatingReducer,
+    // reviewByUserReducer: reviewByUserReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderReturnAPI.middleware).concat(orderDetailAPI.middleware).concat(authApi.middleware).concat(voucherAPI.middleware),
+    getDefaultMiddleware().concat([
+      categoryApi.middleware,
+      productAPI.middleware,
+      productDetailAPI.middleware,
+      cartAPI.middleware,
+      orderAPI.middleware,
+      orderDetailAPI.middleware,
+      voucherAPI.middleware,
+      statisticsApi.middleware,
+      ReviewApi.middleware,
+      orderReturnAPI.middleware,
+      authApi.middleware
+    ])
+  // getDefaultMiddleware().concat(categoryApi.middleware).concat(productAPI.middleware).concat(productDetailAPI.middleware).concat(cartAPI.middleware).concat(orderAPI.middleware).concat(orderDetailAPI.middleware).concat(voucherAPI.middleware)
+  //   .concat(ReviewApi.middleware),
 })
 
 

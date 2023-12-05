@@ -123,21 +123,18 @@ const CheckoutsPage = () => {
 
       await onAddOrder(data).then(({ data }: any) => {
         console.log(data);
-
-        if (data.pay_method === "COD") {
+        if (data?.pay_method === "COD") {
           setTimeout(async () => {
             setLoading(false);
             dispatch(listCartSlice([]))
             navigate(`/orders/${data?._id}`)
           }, 2500)
-        } else if (data.pay_method === "VNBANK") {
-
+        } else if (data?.pay_method === "VNBANK") {
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
             .then(({ data }) => window.location.href = data)
         }
       }
       )
-
     } catch (error) {
       console.log(error);
     }
@@ -146,7 +143,6 @@ const CheckoutsPage = () => {
   const handleVoucher = async (voucherId: string) => {
     if (voucherId) {
       await setIdVoucher(voucherId)
-
     }
   }
   useEffect(() => {

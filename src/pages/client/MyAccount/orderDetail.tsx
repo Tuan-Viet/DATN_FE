@@ -7,21 +7,26 @@ import {
 } from "../../../store/order/order.service";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, useEffect, useState } from "react";
-import { useListOrderDetailQuery } from "../../../store/orderDetail/orderDetail.service";
+import { useListOrderDetailQuery, useUpdateOrderDetailMutation } from "../../../store/orderDetail/orderDetail.service";
 import { listOrderDetailSlice } from "../../../store/orderDetail/orderDetailSlice";
 import { RootState } from "@reduxjs/toolkit/query";
-import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
-import { useFetchListProductQuery } from "../../../store/product/product.service";
+import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import { Button, Modal } from "antd";
-import { useForm } from "react-hook-form";
 import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
-import { yupResolver } from "@hookform/resolvers/yup";
 import { useAddOrderMutation } from "../../../store/orderReturn/order.service";
 import { current } from "@reduxjs/toolkit";
+import { useForm } from "react-hook-form";
+import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, Form, Modal, Rate, Upload, UploadFile, UploadProps, message, notification } from "antd";
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons';
+import TextArea from "antd/es/input/TextArea";
+import axios from "axios";
+import { useAddReviewMutation } from "../../../store/reviews/review.service";
 
 function formatDateStringToDisplayDate(dateString) {
   const originalDate = new Date(dateString);
@@ -73,7 +78,17 @@ function mapStatusPaymentToText(statusCode) {
 
 const OrderDetail = () => {
   const dispatch: Dispatch<any> = useDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const { handleSubmit, register, setValue, formState: { errors } } = useForm<ReviewForm>({
+    resolver: yupResolver(ReviewSchema)
+  })
   const user = useSelector((state: any) => state.user);
+  useEffect(() => {
+    if (user) {
+      setValue("user_id", user?.current?._id)
+    }
+  }, [user])
   const isLoggedIn = user?.isLoggedIn;
   const navigate = useNavigate();
   useEffect(() => {
@@ -83,13 +98,27 @@ const OrderDetail = () => {
   }, [navigate]);
 
   const { id } = useParams();
-  const { data: order } = useGetOneOrderQuery(id);
-  const { data: listOrderDetail } = useListOrderDetailQuery();
-  const { data: listProductDetail } = useListProductDetailQuery();
-  const { data: listProduct } = useFetchListProductQuery();
-  dispatch(listOrderDetailSlice(listOrderDetail));
-  dispatch(listProductDetailSlice(listProductDetail));
-  dispatch(listProductSlice(listProduct));
+  const { data: order } = useGetOneOrderQuery(id!);
+  const { data: listOrderDetail, isSuccess: isSuccessListOrder } = useListOrderDetailQuery();
+  const { data: listProductDetail, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery();
+  const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery();
+  // const [productsInOrderState, setProductsInOrder] = useState<any>([])
+  const [onaddReviews] = useAddReviewMutation()
+  useEffect(() => {
+    if (listOrderDetail) {
+      dispatch(listOrderDetailSlice(listOrderDetail));
+    }
+  }, [isSuccessListOrder, isModalOpen])
+  useEffect(() => {
+    if (listProductDetail) {
+      dispatch(listProductDetailSlice(listProductDetail));
+    }
+  }, [isSuccessListProductDetail])
+  useEffect(() => {
+    if (listProduct) {
+      dispatch(listProductSlice(listProduct));
+    }
+  }, [isSuccessProduct])
 
   const [updateOrder] = useUpdateOrderMutation();
 
@@ -104,18 +133,16 @@ const OrderDetail = () => {
   );
 
   const orderDetailIds = order?.orderDetails.map(
-    (orderDetail) => orderDetail._id
+    (orderDetail: any) => orderDetail?._id
   );
-
-  const productsInOrder = listOrderDetailState?.filter((orderDetail) =>
+  const productsInOrder = listOrderDetailState?.filter((orderDetail: any) =>
     orderDetailIds?.includes(orderDetail._id)
   );
 
   let totalProductPrice = 0;
-  productsInOrder?.forEach((product) => {
+  productsInOrder?.forEach((product: any) => {
     totalProductPrice += product.totalMoney;
   });
-
   const handleCancelOrder = async (id: string) => {
     if (confirm("Bạn có chắc chắn muốn hủy đơn hàng này")) {
       try {
@@ -154,20 +181,36 @@ const OrderDetail = () => {
       }
     });
   };
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const showModal = () => {
+  const [idProduct, setIdProduct] = useState<string>("")
+  const [idProductDetail, setIdProductDetail] = useState<string>("")
+  const { data: getOneProduct } = useFetchOneProductQuery(idProduct!)
+  const { data: getOneProductDetail } = useGetOneProductDetailQuery(idProductDetail!)
+  const [orderDetailId, setOrderDetailId] = useState<string>("")
+  const showModal = (id: string, idProDetail: string, orderDetailId: string) => {
+    if (id) {
+      setIdProduct(id)
+      if (orderDetailId) {
+        setOrderDetailId(orderDetailId)
+      }
+      setIdProductDetail(idProDetail)
+      setValue("product_id", id)
+    }
     setIsModalOpen(true);
   };
-  const handleCancel = () => {
+
+  const [isModalOrderOpen, setIsModalOrderOpen] = useState(false);
+  const showOrderModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleOrderCancel = () => {
     setIsModalOpen(false);
   };
 
   const {
-    register,
-    setValue,
-    handleSubmit,
-    formState: { errors }
+    register: registerOrder,
+    setValue: setOrderValue,
+    handleSubmit: handleOrderSubmit,
+    formState: { errors: OrderErrors }
   } = useForm<orderReturnForm>({
     resolver: yupResolver(orderReturnSchema)
   })
@@ -182,10 +225,58 @@ const OrderDetail = () => {
     setIsModalOpen(false);
   }
 
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  const [onupdateOrderDetail] = useUpdateOrderDetailMutation()
+
+  const onFinish = async (values: any) => {
+    // console.log('Uploaded files:', fileList);
+    const imageObjects = fileList.map(file => ({
+      url: file.response[0].url,
+      publicId: file.response[0].publicId
+    }));
+    values.images = imageObjects;
+    if (idProduct && user?.current?._id && getOneProductDetail) {
+      const valuesData = { ...values, color: getOneProductDetail.nameColor, size: getOneProductDetail.size, userId: user.current._id, productId: idProduct }
+      await onaddReviews(valuesData)
+      if (orderDetailId) {
+        await onupdateOrderDetail({ _id: orderDetailId, order: { isReviewed: true } })
+      }
+      navigate(`/products/${idProduct}`)
+      message.success("Cảm ơn bạn đã đánh giá!")
+      setIsModalOpen(false);
+    }
+  };
+  // useEffect(() => {
+  //   if (productsInOrder) {
+  //     setProductsInOrder(productsInOrder)
+  //   }
+  // }, [listOrderDetailState, isModalOpen])
+  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
+    setFileList(newFileList);
+  const handleRemoveImage = async (file: UploadFile) => {
+    console.log(file);
+    try {
+      await axios.delete(`http://localhost:8080/api/images/remove/${file.response[0].publicId}`);
+      notification.success({
+        message: "Xóa ảnh thành công",
+        duration: 5,
+        closeIcon: true
+      });
+    } catch (error) {
+      // console.error("Lỗi khi xóa ảnh", error);
+    }
+  };
   return (
     <>
       <Header></Header>
       <div className="container">
+        {/* <Rate /> */}
         <div className="mt-14">
           <h1 className="text-[25px] mb-7 font-bold text-center pb-5 relative">
             Chi tiết đơn hàng
@@ -253,7 +344,7 @@ const OrderDetail = () => {
                     <h3 className="font-semibold text-lg mb-1">
                       ĐƠN HÀNG: #{id}
                     </h3>
-                    <p className="text-sm mb-3">
+                    <p className="text-sm cursor-pointer mb-3">
                       Đặt lúc —{" "}
                       {formatDateStringToDisplayDate(order?.createdAt)}
                     </p>
@@ -278,7 +369,7 @@ const OrderDetail = () => {
                       </>
                     )}
                     {order?.status == 3 && (
-                      <Button type="primary" onClick={showModal} className="text-white bg-blue-700"  >
+                      <Button type="primary" onClick={showOrderModal} className="text-white bg-blue-700"  >
                         Trả hàng
                       </Button>
                     )}
@@ -286,29 +377,29 @@ const OrderDetail = () => {
                   <Modal
                     title="Trả hàng"
                     centered
-                    open={isModalOpen}
+                    open={isModalOrderOpen}
                     onOk={handleSubmit(onAddOrderReturn)}
-                    onCancel={(handleCancel)}
+                    onCancel={(handleOrderCancel)}
                     width={1000}
                   >
 
                     <form className=" mx-auto" onSubmit={handleSubmit(onAddOrderReturn)}>
-                      <input type="hidden" value={user.current._id} {...register("userId")} id="userId" />
+                      <input type="hidden" value={user.current._id} {...registerOrder("userId")} id="userId" />
                       <div className="mb-5">
                         <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Họ tên người gửi</label>
-                        <input {...register("fullName")} type="text" id="fullName" className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                       </div>
                       <div className="mb-5">
                         <label htmlFor="base-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Số điện thoại người gửi</label>
-                        <input type="text" {...register("phoneNumber")} id="phoneNumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                       </div>
                       <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Địa chỉ gửi</label>
-                        <input type="text" {...register("address")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input type="text" {...registerOrder("address")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                       </div>
                       <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do trả hàng</label>
-                        <input type="text" {...register("reason")} id="reason" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input type="text" {...registerOrder("reason")} id="reason" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                       </div>
                       <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Sản phẩm trả hàng</label>
@@ -349,10 +440,10 @@ const OrderDetail = () => {
                                               .map((pro) => (
 
                                                 <tr className="bg-white ">
-                                                  <input type="hidden" {...register(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
-                                                  <input type="hidden" {...register(`orderDetailIds.${index}.color`)} value={product.color} className="" />
-                                                  <input type="hidden" {...register(`orderDetailIds.${index}.size`)} value={product.size} className="" />
-                                                  <input type="hidden" {...register(`orderDetailIds.${index}.price`)} value={product.price} className="" />
+                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
+                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
+                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
+                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
                                                   <th
                                                     scope="row"
                                                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
@@ -380,7 +471,7 @@ const OrderDetail = () => {
                                                   <td className="px-6 py-4">
 
                                                     <div className="relative flex items-center max-w-[8rem]">
-                                                      <input type="number" {...register(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} placeholder="0" required min={0} max={product.quantity} />
+                                                      <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} placeholder="0" required min={0} max={product.quantity} />
                                                       /{product.quantity}
                                                     </div>
                                                   </td>
@@ -417,15 +508,15 @@ const OrderDetail = () => {
                   <div className="text-right">
                     {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 && (
                       <button
-                        onClick={() => handleCancelOrder(id)}
-                        className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+                        onClick={() => handleCancelOrder(id!)}
+                        className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                       >
                         Hủy đơn hàng
                       </button>
                     )}
                     <Link
                       to="/account"
-                      className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2"
+                      className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                     >
                       Quay lại trang tài khoản
                     </Link>
@@ -433,7 +524,7 @@ const OrderDetail = () => {
                 </div>
                 <div className="relative overflow-x-auto mb-9 shadow-md sm:rounded-lg">
                   <table className="w-full text-[15px] text-left border-8 border-[#d9edf7]">
-                    <thead className="text-sm uppercase border-b-2 border-black bg-gray-50">
+                    <thead className="text-sm cursor-pointer uppercase border-b-2 border-black bg-gray-50">
                       <tr>
                         <th scope="col" className="px-6 py-3">
                           Sản phẩm
@@ -450,43 +541,48 @@ const OrderDetail = () => {
                         <th scope="col" className="px-6 py-3">
                           Thành tiền
                         </th>
+                        {order && order.status === 4 && <th scope="col" className="px-6 py-3">
+                          Đánh giá
+                        </th>}
                       </tr>
                     </thead>
                     <tbody>
-                      {productsInOrder?.map((product) => {
+                      {productsInOrder?.map((product: any) => {
                         return (
                           <>
                             {productDetailState
                               ?.filter(
-                                (proDetail) =>
+                                (proDetail: any) =>
                                   proDetail._id === product.productDetailId
                               )
-                              .map((item) => {
+                              .map((item: any) => {
                                 return (
                                   <>
                                     {productState
                                       ?.filter(
-                                        (prod) => prod._id === item.product_id
+                                        (prod: any) => prod._id === item.product_id
                                       )
-                                      .map((pro) => (
+                                      .map((pro: any) => (
                                         <tr className="bg-white">
                                           <th
                                             scope="row"
-                                            className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                            className="font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
                                           >
-                                            <img
-                                              src={item.imageColor}
-                                              alt={pro.title}
-                                              className="w-[58px] h-[78px] object-cover"
-                                            />
-                                            <div>
-                                              <p className="mb-4 max-w-[340px]">
-                                                {pro.title}
-                                              </p>
-                                              <p>
-                                                {product.color} / {product.size}
-                                              </p>
-                                            </div>
+                                            <Link to={`/products/${pro._id!}`} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5">
+                                              <img
+                                                src={item.imageColor}
+                                                alt={pro.title}
+                                                className="w-[58px] h-[78px] object-cover"
+                                              />
+                                              <div>
+                                                <p className="mb-4 max-w-[340px]">
+                                                  {pro.title}
+                                                </p>
+                                                <p>
+                                                  {product.color} / {product.size}
+                                                </p>
+                                              </div>
+                                            </Link>
                                           </th>
                                           <td className="px-6 py-4">
                                             ESTP03872PE00SB_BL-XXL
@@ -505,6 +601,10 @@ const OrderDetail = () => {
                                               "vi-VN"
                                             )}
                                             ₫
+                                          </td>
+                                          <td>
+                                            {order && order.status === 4 && product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
+                                            {order && order.status === 4 && product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
                                           </td>
                                         </tr>
                                       ))}
@@ -588,6 +688,81 @@ const OrderDetail = () => {
               </div>
             </div>
           </div>
+          {/* overlayProduct-reviewed */}
+          {order && order.status === 4 &&
+            <>
+              {/* <Button ghost type="primary" onClick={showModal}>
+                Open Modal
+              </Button> */}
+              <Modal
+                cancelButtonProps={{ style: { display: 'none' } }}
+                title="Đánh giá của bạn" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                <Form
+                  name="basic"
+                  layout="vertical"
+                  style={{ maxWidth: 600 }}
+                  onFinish={onFinish}
+                >
+                  {getOneProduct && getOneProductDetail &&
+                    <div className="">
+                      <div className="flex pb-3">
+                        <img className="" width={80} src={getOneProduct.images?.[0]} alt="" />
+                        <div className="flex flex-col p-2">
+                          <p>{getOneProduct?.title}</p>
+                          <div className="bg-gray-300 px-2 flex items-center w-auto rounded-sm text-sm my-1">
+                            {getOneProductDetail.nameColor} / {getOneProductDetail.size}
+                          </div>
+                          <div className="flex ">
+                            <del className="text-gray-400">{getOneProduct?.price?.toLocaleString("vi-VN")}đ</del>
+                            <p className="ml-2">{getOneProduct?.discount?.toLocaleString("vi-VN")}đ</p>
+                          </div>
+                        </div>
+                      </div>
+                      <Form.Item
+                        label="Đánh giá"
+                        name="rating"
+                        className="text-xl"
+                        rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
+                      >
+                        <Rate className="text-2xl" />
+                      </Form.Item>
+                    </div>
+                  }
+
+                  <Form.Item
+                    label="Bình luận"
+                    name="comment"
+                    rules={[{ required: true, message: 'Hãy nhập tối thiểu 10 kí tự bạn nhé!' }]}
+                  >
+                    <TextArea />
+                  </Form.Item>
+                  <Form.Item name="images"
+                    label="Ảnh đánh giá"
+                    rules={[{ required: true, message: 'Hãy nhập ảnh của bạn để đánh giá' }]}
+
+                  >
+
+                    <Upload name='images'
+                      multiple
+                      action={'http://localhost:8080/api/images/upload'}
+                      fileList={fileList}
+                      onChange={handleChange}
+                      listType="picture-card"
+                      iconRender={() => <LoadingOutlined />}
+                      onRemove={(file) => handleRemoveImage(file)}
+                    >
+                      {fileList.length >= 5 ? null : <Button className="text-sm" icon={<UploadOutlined />}>Tải ảnh lên</Button>}
+                    </Upload>
+                  </Form.Item>
+
+                  <Form.Item >
+                    <Button type="primary" className="bg-black w-full py-3 flex items-center justify-center" htmlType="submit">
+                      Viết đánh giá
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Modal>
+            </>}
         </div>
       </div >
       <Footer></Footer>

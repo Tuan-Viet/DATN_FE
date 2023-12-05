@@ -7,6 +7,7 @@ const routes = {
     products: "/collections/:id?",
     productDetail: "/products/:id",
     cart: "/cart",
+    resetPassword: "/resetPassword",
     checkout: "/checkout",
     Billconfirm: "/orders/:id",
     signin: "/signin",
@@ -24,6 +25,7 @@ const routes = {
     adminProducts: "/admin/product",
     adminProductAdd: "/admin/product/add",
     adminProductUpdate: "/admin/product/update/:id",
+    adminProductById: "/admin/product/:id",
     adminCategorys: "/admin/category",
     adminCategoryAdd: "/admin/category/add",
     adminCategoryUpdate: "/admin/category/update/:id",
@@ -34,6 +36,14 @@ const routes = {
     adminVoucherPage: "/admin/voucher",
     adminVoucherAdd: "/admin/voucher/add",
     adminVoucherUpdate: "/admin/voucher/update/:id",
+    adminStatistic: "/admin/statistic",
+    adminProductRevanue: "/admin/statistic/by_product",
+    adminOrderRevanue: "/admin/statistic/by_order",
+    adminOrderRevanueByDate: "/admin/statistic/by_date",
+    adminOrderRevanueByWeek: "/admin/statistic/by_week",
+    adminOrderRevanueByMonth: "/admin/statistic/by_month",
+    adminOrderRevanueByQuarter: "/admin/statistic/by_quarter",
+
 }
 
 export default routes;

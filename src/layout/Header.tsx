@@ -31,6 +31,8 @@ import { logout } from "../store/user/userSlice";
 import { Breadcrumb, Button, Form, Input, Space, message } from "antd";
 import { ICart } from "../store/cart/cart.interface";
 import { useForm } from "react-hook-form";
+import { ForgotAccountForm, ForgotAccountSchema } from "../Schemas/forgotAccount";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type FormDataType = {
   email: string;
@@ -45,7 +47,6 @@ const Header = () => {
   const { data: listProduct, isSuccess: isSuccessListProduct } =
     useFetchListProductQuery();
   const cartState = useSelector((state: RootState) => state.cartSlice.carts);
-
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
   );
@@ -74,13 +75,7 @@ const Header = () => {
       toast.success("Đăng nhập thành công");
       if (cartState?.length > 0) {
         cartStore?.map((cart) => {
-          return onAddCart({ userId: response?.data?.user._id, ...cart });
-        });
-      } else {
-        console.log(2);
-
-        cartStore?.map((cart) => {
-          onAddCart({ userId: response?.data?.user._id, ...cart });
+          onAddCart({ userId: response?.data?.user?._id, ...cart });
         });
       }
       dispatch(
@@ -118,6 +113,7 @@ const Header = () => {
   };
   useEffect(() => {
     if (listCart) {
+      console.log(1)
       if (user?.current?._id) {
         dispatch(listCartSlice(listCart));
       } else {
@@ -125,6 +121,17 @@ const Header = () => {
       }
     }
   }, [isSuccessCart, listCart]);
+
+  useEffect(() => {
+    if (listCart) {
+      console.log(1)
+      if (user?.current?._id) {
+        dispatch(listCartSlice(listCart));
+      } else {
+        dispatch(listCartSlice(cartStore ? cartStore : [])!);
+      }
+    }
+  }, []);
   useEffect(() => {
     if (listProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail));
@@ -138,7 +145,6 @@ const Header = () => {
 
   // xu li cart
   const removeCart = async (id: string) => {
-    console.log(id);
     try {
       if (id) {
         if (user?.current?._id) {
@@ -151,6 +157,7 @@ const Header = () => {
           const isConfirm = window.confirm("Ban co chac chan muon xoa khong?");
           if (isConfirm) {
             dispatch(removeCartSlice(id));
+            message.success("Xóa thành công!");
           }
         }
       }
@@ -158,41 +165,51 @@ const Header = () => {
       console.log(error);
     }
   };
+  const [decCart, setDecCart] = useState<boolean>(false)
   const decreaseCart = async (_id: string, discount: number) => {
     try {
       if (_id && discount) {
-        dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
-      }
-      const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
-      if (cartIndex) {
-        await onUpdateCart({ _id, ...cartIndex });
+        if (user?.current?._id) {
+          dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
+          const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
+          if (cartIndex) {
+            await onUpdateCart({ _id, ...cartIndex });
+          }
+        } else {
+          dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
+          setDecCart(true)
+        }
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const [increCart, setIncreCart] = useState<boolean>(false)
   const increaseCart = async (_id: string, discount: number) => {
     try {
       console.log(_id);
       if (_id) {
-        if (user.current._id) {
-          console.log(2);
+        if (user?.current?._id) {
           dispatch(increaseCartSlice({ _id: _id, discount: discount }));
           const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!);
           if (cartIndex) {
             await onUpdateCart({ _id, ...cartIndex });
           }
         } else {
-          console.log(1);
           dispatch(increaseCartSlice({ _id: _id, discount: discount }));
-          // const cartIndex = JSON.parse(localStorage.getItem("cartIndex")!)
+          setIncreCart(true)
         }
       }
     } catch (error) {
       console.log(error);
     }
   };
+  useEffect(() => {
+    dispatch(listCartSlice(cartStore ? cartStore : [])!);
+    setIncreCart(false)
+    setDecCart(false)
+  }, [increCart, decCart])
   // hàm dropdownUser
   const handleDropdown = () => {
     const iconUser = document.querySelector(".icon-user");
@@ -289,6 +306,7 @@ const Header = () => {
   const {
     handleSubmit
   } = useForm()
+
   const productSearch = useSelector((state: RootState) => state.productSearchReducer.products)
   useEffect(() => {
     if (listProduct && searchTerms) {
@@ -314,6 +332,21 @@ const Header = () => {
       //   } else {
       // }
     }
+  }
+  // forgotPassword
+  const {
+    handleSubmit: handleSubmitAccount,
+    register: registerAccount,
+    formState: { errors }
+  } = useForm<ForgotAccountForm>({
+    resolver: yupResolver(ForgotAccountSchema)
+  })
+  const handleForgotAccount = async (data: ForgotAccountForm) => {
+    await axios.post(
+      "http://localhost:8080/api/auth/user/forgotPassword",
+      data
+    );
+    message.success("Mã token đã gửi về email của bạn")
   }
   return (
     <>
@@ -727,41 +760,43 @@ const Header = () => {
                             </div>
                             <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
                               <p>Quên mật khẩu?</p>
-                              <button
+                              <p
                                 onClick={forgotPassword}
-                                className="hover:text-black"
+                                className="hover:text-black cursor-pointer"
                               >
                                 Khôi phục mật khẩu
-                              </button>
+                              </p>
                             </div>
                           </Form.Item>
                         </Form>
                       </div>
                       {/* khôi phục mật khẩu */}
-                      <div className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
+                      <form onSubmit={handleSubmitAccount(handleForgotAccount)} className="flex flex-col transition-all ease-in-out isSelected absolute left-0 right-0 translate-x-[150%] items-center">
                         <h1 className="uppercase text-[18px] text-[#333333]">
                           Khôi phục mật khẩu
                         </h1>
                         <p className="text-[#666666]">Nhập email của bạn</p>
                         <hr className="my-4 w-full" />
                         <input
-                          type="text"
+                          type="email"
+                          {...registerAccount("email")}
                           className="py-2 px-2 w-full border-2 focus:outline-none mt-3"
                           placeholder="Email"
                         />
+                        <p className="italic text-red-500 text-sm">{errors ? errors.email?.message : ""}</p>
                         <button className="w-full text-white bg-[#333333] hover:bg-[#000000] transition-all ease-linear uppercase text-[14px] py-3 px-3 mt-8 rounded-lg">
                           Khôi phục
                         </button>
                         <div className="flex text-[#666666] w-full text-[12px] justify-between mt-2">
                           <p>Bạn đã nhớ mật khẩu?</p>
-                          <button
+                          <p
                             onClick={backSigninDropdown}
-                            className="hover:text-black"
+                            className="hover:text-black cursor-pointer"
                           >
                             Trở về đăng nhập
-                          </button>
+                          </p>
                         </div>
-                      </div>
+                      </form>
                     </div>
                   )}
                 </div>
@@ -893,6 +928,8 @@ const Header = () => {
             <hr className="my-[20px]" />
             <div className="overflow-y-scroll h-[450px]">
               {cartState?.map((cart, index) => {
+                console.log(cartState);
+
                 return (
                   <div key={index}>
                     {productDetailState
@@ -990,18 +1027,35 @@ const Header = () => {
                                           </p>
                                         </div>
                                         <div className="flex items-center w-[100px] border border-gray-300 rounded">
-                                          <button
+                                          {user?.current?._id ? <button
                                             onClick={() =>
                                               decreaseCart(
                                                 cart._id!,
                                                 pro.discount!
                                               )
                                             }
+                                            disabled={
+                                              cart?.quantity == 1
+                                            }
                                             type="button"
-                                            className="w-10 h-8 flex items-center justify-center bg-gray-300 leading-10 text-gray-700 transition hover:opacity-75"
+                                            className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
                                           >
-                                            &minus;
-                                          </button>
+                                            +
+                                          </button> : <button
+                                            onClick={() =>
+                                              decreaseCart(
+                                                cart.productDetailId!,
+                                                pro.discount!
+                                              )
+                                            }
+                                            disabled={
+                                              cart?.quantity == 1
+                                            }
+                                            type="button"
+                                            className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
+                                          >
+                                            +
+                                          </button>}
                                           <input
                                             type="number"
                                             id="Quantity"
@@ -1010,7 +1064,7 @@ const Header = () => {
                                             max={item?.quantity}
                                             className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                           />
-                                          <button
+                                          {user?.current?._id ? <button
                                             onClick={() =>
                                               increaseCart(
                                                 cart._id!,
@@ -1027,7 +1081,24 @@ const Header = () => {
                                               } `}
                                           >
                                             +
-                                          </button>
+                                          </button> : <button
+                                            onClick={() =>
+                                              increaseCart(
+                                                cart.productDetailId!,
+                                                pro.discount!
+                                              )
+                                            }
+                                            disabled={
+                                              item?.quantity === cart?.quantity
+                                            }
+                                            type="button"
+                                            className={`${item?.quantity === cart?.quantity
+                                              ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                              : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                              } `}
+                                          >
+                                            +
+                                          </button>}
                                         </div>
                                       </div>
                                     </div>

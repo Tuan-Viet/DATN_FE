@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { FormInstance, UploadFile, UploadProps } from 'antd';
-import { Breadcrumb, Button, Form, Input, Space, Upload, message } from 'antd';
+import { Breadcrumb, Button, Form, Input, Space, Spin, Upload, message } from 'antd';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useFetchOneCategoryQuery, useUpdateCategoryMutation } from '../../../store/category/category.service';
 import {
@@ -46,8 +46,18 @@ const categoryUpdate = () => {
     const navigate = useNavigate();
     const [onUpdate] = useUpdateCategoryMutation()
     const { id } = useParams();
-    const { data: fetchOneCategory, isSuccess: isSuccessOneCategory } = useFetchOneCategoryQuery(id)
+    const { data: fetchOneCategory, isSuccess } = useFetchOneCategoryQuery(id)
     const [newImage, setNewImage] = useState(false);
+
+
+
+    // if (!isSuccess) {
+    //     return <>
+    //         <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
+    //             <Spin size='large' />
+    //         </div>
+    //     </>;
+    // }
 
     form.setFieldsValue({
         _id: fetchOneCategory?._id,
@@ -68,22 +78,6 @@ const categoryUpdate = () => {
             url: (fetchOneCategory && fetchOneCategory.images ? fetchOneCategory.images.url : ''),
         },
     ]);
-    console.log(fileList);
-
-    // const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-    // useEffect(() => {
-    //     if (isSuccessOneCategory && fetchOneCategory && Array.isArray(fetchOneCategory.images)) {
-    //         const initialFileList = fetchOneCategory.images.map((image: any, index: any) => ({
-    //             uid: image.publicId,
-    //             name: `image${index}`, // Set the image name here
-    //             status: 'done',
-    //             url: image.url, // Set the image URL here
-    //         }));
-    //         setFileList(initialFileList);
-    //     }
-    // }, [isSuccessOneCategory, fetchOneCategory]);
-
 
     const handleCancel = () => setPreviewOpen(false);
 
@@ -99,8 +93,6 @@ const categoryUpdate = () => {
 
     const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
         setNewImage(true)
-        // setFileList(newFileList)
-
     }
 
     const onFinish = async (values: any) => {

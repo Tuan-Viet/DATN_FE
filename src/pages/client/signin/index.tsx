@@ -11,6 +11,11 @@ import { RootState } from "../../../store";
 import { useAddCartMutation, useListCartQuery } from "../../../store/cart/cart.service";
 import { listCartSlice } from "../../../store/cart/cartSlice";
 import { ICart } from "../../../store/cart/cart.interface";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { ForgotAccountForm, ForgotAccountSchema } from "../../../Schemas/forgotAccount";
+import ForgotPassword from "./ForgotPassword";
+import Swal from "sweetalert2";
 
 type FormDataType = {
   email: string;
@@ -19,13 +24,11 @@ type FormDataType = {
 
 const signin = () => {
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
-
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const [onAddCart] = useAddCartMutation()
-
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
   const user = useSelector((state: any) => state?.user);
-
+  console.log(cartState)
   useEffect(() => {
     const buttonSignin = document.querySelector(".buttonSignin");
     const formSignin = document.querySelector(".formSignin");
@@ -67,20 +70,9 @@ const signin = () => {
       );
       toast.success("Đăng nhập thành công");
       if (cartState?.length > 0) {
-        // const cartIndex: ICart | undefined = cartState?.find((cart) => {
-        //   return cartStore?.filter((item) => cart.productDetailId === item.productDetailId)
-        // })
-        // console.log(cartIndex);
         cartStore?.map((cart) => {
-          return onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
-
-      } else {
-        console.log(2);
-
-        cartStore?.map((cart) => {
-          onAddCart({ userId: response?.data?.user._id, ...cart })
-        })
+          onAddCart({ userId: response?.data?.user?._id, ...cart });
+        });
       }
       dispatch(
         register({
@@ -104,9 +96,24 @@ const signin = () => {
       }
     }
   };
+
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
   }, []);
+  useEffect(() => {
+    let params = new URLSearchParams(document.location.search)
+    let token = params.get("confirmationCode");
+    if (token) {
+      axios.post(
+        `http://localhost:8080/api/auth/confirm-registration/${token}`
+      ).then(({ data }) =>
+        Swal.fire({
+          title: data.message,
+          icon: "success",
+        })
+      );
+    }
+  }, [])
   return (
     <>
       <Header></Header>
@@ -198,59 +205,8 @@ const signin = () => {
             </div>
           </Form.Item>
         </Form>
-        {/* <form className="w-full formSignin" action="">
-          <input
-            type="text"
-            placeholder="Vui lòng nhập email của bạn ..."
-            className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white "
-          />
-          <input
-            type="password"
-            placeholder="Vui lòng nhập mật khẩu"
-            className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white "
-          />
-          <div className="flex mt-[25px]">
-            <button className="bg-[#333333] hover:bg-black transition-all ease-linear px-[28px] py-[12px] text-[#ffffff] rounded-lg uppercase tracking-wide">
-              Đăng Nhập
-            </button>
-            <div className="flex flex-col ml-[30px]">
-              <div className="font-thin flex">
-                <p>Bạn chưa có tài khoản?</p>
-                <Link
-                  to="/signup"
-                  className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80 buttonSignup-2"
-                >
-                  Đăng ký
-                </Link>
-              </div>
-              <p>
-                Bạn quên mật khẩu?
-                <span className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80 buttonForgotPass">
-                  Quên mật khẩu
-                </span>
-              </p>
-            </div>
-          </div>
-        </form> */}
         {/* forgot password */}
-        <form className="w-full formForgotPass hidden" action="">
-          <input
-            type="text"
-            placeholder="Vui lòng nhập email của bạn ..."
-            className="w-full border-[1px] bg-[#EDEDED] text-[#5c5c5c] italic tracking-wide px-4 py-4 mb-[25px] focus:outline-none focus:bg-white "
-          />
-          <div className="flex mt-[25px]">
-            <button className="bg-[#333333] hover:bg-black transition-all ease-linear px-[28px] py-[12px] text-[#ffffff] rounded-lg uppercase tracking-wide">
-              Gửi email
-            </button>
-            <div className="flex flex-col ml-[30px]">
-              <p>Quay lại?</p>
-              <p className="text-blue-400 italic ml-1 opacity-60 cursor-pointer hover:opacity-80 buttonSignin-3">
-                Đăng Nhập
-              </p>
-            </div>
-          </div>
-        </form>
+        <ForgotPassword></ForgotPassword>
       </div>
       <Footer></Footer>
     </>
