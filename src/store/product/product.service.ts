@@ -5,13 +5,13 @@ const productAPI = createApi({
     reducerPath: "products",
     baseQuery: fetchBaseQuery({
         baseUrl: "http://localhost:8080/api",
-        prepareHeaders(headers, {getState}) {
+        prepareHeaders(headers, { getState }) {
             const token = (getState() as RootState).user.token
             if (token) {
                 headers.set('Authorization', `Bearer ${token}`)
-              }
-              return headers
-        }, 
+            }
+            return headers
+        },
     }),
     tagTypes: ["products"],
     endpoints: (builer) => ({

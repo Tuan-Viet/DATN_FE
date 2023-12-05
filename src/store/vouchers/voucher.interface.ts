@@ -7,10 +7,12 @@ export interface IVoucher {
     discount: number
     used: number
     minOrderValue: number
+    maxOrderValue: number
     validFrom: number
     validTo: number
     description: string
     createdAt: Date;
+    status: boolean;
 }
 
 export interface IVoucherState {

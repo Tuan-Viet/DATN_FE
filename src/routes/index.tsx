@@ -34,6 +34,7 @@ import signup from "../pages/client/signup";
 import OrderRevanue from "../pages/admin/statistic/OrderRevanueByMonth";
 import OrderRevanueByMonth from "../pages/admin/statistic/OrderRevanueByMonth";
 import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
+import productById from "../pages/admin/productById";
 
 
 export const publicRoutes = [
@@ -63,6 +64,7 @@ export const privateRoutes = [
   { path: routes.adminProducts, Component: productPage },
   { path: routes.adminProductAdd, Component: productAdd },
   { path: routes.adminProductUpdate, Component: productUpdate },
+  { path: routes.adminProductById, Component: productById },
   { path: routes.adminCategorys, Component: categoryPage },
   { path: routes.adminCategoryAdd, Component: categoryAdd },
   { path: routes.adminCategoryUpdate, Component: categoryUpdate },
