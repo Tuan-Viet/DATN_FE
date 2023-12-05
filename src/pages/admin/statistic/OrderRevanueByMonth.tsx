@@ -62,7 +62,10 @@ const columns = [
 
   // Thêm các cột khác nếu cần
 ];
-const OrderRevanueByMonth = () => {
+interface OrderRevanueByMonthProps {
+  showTable?: boolean; 
+}
+const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({showTable : true})) => {
   const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueMonth } = useGetOrderRevenueByMonthQuery()
   console.log(orderRevanueMonth);
   console.log(isSuccessGetRevanueMonth);
@@ -123,6 +126,7 @@ const OrderRevanueByMonth = () => {
         return dateA - dateB;
       })
     : [];
+
   return (
     <>
       <div>
@@ -155,6 +159,7 @@ const OrderRevanueByMonth = () => {
           }}
         /></div>
       <div>
+      {props.showTable && (
         <Table
           columns={columns}
           dataSource={data}
@@ -184,7 +189,7 @@ const OrderRevanueByMonth = () => {
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />
+        />)}
       </div></>
   )
 }

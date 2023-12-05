@@ -49,6 +49,8 @@ const categoryUpdate = () => {
     const { data: fetchOneCategory, isSuccess } = useFetchOneCategoryQuery(id)
     const [newImage, setNewImage] = useState(false);
 
+
+
     // if (!isSuccess) {
     //     return <>
     //         <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
@@ -76,21 +78,6 @@ const categoryUpdate = () => {
             url: (fetchOneCategory && fetchOneCategory.images ? fetchOneCategory.images.url : ''),
         },
     ]);
-
-    // const [fileList, setFileList] = useState<UploadFile[]>([]);
-
-    // useEffect(() => {
-    //     if (isSuccessOneCategory && fetchOneCategory && Array.isArray(fetchOneCategory.images)) {
-    //         const initialFileList = fetchOneCategory.images.map((image: any, index: any) => ({
-    //             uid: image.publicId,
-    //             name: `image${index}`, // Set the image name here
-    //             status: 'done',
-    //             url: image.url, // Set the image URL here
-    //         }));
-    //         setFileList(initialFileList);
-    //     }
-    // }, [isSuccessOneCategory, fetchOneCategory]);
-
 
     const handleCancel = () => setPreviewOpen(false);
 

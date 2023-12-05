@@ -20,6 +20,7 @@ import BillConfirm from "../pages/client/BillConfirm";
 import CheckoutsPage from "../pages/client/Checkouts";
 import Contact from "../pages/client/Contact";
 import myAccount from "../pages/client/MyAccount";
+import ChangePassword from "../pages/client/MyAccount/changePassword";
 import myAddress from "../pages/client/MyAccount/myAddress";
 import myOrders from "../pages/client/MyAccount/myOrders";
 import OrderDetail from "../pages/client/MyAccount/orderDetail";
@@ -34,6 +35,7 @@ import signup from "../pages/client/signup";
 import OrderRevanue from "../pages/admin/statistic/OrderRevanueByMonth";
 import OrderRevanueByMonth from "../pages/admin/statistic/OrderRevanueByMonth";
 import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
+import productById from "../pages/admin/productById";
 
 
 export const publicRoutes = [
@@ -50,6 +52,7 @@ export const publicRoutes = [
   { path: routes.signup, Component: signup },
   { path: routes.myAccount, Component: myAccount },
   { path: routes.orders, Component: myOrders },
+  { path: routes.changePassword, Component: ChangePassword },
   { path: routes.addresses, Component: myAddress },
   { path: routes.orderDetail, Component: OrderDetail },
   { path: routes.products, Component: ProductPage },
@@ -63,6 +66,7 @@ export const privateRoutes = [
   { path: routes.adminProducts, Component: productPage },
   { path: routes.adminProductAdd, Component: productAdd },
   { path: routes.adminProductUpdate, Component: productUpdate },
+  { path: routes.adminProductById, Component: productById },
   { path: routes.adminCategorys, Component: categoryPage },
   { path: routes.adminCategoryAdd, Component: categoryAdd },
   { path: routes.adminCategoryUpdate, Component: categoryUpdate },

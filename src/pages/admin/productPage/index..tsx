@@ -20,7 +20,7 @@ import {
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
+import { useFetchListProductByAdminQuery, useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
@@ -33,6 +33,7 @@ import { ColumnsType, TableProps } from 'antd/es/table';
 
 interface DataType {
     _id: React.Key;
+    sku: string;
     title: string;
     sku: string;
     images: any[];
@@ -48,7 +49,7 @@ const productPage = () => {
     const [onRemove] = useRemoveProductMutation()
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
-    const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductQuery()
+    const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductByAdminQuery()
     const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
     const { data: listCategory } = useFetchListCategoryQuery()
     // const productState = useSelector((state: RootState) => state.productSlice.products)
@@ -196,11 +197,6 @@ const productPage = () => {
 
     ];
 
-
-
-
-
-
     const toggleCategory = (categoryId: any) => {
         if (selectedCategories.includes(categoryId)) {
             setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
@@ -290,6 +286,10 @@ const productPage = () => {
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
+
+    // useEffect(() => {
+    //     window.scrollTo({ top: 0, left: 0 });
+    // }, []);
     return (
         <div className="">
             {contextHolder}

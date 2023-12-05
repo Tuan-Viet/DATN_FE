@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { FormInstance } from 'antd';
 import {
     Button,
@@ -12,7 +12,9 @@ import {
     Row,
     Col,
     Breadcrumb,
-    DatePicker
+    DatePicker,
+    Radio,
+    Checkbox
 } from 'antd';
 import {
     SyncOutlined
@@ -57,9 +59,26 @@ const VoucherAdd = () => {
     const vocherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
     const voucherCodes = vocherState.map((voucher) => voucher.code);
 
-    const [discountType, setDiscountType] = React.useState(undefined);
-    const handleTypeChange = (value: any) => {
-        setDiscountType(value);
+    const [isEndDateDisabled, setIsEndDateDisabled] = useState(false);
+    const handleCheckboxEndDate = (e: any) => {
+        setIsEndDateDisabled(e.target.checked);
+    };
+
+    const [isQuantityDisabled, setIsQuantityDisabled] = useState(false);
+    const handleCheckboxQuantity = (e: any) => {
+        setIsQuantityDisabled(e.target.checked);
+    };
+
+
+    const [discountType, setDiscountType] = React.useState("value");
+
+    const handleDiscountTypeChange = (value: any) => {
+        setDiscountType(value.target.value);
+    };
+
+    const [promotionType, setPromotionType] = React.useState(1);
+    const handlePromotionTypeChange = (value: any) => {
+        setPromotionType(value);
     };
 
     const formatter = (value: any) => {
@@ -89,11 +108,13 @@ const VoucherAdd = () => {
 
     const onFinish = async (values: any) => {
         try {
-            const rangeValue = values['validFrom'];
+
             const voucherData = {
                 ...values,
-                validFrom: rangeValue[0].format('YYYY-MM-DD'),
-                validTo: rangeValue[1].format('YYYY-MM-DD')
+                description: values.description,
+                quantity: values.quantity ? values.quantity : null,
+                validFrom: values.validFrom.format('YYYY-MM-DD'),
+                validTo: values.validTo ? values.validTo.format('YYYY-MM-DD') : null
             };
 
             await onAdd(voucherData)
@@ -105,6 +126,9 @@ const VoucherAdd = () => {
         }
     };
 
+    useEffect(() => {
+        window.scrollTo({ top: 0, left: 0 });
+    }, []);
     return <>
         <Breadcrumb className='pb-3'
             items={[
@@ -116,113 +140,188 @@ const VoucherAdd = () => {
                 },
             ]}
         />
-        <div className='border p-10 rounded-lg  bg-white'>
-            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff] mb-10">
-                Tạo mới Voucher
-            </h3>
+        <div className=' p-10 '>
             <Form
                 form={form}
                 name="validateOnly"
                 layout="vertical"
                 onFinish={onFinish}
                 autoComplete="off"
-                className="mx-auto w-[700px]"
+                className="mx-auto "
             >
-                <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-                    <Col className="gutter-row" span={24}>
-                        <Form.Item
-                            name="title"
-                            label="Tên"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: 'Không được để trống!'
-                                }
-                            ]}>
-                            <Input />
-                        </Form.Item>
-                    </Col>
+                <div className="flex space-x-10">
+                    <div className="w-2/3 space-y-5">
+                        <div className="bg-white border space-y-3 rounded-sm">
+                            <h1 className='border-b p-5 font-medium text-lg'>Thông tin chung</h1>
+                            <div className=" px-5 flex space-x-5">
+                                <Form.Item
+                                    name="title"
+                                    label="Tên đợt phát hành"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Không được để trống!'
+                                        }
+                                    ]}
+                                    className='w-1/2'>
+                                    <Input />
+                                </Form.Item>
+                                <Form.Item
+                                    name="code"
+                                    label="Mã đợt phát hành"
+                                    rules={[{ required: true, message: 'Không được để trống!' }, { validator: handleCheckCode },]}
+                                    normalize={(value) => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}
+                                    className='w-1/2'
+                                >
+                                    <Input suffix={<SyncOutlined onClick={generateRandomCode} className='text-gray-400' />} />
+                                </Form.Item>
+                            </div>
+                            <div className=" px-5 flex space-x-5">
+                                <div className="w-1/2">
+                                    {isQuantityDisabled ? (
+                                        <Form.Item
+                                            label="Số lượng áp dụng"
+                                            className='w-full mb-3'
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                style={{ width: '100%' }}
+                                                disabled={isQuantityDisabled}
+                                            />
+                                        </Form.Item>
+                                    ) : (
+                                        <Form.Item
+                                            name="quantity"
+                                            label="Số lượng áp dụng"
+                                            rules={isQuantityDisabled ? [] : [{ required: true, message: 'Không được để trống!' }]}
+                                            className='w-full mb-3'
+                                        >
+                                            <InputNumber
+                                                min={0}
+                                                formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                                style={{ width: '100%' }}
+                                            />
+                                        </Form.Item>
+                                    )}
+                                    <Form.Item
+                                        className='mb-0'>
+                                        <Checkbox
+                                            className=' px-2'
+                                            onChange={handleCheckboxQuantity}
+                                        >
+                                            Không giới hạn số lượng
+                                        </Checkbox>
+                                    </Form.Item>
+                                </div>
 
+                            </div>
+                            <details className="px-5 mt-[-20px] overflow-hidden [&_summary::-webkit-details-marker]:hidde">
+                                <summary
+                                    className="flex w-[250px] cursor-pointer pb-3 px-3 transition"
+                                >
+                                    <span className="text-sm text-blue-500">Mô tả </span>
+                                </summary>
+                                <div className="">
+                                    <Form.Item
+                                        name="description"
+                                    >
+                                        <TextArea rows={4}></TextArea>
+                                    </Form.Item>
+                                </div>
+                            </details>
+                        </div>
+                        <div className="bg-white border space-y-3 rounded-sm">
+                            <h1 className='border-b p-5 font-medium text-lg'>Điều kiện áp dụng</h1>
+                            <div className=" px-5 ">
+                                <h2 className='text-blue-500 pb-3 font-medium'>Chiết khấu theo tổng đơn hàng</h2>
+                                <div className="flex space-x-5 items-end">
+                                    <Form.Item name="minOrderValue" label="Giá trị từ" className='border-b'>
+                                        <InputNumber
+                                            min={0}
+                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                            style={{ width: '100%' }}
+                                            bordered={false}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item name="maxOrderValue" label="Giá trị đến" className='border-b'>
+                                        <InputNumber
+                                            min={0}
+                                            formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                            style={{ width: '100%' }}
+                                            bordered={false}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item name="type" initialValue={"value"}>
+                                        <Radio.Group buttonStyle="solid" onChange={handleDiscountTypeChange}>
+                                            <Radio.Button value="value">Giá trị</Radio.Button>
+                                            <Radio.Button value="percent">%</Radio.Button>
+                                        </Radio.Group>
+                                    </Form.Item>
+                                    <Form.Item
+                                        name="discount"
+                                        label="Giá trị khuyến mại"
+                                        rules={[{ required: true, message: 'Không được để trống!' }]}
+                                        className='border-b'
+                                    >
+                                        <InputNumber
+                                            min={0}
+                                            max={discountType === 'percent' ? 100 : undefined}
+                                            formatter={formatter}
+                                            style={{ width: '100%' }}
+                                            suffix={discountType === 'percent' ? '%' : undefined}
+                                            bordered={false}
+                                        />
+                                    </Form.Item>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="w-1/3">
+                        <div className="bg-white border rounded-sm">
+                            <h1 className='border-b py-2 font-semibold px-3'>Thời gian áp dụng</h1>
+                            <div className="px-3 py-2" >
+                                <Form.Item
+                                    name="validFrom"
+                                    label="Ngày bắt đầu"
+                                    rules={[{ required: true, message: 'Không được để trống!' }]}
+                                    className='mt-3 mb-3 '
+                                >
+                                    <DatePicker style={{ width: '100%' }} format="DD-MM-YYYY" />
 
-                    <Col className="gutter-row" span={12}>
-                        <Form.Item
-                            label="Hạn sử dụng"
-                            name="validFrom"
-                            rules={[{ required: true, message: 'Không được để trống!' }]}
-                        >
-                            <RangePicker style={{ width: '100%' }} format="DD-MM-YYYY" />
-                        </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={12}>
-                        <Form.Item
-                            name="code"
-                            label="Mã CODE"
-                            rules={[{ required: true, message: 'Không được để trống!' }, { validator: handleCheckCode },]}
-                            normalize={(value) => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}
-                        >
-                            <Input suffix={<SyncOutlined onClick={generateRandomCode} className='text-gray-400' />} />
-                        </Form.Item>
+                                </Form.Item>
 
-                    </Col>
-                    <Col className="gutter-row" span={12}>
-                        <Form.Item name="quantity" label="Số lượng" rules={[{ required: true, message: 'Không được để trống!' }]}>
-                            <InputNumber
-                                min={0}
-                                formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                style={{ width: '100%' }}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={12}>
-                        <Form.Item name="minOrderValue" label="Áp dụng (đơn hàng tối thiểu)">
-                            <InputNumber
-                                placeholder='Cho tất cả đơn hàng'
-                                min={0}
-                                formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                                style={{ width: '100%' }}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={12}>
-                        <Form.Item name="type" label="Loại" rules={[{ required: true, message: 'Không được để trống!' }]}>
-                            <Select
-                                allowClear
-                                onChange={handleTypeChange}
-                                options={[
-                                    { value: 'value', label: 'value' },
-                                    { value: 'percent', label: 'percent' },
-                                ]}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={12}>
-                        <Form.Item
-                            name="discount"
-                            label="Giảm giá"
-                            rules={[{ required: true, message: 'Không được để trống!' }]}
-                        >
-                            <InputNumber
-                                min={0}
-                                max={discountType === 'percent' ? 100 : undefined}
-                                formatter={formatter}
-                                style={{ width: '100%' }}
-                                suffix={discountType === 'percent' ? '%' : undefined}
-                                disabled={!discountType}
-                            />
-                        </Form.Item>
-                    </Col>
-                    <Col className="gutter-row" span={24}>
-                        <Form.Item
-                            name="description"
-                            label="Mô tả"
-                            rules={[{ required: true, message: 'Không được để trống!' }]}
-                        >
-                            <TextArea rows={4} />
-                        </Form.Item>
+                                {isEndDateDisabled ? (
+                                    <Form.Item
+                                        label="Ngày kết thúc"
+                                        className='mt-3 mb-3'
+                                    >
+                                        <Input style={{ width: '100%' }} disabled={isEndDateDisabled} />
+                                    </Form.Item>
 
-                    </Col>
-                </Row>
+                                ) : (
+                                    <Form.Item
+                                        name="validTo"
+                                        label="Ngày kết thúc"
+                                        rules={[{ required: true, message: 'Không được để trống!' }]}
+                                        className='mt-3 mb-3'
+                                    >
+                                        <DatePicker style={{ width: '100%' }} format="DD-MM-YYYY" />
+                                    </Form.Item>
 
+                                )}
+                                <Form.Item>
+                                    <Checkbox
+                                        className='px-2'
+                                        onChange={handleCheckboxEndDate}
+                                    >
+                                        Không cần ngày kết thúc
+                                    </Checkbox>
+                                </Form.Item>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {/* <Form.Item noStyle shouldUpdate>
                         {() => (
                             <Typography>

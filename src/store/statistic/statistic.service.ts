@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { DateStatistics, MonthlyStatistics, OrderStatistics, ProductStatistics, QuarterlyStatistics } from "./statistic.interface";
+import { DashboardStatistic, DateStatistics, MonthlyStatistics, OrderStatistics, ProductStatistics, QuarterlyStatistics } from "./statistic.interface";
 
 const statisticsApi = createApi({
   reducerPath: "statistics",
@@ -8,6 +8,10 @@ const statisticsApi = createApi({
   }),
   tagTypes: ["statistics"],
   endpoints: (builder) => ({
+    getDashboardStatistic: builder.query<DashboardStatistic, void>({
+      query: () => "/statistics",
+      providesTags: ["statistics"],
+    }),
     getProductRevenue: builder.query<ProductStatistics[], void>({
       query: () => "/statistics/product",
       providesTags: ["statistics"],
@@ -41,7 +45,8 @@ export const {
   useGetOrderRevenueByMonthQuery,
   useGetOrderRevenueByWeekQuery,
   useGetOrderRevenueByQuarterQuery,
-  useGetOrderRevenueQuery
+  useGetOrderRevenueQuery,
+  useGetDashboardStatisticQuery
 } = statisticsApi;
 
 export default statisticsApi;

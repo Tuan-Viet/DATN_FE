@@ -2,66 +2,126 @@ import {
     TeamOutlined,
     SolutionOutlined,
     SkinOutlined,
-    BarChartOutlined
+    BarChartOutlined,
+    InboxOutlined
 } from '@ant-design/icons';
-import { useGetOrderRevenueByMonthQuery } from '../../../store/statistic/statistic.service';
+import { useGetDashboardStatisticQuery, useGetOrderRevenueByMonthQuery, useGetOrderRevenueByQuarterQuery, useGetOrderRevenueByWeekQuery, useGetOrderRevenueQuery, useGetProductRevenueQuery } from '../../../store/statistic/statistic.service';
 import Highcharts from 'highcharts';
-import { MonthlyStatistics } from '../../../store/statistic/statistic.interface';
+import { MonthlyStatistics, DashboardStatistic } from '../../../store/statistic/statistic.interface';
 import HighchartsReact from 'highcharts-react-official';
-import { Spin } from 'antd';
+import { List, Rate, Skeleton, Spin, TreeSelect } from 'antd';
 import { useFetchListProductQuery } from '../../../store/product/product.service';
 import { useListOrderQuery } from '../../../store/order/order.service';
+import { useState } from 'react';
+import OrderRevanueByWeek from '../statistic/OrderRevanueByWeek';
+import OrderRevanueByMonth from '../statistic/OrderRevanueByMonth';
+import OrderRevanueByQuarter from '../statistic/OrderRevanueByQuarter';
+import OrderStatistic from '../statistic/OrderStatistic';
+import ProductStatistic from '../statistic/ProductStatistic';
 
 const DashboardPage = () => {
-    const { data: orderRevanueMonth, isSuccess } = useGetOrderRevenueByMonthQuery()
-    const { data: listProduct } = useFetchListProductQuery()
-    const { data: listOrder } = useListOrderQuery()
+    const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
+    const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueByMonth } = useGetOrderRevenueByMonthQuery()
+    const { data: orderRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
+    const { data: orderRevanueWeek } = useGetOrderRevenueByWeekQuery()
+    const { data: productRevanue } = useGetProductRevenueQuery();
+    const { data: orderRevanue } = useGetOrderRevenueQuery();
 
-    if (!isSuccess) {
+    // const { data: listProduct } = useFetchListProductQuery()
+    // const { data: listOrder } = useListOrderQuery()
+    const [value, setValue] = useState<string>("week");
+
+    const treeData = [
+        {
+            title: '24 giờ qua',
+            value: 'date',
+            children: [
+                {
+                    title: 'Theo tuần',
+                    value: 'week',
+                },
+                {
+                    title: 'Theo tháng',
+                    value: 'month',
+                },
+                {
+                    title: 'Theo quý',
+                    value: 'quarter',
+                },
+            ],
+        },
+    ];
+    if (!isSuccess || !isSuccessGetRevanueByMonth) {
         return <>
             <div className="flex justify-center items-center h-[600px]">
                 <Spin size='large' />
             </div>
         </>;
     }
-    let filledData: MonthlyStatistics[] = [];
-    const caculateAvgRevalueByMonth = (data: MonthlyStatistics[]) => {
-        if (data) {
-            const total = data.reduce((acc, item) => acc += item.totalRevenue, 0) / 12;
-            return total.toFixed()
-        }
-    }
-    const generateAllMonths = () => {
-        const allMonths = [];
-        const currentDate = new Date();
-        for (let i = 0; i < 12; i++) {
-            const month = currentDate.getMonth() - i;
-            const year = currentDate.getFullYear();
-            allMonths.unshift(`${year}-${String(month + 1).padStart(2, '0')}`);
-        }
-        return allMonths;
-    };
-    const fillMissingMonths = (data: MonthlyStatistics[], allMonths: string[]) => {
-        const filledData = allMonths.map(month => {
-            const matchingData = data.find(entry => entry.month === month);
-            return matchingData || {
-                month,
-                totalOrders: 0,
-                totalOrderValue: 0,
-                totalRevenue: 0,
-                totalProfit: 0,
-                totalCostPrice: 0,
-                totalQuantitySold: 0,
-            };
-        });
-        return filledData;
-    };
-    if (orderRevanueMonth) {
-        const allMonths = generateAllMonths();
-        filledData = fillMissingMonths(orderRevanueMonth, allMonths);
-    }
+    // const caculateAvgRevalueByMonth = (data: MonthlyStatistics[]) => {
+    //     if (data) {
+    //         const total = data.reduce((acc, item) => acc += item.totalRevenue, 0) / 12;
+    //         return total.toFixed()
+    //     }
+    // }
 
+    const columnChartData = [
+        {
+            name: 'Doanh số',
+            y: dashboardStatistic?.revenue,
+        },
+        {
+            name: 'Lợi nhuận',
+            y: dashboardStatistic?.profit,
+        },
+    ];
+
+    const columnChartOptions = {
+        chart: {
+            type: 'column', // Chọn loại biểu đồ cột
+        },
+        title: {
+            text: 'Doanh số và Lợi nhuận',
+        },
+        xAxis: {
+            categories: ['Doanh số', 'Lợi nhuận'],
+        },
+        yAxis: {
+            title: {
+                text: 'Số liệu',
+            },
+        },
+        series: [
+            {
+                name: 'Số liệu trong 24 giờ',
+                data: columnChartData,
+            },
+        ],
+    };
+    const onChange = (newValue: string) => {
+        // navigate(`/admin/statistic/by_` +newValue)
+        setValue(newValue);
+    };
+    const renderComponent = () => {
+        switch (value) {
+            case 'week':
+                return <OrderRevanueByWeek />;
+            case 'month':
+                return <OrderRevanueByMonth showTable={false} />;
+            case 'quarter':
+                return <OrderRevanueByQuarter />;
+            case 'product':
+                return <ProductStatistic />;
+            case 'order':
+                return <OrderStatistic />;
+            default:
+                return <HighchartsReact highcharts={Highcharts} options={columnChartOptions} />
+                    ;
+        }
+    };
     return <>
+        <h2 className='text-2xl p-4 font-bold pb-2'>KẾT QUẢ KINH DOANH TRONG NGÀY</h2>
+        <p className='text-sm italic px-4'>Trong vòng 24 giờ</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 p-4 gap-4">
             <div
                 className="bg-violet-500 shadow-lg rounded-md flex items-center justify-between p-3 border-b-4 border-violet-600 dark:border-gray-600 text-white font-medium group"
@@ -86,7 +146,7 @@ const DashboardPage = () => {
                     <SolutionOutlined className='text-orange-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">{listOrder?.length}</p>
+                    <p className="text-2xl">{dashboardStatistic.newOrdersCount}</p>
                     <p>Đơn hàng</p>
                 </div>
             </div>
@@ -100,8 +160,8 @@ const DashboardPage = () => {
                     <SkinOutlined className='text-blue-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">{listProduct?.length}</p>
-                    <p>Sản phẩm</p>
+                    <p className="text-2xl">{dashboardStatistic.bestSellingProduct.reduce((acc, curr) => acc += curr.totalQuantitySold, 0)}</p>
+                    <p>Sản phẩm bán được</p>
                 </div>
             </div>
 
@@ -114,41 +174,65 @@ const DashboardPage = () => {
                     <BarChartOutlined className='text-lime-500 text-3xl transform transition-transform duration-500 ease-in-out' />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">{orderRevanueMonth ? caculateAvgRevalueByMonth(orderRevanueMonth)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''}đ</p>
-                    <p>Doanh số / tháng</p>
+                    <p className="text-2xl">
+                        {/* {orderRevanueMonth ? caculateAvgRevalueByMonth(orderRevanueMonth)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''}đ */}
+                        {dashboardStatistic?.revenue?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
+                    </p>
+                    <p>Doanh số</p>
                 </div>
             </div>
+
         </div>
 
 
-        <HighchartsReact
-            highcharts={Highcharts}
-            options={{
-                chart: {
-                    type: 'column'
-                },
-                title: {
-                    text: 'Biểu đồ doanh thu'
-                },
-                xAxis: {
-                    categories: filledData?.map(entry => entry.month) || []
-                },
-                yAxis: {
-                    title: {
-                        text: 'Doanh thu (đơn vị)'
-                    }
-                },
-                series: [{
-                    name: 'Doanh thu',
-                    data: filledData?.map(entry => entry.totalRevenue) || []
-                },
-                {
-                    name: 'Lợi nhuận',
-                    data: filledData?.map(entry => entry.totalProfit) || []
-                },
-                ]
-            }}
-        />
+        <div className='flex justify-between'>
+            <div className='w-2/3'>
+                <h3 className='px-4 text-lg font-medium'>Tổng quan báo cáo</h3>
+                <label htmlFor="" className='block ml-10 text my-3'>Loại báo cáo:
+                    <TreeSelect
+                        style={{ width: 200, marginLeft: 10 }}
+                        value={value}
+                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        treeData={treeData}
+                        treeDefaultExpandAll
+                        onChange={onChange}
+                        defaultValue='1'
+                    />
+                </label>
+                {renderComponent()}
+            </div>
+            <div className='w-1/4 flex flex-col'>
+                <div className='my-4'>
+                    <h3 className='text-2xl font-medium'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
+                    {dashboardStatistic.bestSellingProduct && (
+                        <div>
+                            <p className='my-1 text-md text-md'>Tên sản phẩm: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0].title}</span></p>
+                            <p className='my-1 text-xs'>Số lượng bán: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0].totalQuantitySold}</span></p>
+                        </div>
+                    )}
+                </div>
+                <div>                <h3 className='text-2xl font-medium'>Đánh giá gần đây</h3>
+
+                    <List
+                        className="demo-loadmore-list"
+                        itemLayout="horizontal"
+                        dataSource={dashboardStatistic?.newReviews}
+                        renderItem={(review) => (
+                            <List.Item
+                                actions={[<a className='text-xs'>Chi tiết</a>]}
+                            >
+                                <Skeleton avatar title={false} loading={false} active>
+                                    <List.Item.Meta
+                                        title={<a className='text-xs'>{review.productId?.title}</a>}
+                                        description={<span className='text-xs'>{review.comment}</span>}
+                                    />
+                                    <Rate className='text-xs' disabled defaultValue={review.rating} />
+                                </Skeleton>
+                            </List.Item>
+                        )}
+                    /></div>
+            </div>
+        </div>
 
     </>
 

@@ -61,8 +61,10 @@ const columns = [
   },
 
   // Thêm các cột khác nếu cần
-];
-const OrderRevanueByWeek = () => {
+];interface OrderRevanueByMonthProps {
+  showTable?: boolean; 
+}
+const OrderRevanueByWeek = (props: OrderRevanueByMonthProps = ({showTable : true})) => {
   const { data: orderRevanueWeek, isSuccess: isSuccessGetRevanueWeek } = useGetOrderRevenueByWeekQuery()
   if (!isSuccessGetRevanueWeek) {
     return <>
@@ -152,6 +154,7 @@ const OrderRevanueByWeek = () => {
           }}
         /></div>
       <div>
+      {props.showTable && (
         <Table
           columns={columns}
           dataSource={data}
@@ -181,7 +184,7 @@ const OrderRevanueByWeek = () => {
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />
+        />)}
       </div></>
   )
 }
