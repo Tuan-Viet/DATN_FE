@@ -5,7 +5,7 @@ import {
     BarChartOutlined,
     InboxOutlined
 } from '@ant-design/icons';
-import { useGetDashboardStatisticQuery, useGetOrderRevenueByMonthQuery } from '../../../store/statistic/statistic.service';
+import { useGetDashboardStatisticQuery, useGetOrderRevenueByMonthQuery, useGetOrderRevenueByQuarterQuery, useGetOrderRevenueByWeekQuery } from '../../../store/statistic/statistic.service';
 import Highcharts from 'highcharts';
 import { MonthlyStatistics, DashboardStatistic } from '../../../store/statistic/statistic.interface';
 import HighchartsReact from 'highcharts-react-official';
@@ -22,6 +22,10 @@ import ProductStatistic from '../statistic/ProductStatistic';
 const DashboardPage = () => {
     const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
     const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueByMonth } = useGetOrderRevenueByMonthQuery()
+    const { data: orderRevanueQuarter, isSuccess: isSuccessGetRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
+  const { data: orderRevanueWeek, isSuccess: isSuccessGetRevanueWeek } = useGetOrderRevenueByWeekQuery()
+
+
     // const { data: listProduct } = useFetchListProductQuery()
     // const { data: listOrder } = useListOrderQuery()
     const [value, setValue] = useState<string>("week");
@@ -44,16 +48,6 @@ const DashboardPage = () => {
               value: 'quarter',
             },
           ],
-        },
-        {
-          title: 'Theo sản phẩm',
-          value: 'product',
-  
-        },
-        {
-          title: 'Theo đơn hàng',
-          value: 'order',
-  
         },
       ];
     if (!isSuccess || !isSuccessGetRevanueByMonth) {

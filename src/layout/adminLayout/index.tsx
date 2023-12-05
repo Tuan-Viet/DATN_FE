@@ -53,9 +53,6 @@ const items: MenuItem[] = [
   ]),
   getItem('Thống kê', 'sub4', <BarChartOutlined />, [
     getItem(<Link to={"/admin/statistic"}>Báo cáo bán hàng</Link >, '9'),
-    // getItem(<Link to={"/admin/statistic/product"}>Thống kê theo sản phẩm</Link >, '10'),
-    // getItem(<Link to={"/admin/statistic/order"}>Thống kê theo quý</Link >, '11'),
-
   ]),
 ];
 

@@ -86,7 +86,7 @@ const productUpdate = () => {
     // const { data: products } = useFetchListProductQuery();
     const { id } = useParams();
     // const product = products?.find((product: IProduct) => product._id === id);
-    const { data: product } = useFetchOneProductQuery(id || '')
+    const { data: product } = useFetchOneProductByAdminQuery(id || '')
     const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
     const listSku = productSearchState
         .filter((p) => p.sku !== product?.sku)
@@ -115,47 +115,45 @@ const productUpdate = () => {
         }
     }, [product]);
 
-    useEffect(() => {
-        if (product?.variants) {
-            const promises = product.variants.map((variantId: any) => {
-                return axios
-                    .get(` http://localhost:8080/api/productDetails/${variantId}`)
-                    .then((response) => response.data
-                    )
-                    .catch((error) => {
-                        console.error(`Error fetching product details for variant ${variantId}:`, error);
-                        return null;
-                    });
+    function filterAndTransformVariants(inputVariants:any) {
+        const resultVariants = [];
+      
+        // Tạo một đối tượng để lưu trữ thông tin về màu sắc và biến thể
+        const colorMap = {};
+      
+        // Lặp qua từng biến thể và nhóm chúng dựa trên màu sắc
+        inputVariants.forEach((variant) => {
+          const { nameColor, size, quantity, imageColor } = variant;
+      
+          // Nếu màu sắc chưa tồn tại trong colorMap, thêm nó vào
+          if (!colorMap[nameColor]) {
+            colorMap[nameColor] = {
+              nameColor,
+              items: [],
+              imageColor,
+            };
+          }
+      
+          // Tìm kiếm xem đã có size trong items chưa, nếu có cộng thêm quantity
+          const existingSize = colorMap[nameColor].items.find((item) => item.size === size);
+          if (existingSize) {
+            existingSize.quantity += quantity;
+          } else {
+            // Nếu không, thêm một bản ghi mới cho size và quantity
+            colorMap[nameColor].items.push({
+              size,
+              quantity,
             });
-            Promise.all(promises)
-                .then((results) => {
-                    const filteredResults = results.filter((detail) => detail !== null);
-                    setProductDetails(filteredResults);
-                });
+          }
+        });
+      
+        // Chuyển đối object thành mảng để đáp ứng định dạng đầu ra mong muốn
+        for (const colorKey in colorMap) {
+          resultVariants.push(colorMap[colorKey]);
         }
-    }, [product]);
-
-    const variantsMap = new Map();
-    productDetails.forEach((detail) => {
-        const key = `${detail.imageColor}-${detail.nameColor}`;
-        if (variantsMap.has(key)) {
-            const existingVariant = variantsMap.get(key);
-            // Tạo một đối tượng mới với _id và thêm nó vào items
-            const newItem = { _id: detail._id, size: detail.size, quantity: detail.quantity };
-            existingVariant.items.push(newItem);
-        } else {
-            variantsMap.set(key, {
-                product_id: id,
-                imageColor: detail.imageColor,
-                nameColor: detail.nameColor,
-                sold: detail.sold,
-                deleted: detail.deleted,
-                items: [{ _id: detail._id, size: detail.size, quantity: detail.quantity }]
-            });
-        }
-    });
-    // Chuyển dữ liệu từ Map thành mảng variants
-    const variants = Array.from(variantsMap.values());
+      console.log(resultVariants);
+        return resultVariants;
+      }
 
     const [form] = Form.useForm();
     form.setFieldsValue({
@@ -166,7 +164,7 @@ const productUpdate = () => {
         costPrice: product?.costPrice,
         price: product?.price,
         images: product?.images,
-        variants: variants,
+        variants: product?.variants?filterAndTransformVariants(product?.variants):[],
         description: product?.description,
         categoryId: product?.categoryId?._id && product?.categoryId._id,
     });
@@ -595,10 +593,10 @@ const productUpdate = () => {
                                                                     className="avatar-uploader"
                                                                     maxCount={1}
                                                                 >
-                                                                    {variants[field.name]?.imageColor ? (
+                                                                    {product?.variants[field.name]?.imageColor ? (
                                                                         <div className="w-[100px] h-[100px] p-1 relative">
                                                                             <img
-                                                                                src={variants[field.name]?.imageColor}
+                                                                                src={product?.variants[field.name]?.imageColor}
                                                                                 alt="Image"
                                                                                 style={{
                                                                                     margin: '0 auto',
