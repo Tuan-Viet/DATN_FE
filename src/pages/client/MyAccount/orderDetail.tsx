@@ -173,9 +173,11 @@ const OrderDetail = () => {
   })
 
   const [addOrderreturn] = useAddOrderMutation()
+  const [updatedOrder] = useUpdateOrderMutation()
 
   const onAddOrderReturn = async (data: orderReturnForm) => {
     await addOrderreturn(data)
+    await updateOrder({ id: id, status: 5 })
     toast.success('Trả hàng thành công vui lòng đợi xác nhận')
     setIsModalOpen(false);
   }
@@ -272,10 +274,13 @@ const OrderDetail = () => {
                             xác thực đơn hàng
                           </button>
                         </p>
-                        <Button type="primary" onClick={showModal} className="text-white bg-blue-700"  >
-                          Trả hàng
-                        </Button>
+
                       </>
+                    )}
+                    {order?.status == 3 && (
+                      <Button type="primary" onClick={showModal} className="text-white bg-blue-700"  >
+                        Trả hàng
+                      </Button>
                     )}
                   </div>
                   <Modal
