@@ -64,7 +64,7 @@ const Sale = () => {
                         {product?.discount?.toLocaleString("vi-VN")}đ
                       </span>
                       <span className="text-[13px] text-[#878C8F]">
-                        <del>{product.price.toLocaleString("vi-VN")}đ</del>
+                        <del>{product.price?.toLocaleString("vi-VN")}đ</del>
                       </span>
                     </div>
                   </div>

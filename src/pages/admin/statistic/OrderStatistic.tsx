@@ -56,10 +56,10 @@ const columns: ColumnsType<DataType> = [
 
 ];
 interface OrderRevanueByMonthProps {
-  showTable?: boolean; 
+  showTable?: boolean;
 }
-const OrderStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})) => {
-  const { data: productRevanue, isSuccess } = useGetOrderRevenueQuery();
+const OrderStatistic = (props: OrderRevanueByMonthProps = ({ showTable: true })) => {
+  const { data: orderRevanue, isSuccess } = useGetOrderRevenueQuery();
   if (!isSuccess) {
     return <>
       <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
@@ -68,7 +68,7 @@ const OrderStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})) 
     </>;
   }
   const data: DataType[] = isSuccess
-    ? productRevanue?.map((item: any) => ({
+    ? orderRevanue?.map((item: any) => ({
       key: item.orderId,
       orderId: item.orderId,
       customerName: item.customerName,
@@ -82,32 +82,32 @@ const OrderStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})) 
   return (
     <div>
       {props.showTable && (
-      <Table
-        sticky
-        showHeader={true}
-        columns={columns}
-        dataSource={data}
-        pagination={{ size: 'small', pageSize: 10 }}
-        summary={() => (
-          <Table.Summary.Row className='h-20 bg-blue-50'>
-            <Table.Summary.Cell index={0} colSpan={2}>
-              <strong>Tổng</strong>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={1} colSpan={1}>
-              <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={2} colSpan={1}>
-              <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={0} colSpan={1}>
-              <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-            </Table.Summary.Cell>
-            <Table.Summary.Cell index={0} colSpan={1}>
-              <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-            </Table.Summary.Cell>
-          </Table.Summary.Row>
-        )}
-      />)}
+        <Table
+          sticky
+          showHeader={true}
+          columns={columns}
+          dataSource={data}
+          pagination={{ size: 'small', pageSize: 10 }}
+          summary={() => (
+            <Table.Summary.Row className='h-20 bg-blue-50'>
+              <Table.Summary.Cell index={0} colSpan={2}>
+                <strong>Tổng</strong>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={1}>
+                <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={2} colSpan={1}>
+                <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={0} colSpan={1}>
+                <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={0} colSpan={1}>
+                <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          )}
+        />)}
 
     </div>
   );

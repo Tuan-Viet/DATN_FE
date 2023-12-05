@@ -22,35 +22,35 @@ import ProductStatistic from '../statistic/ProductStatistic';
 const DashboardPage = () => {
     const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
     const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueByMonth } = useGetOrderRevenueByMonthQuery()
-    const { data: orderRevanueQuarter, isSuccess: isSuccessGetRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
-  const { data: orderRevanueWeek, isSuccess: isSuccessGetRevanueWeek } = useGetOrderRevenueByWeekQuery()
-  const { data: productRevanue } = useGetProductRevenueQuery();
-  const { data: productRevanue, isSuccess } = useGetOrderRevenueQuery();
+    const { data: orderRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
+    const { data: orderRevanueWeek } = useGetOrderRevenueByWeekQuery()
+    const { data: productRevanue } = useGetProductRevenueQuery();
+    const { data: orderRevanue } = useGetOrderRevenueQuery();
 
     // const { data: listProduct } = useFetchListProductQuery()
     // const { data: listOrder } = useListOrderQuery()
     const [value, setValue] = useState<string>("week");
-    
+
     const treeData = [
         {
-          title: '24 giờ qua',
-          value: 'date',
-          children: [
-            {
-              title: 'Theo tuần',
-              value: 'week',
-            },
-            {
-              title: 'Theo tháng',
-              value: 'month',
-            },
-            {
-              title: 'Theo quý',
-              value: 'quarter',
-            },
-          ],
+            title: '24 giờ qua',
+            value: 'date',
+            children: [
+                {
+                    title: 'Theo tuần',
+                    value: 'week',
+                },
+                {
+                    title: 'Theo tháng',
+                    value: 'month',
+                },
+                {
+                    title: 'Theo quý',
+                    value: 'quarter',
+                },
+            ],
         },
-      ];
+    ];
     if (!isSuccess || !isSuccessGetRevanueByMonth) {
         return <>
             <div className="flex justify-center items-center h-[600px]">
@@ -101,24 +101,24 @@ const DashboardPage = () => {
     const onChange = (newValue: string) => {
         // navigate(`/admin/statistic/by_` +newValue)
         setValue(newValue);
-      };
-      const renderComponent = () => {
+    };
+    const renderComponent = () => {
         switch (value) {
-          case 'week':
-            return <OrderRevanueByWeek />;
-          case 'month':
-            return <OrderRevanueByMonth showTable= {false}/>;
-          case 'quarter':
-            return <OrderRevanueByQuarter />;
-          case 'product':
-            return <ProductStatistic />;
-          case 'order':
-            return <OrderStatistic />;
-          default:
-            return                 <HighchartsReact highcharts={Highcharts} options={columnChartOptions} />
-            ;
+            case 'week':
+                return <OrderRevanueByWeek />;
+            case 'month':
+                return <OrderRevanueByMonth showTable={false} />;
+            case 'quarter':
+                return <OrderRevanueByQuarter />;
+            case 'product':
+                return <ProductStatistic />;
+            case 'order':
+                return <OrderStatistic />;
+            default:
+                return <HighchartsReact highcharts={Highcharts} options={columnChartOptions} />
+                    ;
         }
-      };
+    };
     return <>
         <h2 className='text-2xl p-4 font-bold pb-2'>KẾT QUẢ KINH DOANH TRONG NGÀY</h2>
         <p className='text-sm italic px-4'>Trong vòng 24 giờ</p>
@@ -177,7 +177,7 @@ const DashboardPage = () => {
                     <p className="text-2xl">
                         {/* {orderRevanueMonth ? caculateAvgRevalueByMonth(orderRevanueMonth)?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ''}đ */}
                         {dashboardStatistic?.revenue?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
-                        </p>
+                    </p>
                     <p>Doanh số</p>
                 </div>
             </div>
@@ -187,19 +187,19 @@ const DashboardPage = () => {
 
         <div className='flex justify-between'>
             <div className='w-2/3'>
-                <h3 className='px-4 text-lg font-medium'>Tổng quan báo cáo</h3>           
+                <h3 className='px-4 text-lg font-medium'>Tổng quan báo cáo</h3>
                 <label htmlFor="" className='block ml-10 text my-3'>Loại báo cáo:
-            <TreeSelect
-              style={{ width: 200, marginLeft: 10 }}
-              value={value}
-              dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-              treeData={treeData}
-              treeDefaultExpandAll
-              onChange={onChange}
-              defaultValue='1'
-            />
-          </label>
-          {renderComponent()}
+                    <TreeSelect
+                        style={{ width: 200, marginLeft: 10 }}
+                        value={value}
+                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        treeData={treeData}
+                        treeDefaultExpandAll
+                        onChange={onChange}
+                        defaultValue='1'
+                    />
+                </label>
+                {renderComponent()}
             </div>
             <div className='w-1/4 flex flex-col'>
                 <div className='my-4'>
