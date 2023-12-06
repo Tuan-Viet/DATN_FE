@@ -6,6 +6,7 @@ export interface IProductDetail {
     sold: number
     imageColor: string
     quantity: number
+    createdAt: string
 }
 export interface IProductDetailState {
     productDetails: IProductDetail[]
