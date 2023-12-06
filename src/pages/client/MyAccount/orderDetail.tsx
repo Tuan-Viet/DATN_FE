@@ -67,9 +67,9 @@ function mapStatusToText(statusCode) {
 
 function mapStatusPaymentToText(statusCode) {
   switch (statusCode) {
-    case "0":
+    case 0:
       return "Chưa thanh toán";
-    case "1":
+    case 1:
       return "Đã thanh toán";
     default:
       return "Trạng thái không xác định";
@@ -105,7 +105,6 @@ const OrderDetail = () => {
   const { data: listOrderDetail, isSuccess: isSuccessListOrder } = useListOrderDetailQuery();
   const { data: listProductDetail, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery();
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery();
-  // const [productsInOrderState, setProductsInOrder] = useState<any>([])
   const [onaddReviews] = useAddReviewMutation()
   useEffect(() => {
     if (listOrderDetail) {
@@ -238,7 +237,6 @@ const OrderDetail = () => {
   const [onupdateOrderDetail] = useUpdateOrderDetailMutation()
 
   const onFinish = async (values: any) => {
-    // console.log('Uploaded files:', fileList);
     const imageObjects = fileList.map(file => ({
       url: file.response[0].url,
       publicId: file.response[0].publicId
@@ -251,15 +249,13 @@ const OrderDetail = () => {
         await onupdateOrderDetail({ _id: orderDetailId, order: { isReviewed: true } })
       }
       navigate(`/products/${idProduct}`)
-      message.success("Cảm ơn bạn đã đánh giá!")
+      Swal.fire({
+        title: "Cảm ơn bạn đã đánh giá !",
+        icon: "success",
+      })
       setIsModalOpen(false);
     }
   };
-  // useEffect(() => {
-  //   if (productsInOrder) {
-  //     setProductsInOrder(productsInOrder)
-  //   }
-  // }, [listOrderDetailState, isModalOpen])
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
     setCountUpload(newFileList.length);
@@ -274,7 +270,6 @@ const OrderDetail = () => {
         closeIcon: true
       });
     } catch (error) {
-      // console.error("Lỗi khi xóa ảnh", error);
     }
   };
   return (
@@ -511,14 +506,14 @@ const OrderDetail = () => {
 
                   </Modal>
                   <div className="text-right">
-                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 && (
-                      <button
+                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
+                      order?.paymentStatus && Number(order?.paymentStatus) !== 1 && <button
                         onClick={() => handleCancelOrder(id!)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                       >
                         Hủy đơn hàng
                       </button>
-                    )}
+                    }
                     <Link
                       to="/account"
                       className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
@@ -645,7 +640,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
-                        <td className="px-6 py-4 font-bold">40,000₫</td>
+                        <td className="px-6 py-4 font-bold">Miễn phí</td>
                       </tr>
                       <tr className="bg-white">
                         <th
@@ -658,7 +653,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {(totalProductPrice + 40000).toLocaleString("vi-VN")}₫
+                          {(totalProductPrice).toLocaleString("vi-VN")}₫
                         </td>
                       </tr>
                     </tbody>
@@ -673,7 +668,7 @@ const OrderDetail = () => {
                       Tình trạng thanh toán:{" "}
                       {mapStatusPaymentToText(order?.paymentStatus)}
                     </p>
-                    <p>Vận chuyển: Chờ xử lý</p>
+                    <p>Trạng thái đơn hàng: {mapStatusToText(order?.status)}</p>
                   </div>
                   <div>
                     <p className="mb-2">
@@ -693,12 +688,8 @@ const OrderDetail = () => {
               </div>
             </div>
           </div>
-          {/* overlayProduct-reviewed */}
           {order && order.status === 4 &&
             <>
-              {/* <Button ghost type="primary" onClick={showModal}>
-                Open Modal
-              </Button> */}
               <Modal
                 cancelButtonProps={{ style: { display: 'none' } }}
                 title="Đánh giá của bạn" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
@@ -719,7 +710,7 @@ const OrderDetail = () => {
                           </div>
                           <div className="flex ">
                             <del className="text-gray-400">{getOneProduct?.price?.toLocaleString("vi-VN")}đ</del>
-                            <p className="ml-2">{getOneProduct?.discount?.toLocaleString("vi-VN")}đ</p>
+                            <p className="ml-2">{(getOneProduct?.price - getOneProduct?.discount).toLocaleString("vi-VN")}đ</p>
                           </div>
                         </div>
                       </div>
@@ -743,7 +734,6 @@ const OrderDetail = () => {
                   </Form.Item>
                   <Form.Item name="images"
                     label="Ảnh đánh giá"
-                    rules={[{ required: true, message: 'Hãy nhập ảnh của bạn để đánh giá' }]}
                     className="relative"
                   >
                     <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">{countUpload}/3</span>

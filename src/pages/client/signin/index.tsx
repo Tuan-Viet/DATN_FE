@@ -57,7 +57,9 @@ const signin = () => {
     if (listCart) {
       if (user?.current?._id) {
         dispatch(listCartSlice(listCart))
+        console.log("list cart")
       } else {
+        console.log("list cartStore")
         dispatch(listCartSlice(cartStore ? cartStore : [])!)
       }
     }

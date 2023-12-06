@@ -13,7 +13,6 @@ import {
   addCartSlice,
   decreaseCartSlice,
   increaseCartSlice,
-  listCartLocalSlice,
   listCartSlice,
   removeCartSlice,
 } from "../store/cart/cartSlice";
@@ -21,7 +20,7 @@ import {
   useGetOneProductDetailQuery,
   useListProductDetailQuery,
 } from "../store/productDetail/productDetail.service";
-import { listProductDetailSlice } from "../store/productDetail/productDetailSlice";
+import { listProductDetailRelatedSlice, listProductDetailSlice } from "../store/productDetail/productDetailSlice";
 import { useFetchListProductQuery, useSearchProductQuery } from "../store/product/product.service";
 import { listProductSearchSlice, listProductSlice } from "../store/product/productSlice";
 import { toast } from "react-toastify";
@@ -50,22 +49,20 @@ const Header = () => {
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
   );
+  const productDetailRelatedState = useSelector(
+    (state: RootState) => state.productDetailRelatedReducer.productDetails
+  );
   const productState = useSelector(
     (state: RootState) => state.productSlice.products
-  );
-  const cartLocalState = useSelector(
-    (state: RootState) => state.cartLocalReducer.cartLocals
   );
   const [onRemoveCart] = useDeleteCartMutation();
   const [onUpdateCart] = useUpdateCartMutation();
   const [onAddCart] = useAddCartMutation();
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!);
-
   // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0);
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  // console.log(listCart);
   const handSubmitSignin = async (data: FormDataType) => {
     try {
       const response = await axios.post(
@@ -103,7 +100,6 @@ const Header = () => {
   const isLoggedIn = user?.isLoggedIn;
   const fullName = user?.current?.fullname;
   const role = user?.current?.role;
-
   const logOut = () => {
     // Gọi action đăng xuất
     dispatch(logout());
@@ -113,28 +109,18 @@ const Header = () => {
   };
   useEffect(() => {
     if (listCart) {
-      console.log(1)
       if (user?.current?._id) {
-        dispatch(listCartSlice(listCart));
+        dispatch(listCartSlice(listCart))
+        console.log("list cart", listCart)
       } else {
-        dispatch(listCartSlice(cartStore ? cartStore : [])!);
+        console.log("list cartStore")
+        dispatch(listCartSlice(cartStore ? cartStore : [])!)
       }
     }
   }, [isSuccessCart, listCart]);
-
-  useEffect(() => {
-    if (listCart) {
-      console.log(1)
-      if (user?.current?._id) {
-        dispatch(listCartSlice(listCart));
-      } else {
-        dispatch(listCartSlice(cartStore ? cartStore : [])!);
-      }
-    }
-  }, []);
   useEffect(() => {
     if (listProductDetail) {
-      dispatch(listProductDetailSlice(listProductDetail));
+      dispatch(listProductDetailRelatedSlice(listProductDetail));
     }
   }, [isSuccessProductDetail]);
   useEffect(() => {
@@ -142,7 +128,6 @@ const Header = () => {
       dispatch(listProductSlice(listProduct));
     }
   }, [isSuccessListProduct]);
-
   // xu li cart
   const removeCart = async (id: string) => {
     try {
@@ -165,7 +150,6 @@ const Header = () => {
       console.log(error);
     }
   };
-  const [decCart, setDecCart] = useState<boolean>(false)
   const decreaseCart = async (_id: string, discount: number) => {
     try {
       if (_id && discount) {
@@ -175,9 +159,11 @@ const Header = () => {
           if (cartIndex) {
             await onUpdateCart({ _id, ...cartIndex });
           }
+          console.log(2)
+
         } else {
+          console.log(1)
           dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
-          setDecCart(true)
         }
       }
     } catch (error) {
@@ -185,10 +171,8 @@ const Header = () => {
     }
   };
 
-  const [increCart, setIncreCart] = useState<boolean>(false)
   const increaseCart = async (_id: string, discount: number) => {
     try {
-      console.log(_id);
       if (_id) {
         if (user?.current?._id) {
           dispatch(increaseCartSlice({ _id: _id, discount: discount }));
@@ -198,18 +182,13 @@ const Header = () => {
           }
         } else {
           dispatch(increaseCartSlice({ _id: _id, discount: discount }));
-          setIncreCart(true)
         }
       }
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    dispatch(listCartSlice(cartStore ? cartStore : [])!);
-    setIncreCart(false)
-    setDecCart(false)
-  }, [increCart, decCart])
+
   // hàm dropdownUser
   const handleDropdown = () => {
     const iconUser = document.querySelector(".icon-user");
@@ -325,12 +304,6 @@ const Header = () => {
       localStorage.setItem("searchTerm", JSON.stringify(searchTerms))
       dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: listProduct }))
       navigate(`/search`)
-      //   if (searchTerms.trim() === "") {
-      //     localStorage.setItem("searchTerm", JSON.stringify(searchTerms))
-      //     navigate("/search")
-      //     dispatch(listProductSearchSlice({ searchTerm: searchTerms, products: [] }))
-      //   } else {
-      // }
     }
   }
   // forgotPassword
@@ -920,196 +893,191 @@ const Header = () => {
             <h1 className="font-bold tracking-wide text-[20px] mb-[10px]">
               Giỏ hàng
             </h1>
-            <h1 className="tracking-wide py-[10px] text-sm">
+            {/* <h1 className="tracking-wide py-[10px] text-sm">
               Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong>{" "}
               để có thể{" "}
               <strong className="uppercase">miễn phí vận chuyển</strong>
-            </h1>
+            </h1> */}
             <hr className="my-[20px]" />
             <div className="overflow-y-scroll h-[450px]">
               {cartState?.map((cart, index) => {
-                console.log(cartState);
-
-                return (
-                  <div key={index}>
-                    {productDetailState
-                      ?.filter(
-                        (proDetail) => proDetail?._id === cart?.productDetailId
-                      )
-                      .map((item) => {
-                        return (
-                          <div key={index}>
-                            {productState
-                              ?.filter(
-                                (product) => product._id === item.product_id
-                              )
-                              .map((pro) => {
-                                return (
-                                  <div
-                                    className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative"
-                                    key={index}
-                                  >
-                                    <Link to={`/products/${pro._id}`}>
-                                      <img
-                                        src={item?.imageColor}
-                                        alt="product-image"
-                                        className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
+                return <div key={index}>
+                  {productDetailRelatedState?.filter(
+                    (proDetail) => proDetail._id === cart.productDetailId
+                  )
+                    .map((item, index) => {
+                      return <div key={index}>
+                        {productState
+                          ?.filter(
+                            (product) => product._id === item.product_id
+                          )
+                          .map((pro, index) => {
+                            return (
+                              <div
+                                className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative"
+                                key={index}
+                              >
+                                <Link to={`/products/${pro._id}`}>
+                                  <img
+                                    src={item?.imageColor}
+                                    alt="product-image"
+                                    className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
+                                  />
+                                </Link>
+                                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                  <div className="mt-5 sm:mt-0">
+                                    <h2 className="text-lg font-bold text-gray-900">
+                                      {pro?.title}
+                                    </h2>
+                                    {/* color and size */}
+                                    <p className="mt-1 text-xs text-gray-700">
+                                      {item?.nameColor} / {item?.size}
+                                    </p>
+                                    {/* price product */}
+                                    <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
+                                      {(pro.price - pro.discount).toLocaleString("vi-VN")}
+                                      đ
+                                    </p>
+                                  </div>
+                                  {user?.current?._id ? (
+                                    <div
+                                      className="absolute right-[10px] top-[10px]"
+                                      onClick={() => removeCart(cart._id!)}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                      >
+                                        <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M6 18L18 6M6 6l12 12"
+                                        />
+                                      </svg>
+                                    </div>
+                                  ) : (
+                                    <div
+                                      className="absolute right-[10px] top-[10px]"
+                                      onClick={() =>
+                                        removeCart(cart.productDetailId!)
+                                      }
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                      >
+                                        <path
+                                          stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="M6 18L18 6M6 6l12 12"
+                                        />
+                                      </svg>
+                                    </div>
+                                  )}
+                                  <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                    <div className="flex items-center">
+                                      <p className="font-bold tracking-wide text-[15px]">
+                                        {cart?.totalMoney?.toLocaleString(
+                                          "vi-VN"
+                                        )}
+                                        đ
+                                      </p>
+                                    </div>
+                                    <div className="flex items-center w-[100px] border border-gray-300 rounded">
+                                      {user?.current?._id ? <button
+                                        onClick={() =>
+                                          decreaseCart(
+                                            cart._id!,
+                                            (pro.price - pro.discount)
+                                          )
+                                        }
+                                        disabled={
+                                          cart?.quantity == 1
+                                        }
+                                        type="button"
+                                        className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
+                                      >
+                                        -
+                                      </button> : <button
+                                        onClick={() =>
+                                          decreaseCart(
+                                            cart.productDetailId!,
+                                            (pro.price - pro.discount)
+                                          )
+                                        }
+                                        disabled={
+                                          cart?.quantity == 1
+                                        }
+                                        type="button"
+                                        className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
+                                      >
+                                        -
+                                      </button>}
+                                      <input
+                                        type="number"
+                                        id="Quantity"
+                                        value={cart.quantity}
+                                        // value={Number(cartState.reduce((acc: number, curr: any) => {
+                                        //   if (curr.productDetailId == item._id) {
+                                        //     return acc += curr.quantity
+                                        //   }
+                                        // }, 0))}
+                                        min="1"
+                                        max={item?.quantity}
+                                        className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                       />
-                                    </Link>
-                                    <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                                      <div className="mt-5 sm:mt-0">
-                                        <h2 className="text-lg font-bold text-gray-900">
-                                          {pro?.title}
-                                        </h2>
-                                        {/* color and size */}
-                                        <p className="mt-1 text-xs text-gray-700">
-                                          {item?.nameColor} / {item?.size}
-                                        </p>
-                                        {/* price product */}
-                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
-                                          {pro?.discount.toLocaleString(
-                                            "vi-VN"
-                                          )}
-                                          đ
-                                        </p>
-                                      </div>
-
-                                      {user?.current?._id ? (
-                                        <div
-                                          className="absolute right-[10px] top-[10px]"
-                                          onClick={() => removeCart(cart._id!)}
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                                          >
-                                            <path
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              d="M6 18L18 6M6 6l12 12"
-                                            />
-                                          </svg>
-                                        </div>
-                                      ) : (
-                                        <div
-                                          className="absolute right-[10px] top-[10px]"
-                                          onClick={() =>
-                                            removeCart(cart.productDetailId!)
-                                          }
-                                        >
-                                          <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke-width="1.5"
-                                            stroke="currentColor"
-                                            className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                                          >
-                                            <path
-                                              stroke-linecap="round"
-                                              stroke-linejoin="round"
-                                              d="M6 18L18 6M6 6l12 12"
-                                            />
-                                          </svg>
-                                        </div>
-                                      )}
-                                      <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                                        <div className="flex items-center">
-                                          <p className="font-bold tracking-wide text-[15px]">
-                                            {cart?.totalMoney?.toLocaleString(
-                                              "vi-VN"
-                                            )}
-                                            đ
-                                          </p>
-                                        </div>
-                                        <div className="flex items-center w-[100px] border border-gray-300 rounded">
-                                          {user?.current?._id ? <button
-                                            onClick={() =>
-                                              decreaseCart(
-                                                cart._id!,
-                                                pro.discount!
-                                              )
-                                            }
-                                            disabled={
-                                              cart?.quantity == 1
-                                            }
-                                            type="button"
-                                            className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
-                                          >
-                                            +
-                                          </button> : <button
-                                            onClick={() =>
-                                              decreaseCart(
-                                                cart.productDetailId!,
-                                                pro.discount!
-                                              )
-                                            }
-                                            disabled={
-                                              cart?.quantity == 1
-                                            }
-                                            type="button"
-                                            className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
-                                          >
-                                            +
-                                          </button>}
-                                          <input
-                                            type="number"
-                                            id="Quantity"
-                                            value={cart?.quantity}
-                                            min="1"
-                                            max={item?.quantity}
-                                            className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-                                          />
-                                          {user?.current?._id ? <button
-                                            onClick={() =>
-                                              increaseCart(
-                                                cart._id!,
-                                                pro.discount!
-                                              )
-                                            }
-                                            disabled={
-                                              item?.quantity === cart?.quantity
-                                            }
-                                            type="button"
-                                            className={`${item?.quantity === cart?.quantity
-                                              ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
-                                              : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
-                                              } `}
-                                          >
-                                            +
-                                          </button> : <button
-                                            onClick={() =>
-                                              increaseCart(
-                                                cart.productDetailId!,
-                                                pro.discount!
-                                              )
-                                            }
-                                            disabled={
-                                              item?.quantity === cart?.quantity
-                                            }
-                                            type="button"
-                                            className={`${item?.quantity === cart?.quantity
-                                              ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
-                                              : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
-                                              } `}
-                                          >
-                                            +
-                                          </button>}
-                                        </div>
-                                      </div>
+                                      {user?.current?._id ? <button
+                                        onClick={() =>
+                                          increaseCart(
+                                            cart._id!,
+                                            (pro.price - pro.discount)
+                                          )
+                                        }
+                                        disabled={
+                                          item?.quantity === cart?.quantity
+                                        }
+                                        type="button"
+                                        className={`${item?.quantity === cart?.quantity
+                                          ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                          : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                          } `}
+                                      >
+                                        +
+                                      </button> : <button
+                                        onClick={() =>
+                                          increaseCart(
+                                            cart.productDetailId!,
+                                            (pro.price - pro.discount)
+                                          )
+                                        }
+                                        disabled={
+                                          item?.quantity === cart?.quantity
+                                        }
+                                        type="button"
+                                        className={`${item?.quantity === cart?.quantity
+                                          ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                          : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                          } `}
+                                      >
+                                        +
+                                      </button>}
                                     </div>
                                   </div>
-                                );
-                              })}
-                          </div>
-                        );
-                      })}
-                  </div>
-                );
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    })}
+                </div>
               })}
             </div>
           </div>

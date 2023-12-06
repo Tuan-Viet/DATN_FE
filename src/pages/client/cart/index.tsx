@@ -15,6 +15,7 @@ import { message } from "antd";
 const cartPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+    console.log(listCart)
     const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
     const cartState = useSelector((state: RootState) => state.cartSlice.carts)
@@ -66,8 +67,7 @@ const cartPage = () => {
             dispatch(listProductSlice(listProduct))
         }
     }, [isSuccessListProduct])
-    const [decCart, setDecCart] = useState<boolean>(false)
-    const [increCart, setIncreCart] = useState<boolean>(false)
+
 
     const decreaseCart = async (_id: string, discount: number) => {
         try {
@@ -80,7 +80,6 @@ const cartPage = () => {
                     }
                 } else {
                     dispatch(decreaseCartSlice({ _id: _id, discount: discount }));
-                    setDecCart(true)
                 }
             }
         } catch (error) {
@@ -100,18 +99,12 @@ const cartPage = () => {
                     }
                 } else {
                     dispatch(increaseCartSlice({ _id: _id, discount: discount }));
-                    setIncreCart(true)
                 }
             }
         } catch (error) {
             console.log(error);
         }
     };
-    useEffect(() => {
-        dispatch(listCartSlice(cartStore ? cartStore : [])!);
-        setIncreCart(false)
-        setDecCart(false)
-    }, [increCart, decCart])
     useEffect(() => {
         let total = 0
         if (cartState) {
@@ -152,7 +145,7 @@ const cartPage = () => {
                                                         {/* color and size */}
                                                         <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
                                                         {/* price product */}
-                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{pro.discount.toLocaleString("vi-VN")}đ</p>
+                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{(pro.price - pro.discount).toLocaleString("vi-VN")}đ</p>
                                                     </div>
                                                     {user?.current?._id ? (
                                                         <div
@@ -211,7 +204,7 @@ const cartPage = () => {
                                                                 onClick={() =>
                                                                     decreaseCart(
                                                                         cart._id!,
-                                                                        pro.discount!
+                                                                        (pro.price - pro.discount)
                                                                     )
                                                                 }
                                                                 disabled={
@@ -220,12 +213,12 @@ const cartPage = () => {
                                                                 type="button"
                                                                 className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
                                                             >
-                                                                +
+                                                                -
                                                             </button> : <button
                                                                 onClick={() =>
                                                                     decreaseCart(
                                                                         cart.productDetailId!,
-                                                                        pro.discount!
+                                                                        (pro.price - pro.discount)
                                                                     )
                                                                 }
                                                                 disabled={
@@ -234,7 +227,7 @@ const cartPage = () => {
                                                                 type="button"
                                                                 className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
                                                             >
-                                                                +
+                                                                -
                                                             </button>}
                                                             <input
                                                                 type="number"
@@ -248,7 +241,7 @@ const cartPage = () => {
                                                                 onClick={() =>
                                                                     increaseCart(
                                                                         cart._id!,
-                                                                        pro.discount!
+                                                                        (pro.price - pro.discount)
                                                                     )
                                                                 }
                                                                 disabled={
@@ -265,7 +258,7 @@ const cartPage = () => {
                                                                 onClick={() =>
                                                                     increaseCart(
                                                                         cart.productDetailId!,
-                                                                        pro.discount!
+                                                                        (pro.price - pro.discount)
                                                                     )
                                                                 }
                                                                 disabled={

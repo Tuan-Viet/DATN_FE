@@ -28,6 +28,18 @@ const productDetailSlice = createSlice({
         },
     })
 })
+const productDetailRelatedSlice = createSlice({
+    name: "productDetails",
+    initialState: initialStateProductDetail,
+    reducers: ({
+        listProductDetailRelatedSlice: (state: IProductDetailState, actions: PayloadAction<IProductDetail[]>) => {
+            state.productDetails = actions.payload
+        },
+        // listProductDetailByProductId: (state: IProductDetailState, actions: PayloadAction<IProductDetail[]>) => {
+        //     state.productDetails = actions.payload
+        // },
+    })
+})
 const productDetailFilterSlice = createSlice({
     name: "productDetails",
     initialState: initalStateProductDetailFilter,
@@ -69,8 +81,10 @@ const productDetailIdSlice = createSlice({
 
 export const { listProductDetailFilter, listProductDetailFilterSlice } = productDetailFilterSlice.actions
 export const { listProductDetailSlice } = productDetailSlice.actions
+export const { listProductDetailRelatedSlice } = productDetailRelatedSlice.actions
 export const { listProductDetailIdFilter, getOneIdProductDetailSlice } = productDetailIdSlice.actions
 export const productDetailFilterSliceReducer = productDetailFilterSlice.reducer
 export const productDetailIdReducer = productDetailIdSlice.reducer
+export const productDetailRelatedReducer = productDetailRelatedSlice.reducer
 export default productDetailSlice.reducer
 
