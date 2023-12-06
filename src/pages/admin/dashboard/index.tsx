@@ -21,8 +21,8 @@ import ProductStatistic from '../statistic/ProductStatistic';
 
 const DashboardPage = () => {
     const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
-    const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueByMonth } = useGetOrderRevenueByMonthQuery()
-    const { data: orderRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
+    const { data: orderRevanueMonth } = useGetOrderRevenueByMonthQuery()
+    const { data: orderRevanueQuarter, } = useGetOrderRevenueByQuarterQuery();
     const { data: orderRevanueWeek } = useGetOrderRevenueByWeekQuery()
     const { data: productRevanue } = useGetProductRevenueQuery();
     const { data: orderRevanue } = useGetOrderRevenueQuery();
@@ -51,7 +51,7 @@ const DashboardPage = () => {
             ],
         },
     ];
-    if (!isSuccess || !isSuccessGetRevanueByMonth) {
+    if (!isSuccess) {
         return <>
             <div className="flex justify-center items-center h-[600px]">
                 <Spin size='large' />
@@ -206,8 +206,8 @@ const DashboardPage = () => {
                     <h3 className='text-2xl font-medium'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
                     {dashboardStatistic.bestSellingProduct && (
                         <div>
-                            <p className='my-1 text-md text-md'>Tên sản phẩm: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0].title}</span></p>
-                            <p className='my-1 text-xs'>Số lượng bán: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0].totalQuantitySold}</span></p>
+                            <p className='my-1 text-md text-md'>Tên sản phẩm: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0]?.title}</span></p>
+                            <p className='my-1 text-xs'>Số lượng bán: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0]?.totalQuantitySold}</span></p>
                         </div>
                     )}
                 </div>

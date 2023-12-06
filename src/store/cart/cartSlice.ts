@@ -16,7 +16,6 @@ const cartSlice = createSlice({
                 const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)._id)
                 state.carts = listCartByUser
             } else {
-                console.log(1)
                 state.carts = actions.payload
             }
         },
@@ -86,6 +85,8 @@ const cartSlice = createSlice({
                             totalMoney: updatedCartStore[cartStoreIndex].totalMoney + actions.payload.discount
                         }
                         localStorage.setItem("carts", JSON.stringify(updatedCartStore))
+                        const cartLocal: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+                        state.carts = cartLocal
                     }
                 }
             }
@@ -107,7 +108,6 @@ const cartSlice = createSlice({
                 if (cartStore) {
                     const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
                     if (cartStoreIndex !== -1) {
-
                         const updatedCartStore = [...cartStore]
                         updatedCartStore[cartStoreIndex] = {
                             ...updatedCartStore[cartStoreIndex],
@@ -115,6 +115,8 @@ const cartSlice = createSlice({
                             totalMoney: updatedCartStore[cartStoreIndex].totalMoney - actions.payload.discount
                         }
                         localStorage.setItem("carts", JSON.stringify(updatedCartStore))
+                        const cartLocal: ICart[] = JSON.parse(localStorage.getItem("carts")!)
+                        state.carts = cartLocal
                     }
                 }
             }

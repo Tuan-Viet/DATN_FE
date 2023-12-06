@@ -6,7 +6,7 @@ import ProductInfo from "./ProductInfo";
 const productDetail = () => {
     return <>
         <Header></Header>
-        <Breadcrumb></Breadcrumb>
+        {/* <Breadcrumb></Breadcrumb> */}
         <ProductInfo></ProductInfo>
         <Footer></Footer>
     </>

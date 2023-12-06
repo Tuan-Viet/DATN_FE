@@ -43,7 +43,7 @@ const CheckoutsPage = () => {
   const [idVoucher, setIdVoucher] = useState<string>("")
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
   const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
-
+  console.log(cartState)
   useEffect(() => {
     if (listCart) {
       if (user?.current?._id) {
@@ -70,27 +70,12 @@ const CheckoutsPage = () => {
   }, [isSuccessVoucher])
 
 
-  // console.log(user);
-
-  // // console.log(myVoucher);
-  // let userVoucher: any[] = []
   useEffect(() => {
     const myVoucher = InfoUser?.voucherwallet
   }, [InfoUser])
 
   const myVoucher = InfoUser?.voucherwallet
   console.log(myVoucher);
-
-  // myVoucher.map((item: any) => {
-  //   const voucher = voucherSlice.find((vourcher) => vou)
-  //   // userVoucher.push(voucherSlice.find(voucher._id == item))
-  // })
-  // console.log(userVoucher);
-
-
-  // const myVoucher = voucherState.filter(voucher => voucher._id == user.current.voucherwallet)
-  // console.log(myVoucher);
-
 
   const {
     register,
@@ -206,6 +191,9 @@ const CheckoutsPage = () => {
   useEffect(() => {
     handleFindVoucher()
   }, [])
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, []);
   return (
     <>
       {loading && (
@@ -355,7 +343,6 @@ const CheckoutsPage = () => {
             </div>
           </div>
           <div className="border-l-[1px] pl-5 w-full">
-
             <h1 className="text-xl font-bold mb-5">Đơn hàng ({cartState.length} sản phẩm)</h1>
             <div className="pt-7 border-t-[1px] border-b-[1px] h-[250px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
@@ -370,7 +357,7 @@ const CheckoutsPage = () => {
                         <input type="text" value={item.size} className="hidden" {...register(`carts.${index}.size`)} />
                         {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
                           return <div className="mb-6 flex relative gap-x-20">
-                            <input type="text" value={pro.discount} className="hidden" {...register(`carts.${index}.price`)} />
+                            <input type="text" value={pro.price - pro.discount} className="hidden" {...register(`carts.${index}.price`)} />
                             <div className="border rounded-lg relative w-[125px] h-[185px]">
                               <img
                                 src={item.imageColor}

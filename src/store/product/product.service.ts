@@ -27,7 +27,7 @@ const productAPI = createApi({
             query: () => `/products/admin`,
             providesTags: ["products"]
         }),
-        fetchOneProductByAdmin: builer.query<IProduct, string>({
+        fetchOneProductByAdmin: builer.query({
             query: (id) => `/products/admin/` + id,
             providesTags: ["products"]
         }),

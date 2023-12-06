@@ -23,7 +23,7 @@ import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form, Modal, Rate, Upload, UploadFile, UploadProps, message, notification } from "antd";
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons';
+import { LoadingOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import { useAddReviewMutation } from "../../../store/reviews/review.service";
@@ -65,11 +65,11 @@ function mapStatusToText(statusCode) {
   }
 }
 
-function mapStatusPaymentToText(statusCode) {
+function mapStatusPaymentToText(statusCode: number) {
   switch (statusCode) {
-    case "0":
+    case 0:
       return "Chưa thanh toán";
-    case "1":
+    case 1:
       return "Đã thanh toán";
     default:
       return "Trạng thái không xác định";
@@ -83,6 +83,8 @@ const OrderDetail = () => {
   const { handleSubmit, register, setValue, formState: { errors } } = useForm<ReviewForm>({
     resolver: yupResolver(ReviewSchema)
   })
+  const [countUpload, setCountUpload] = useState([0]);
+
   const user = useSelector((state: any) => state.user);
   useEffect(() => {
     if (user) {
@@ -235,7 +237,6 @@ const OrderDetail = () => {
   const [onupdateOrderDetail] = useUpdateOrderDetailMutation()
 
   const onFinish = async (values: any) => {
-    // console.log('Uploaded files:', fileList);
     const imageObjects = fileList.map(file => ({
       url: file.response[0].url,
       publicId: file.response[0].publicId
@@ -252,15 +253,12 @@ const OrderDetail = () => {
       setIsModalOpen(false);
     }
   };
-  // useEffect(() => {
-  //   if (productsInOrder) {
-  //     setProductsInOrder(productsInOrder)
-  //   }
-  // }, [listOrderDetailState, isModalOpen])
-  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
+
+  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
+    setCountUpload(newFileList.length);
+  }
   const handleRemoveImage = async (file: UploadFile) => {
-    console.log(file);
     try {
       await axios.delete(`http://localhost:8080/api/images/remove/${file.response[0].publicId}`);
       notification.success({
@@ -506,14 +504,14 @@ const OrderDetail = () => {
 
                   </Modal>
                   <div className="text-right">
-                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 && (
-                      <button
+                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
+                      order?.paymentStatus && Number(order?.paymentStatus) !== 1 && <button
                         onClick={() => handleCancelOrder(id!)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                       >
                         Hủy đơn hàng
                       </button>
-                    )}
+                    }
                     <Link
                       to="/account"
                       className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
@@ -547,13 +545,13 @@ const OrderDetail = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {productsInOrder?.map((product: any) => {
+                      {productsInOrder?.map((order: any) => {
                         return (
                           <>
                             {productDetailState
                               ?.filter(
                                 (proDetail: any) =>
-                                  proDetail._id === product.productDetailId
+                                  proDetail._id === order.productDetailId
                               )
                               .map((item: any) => {
                                 return (
@@ -579,32 +577,32 @@ const OrderDetail = () => {
                                                   {pro.title}
                                                 </p>
                                                 <p>
-                                                  {product.color} / {product.size}
+                                                  {order.color} / {order.size}
                                                 </p>
                                               </div>
                                             </Link>
                                           </th>
                                           <td className="px-6 py-4">
-                                            ESTP03872PE00SB_BL-XXL
+                                            {pro.sku}
                                           </td>
                                           <td className="px-6 py-4">
-                                            {product.price.toLocaleString(
+                                            {(pro.price - pro.discount).toLocaleString(
                                               "vi-VN"
                                             )}
                                             ₫
                                           </td>
                                           <td className="px-6 py-4">
-                                            {product.quantity}
+                                            {order.quantity}
                                           </td>
                                           <td className="px-6 py-4">
-                                            {product.totalMoney.toLocaleString(
+                                            {order.totalMoney.toLocaleString(
                                               "vi-VN"
                                             )}
                                             ₫
                                           </td>
                                           <td>
-                                            {order && order.status === 4 && product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
-                                            {order && order.status === 4 && product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
+                                            {order && order.status === 4 && order.isReviewed === false && <div onClick={() => showModal(pro._id!, order.productDetailId!, order._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
+                                            {order && order.status === 4 && order.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
                                           </td>
                                         </tr>
                                       ))}
@@ -640,7 +638,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
-                        <td className="px-6 py-4 font-bold">40,000₫</td>
+                        <td className="px-6 py-4 font-bold">Miễn phí</td>
                       </tr>
                       <tr className="bg-white">
                         <th
@@ -653,7 +651,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {(totalProductPrice + 40000).toLocaleString("vi-VN")}₫
+                          {(totalProductPrice).toLocaleString("vi-VN")}₫
                         </td>
                       </tr>
                     </tbody>
@@ -665,10 +663,10 @@ const OrderDetail = () => {
                   </h2>
                   <div className="bg-[#d9edf7] text-[#31708f] border border-[#bce8f1] p-3 mb-5 rounded-lg">
                     <p className="mb-2">
-                      Tình trạng thanh toán:{" "}
-                      {mapStatusPaymentToText(order?.paymentStatus)}
+                      Tình trạng thanh toán :{" "}
+                      {mapStatusPaymentToText(Number(order?.paymentStatus))}
                     </p>
-                    <p>Vận chuyển: Chờ xử lý</p>
+                    <p>Trạng thái đơn hàng : {mapStatusToText(order?.status)}</p>
                   </div>
                   <div>
                     <p className="mb-2">
@@ -706,11 +704,11 @@ const OrderDetail = () => {
                   {getOneProduct && getOneProductDetail &&
                     <div className="">
                       <div className="flex pb-3">
-                        <img className="" width={80} src={getOneProduct.images?.[0]} alt="" />
+                        <img className="h-20" src={getOneProduct.images?.[0]} alt="" />
                         <div className="flex flex-col p-2">
                           <p>{getOneProduct?.title}</p>
-                          <div className="bg-gray-300 px-2 flex items-center w-auto rounded-sm text-sm my-1">
-                            {getOneProductDetail.nameColor} / {getOneProductDetail.size}
+                          <div className="">
+                            <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{getOneProductDetail.size}</span> - <span className="text-xs text-blue-500"> {getOneProductDetail.nameColor}</span>
                           </div>
                           <div className="flex ">
                             <del className="text-gray-400">{getOneProduct?.price?.toLocaleString("vi-VN")}đ</del>
@@ -721,14 +719,13 @@ const OrderDetail = () => {
                       <Form.Item
                         label="Đánh giá"
                         name="rating"
-                        className="text-xl"
+                        className="text-base"
                         rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
                       >
                         <Rate className="text-2xl" />
                       </Form.Item>
                     </div>
                   }
-
                   <Form.Item
                     label="Bình luận"
                     name="comment"
@@ -738,10 +735,9 @@ const OrderDetail = () => {
                   </Form.Item>
                   <Form.Item name="images"
                     label="Ảnh đánh giá"
-                    rules={[{ required: true, message: 'Hãy nhập ảnh của bạn để đánh giá' }]}
-
+                    className="relative"
                   >
-
+                    <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">{countUpload}/3</span>
                     <Upload name='images'
                       multiple
                       action={'http://localhost:8080/api/images/upload'}
@@ -750,13 +746,17 @@ const OrderDetail = () => {
                       listType="picture-card"
                       iconRender={() => <LoadingOutlined />}
                       onRemove={(file) => handleRemoveImage(file)}
+                      maxCount={3}
                     >
-                      {fileList.length >= 5 ? null : <Button className="text-sm" icon={<UploadOutlined />}>Tải ảnh lên</Button>}
+                      <div>
+                        <PlusOutlined />
+                        <div>Upload </div>
+                      </div>
                     </Upload>
                   </Form.Item>
 
                   <Form.Item >
-                    <Button type="primary" className="bg-black w-full py-3 flex items-center justify-center" htmlType="submit">
+                    <Button type="primary" className="bg-blue-500 w-full py-3 flex items-center justify-center " htmlType="submit">
                       Viết đánh giá
                     </Button>
                   </Form.Item>
