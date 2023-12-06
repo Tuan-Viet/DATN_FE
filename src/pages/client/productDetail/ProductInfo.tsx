@@ -4,7 +4,7 @@ import { Navigation, Autoplay } from "swiper/modules";
 import React, { Dispatch, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useGetOneProductDetailQuery, useListProductDetailQuery, useUpdateProductDetailMutation } from "../../../store/productDetail/productDetail.service";
-import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
+import { useFetchListProductQuery, useFetchOneProductByAdminQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { getOneIdProductDetailSlice, listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
@@ -22,15 +22,19 @@ import {
   Breadcrumb,
   Button,
   Form,
+  Image,
   Input,
   List,
   Rate,
+  Skeleton,
   Space,
   message,
 } from 'antd';
 import ProductViewed from "./ProductViewed";
 import { useFetchListReviewsQuery } from "../../../store/reviews/review.service";
 import { listReviewByRate, listReviewByRateFilterSlice, listReviewByRateSlice, listReviewByUserFilterSlice, listReviewSlice } from "../../../store/reviews/reviewSlice";
+import { IProductDetail } from "../../../store/productDetail/productDetail.interface";
+import moment from "moment";
 
 const ProductInfo = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -72,7 +76,8 @@ const ProductInfo = () => {
 
     const [currentTab, setCurrentTab] = useState(1);
     const { data: listProduct } = useFetchListProductQuery()
-    const { data: getOneProduct, isSuccess: isSuccessGetOneProduct, isLoading: productLoading } = useFetchOneProductQuery(id)
+    // const { data: getOneProduct, isSuccess: isSuccessProduct, isLoading: productLoading } = useFetchOneProductQuery(id)
+    const { data: getOneProduct, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id)
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
@@ -90,6 +95,17 @@ const ProductInfo = () => {
         setRateAver(rateAverage)
       }
     }, [reviewState, rateAver])
+
+    const data = reviewByRateStateVer.map((item, index) => ({
+      color: item.color,
+      size: item.size,
+      date: moment(item.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
+      images: item.images,
+      rate: item.rating,
+      fullname: item.userId ? item.userId?.fullname : null,
+      comment: item.comment,
+      useId: item.userId ? item.userId._id : null
+    }));
     const renderContent = () => {
       switch (currentTab && currentTab) {
         case 1:
@@ -102,66 +118,78 @@ const ProductInfo = () => {
           );
         case 2:
           return <>
-            <div className="bg-[#fffbf8] px-[24px] py-4 flex">
-              <div className="">
-                <div className="flex items-center text-yellow-500">
-                  <p className="text-[24px]"> {rateAver ? rateAver.toFixed(1) : 0}</p><span className="ml-2">trên 5 sao</span>
+            <div className="bg-[#fffbf8] px-[24px] py-4 ">
+              <div className="flex w-[80%] mx-auto">
+                <div className="">
+                  <div className="flex items-center text-yellow-500">
+                    <p className="text-[24px]"> {rateAver ? rateAver.toFixed(1) : 0}</p><span className="ml-2">trên 5 sao</span>
+                  </div>
+                  <Rate value={rateAver} disabled className="text-2xl " />
                 </div>
-                <Rate value={rateAver} disabled className="text-2xl " />
-              </div>
-              <div className="flex ml-10">
-                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 0, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Tất cả</div>
-                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 5, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">5 sao</div>
-                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 4, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">4 sao</div>
-                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 3, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">3 sao</div>
-                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 2, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">2 sao</div>
-                <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 1, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">1 sao</div>
-                {userStore?.current?._id && <div onClick={() => dispatch(listReviewByUserFilterSlice({ userId: userStore.current._id, reviews: reviewState && reviewState }))} className="border border-1 w-[150px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Đánh giá của tôi</div>}
+                <div className="flex ml-10">
+                  <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 0, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Tất cả</div>
+                  <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 5, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">5 sao</div>
+                  <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 4, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">4 sao</div>
+                  <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 3, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">3 sao</div>
+                  <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 2, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">2 sao</div>
+                  <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 1, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">1 sao</div>
+                  {userStore?.current?._id && <div onClick={() => dispatch(listReviewByUserFilterSlice({ userId: userStore.current._id, reviews: reviewState && reviewState }))} className="border border-1 w-[150px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Đánh giá của tôi</div>}
 
+                </div>
               </div>
             </div>
-            <List
-              itemLayout="vertical"
-              size="large"
-              pagination={{
-                onChange: (page) => {
-                  console.log(page);
-                },
-                pageSize: 3,
-              }}
-              dataSource={reviewByRateStateVer && reviewByRateStateVer}
+            <div className="w-[80%] mx-auto">
 
-              renderItem={(item) => (
-                <List.Item
-                  key={item.productId}
-
-                >
-
-                  {/* <div>{item.createdAt}</div> */}
-                  <div className="flex w-[200px] items-center">
-                    <p className="mr-3">{item.userId?.fullname}</p>
-                    <Rate disabled value={item?.rating} className="text-sm" />
+              {reviewByRateStateVer.length > 0 && (
+                <div className="">
+                  <div className="my-5">
+                    <span className="text-xl font-medium mr-1">{reviewByRateStateVer.length}</span>
+                    <span className="text-sm text-gray-500">(Đánh giá)</span>
                   </div>
-                  <p className="text-[10px] bg-gray-300 w-[80px] rounded-sm flex items-center justify-center my-2">{item.color} / {item.size}</p>
+                  <List
+                    itemLayout="vertical"
+                    size="large"
+                    pagination={{
+                      onChange: (page) => {
+                        console.log(page);
+                      },
+                      pageSize: 10,
+                    }}
+                    dataSource={data}
+                    renderItem={(item) => (
+                      <List.Item
+                        extra={
+                          <Image.PreviewGroup
+                            preview={{
+                              onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                            }}
+                          >
+                            {item.images.map((image) => (
+                              <Image height={70} src={image.url} alt="" className="pr-1" />
 
-
-
-                  <div className="mt-4">
-                    {item?.comment}
-                  </div>
-                  <div className="flex ml-[-8px]">
-                    {item?.images?.map((url) =>
-                      <img
-                        width={80}
-                        alt="logo"
-                        src={url?.url}
-                        className="mt-3 ml-2 border border-1"
-                      />
+                            ))}
+                          </Image.PreviewGroup>
+                        }
+                      >
+                        <div className="">
+                          <div className="flex items-center space-x-2">
+                            <span className=""><Link to={``}>{item.fullname}</Link></span>
+                            <span className="block"><Rate value={item.rate} disabled className="text-xs mb-0"></Rate></span>
+                          </div>
+                          <div className="flex mt-0 items-center ">
+                            <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{item.date}</span>
+                            <div className="px-1">
+                              <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
+                            </div>
+                          </div>
+                          <span className="block my-2">{item.comment}</span>
+                        </div>
+                      </List.Item>
                     )}
-                  </div>
-                </List.Item>
+                  />
+                </div>
               )}
-            />
+            </div>
           </>
         case 3:
           return (
@@ -476,108 +504,240 @@ const ProductInfo = () => {
         dispatch(listProductDetailSlice(listProductDetailApi))
       }
     }, [isSuccessProductDetail])
+
+    function filterAndTransformVariants(inputVariants: any) {
+      const resultVariants = [];
+
+      const colorMap: any = {};
+
+      (inputVariants ?? []).forEach((variant: any) => {
+        const { product_id, nameColor, size, quantity, imageColor, sold, deleted, _id } = variant;
+
+        if (!colorMap[nameColor]) {
+          colorMap[nameColor] = {
+            product_id,
+            imageColor,
+            nameColor,
+            items: [],
+            sold,
+            deleted,
+          };
+        }
+
+        const existingSize = colorMap[nameColor].items.find((item: any) => item.size === size);
+        if (existingSize) {
+          existingSize.quantity += quantity;
+        } else {
+          colorMap[nameColor].items.push({
+            _id,
+            size,
+            quantity,
+          });
+        }
+      });
+
+      for (const colorKey in colorMap) {
+        resultVariants.push(colorMap[colorKey]);
+      }
+      console.log(resultVariants);
+      return resultVariants;
+    }
+
+    // const [productDetails, setProductDetails] = useState<any[]>([]);
+    const productDetails = filterAndTransformVariants(getOneProduct?.variants)
+    const colorProduct = productDetails.map((product: any) => product.nameColor)
+    console.log(productDetailFilterState);
+    // console.log(productDetails);
+
+
+    let sizeProduct: any = [];
+    productDetails.forEach((item) => {
+      item.items.forEach((sizeObj: any) => {
+        if (!sizeProduct.includes(sizeObj.size)) {
+          sizeProduct.push(sizeObj.size);
+        }
+      });
+    });
+
+    const imagesProduct = productDetails.map((product: any) => product.imageColor)
+    const listImages = [...getOneProduct?.images ?? [], ...imagesProduct];
+
+    const [selectedImage, setSelectedImage] = useState(0);
+    const handleImageClick = (index: any) => {
+      setSelectedImage(index);
+    };
+
+    const handlePrevClick = () => {
+      setSelectedImage((prev) => (prev > 0 ? prev - 1 : listImages.length - 1));
+    };
+
+    const handleNextClick = () => {
+      setSelectedImage((prev) => (prev < listImages.length - 1 ? prev + 1 : 0));
+    };
+
     useEffect(() => {
       window.scrollTo({ top: 0, left: 0 });
     }, []);
     return (
-      <div className="max-w-[1500px] mx-auto mb-[70px]" id="scroller">
+      <div className=" mx-3 mb-[70px] my-10" id="scroller ">
         {/* <ScrollToTop /> */}
-        <div className="flex gap-x-7 mb-10">
-          <div className="w-[433px]">
-            {/* anh to */}
-            <div className="product-detail-thumbnail w-[433px] mb-[10px]">
-              <Swiper
-                modules={[Navigation]}
-                // grabCursor={"true"}
-                spaceBetween={30}
-                slidesPerView={"auto"}
-                navigation={true}
-                autoplay={{ delay: 3000 }}
-              >
-                <SwiperSlide>
-                  <div className="">
-                    <img
-                      src={getOneProduct?.images?.[0]}
-                      className="h-[555px] object-cover"
-                      alt=""
-                    />
-                  </div>
-                </SwiperSlide>
-                {[...new Set(productDetailState?.filter((pro) => pro.product_id === getOneProduct?._id).flatMap((i) => i.imageColor))].map((url, index) => {
-                  return <>
-                    <SwiperSlide key={index}>
-                      <div className="">
-                        <img
-                          src={url}
-                          className="h-[555px] object-cover"
-                          alt=""
-                        />
+        <div className="flex justify-between gap-x-7 mb-10 mx-10">
+          {!isSuccessProduct ? (
+            <div className="space-y-3">
+              <Skeleton.Image active={true} style={{ width: '380px', height: '400px' }} />
+              <Skeleton.Image active={true} style={{ width: '80px', height: '80px' }} />
+            </div>
+          ) : (
+            <div className="">
+              <div className="w-[400px] h-[500px] relative">
+                <img
+                  src={listImages[selectedImage]}
+                  alt=""
+                  className="w-[400px] h-[500px] object-cover border"
+                />
+                <button
+                  onClick={handlePrevClick}
+                  className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
+                >
+                  &lt;
+                </button>
+                <button
+                  onClick={handleNextClick}
+                  className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
+                >
+                  &gt;
+                </button>
+              </div>
+              <div className=" mt-5">
+                <Swiper
+                  modules={[Navigation]}
+                  spaceBetween={4}
+                  slidesPerView={"auto"}
+                  navigation={true}
+                  className="w-[400px] mx-auto"
+                >
+                  {listImages.map((imageUrl, index) => {
+                    return <SwiperSlide key={index} className="w-20 h-24 ">
+                      <div
+                        onClick={() => handleImageClick(index)}
+                        className={`h-20 w-16 overflow-hidden mb-3 relative group transform transition-transform hover:scale-110 
+                      }`}
+                      >
+                        <div className="h-20 flex items-center justify-center">
+                          <img
+                            src={imageUrl}
+                            alt=""
+                            className="h-full w-full object-cover "
+                          />
+                        </div>
+
                       </div>
                     </SwiperSlide>
-                  </>
-                })}
-              </Swiper>
-            </div>
-            {/* anh nho? */}
-            {getOneProduct?.images?.map((item, index) => {
-              return <div className="flex ml-[-8px]" key={index}>
-                <img
-                  src={item}
-                  className="w-[61.83px] h-[79.13px] cursor-pointer ml-2"
-                  alt=""
-                />
-                {[...new Set(productDetailState?.filter((pro) => pro.product_id === getOneProduct._id).map((i) => i.imageColor))].map((url) => {
-                  return <>
-                    <img
-                      src={url}
-                      className="w-[61.83px] h-[79.13px] ml-2 cursor-pointer"
-                      alt=""
-                    />
-                  </>
-                })}
-              </div>
-            })}
-          </div>
-          <div className="product-info">
-            <div className="mb-10">
-              <h1 className="text-[26px] font-bold mb-2">
-                {getOneProduct?.title}
-              </h1>
-              <div className="flex gap-x-5 text-sm">
-                <span>
-                  Mã sản phẩm: <b>ESTA01012CT06MB_NV-S</b>
-                </span>
-                <span>
-                  Tình trạng: <b>Còn hàng</b>
-                </span>
-                <span>
-                  Thương hiệu: <b className="uppercase">HUSTLE</b>
-                </span>
+                  })}
+                </Swiper>
+
               </div>
             </div>
+          )}
+
+          <div className="product-info w-2/3">
+            {!isSuccessProduct ? (
+              <div className="">
+                <div className="">
+                  <Skeleton.Input active={true} style={{ width: '380px', height: '39px' }} />
+                </div>
+                <div className="mt-3">
+                  <Skeleton.Input active={true} style={{ width: '550px', height: '20px' }} />
+                </div>
+              </div>
+            ) : (
+              <div className="mb-10">
+                <h1 className="text-[26px] font-bold mb-2">
+                  {getOneProduct?.title}
+                </h1>
+                <div className="flex gap-x-5 text-sm">
+                  <span>
+                    Mã sản phẩm: <b>{getOneProduct?.sku}</b>
+                  </span>
+                  <span>
+                    Tình trạng: <b>Còn hàng</b>
+                  </span>
+                  <span>
+                    Thương hiệu: <b className="uppercase">HUSTLE</b>
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* form */}
             <form onSubmit={handleSubmit(handleFormProductDetail)}>
               <div className="px-4">
-                <div className="flex items-center gap-x-[109px] py-4 mb-2">
-                  <span className="text-sm font-bold">Giá:</span>
-                  <div className="font-bold text-xl text-[#FF2C26]">
-                    {getOneProduct?.discount?.toLocaleString("vi-VN")}đ
-                    <del className="font-bold text-sm text-[#ccc] ml-2">
-                      {getOneProduct?.price?.toLocaleString("vi-VN")}đ
-                    </del>
+                {!isSuccessProduct ? (
+                  <div className="my-5 mt-14">
+                    <Skeleton.Input active={true} style={{ width: '500px', height: '60px' }} />
                   </div>
-                  {getOneProduct && getOneProduct?.price > getOneProduct?.discount ? <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
-                    -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
-                  </span> : ""}
-                </div>
+                ) : (
+                  <div className="flex items-center gap-x-[109px] py-4 mb-2">
+                    <span className="text-sm font-bold">Giá:</span>
+                    <div className="font-bold text-xl text-[#FF2C26]">
+                      {getOneProduct?.discount?.toLocaleString("vi-VN")}đ
+                      <del className="font-bold text-sm text-[#ccc] ml-2">
+                        {getOneProduct?.price?.toLocaleString("vi-VN")}đ
+                      </del>
+                    </div>
+                    {getOneProduct && getOneProduct?.price > getOneProduct?.discount ? <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
+                      -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
+                    </span> : ""}
+                  </div>
+                )}
+
                 {/* bien the */}
                 <div>
-                  {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
-                    <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
-                    <div className="flex my-6">
-                      <div className="w-[13%] text-sm font-bold">Màu sắc</div>
-                      <div className="flex">
-                        {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item?.nameColor))].map((nameColor) => {
+                  {!isSuccessProduct ? (
+                    <div className="mt-3">
+                      <div className="">
+                        <Skeleton.Input active={true} style={{ width: '300px', height: '36px' }} />
+                      </div>
+                      <div className="mt-1">
+                        <Skeleton.Input active={true} style={{ width: '300px', height: '36px' }} />
+                      </div>
+                      <div className="mt-8">
+                        <Skeleton.Button active={true} style={{ width: '200px', height: '40px' }} />
+                      </div>
+                      <div className="mt-5 flex space-x-5 mb-3">
+                        <Skeleton.Button active={true} style={{ width: '300px', height: '50px' }} />
+                        <Skeleton.Button active={true} style={{ width: '300px', height: '50px' }} />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="">
+                      {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
+                        <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
+
+                        <div className="flex my-6">
+                          <div className="w-[13%] text-sm font-bold">Màu sắc</div>
+                          <div className="flex">
+                            {colorProduct.map((color, index) => (
+                              <div className="mx-1">
+                                <input
+                                  type="radio"
+                                  value={color}
+                                  onClick={() => {
+                                    handleColorProductDetail(color);
+                                    handleImageClick(index + getOneProduct.images.length);
+                                  }}
+                                  id={color}
+                                  name="color"
+                                  className="hidden peer"
+                                />
+                                <label htmlFor={color}
+                                  className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                                >
+                                  {color}
+                                </label>
+                              </div>
+                            ))}
+                            {/* {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item?.color))].map((nameColor) => {
                           return <div className="mx-1">
                             <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
                             <label htmlFor={nameColor}
@@ -586,155 +746,134 @@ const ProductInfo = () => {
                               {nameColor}
                             </label>
                           </div>
-                        })}
-                      </div>
-                    </div>
-                    <div className="flex my-6">
-                      {/* size */}
-                      <div className="w-[13%] text-sm font-bold">Kích thước</div>
-                      <div className="flex">
-                        {productDetailFilterState?.map((item) => {
-                          return <>
-                            {item.quantity > 0 ? <div className="mx-1" key={item._id}>
-                              <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
-                              <label htmlFor={item.size}
-                                className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                              >
-                                {item.size}
-                              </label>
-                            </div> :
-                              <div className="mx-1">
-                                <label
-                                  className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
-                                >
-                                  {item.size}
-                                </label>
-                              </div>
-                            }
-                          </>
-                        })}
-                      </div>
-                    </div >
-                    <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
-                      <span className="text-sm font-bold">Số lượng:</span>
-                      <div>
-                        <label htmlFor="Quantity" className="sr-only">
-                          {" "}
-                          Quantity{" "}
-                        </label>
-
-                        <div className="flex items-center border border-gray-300 rounded">
-                          <button
-                            onClick={decreaseQuantity}
-                            type="button"
-                            className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                          >
-                            &minus;
-                          </button>
-
-                          <input
-                            type="number"
-                            id="Quantity"
-                            value={quantity}
-                            className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-                          />
-
-                          <button
-                            onClick={increaseQuantity}
-                            type="button"
-                            className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                          >
-                            +
-                          </button>
+                        })} */}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div className="mb-7">
-                      <div className="flex gap-x-[15px] mb-5">
-                        <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
-                          Thêm vào giỏ
-                        </button>
-                        <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
-                          Mua ngay
-                        </button>
-                      </div>
-                      <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
+
+                        <div className="flex my-6">
+                          {/* size */}
+                          <div className="w-[13%] text-sm font-bold">Kích thước</div>
+                          <div className="flex">
+                            {productDetailFilterState
+                              ?.slice()
+                              .sort((a: any, b: any) => new Date(a?.createdAt).getTime() - new Date(b?.createdAt).getTime())
+                              .map((item) => {
+                                return <>
+                                  {item.quantity > 0 ? <div className="mx-1" key={item._id}>
+                                    <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
+                                    <label htmlFor={item.size}
+                                      className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                                    >
+                                      {item.size}
+                                    </label>
+                                  </div> :
+                                    <div className="mx-1">
+                                      <label
+                                        className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
+                                      >
+                                        {item.size}
+                                      </label>
+                                    </div>
+                                  }
+                                </>
+                              })}
+                          </div>
+                        </div >
+                        <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
+                          <span className="text-sm font-bold">Số lượng:</span>
+                          <div>
+                            <label htmlFor="Quantity" className="sr-only">
+                              {" "}
+                              Quantity{" "}
+                            </label>
+
+                            <div className="flex items-center border border-gray-300 rounded">
+                              <button
+                                onClick={decreaseQuantity}
+                                type="button"
+                                className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                              >
+                                &minus;
+                              </button>
+
+                              <input
+                                type="number"
+                                id="Quantity"
+                                value={quantity}
+                                className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+
+                              <button
+                                onClick={increaseQuantity}
+                                type="button"
+                                className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="mb-7">
+                          <div className="flex gap-x-[15px] mb-5">
+                            <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                              Thêm vào giỏ
+                            </button>
+                            <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
+                              Mua ngay
+                            </button>
+                          </div>
+                          {/* <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
                         Click vào đây để nhận ưu đãi
-                      </div>
+                      </div> */}
+                        </div>
+                      </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div> : ""}
                     </div>
-                  </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div> : ""}
+                  )}
+
                 </div>
               </div>
 
             </form>
-            <div className="policy flex justify-between gap-x-[13px]">
-              <div>
-                <div className="flex items-center gap-x-[10px] mb-4">
-                  <img
-                    src="/images/icon/product_info1_desc1_img.png"
-                    className="w-[30px] h-[30px]"
-                    alt=""
-                  />
-                  <span className="text-sm">
-                    Miễn phí giao hàng cho đơn hàng từ 500K
-                  </span>
+            {isSuccessProduct ? (
+              <div className="policy flex justify-between gap-x-[13px]">
+                <div>
+                  <div className="flex items-center gap-x-[10px] mb-4">
+                    <img
+                      src="/images/icon/product_info2_desc3_img.png"
+                      className="w-[30px] h-[30px]"
+                      alt=""
+                    />
+                    <span className="text-sm">
+                      Kiểm tra, thanh toán khi nhận hàng COD
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-x-[10px] mb-4">
-                  <img
-                    src="/images/icon/product_info2_desc1_img.png"
-                    className="w-[30px] h-[30px]"
-                    alt=""
-                  />
-                  <span className="text-sm">
-                    ĐỔI SẢN PHẨM DỄ DÀNG (Trong vòng 7 ngày khi còn nguyên tem
-                    mác)
-                  </span>
+                <div>
+                  <div className="flex items-center gap-x-[10px] mb-4">
+                    <img
+                      src="/images/icon/product_info1_desc2_img.png"
+                      className="w-[30px] h-[30px]"
+                      alt=""
+                    />
+                    <span className="text-sm">Hàng phân phối chính hãng 100%</span>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="flex items-center gap-x-[10px] mb-4">
-                  <img
-                    src="/images/icon/product_info1_desc2_img.png"
-                    className="w-[30px] h-[30px]"
-                    alt=""
-                  />
-                  <span className="text-sm">Hàng phân phối chính hãng 100%</span>
-                </div>
-                <div className="flex items-center gap-x-[10px] mb-4">
-                  <img
-                    src="/images/icon/product_info2_desc2_img.png"
-                    className="w-[30px] h-[30px]"
-                    alt=""
-                  />
-                  <span className="text-sm">
-                    Kiểm tra, thanh toán khi nhận hàng COD
-                  </span>
+                <div>
+                  <div className="flex items-center gap-x-[10px] mb-4">
+                    <img
+                      src="/images/icon/product_info1_desc3_img.png"
+                      className="w-[30px] h-[30px]"
+                      alt=""
+                    />
+                    <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
+                  </div>
+
                 </div>
               </div>
-              <div>
-                <div className="flex items-center gap-x-[10px] mb-4">
-                  <img
-                    src="/images/icon/product_info1_desc3_img.png"
-                    className="w-[30px] h-[30px]"
-                    alt=""
-                  />
-                  <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
-                </div>
-                <div className="flex items-center gap-x-[10px] mb-4">
-                  <img
-                    src="/images/icon/product_info2_desc3_img.png"
-                    className="w-[30px] h-[30px]"
-                    alt=""
-                  />
-                  <span className="text-sm">
-                    Kiểm tra, thanh toán khi nhận hàng COD
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div>
+            ) : ""}
+          </div >
+        </div >
+        <div className="px-10">
           <div className="product-tabs flex gap-x-[60px]">
             <div>
               <button
@@ -785,7 +924,7 @@ const ProductInfo = () => {
         </div>
         {/* san pham lien quan */}
         <div>
-          <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase">
+          <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase mt-10">
             Sản phẩm liên quan
           </h1>
           <div className="product-related mb-12">
@@ -865,7 +1004,7 @@ const ProductInfo = () => {
         </div>
         {/* Sản phẩm đã xem */}
         <ProductViewed idProduct={id} listProductDetail={productDetailState}></ProductViewed>
-      </div>
+      </div >
     );
 
   }

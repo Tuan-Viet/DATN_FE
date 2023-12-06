@@ -23,7 +23,7 @@ import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form, Modal, Rate, Upload, UploadFile, UploadProps, message, notification } from "antd";
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons';
+import { LoadingOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import { useAddReviewMutation } from "../../../store/reviews/review.service";
@@ -83,6 +83,9 @@ const OrderDetail = () => {
   const { handleSubmit, register, setValue, formState: { errors } } = useForm<ReviewForm>({
     resolver: yupResolver(ReviewSchema)
   })
+  const [countUpload, setCountUpload] = useState([0]);
+  console.log(countUpload);
+
   const user = useSelector((state: any) => state.user);
   useEffect(() => {
     if (user) {
@@ -257,8 +260,10 @@ const OrderDetail = () => {
   //     setProductsInOrder(productsInOrder)
   //   }
   // }, [listOrderDetailState, isModalOpen])
-  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) =>
+  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
+    setCountUpload(newFileList.length);
+  }
   const handleRemoveImage = async (file: UploadFile) => {
     console.log(file);
     try {
@@ -706,11 +711,11 @@ const OrderDetail = () => {
                   {getOneProduct && getOneProductDetail &&
                     <div className="">
                       <div className="flex pb-3">
-                        <img className="" width={80} src={getOneProduct.images?.[0]} alt="" />
+                        <img className="h-20" src={getOneProduct.images?.[0]} alt="" />
                         <div className="flex flex-col p-2">
                           <p>{getOneProduct?.title}</p>
-                          <div className="bg-gray-300 px-2 flex items-center w-auto rounded-sm text-sm my-1">
-                            {getOneProductDetail.nameColor} / {getOneProductDetail.size}
+                          <div className="">
+                            <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{getOneProductDetail.size}</span> - <span className="text-xs text-blue-500"> {getOneProductDetail.nameColor}</span>
                           </div>
                           <div className="flex ">
                             <del className="text-gray-400">{getOneProduct?.price?.toLocaleString("vi-VN")}đ</del>
@@ -721,7 +726,7 @@ const OrderDetail = () => {
                       <Form.Item
                         label="Đánh giá"
                         name="rating"
-                        className="text-xl"
+                        className="text-base"
                         rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
                       >
                         <Rate className="text-2xl" />
@@ -739,9 +744,9 @@ const OrderDetail = () => {
                   <Form.Item name="images"
                     label="Ảnh đánh giá"
                     rules={[{ required: true, message: 'Hãy nhập ảnh của bạn để đánh giá' }]}
-
+                    className="relative"
                   >
-
+                    <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">{countUpload}/3</span>
                     <Upload name='images'
                       multiple
                       action={'http://localhost:8080/api/images/upload'}
@@ -750,13 +755,17 @@ const OrderDetail = () => {
                       listType="picture-card"
                       iconRender={() => <LoadingOutlined />}
                       onRemove={(file) => handleRemoveImage(file)}
+                      maxCount={3}
                     >
-                      {fileList.length >= 5 ? null : <Button className="text-sm" icon={<UploadOutlined />}>Tải ảnh lên</Button>}
+                      <div>
+                        <PlusOutlined />
+                        <div>Upload </div>
+                      </div>
                     </Upload>
                   </Form.Item>
 
                   <Form.Item >
-                    <Button type="primary" className="bg-black w-full py-3 flex items-center justify-center" htmlType="submit">
+                    <Button type="primary" className="bg-blue-500 w-full py-3 flex items-center justify-center " htmlType="submit">
                       Viết đánh giá
                     </Button>
                   </Form.Item>
