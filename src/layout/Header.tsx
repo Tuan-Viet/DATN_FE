@@ -13,7 +13,6 @@ import {
   addCartSlice,
   decreaseCartSlice,
   increaseCartSlice,
-  listCartLocalSlice,
   listCartSlice,
   removeCartSlice,
 } from "../store/cart/cartSlice";
@@ -53,14 +52,10 @@ const Header = () => {
   const productState = useSelector(
     (state: RootState) => state.productSlice.products
   );
-  const cartLocalState = useSelector(
-    (state: RootState) => state.cartLocalReducer.cartLocals
-  );
   const [onRemoveCart] = useDeleteCartMutation();
   const [onUpdateCart] = useUpdateCartMutation();
   const [onAddCart] = useAddCartMutation();
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!);
-
   // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0);
   const [form] = Form.useForm();
@@ -112,24 +107,15 @@ const Header = () => {
   };
   useEffect(() => {
     if (listCart) {
+      console.log(user?.current?._id)
       if (user?.current?._id) {
         dispatch(listCartSlice(listCart));
-      } else {
+      }
+      if (!user?.current?._id) {
         dispatch(listCartSlice(cartStore ? cartStore : [])!);
       }
     }
   }, [isSuccessCart, listCart]);
-
-  useEffect(() => {
-    if (listCart) {
-      console.log(1)
-      if (user?.current?._id) {
-        dispatch(listCartSlice(listCart));
-      } else {
-        dispatch(listCartSlice(cartStore ? cartStore : [])!);
-      }
-    }
-  }, []);
   useEffect(() => {
     if (listProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail));
@@ -923,8 +909,6 @@ const Header = () => {
             <hr className="my-[20px]" />
             <div className="overflow-y-scroll h-[450px]">
               {cartState?.map((cart, index) => {
-                console.log(cartState);
-
                 return (
                   <div key={index}>
                     {productDetailState

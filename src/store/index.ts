@@ -7,7 +7,7 @@ import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceR
 import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdReducer } from './productDetail/productDetailSlice'
 import productDetailAPI from './productDetail/productDetail.service'
 import cartAPI from './cart/cart.service'
-import cartSlice, { cartLocalReducer } from './cart/cartSlice'
+import cartSlice from './cart/cartSlice'
 import orderAPI from './order/order.service'
 import orderSlice from './order/orderSlice'
 import orderReturnSlice from './orderReturn/orderSlice'
@@ -66,7 +66,6 @@ export const store = configureStore({
     productDetailIdReducer: productDetailIdReducer,
     // cart
     cartSlice: cartSlice,
-    cartLocalReducer: cartLocalReducer,
     // order
     orderSlice: orderSlice,
     orderReturnSlice: orderReturnSlice,
