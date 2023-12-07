@@ -270,22 +270,25 @@ const myAddress = () => {
 
                   )
                 })}
-                <Modal title="Basic Modal" open={isModalUpdateOpen} onCancel={handleCancelUpdate}>
+                <Modal title="Basic Modal" open={isModalUpdateOpen} onOk={handleSubmit(updateAddress)} onCancel={handleCancelUpdate}>
                   <form className="max-w-sm" onSubmit={handleSubmit(updateAddress)}>
                     <input type="hidden" {...register('_id')} name="_id" />
                     <div className="mb-5">
                       <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
                       <input {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                      <p className="text-red-500 italic text-sm">{errors ? errors.fullname?.message : ""}</p>
                     </div>
                     <div className="mb-5">
                       <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Địa chỉ nhận hàng</label>
                       <input {...register('address')} type="text" id="address" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                      <p className="text-red-500 italic text-sm">{errors ? errors.address?.message : ""}</p>
                     </div>
                     <div className="mb-5">
                       <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Số điện thoại</label>
                       <input {...register('phone')} type="text" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                      <p className="text-red-500 italic text-sm">{errors ? errors.phone?.message : ""}</p>
                     </div>
-                    <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
+                    {/* <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button> */}
                   </form>
                 </Modal>
 
@@ -293,21 +296,25 @@ const myAddress = () => {
                 <Button type="primary" onClick={showModal} className="bg-blue-500">
                   Thêm địa chỉ
                 </Button>
-                <Modal title="Basic Modal" open={isModalOpen} onCancel={handleCancel}>
+                <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onAddAddress)} onCancel={handleCancel}>
                   <form className="max-w-sm" onSubmit={handleSubmit(onAddAddress)}>
                     <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
+                      <label htmlFor="fullname" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
                       <input {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                      <p className="text-red-500 italic text-sm">{errors ? errors.fullname?.message : ""}</p>
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Địa chỉ nhận hàng</label>
+                      <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Địa chỉ nhận hàng</label>
                       <input {...register('address')} type="text" id="address" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                      <p className="text-red-500 italic text-sm">{errors ? errors.address?.message : ""}</p>
+
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Số điện thoại</label>
+                      <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Số điện thoại</label>
                       <input {...register('phone')} type="text" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                      <p className="text-red-500 italic text-sm">{errors ? errors.phone?.message : ""}</p>
                     </div>
-                    <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
+                    {/* <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button> */}
                   </form>
                 </Modal>
                 {/* {show === true ? (

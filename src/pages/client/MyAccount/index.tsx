@@ -1,12 +1,14 @@
-import { Dispatch, useEffect } from "react";
+import { Dispatch, useEffect, useState } from "react";
 import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useUpdateAccountMutation } from "../../../store/user/user.service";
+import { useGetInfoUserQuery, useUpdateAccountMutation } from "../../../store/user/user.service";
 import { useForm } from "react-hook-form";
 import { AccountForm, AccountSchema } from "../../../Schemas/Auth";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, Modal } from "antd";
+import { toast } from "react-toastify";
 
 const myAccount = () => {
   const [updateAccount] = useUpdateAccountMutation()
@@ -17,12 +19,20 @@ const myAccount = () => {
     register,
     setValue,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<AccountForm>({
     resolver: yupResolver(AccountSchema)
   })
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   const user = useSelector((state: any) => state.user);
   const isLoggedIn = user?.isLoggedIn;
@@ -39,10 +49,23 @@ const myAccount = () => {
         setValue("email", user.current.email),
         setValue("_id", user.current._id)
     }
-  }, [setValue])
+  }, [isModalOpen])
+
+  // useEffect(() => {
+  //   if (user) {
+  //     setValue("fullname", ''),
+  //       setValue("email", ''),
+  //       setValue("_id", '')
+  //   }
+  // }, [isModalOpen != true])
+
+  const { data: InfoUser, refetch } = useGetInfoUserQuery(user?.current?._id)
+
 
   const onUpdateAccount = async (data: AccountForm) => {
-    await updateAccount(data)
+    await updateAccount(data).then(() => refetch())
+    toast.success('Thay đổi thông tin thành công')
+    setIsModalOpen(false);
   }
   return (
     <>
@@ -133,28 +156,33 @@ const myAccount = () => {
                   Thông tin tài khoản
                 </h2>
                 <div className="border-t border-gray-200 py-3">
-                  <h2 className="font-semibold mb-2">Họ tên: {user?.current?.fullname}</h2>
+                  <h2 className="font-semibold mb-2">Họ tên: {InfoUser?.fullname}</h2>
                   <p className="text-[15px] mb-2">
-                    Email: {user?.current?.email}
+                    Email: {InfoUser?.email}
                   </p>
                   <p className="text-[15px] mb-2">
                     Địa chỉ: 64 Phú Diễn, Bắc Từ Liêm, Hà Nội
                   </p>
                   <p className="text-[15px] mb-2">Số diện thoại: {user?.current?.phone}</p>
 
+                  <Button type="primary" onClick={showModal} className="bg-blue-500">
+                    Thay đổi thông tin
+                  </Button>
+                  <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onUpdateAccount)} onCancel={handleCancel}>
+                    <form className="max-w-sm" onSubmit={handleSubmit(onUpdateAccount)}>
+                      <input type="hidden" {...register('_id')} />
+                      <div className="mb-5">
+                        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Tên của bạn</label>
+                        <input  {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                        <p className="text-red-500 italic text-sm">{errors ? errors.fullname?.message : ""}</p>
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Email của bạn</label>
+                        <input  {...register('email')} type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                        <p className="text-red-500 italic text-sm">{errors ? errors.email?.message : ""}</p>
+                      </div></form>
+                  </Modal>
 
-                  <form className="max-w-sm" onSubmit={handleSubmit(onUpdateAccount)}>
-                    <input type="hidden" {...register('_id')} />
-                    <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Tên của bạn</label>
-                      <input  {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                    </div>
-                    <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Email của bạn</label>
-                      <input  {...register('email')} type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                    </div>
-                    <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
-                  </form>
 
                 </div>
               </div>

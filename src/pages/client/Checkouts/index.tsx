@@ -24,7 +24,7 @@ import { useGetInfoUserQuery } from "../../../store/user/user.service";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
-  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+  const { data: listCart, isSuccess: isSuccessCart, refetch: refetchCart } = useListCartQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
@@ -42,7 +42,7 @@ const CheckoutsPage = () => {
   const [codeVoucher, setcodeVoucher] = useState<string>("")
   const [idVoucher, setIdVoucher] = useState<string>("")
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
-  const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
+  const { data: InfoUser, refetch: refetchUser } = useGetInfoUserQuery(user?.current?._id)
 
   useEffect(() => {
     if (listCart) {
@@ -121,20 +121,21 @@ const CheckoutsPage = () => {
       setLoading(true);
       console.log(data);
 
-      await onAddOrder(data).then(({ data }: any) => {
-        console.log(data);
-        if (data?.pay_method === "COD") {
-          setTimeout(async () => {
-            setLoading(false);
-            dispatch(listCartSlice([]))
-            navigate(`/orders/${data?._id}`)
-          }, 2500)
-        } else if (data?.pay_method === "VNBANK") {
-          axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
-            .then(({ data }) => window.location.href = data)
+      await onAddOrder(data)
+        .then(({ data }: any) => {
+          console.log(data);
+          if (data?.pay_method === "COD") {
+            setTimeout(async () => {
+              setLoading(false);
+              dispatch(listCartSlice([]))
+              navigate(`/orders/${data?._id}`)
+            }, 2500)
+          } else if (data?.pay_method === "VNBANK") {
+            axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
+              .then(({ data }) => window.location.href = data)
+          }
         }
-      }
-      )
+        ).then(() => refetchUser()).then(() => refetchCart())
     } catch (error) {
       console.log(error);
     }

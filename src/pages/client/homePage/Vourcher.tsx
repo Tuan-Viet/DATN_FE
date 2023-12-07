@@ -9,21 +9,21 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import axios from "axios"
 import { toast } from "react-toastify"
+import { useGetInfoUserQuery } from "../../../store/user/user.service"
 
 const Vourcher = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
-    const voucherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
-
     const user = useSelector((state: any) => state?.user);
-    console.log(user);
+    const { data: InfoUser, refetch } = useGetInfoUserQuery(user?.current?._id)
+    const voucherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
 
     const addVoucher = async (userId: string, voucherId: string) => {
         if (user.current._id) {
             await axios.put("http://localhost:8080/api/auth/add-vourcher", {
                 userId: userId,
                 voucherId: voucherId
-            });
+            }).then(() => refetch());
             //   message.success("Successfully registered");
             toast.success("Lưu mã thành công")
         } else {
