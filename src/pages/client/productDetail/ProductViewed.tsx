@@ -62,18 +62,17 @@ const ProductViewed = (props: any) => {
                                         </Link>
                                         <div className="price flex gap-x-[8px] items-baseline">
                                             <span className="text-sm text-[#FF2C26] font-semibold">
-                                                {product?.discount?.toLocaleString("vi-VN")}đ
+                                                {(product?.price - product.discount).toLocaleString("vi-VN")}đ
                                             </span>
-                                            <span className="text-[13px] text-[#878C8F]">
-                                                <del>{product?.price?.toLocaleString("vi-VN")}đ
-                                                </del>
-                                            </span>
+                                            {product.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
+                                                <del>{product.price?.toLocaleString("vi-VN")}đ</del>
+                                            </span>}
                                         </div>
                                     </div>
                                     <div>
-                                        {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                                            {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
-                                        </span> : ""}
+                                        {product.discount > 0 && <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                                            -{`${((product?.price - (product?.price - product?.discount)) / product?.price * 100).toFixed(0)}`}%
+                                        </span>}
                                     </div>
                                     <Link
                                         to=""

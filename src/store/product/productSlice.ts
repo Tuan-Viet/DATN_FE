@@ -55,7 +55,7 @@ const productSaleSlice = createSlice({
             state.products = actions.payload
         },
         listProductSaleSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            const productSales = actions.payload.filter((product) => product.discount < product.price)
+            const productSales = actions.payload.filter((product) => product.discount > 0)
             state.products = productSales
         },
     })

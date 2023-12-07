@@ -16,7 +16,6 @@ const Vourcher = () => {
     const voucherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
 
     const user = useSelector((state: any) => state?.user);
-    console.log(user);
 
     const addVoucher = async (userId: string, voucherId: string) => {
         if (user.current._id) {

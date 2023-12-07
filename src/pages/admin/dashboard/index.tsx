@@ -206,8 +206,8 @@ const DashboardPage = () => {
                     <h3 className='text-2xl font-medium'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
                     {dashboardStatistic.bestSellingProduct && (
                         <div>
-                            <p className='my-1 text-md text-md'>Tên sản phẩm: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0].title}</span></p>
-                            <p className='my-1 text-xs'>Số lượng bán: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0].totalQuantitySold}</span></p>
+                            <p className='my-1 text-md text-md'>Tên sản phẩm: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0]?.title}</span></p>
+                            <p className='my-1 text-xs'>Số lượng bán: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0]?.totalQuantitySold}</span></p>
                         </div>
                     )}
                 </div>

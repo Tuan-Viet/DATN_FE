@@ -4,10 +4,10 @@ import categoryApi from './category/category.service'
 import productAPI from './product/product.service'
 import categorySlice from './category/categorySlice'
 import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer, productViewedSliceReducer } from './product/productSlice'
-import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdReducer } from './productDetail/productDetailSlice'
+import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdReducer, productDetailRelatedReducer } from './productDetail/productDetailSlice'
 import productDetailAPI from './productDetail/productDetail.service'
 import cartAPI from './cart/cart.service'
-import cartSlice, { cartLocalReducer } from './cart/cartSlice'
+import cartSlice from './cart/cartSlice'
 import orderAPI from './order/order.service'
 import orderSlice from './order/orderSlice'
 import orderReturnSlice from './orderReturn/orderSlice'
@@ -64,9 +64,9 @@ export const store = configureStore({
     productDetailSlice: productDetailSlice,
     productDetailFilterSliceReducer: productDetailFilterSliceReducer,
     productDetailIdReducer: productDetailIdReducer,
+    productDetailRelatedReducer: productDetailRelatedReducer,
     // cart
     cartSlice: cartSlice,
-    cartLocalReducer: cartLocalReducer,
     // order
     orderSlice: orderSlice,
     orderReturnSlice: orderReturnSlice,

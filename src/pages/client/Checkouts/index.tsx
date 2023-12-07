@@ -43,7 +43,7 @@ const CheckoutsPage = () => {
   const [idVoucher, setIdVoucher] = useState<string>("")
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
   const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
-
+  console.log(cartState)
   useEffect(() => {
     if (listCart) {
       if (user?.current?._id) {
@@ -70,27 +70,12 @@ const CheckoutsPage = () => {
   }, [isSuccessVoucher])
 
 
-  // console.log(user);
-
-  // // console.log(myVoucher);
-  // let userVoucher: any[] = []
   useEffect(() => {
     const myVoucher = InfoUser?.voucherwallet
   }, [InfoUser])
 
   const myVoucher = InfoUser?.voucherwallet
   console.log(myVoucher);
-
-  // myVoucher.map((item: any) => {
-  //   const voucher = voucherSlice.find((vourcher) => vou)
-  //   // userVoucher.push(voucherSlice.find(voucher._id == item))
-  // })
-  // console.log(userVoucher);
-
-
-  // const myVoucher = voucherState.filter(voucher => voucher._id == user.current.voucherwallet)
-  // console.log(myVoucher);
-
 
   const {
     register,
@@ -166,6 +151,7 @@ const CheckoutsPage = () => {
         total += cart.totalMoney
       })
     }
+
     if (getOneVoucher && getOneVoucher?.type === "percent") {
       total = total - (total * getOneVoucher?.discount) / 100
       if (total) {
@@ -205,6 +191,9 @@ const CheckoutsPage = () => {
   useEffect(() => {
     handleFindVoucher()
   }, [])
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, []);
   return (
     <>
       {loading && (
@@ -354,7 +343,6 @@ const CheckoutsPage = () => {
             </div>
           </div>
           <div className="border-l-[1px] pl-5 w-full">
-
             <h1 className="text-xl font-bold mb-5">Đơn hàng ({cartState.length} sản phẩm)</h1>
             <div className="pt-7 border-t-[1px] border-b-[1px] h-[250px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
@@ -369,7 +357,7 @@ const CheckoutsPage = () => {
                         <input type="text" value={item.size} className="hidden" {...register(`carts.${index}.size`)} />
                         {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
                           return <div className="mb-6 flex relative gap-x-20">
-                            <input type="text" value={pro.discount} className="hidden" {...register(`carts.${index}.price`)} />
+                            <input type="text" value={pro.price - pro.discount} className="hidden" {...register(`carts.${index}.price`)} />
                             <div className="border rounded-lg relative w-[125px] h-[185px]">
                               <img
                                 src={item.imageColor}
@@ -422,16 +410,6 @@ const CheckoutsPage = () => {
                 : ""}
 
             </div>
-            {/* <div className="flex gap-[20px] my-2 w-[700px] flex-nowrap overflow-x-scroll">
-              {voucherState?.map((voucher, index) => {
-                return <>
-                  <div onClick={() => handleVoucher(voucher._id!)} className="border-2 w-[100%] p-3 overflow-hidden h-[120px] hover:border-2 hover:border-[#000] cursor-pointer transition-all ease-linear" key={index}>
-                    <div className="text-[14px]">{voucher.code}<span className="ml-2">(Còn {voucher.quantity})</span></div>
-                    <p>giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>} ({voucher.title})</p>
-                  </div>
-                </>
-              })}
-            </div> */}
             <form className="py-5 flex gap-3 border-b-[1px]">
               <input
                 type="text"
@@ -447,10 +425,7 @@ const CheckoutsPage = () => {
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
-
                 <span className="font-medium">{(totalCart).toLocaleString("vi-VN")}₫</span>
-                {/* <span className="font-medium">{(getOneVoucher?.data && getOneVoucher?.!percent ? (totalCart - (totalCart * getOneVoucher?.discount) / 100).toLocaleString("vi-VN") : totalCart).toLocaleString("vi-VN")}₫</span> */}
-
               </div>
               <div className="flex justify-between">
                 <span>Giao hàng tận nơi</span>
