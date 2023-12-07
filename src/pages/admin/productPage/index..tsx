@@ -30,17 +30,18 @@ import { useForm } from "react-hook-form";
 import { listCategorySlice } from '../../../store/category/categorySlice';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ColumnsType, TableProps } from 'antd/es/table';
+import moment from 'moment';
 
 interface DataType {
     _id: React.Key;
     sku: string;
     title: string;
-    sku: string;
     images: any[];
     price: number;
     discount: number;
     description: string;
     categoryId: string;
+    createdAt: string;
 }
 
 const productPage = () => {
@@ -149,8 +150,8 @@ const productPage = () => {
             title: 'GIẢM GIÁ',
             dataIndex: 'discount',
             key: 'discount',
-            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-            sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
+            render: (value: number) => value > 0 ? (`-${value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`) : "",
+            sorter: (a, b) => a.discount - b.discount, // Sắp xếp theo số
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -169,6 +170,12 @@ const productPage = () => {
             },
             className: 'w-[150px]',
         },
+        {
+            title: 'NGÀY KHỞI TẠO',
+            dataIndex: 'createdAt',
+            render: (value) => moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
+        },
+
 
         {
             title: '',
@@ -282,6 +289,7 @@ const productPage = () => {
         discount: product.discount,
         description: product.description,
         categoryId: product.categoryId,
+        createdAt: product.createdAt,
     }));
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
@@ -320,7 +328,11 @@ const productPage = () => {
                                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                                 </svg>
                             </div>
-                            <input onChange={(e) => setSearch(e.target.value)} type="text" id="default-search" className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                            <input
+                                placeholder='Tìm kiếm theo mã sản phẩm, tên sản phẩm'
+                                onChange={(e) => setSearch(e.target.value)}
+                                type="text" id="default-search"
+                                className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
                         </div>
                     </form>

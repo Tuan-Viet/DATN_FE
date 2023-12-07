@@ -10,7 +10,7 @@ export interface IOrder {
     note: string
     status: number
     paymentStatus: string
-    pay_method: number
+    pay_method: string
     totalMoney: number
     orderDetails: IOrderDetail[]
     createdAt: any

@@ -51,13 +51,13 @@ function formatDateStringToDisplayDate(dateString) {
 function mapStatusToText(statusCode) {
   switch (statusCode) {
     case 0:
-      return "Bạn đã hủy đơn hàng này";
+      return "Hủy đơn hàng";
     case 1:
       return "Chờ xử lý";
     case 2:
-      return "Đã chuẩn bị hàng";
+      return "Chờ lấy hàng";
     case 3:
-      return "Đơn hàng đang được giao đến bạn";
+      return "Đang giao";
     case 4:
       return "Đã nhận hàng";
     default:
