@@ -128,7 +128,12 @@ const cartPage = () => {
                     </div>
                     <hr className="py-4" />
                     <div className="py-4">
-                        <h1 className="tracking-wide">Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong> để có thể <strong className="uppercase">miễn phí vận chuyển</strong></h1>
+                        {/* <h1 className="tracking-wide py-[10px] text-[16px]">
+                            Bạn {totalCart < 500000 ? <span className="">
+                                cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ</strong>
+                                <strong className="uppercase ml-2">miễn phí vận chuyển</strong>
+                            </span> : <span>đã được <strong>Miễn phí vận chuyển</strong></span>}
+                        </h1> */}
                     </div>
                     {cartState?.map((cart, index) => {
                         return <div key={index}>

@@ -116,14 +116,6 @@ const ProductInfo = () => {
     const renderContent = () => {
       switch (currentTab && currentTab) {
         case 1:
-          return (
-            <div className="mb-[40px]">
-              <p>
-                {getOneProduct?.description}
-              </p>
-            </div>
-          );
-        case 2:
           return <>
             <div className="bg-[#fffbf8] px-[24px] py-4 ">
               <div className="flex w-[80%] mx-auto">
@@ -198,6 +190,15 @@ const ProductInfo = () => {
               )}
             </div>
           </>
+        case 2:
+          return (
+            <div className="mb-[40px]">
+              <p>
+                {getOneProduct?.description}
+              </p>
+            </div>
+          );
+
         case 3:
           return (
             <div className="text-sm mb-[40px]">
@@ -863,7 +864,7 @@ const ProductInfo = () => {
                   } text-lg font-semibold pb-2`}
                 onClick={() => setCurrentTab(1)}
               >
-                Mô tả sản phẩm
+                Đánh giá - Nhận xét từ khách hàng
               </button>
             </div>
             <div>
@@ -874,7 +875,7 @@ const ProductInfo = () => {
                   } text-lg font-semibold pb-2`}
                 onClick={() => setCurrentTab(2)}
               >
-                Đánh giá - Nhận xét từ khách hàng
+                Mô tả sản phẩm
               </button>
             </div>
             <div>

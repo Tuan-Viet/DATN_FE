@@ -887,16 +887,17 @@ const Header = () => {
         {/* overlay-cart */}
         <div className="fixed overlay transition-all ease-linear hidden top-0 right-0 bottom-0 left-0  bg-[rgba(57,56,56,0.2)]"></div>
         {/* cart */}
-        <div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 min-w-[480px] h-full py-[20px] px-[15px] flex flex-col justify-between">
+        <div className="fixed top-0 opacity-0 translate-x-[100%] transition-all ease-linear overlay-cart bg-white right-0 max-w-[580px] min-w-[580px] h-full py-[20px] px-[15px] flex flex-col justify-between">
           {/* list product */}
           <div className="">
             <h1 className="font-bold tracking-wide text-[20px] mb-[10px]">
               Giỏ hàng
             </h1>
-            {/* <h1 className="tracking-wide py-[10px] text-sm">
-              Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong>{" "}
-              để có thể{" "}
-              <strong className="uppercase">miễn phí vận chuyển</strong>
+            {/* <h1 className="tracking-wide py-[10px] text-[16px]">
+              Bạn {totalCart < 500000 ? <span className="">
+                cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ</strong>
+                <strong className="uppercase ml-2">miễn phí vận chuyển</strong>
+              </span> : <span>đã được <strong>Miễn phí vận chuyển</strong></span>}
             </h1> */}
             <hr className="my-[20px]" />
             <div className="overflow-y-scroll h-[450px]">
