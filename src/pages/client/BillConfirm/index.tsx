@@ -179,26 +179,6 @@ const BillConfirm = () => {
                             {totalCart.toLocaleString("vi-VN")}đ
                           </td>
                         </tr>
-                        {/* <tr className="border-b hover:bg-gray-50">
-                          <td className="px-6 py-4 font-semibold text-gray-900">
-                            Mã giảm giá
-                          </td>
-                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
-                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
-                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
-                          <td className="px-6 py-4 font-semibold text-gray-900 text-right"></td>
-                        </tr>
-                        <tr className="border-b hover:bg-gray-50">
-                          <td className="px-6 py-4 font-semibold text-gray-900">
-                            Tổng khuyến mãi
-                          </td>
-                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
-                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
-                          <td className="px-6 py-4 font-semibold text-gray-900"></td>
-                          <td className="px-6 py-4 font-semibold text-gray-900 text-right">
-                            0đ
-                          </td>
-                        </tr> */}
                         <tr className="border-b hover:bg-gray-50">
                           <td className="px-6 py-4 font-semibold text-gray-900">
                             Giao hàng tận nơi
@@ -207,7 +187,7 @@ const BillConfirm = () => {
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900 text-right">
-                            Miễn phí
+                            {totalCart >= 500000 ? <p>Miễn phí</p> : <p>40.000đ</p>}
                           </td>
                         </tr>
                         <tr className="border-b hover:bg-gray-50">
@@ -218,7 +198,7 @@ const BillConfirm = () => {
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900"></td>
                           <td className="px-6 py-4 font-semibold text-gray-900 text-right">
-                            {totalCart === (getOneOrder?.totalMoney!) ? "Chưa áp dụng" : "Đã áp dụng"}
+                            {!getOneOrder?.voucher_code ? "Chưa áp dụng" : "Đã áp dụng"}
                           </td>
                         </tr>
                         <tr className="border-b text-xl bg-black">

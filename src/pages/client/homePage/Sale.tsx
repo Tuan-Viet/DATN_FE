@@ -46,14 +46,23 @@ const Sale = () => {
             {productSaleState?.map((product, index) => {
               return <SwiperSlide key={index}
               >
-                {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <div className={`relative group`}>
-                  {/* {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>} */}
+                {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <div className={`relative group overflow-hidden`}>
+
                   <Link to={`/products/${product._id}`}>
-                    <img
-                      src={product.images?.[0]}
-                      className="mx-auto h-[295px] w-full"
-                      alt=""
-                    />
+                    <div className="min-h-[305px] max-h-[395px] overflow-hidden">
+                      <img
+                        src={product.images?.[0]}
+                        className="mx-auto max-h-[305px] min-h-[305px] w-full group-hover:opacity-0 group-hover:scale-100 absolute transition-all ease-linear duration-200"
+                        alt=""
+                      />
+
+                      <img
+                        src={product.images?.[1] ? product.images?.[1] : productDetailState?.find((proDetail) => proDetail?.product_id && proDetail?.product_id?.includes(product._id!))?.imageColor
+                        }
+                        className="mx-auto max-h-[305px] min-h-[305px] w-full duration-999 absolute opacity-0 group-hover:opacity-100 transition-all ease-linear"
+                        alt=""
+                      />
+                    </div>
                   </Link>
                   <div className="product-info p-[8px] bg-white">
                     <div className="text-sm flex justify-between mb-3">

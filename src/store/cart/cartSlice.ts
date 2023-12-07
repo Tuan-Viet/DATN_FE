@@ -23,14 +23,14 @@ const cartSlice = createSlice({
             state.carts = state.carts.filter((cart) => cart._id !== actions.payload)
             const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
             if (cartStore) {
-                const newCartStore = cartStore.filter((cart) => cart.productDetailId != actions.payload)
+                const newCartStore = cartStore.filter((cart) => cart.productDetailId._id != actions.payload)
                 localStorage.setItem("carts", JSON.stringify(newCartStore))
                 state.carts = newCartStore
             }
         },
         addCartSlice: (state: ICartState, actions: PayloadAction<ICart>) => {
             console.log(actions.payload.totalMoney)
-            const cartExistIndex = state.carts.findIndex((cart) => cart.productDetailId === actions.payload.productDetailId)
+            const cartExistIndex = state.carts.findIndex((cart) => cart.productDetailId._id === actions.payload.productDetailId._id)
             const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
             if (JSON.parse(userStore)?._id) {
                 if (cartExistIndex !== -1) {
@@ -47,8 +47,6 @@ const cartSlice = createSlice({
                     ]
                 }
             } else {
-                // console.log(1);
-
                 if (cartExistIndex !== -1) {
                     state.carts[cartExistIndex].quantity += actions.payload.quantity
                 } else {
@@ -76,7 +74,7 @@ const cartSlice = createSlice({
             } else {
                 const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
                 if (cartStore) {
-                    const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
+                    const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId._id === actions.payload._id)
                     if (cartStoreIndex !== -1) {
                         const updatedCartStore = [...cartStore]
                         updatedCartStore[cartStoreIndex] = {
@@ -106,7 +104,7 @@ const cartSlice = createSlice({
             } else {
                 const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
                 if (cartStore) {
-                    const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId === actions.payload._id)
+                    const cartStoreIndex = cartStore.findIndex((cart) => cart.productDetailId._id === actions.payload._id)
                     if (cartStoreIndex !== -1) {
                         const updatedCartStore = [...cartStore]
                         updatedCartStore[cartStoreIndex] = {
