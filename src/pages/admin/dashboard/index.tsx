@@ -21,8 +21,8 @@ import ProductStatistic from '../statistic/ProductStatistic';
 
 const DashboardPage = () => {
     const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
-    const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueByMonth } = useGetOrderRevenueByMonthQuery()
-    const { data: orderRevanueQuarter } = useGetOrderRevenueByQuarterQuery();
+    const { data: orderRevanueMonth } = useGetOrderRevenueByMonthQuery()
+    const { data: orderRevanueQuarter, } = useGetOrderRevenueByQuarterQuery();
     const { data: orderRevanueWeek } = useGetOrderRevenueByWeekQuery()
     const { data: productRevanue } = useGetProductRevenueQuery();
     const { data: orderRevanue } = useGetOrderRevenueQuery();
@@ -51,7 +51,7 @@ const DashboardPage = () => {
             ],
         },
     ];
-    if (!isSuccess || !isSuccessGetRevanueByMonth) {
+    if (!isSuccess) {
         return <>
             <div className="flex justify-center items-center h-[600px]">
                 <Spin size='large' />

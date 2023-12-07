@@ -294,21 +294,29 @@ const productById = () => {
                     </Tooltip>
                 </div>
                 <div className="flex justify-between">
-                    <div className="border p-3 text-center w-1/5 rounded-lg">
-                        <span className="block text-sm text-gray-400">GIÁ BÁN:</span>
+                    <div className="border p-3 text-center w-1/5 rounded-lg relative">
+                        <span className="block text-sm text-gray-400">
+                            GIÁ BÁN:
+
+                        </span>
+
+
                         {!isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
-                            <span className="text-lg font-medium text-gray-500">
-                                {product?.discount === 0
-                                    ? (product?.price ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                    : (product?.discount ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                            </span>
+                            <div className="">
+                                <span className="text-lg font-medium text-gray-500">
+                                    {(product.price - product.discount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+
+                                </span>
+                                {/* {product?.discount > 0 && (<span className="flex items-center justify-center text-white text-xs font-bold bg-red-500 absolute right-1 top-1 w-7 h-7 rounded-full">-{Math.ceil((product.discount / product.price) * 100)}%</span>)} */}
+                                {product.discount > 0 && (<del className="text-gray-400 font-normal text-sm ml-1">{product.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</del>)}
+                            </div>
                         )}
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
                         <span className="block text-sm text-gray-400">ĐƠN HÀNG:</span>
-                        {!isSuccessProductStatistic ? (
+                        {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
                             <span className="text-lg font-medium text-gray-500">
@@ -320,7 +328,7 @@ const productById = () => {
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
                         <span className="block text-sm text-gray-400">HÀNG CÓ SẴN:</span>
-                        {!isSuccessProductStatistic ? (
+                        {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
                             <span className="text-lg font-medium text-gray-500">
@@ -332,7 +340,7 @@ const productById = () => {
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
                         <span className="block text-sm text-gray-400">TỔNG DOANH THU:</span>
-                        {!isSuccessProductStatistic ? (
+                        {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
                             <span className="text-lg font-medium text-gray-500">
