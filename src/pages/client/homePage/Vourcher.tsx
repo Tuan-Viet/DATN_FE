@@ -14,9 +14,7 @@ const Vourcher = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
     const voucherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
-
     const user = useSelector((state: any) => state?.user);
-
     const addVoucher = async (userId: string, voucherId: string) => {
         if (user.current._id) {
             await axios.put("http://localhost:8080/api/auth/add-vourcher", {
@@ -48,16 +46,10 @@ const Vourcher = () => {
             <h1 className="text-[37px] font-semibold uppercase mb-8">
                 Voucher dành cho bạn
             </h1>
-            {/* <div
-                className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch md:grid-cols-4 md:gap-8"
-            > */}
             <Slider {...settings} className=" gap-4 sm:items-stretch md:gap-8">
-
                 {voucherState?.map((voucher, index) => {
-
                     const currentDate = new Date();
                     const validTo = new Date(voucher.validTo);
-
                     if (validTo > currentDate && voucher.quantity > 0) {
                         return (
                             <div
@@ -72,7 +64,6 @@ const Vourcher = () => {
 
                                     <p className="mt-2 text-gray-700">{voucher.title}</p>
                                 </div>
-
                                 <div className="p-2 sm:px-8 ">
                                     <ul className="mt-2 space-y-2 flex justify-between">
                                         <p className="mt-2 text-gray-700">{voucher.code}</p>
@@ -80,7 +71,7 @@ const Vourcher = () => {
                                         <button
                                             className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
                                             type="button"
-                                            onClick={() => addVoucher(user.current._id, voucher._id)}
+                                            onClick={() => addVoucher(user.current._id, voucher._id!)}
                                         >
                                             Lưu mã
                                         </button>

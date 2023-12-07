@@ -640,7 +640,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
-                        <td className="px-6 py-4 font-bold">Miễn phí</td>
+                        <td className="px-6 py-4 font-bold">{totalProductPrice >= 500000 ? <p>Miễn phí</p> : <p>40.000đ</p>}</td>
                       </tr>
                       <tr className="bg-white">
                         <th
@@ -653,7 +653,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {(totalProductPrice).toLocaleString("vi-VN")}₫
+                          {(Number(order?.totalMoney)).toLocaleString("vi-VN")}₫
                         </td>
                       </tr>
                     </tbody>
