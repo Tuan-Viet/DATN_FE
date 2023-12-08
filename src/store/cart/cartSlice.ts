@@ -12,8 +12,8 @@ const cartSlice = createSlice({
     reducers: ({
         listCartSlice: (state: ICartState, actions: PayloadAction<ICart[]>) => {
             const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
-            if (JSON.parse(userStore)?._id) {
-                const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)._id)
+            if (userStore) {
+                const listCartByUser = actions.payload.filter((cart) => cart.userId === JSON.parse(userStore)?._id)
                 state.carts = listCartByUser
             } else {
                 state.carts = actions.payload

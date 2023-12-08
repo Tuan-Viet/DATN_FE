@@ -29,6 +29,7 @@ const Sale = () => {
     }
   }, [isSuccessProduct])
 
+
   return (
     <div className="bg-[#faefec] py-[60px] mb-[60px]">
       <div className="max-w-[1500px] mx-auto">
