@@ -201,10 +201,10 @@ const DashboardPage = () => {
                     />
                 </label>
                 {renderComponent()}
-                <div>                
+                <div>
                     <h3 className='text-2xl font-medium'>Đánh giá gần đây</h3>
 
-                {dashboardStatistic.newReviews.length > 0 ? (
+                    {dashboardStatistic.newReviews.length > 0 ? (
                         <List
                             itemLayout="vertical"
                             size="large"
@@ -255,18 +255,18 @@ const DashboardPage = () => {
                             )} />
                         </div>
                     )}
-                    </div>
+                </div>
             </div>
             <div className='w-1/3 flex flex-col'>
-                <div className='my-4'>
-                    <h3 className='text-2xl font-medium'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
-                    {dashboardStatistic.bestSellingProduct && dashboardStatistic.bestSellingProduct.map((item) => {
+                <div className='my-4 border bg-white p-4'>
+                    <h3 className='text-2xl font-medium text-blue-400 mb-2 rounded-md'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
+                    {/* {dashboardStatistic.bestSellingProduct && dashboardStatistic.bestSellingProduct.map((item) => {
                         return <div>
 
                         </div>
-                    })}
+                    })} */}
                     <List
-
+                        className='my-3'
                         grid={{
                             gutter: 16,
                             column: 1,
@@ -276,16 +276,15 @@ const DashboardPage = () => {
                         dataSource={dashboardStatistic?.bestSellingProduct}
                         renderItem={(item) => (
                             <List.Item>
-                                <Card>
-                                    <div className='grid gap-1 grid-cols-2 '>
-                                        <Image style={{ maxWidth: 100 }} src={item.images[0]} />
-                                        <div className=''>
-                                            <h3>Tên sản phẩm:</h3>
-                                            <Link className='font-medium' to={`/admin/product/${item._id}`}>{item.title}</Link>
-                                            <p>Số lượng: {item.totalQuantitySold}</p>
-                                        </div>
+                                <div className='flex  '>
+                                    <div className="w-16">
+                                        <Image height={60} src={item?.images[0]} />
                                     </div>
-                                </Card>
+                                    <div className=''>
+                                        <Link className='font-medium' to={`/admin/product/${item._id}`}>{item.title}</Link>
+                                        <p>Đã bán: {item.totalQuantitySold}</p>
+                                    </div>
+                                </div>
                             </List.Item>
                         )}
                     />
