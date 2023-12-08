@@ -169,7 +169,6 @@ const productById = () => {
         setSelectedImage((prev) => (prev < listImages.length - 1 ? prev + 1 : 0));
     };
 
-
     const items: CollapseProps['items'] = [
         {
             key: '1',

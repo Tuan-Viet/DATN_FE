@@ -464,7 +464,7 @@ const orderUpdate = () => {
                                                         </span>
                                                     </Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1}>
-                                                        <Link to={``}><Button className='w-full bg-yellow-500 text-white hover:text-white hover:bg-yellow-400'>Kiểm tra</Button></Link>
+                                                        <Link to={`/admin/orderreturn/${orderReturn._id}`}><Button className='w-full bg-yellow-500 text-white hover:text-white hover:bg-yellow-400'>Kiểm tra</Button></Link>
                                                     </Table.Summary.Cell>
                                                 </Table.Summary.Row >
                                             ) : ""}

@@ -86,7 +86,7 @@ const ordersReturnPage = () => {
         {
             title: 'MÃ ĐƠN HÀNG',
             key: '_id',
-            render: (record: any) => (<Link to={`/admin/order/${record?._id}`} className='uppercase'>#{record?._id}</Link>),
+            render: (record: any) => (<Link to={`/admin/orderreturn/${record?._id}`} className='uppercase'>#{record?._id}</Link>),
             className: 'w-1/6',
         },
         {
@@ -171,7 +171,7 @@ const ordersReturnPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/order/${record?._id}`}>
+                    <Link to={`/admin/orderreturn/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-500' />
                     </Link>
                 </Space>
@@ -221,7 +221,7 @@ const ordersReturnPage = () => {
             <Space className='mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        QUẢN LÝ ĐƠN HÀNG
+                        QUẢN LÝ ĐỔI HÀNG
                     </span>
                     {/* <span className="block text-base  text-[#1677ff]">
                         Manage your orders
