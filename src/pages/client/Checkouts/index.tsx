@@ -26,7 +26,7 @@ import { IOrder } from "../../../store/order/order.interface";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
-  const { data: listCart, isSuccess: isSuccessCart, refetch } = useListCartQuery()
+  const { data: listCart, isSuccess: isSuccessCart, refetch: refetchCart } = useListCartQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
@@ -44,7 +44,10 @@ const CheckoutsPage = () => {
   const [codeVoucher, setcodeVoucher] = useState<string>("")
   const [idVoucher, setIdVoucher] = useState<string>("")
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
-  const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
+  const { data: InfoUser, refetch: refetchUser } = useGetInfoUserQuery(user?.current?._id)
+
+  console.log(InfoUser);
+
   useEffect(() => {
     if (listCart) {
       if (user?.current?._id) {
@@ -128,7 +131,7 @@ const CheckoutsPage = () => {
       await onAddOrder(data).then(({ data }: any) => {
         console.log(cartState)
         console.log(data);
-        refetch().then(() => dispatch(listCartSlice(listCart!)))
+        refetchCart().then(() => dispatch(listCartSlice(listCart!)))
         if (data?.pay_method === "COD") {
           setTimeout(async () => {
             setLoading(false);
@@ -141,6 +144,7 @@ const CheckoutsPage = () => {
         }
       }
       )
+      // .then(() => refetchUser()).then(() => refetchCart())
     } catch (error) {
       console.log(error);
     }
@@ -151,6 +155,7 @@ const CheckoutsPage = () => {
       await setIdVoucher(voucherId)
     }
   }
+
   useEffect(() => {
     if (getOneVoucher) {
       setValue("voucher_code", getOneVoucher.code)
@@ -235,9 +240,9 @@ const CheckoutsPage = () => {
         </div>
       )}
       <Header></Header>
-      <div className="container-2">
+      <div className="container-2 px-10">
         <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px] mt-10 mb-10">
-          <div className="">
+          <div className="w-1/2">
 
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
@@ -245,17 +250,34 @@ const CheckoutsPage = () => {
                   <h3 className="text-lg mb-5 font-bold">
                     Thông tin giao hàng
                   </h3>
-                  <p className="text-sm">
-                    Bạn đã có tài khoản?{" "}
-                    <Link
-                      to=""
-                      className="text-primary font-semibold text-blue-500"
-                    >
-                      Đăng nhập
-                    </Link>
-                  </p>
+                  {!user?.current?._id
+                    ?
+                    <p className="text-sm">
+                      Bạn đã có tài khoản?{" "}
+                      <Link
+                        to={`/signin`}
+                        className="text-primary font-semibold text-blue-500"
+                      >
+                        Đăng nhập
+                      </Link>
+                    </p>
+                    : <span>Xin chào,{user?.current?.fullname}</span>
+                  }
+
                 </div>
                 <div>
+                  {/* <div className="mb-3">
+
+                    <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn địa chỉ giao hàng</label>
+                    <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option selected>Địa chỉ của bạn</option>
+                      {InfoUser?.addresses?.map((item, index) =>
+                        <option value="US">{item.address}</option>
+                      )}
+                     
+                    </select>
+
+                  </div> */}
                   <div className="mb-3">
                     <input
 
@@ -507,10 +529,10 @@ const CheckoutsPage = () => {
               </Link>
 
               <div className="flex flex-col">
-                <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
+                {user?.current?._id ? <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                   Đặt hàng
-                </button>
-                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors?.userId?.message : ""}</Link>
+                </button> : <Link to={"/signin"} className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">Bạn cần phải đăng nhập</Link>}
+
               </div>
             </div>
           </div>

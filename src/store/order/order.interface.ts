@@ -9,11 +9,13 @@ export interface IOrder {
     voucher_code: string
     note: string
     status: number
-    paymentStatus: string
-    pay_method: number
+    paymentStatus: number
+    pay_method: string
     totalMoney: number
     orderDetails: IOrderDetail[]
     createdAt: any
+    orderReturn: any
+
 }
 
 export interface IOrderState {

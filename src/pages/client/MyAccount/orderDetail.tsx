@@ -17,7 +17,7 @@ import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
-import { useAddOrderMutation } from "../../../store/orderReturn/order.service";
+import { useAddOrderReturnMutation } from "../../../store/orderReturn/order.service";
 import { current } from "@reduxjs/toolkit";
 import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
@@ -78,6 +78,7 @@ function mapStatusPaymentToText(statusCode) {
 
 const OrderDetail = () => {
   const dispatch: Dispatch<any> = useDispatch();
+  const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const { handleSubmit, register, setValue, formState: { errors } } = useForm<ReviewForm>({
@@ -123,6 +124,28 @@ const OrderDetail = () => {
   }, [isSuccessProduct])
 
   const [updateOrder] = useUpdateOrderMutation();
+
+
+  const [imageList, setImageList] = useState<any[]>([]);
+
+
+
+  const handleImageChange = (info) => {
+    if (info.file.status === 'done') {
+      const imageUrl = info.file.response[0].url;
+      setImageList([...imageList, imageUrl]);
+    }
+  };
+
+  const handleImageProductRemove = (file) => {
+    console.log(file);
+
+    console.log(file.response[0].url);
+
+    const updatedImageList = imageList.filter((url) => url !== file.response[0].url);
+    setImageList(updatedImageList);
+  };
+  console.log(imageList);
 
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
@@ -202,11 +225,14 @@ const OrderDetail = () => {
 
   const [isModalOrderOpen, setIsModalOrderOpen] = useState(false);
   const showOrderModal = () => {
-    setIsModalOpen(true);
+    setIsModalOrderOpen(true);
   };
   const handleOrderCancel = () => {
-    setIsModalOpen(false);
+    setIsModalOrderOpen(false);
   };
+
+  const [fileImageList, setImageFileList] = useState<UploadFile[]>([]);
+  const [countProductUpload, setProductCountUpload] = useState([0]);
 
   const {
     register: registerOrder,
@@ -217,14 +243,18 @@ const OrderDetail = () => {
     resolver: yupResolver(orderReturnSchema)
   })
 
-  const [addOrderreturn] = useAddOrderMutation()
+  const [addOrderReturn] = useAddOrderReturnMutation()
   const [updatedOrder] = useUpdateOrderMutation()
 
   const onAddOrderReturn = async (data: orderReturnForm) => {
-    await addOrderreturn(data)
-    await updateOrder({ id: id, status: 5 })
+    const image = imageList
+    const value = { ...data, images: image }
+    console.log(value);
+
+    await addOrderReturn(value)
+    await updatedOrder({ id: id, status: 6 })
     toast.success('Trả hàng thành công vui lòng đợi xác nhận')
-    setIsModalOpen(false);
+    setIsModalOrderOpen(false);
   }
 
   const handleOk = () => {
@@ -256,6 +286,22 @@ const OrderDetail = () => {
       setIsModalOpen(false);
     }
   };
+
+
+  const props: UploadProps = {
+    listType: "picture-card",
+    name: "images",
+    multiple: true,
+    action: " http://localhost:8080/api/images/upload",
+  };
+
+
+
+
+
+
+
+
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
     setCountUpload(newFileList.length);
@@ -368,7 +414,7 @@ const OrderDetail = () => {
 
                       </>
                     )}
-                    {order?.status == 3 && (
+                    {order?.status == 4 && (
                       <Button type="primary" onClick={showOrderModal} className="text-white bg-blue-700"  >
                         Trả hàng
                       </Button>
@@ -378,29 +424,65 @@ const OrderDetail = () => {
                     title="Trả hàng"
                     centered
                     open={isModalOrderOpen}
-                    onOk={handleSubmit(onAddOrderReturn)}
+                    onOk={handleOrderSubmit(onAddOrderReturn)}
+                    okButtonProps={{ className: "text-white bg-blue-500" }}
                     onCancel={(handleOrderCancel)}
                     width={1000}
                   >
 
-                    <form className=" mx-auto" onSubmit={handleSubmit(onAddOrderReturn)}>
+                    <form className=" mx-auto" onSubmit={handleOrderSubmit(onAddOrderReturn)}>
                       <input type="hidden" value={user.current._id} {...registerOrder("userId")} id="userId" />
+                      <input type="hidden" value={order?._id} {...registerOrder("orderId")} id="orderId" />
                       <div className="mb-5">
                         <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Họ tên người gửi</label>
-                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.fullName?.message : ""}</p>
+
                       </div>
                       <div className="mb-5">
                         <label htmlFor="base-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Số điện thoại người gửi</label>
-                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.phoneNumber?.message : ""}</p>
+
                       </div>
                       <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Địa chỉ gửi</label>
                         <input type="text" {...registerOrder("address")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.message : ""}</p>
+
                       </div>
                       <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do trả hàng</label>
                         <input type="text" {...registerOrder("reason")} id="reason" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
+
                       </div>
+                      <Form
+                        form={form}
+                        name="validateOnly"
+                        layout="vertical"
+                        autoComplete="off"
+                      // onFinish={uploadFile}
+                      >
+                        <Form.Item
+                          name="productImages"
+                          label="Ảnh Sản phẩm"
+                          className="relative"
+                          rules={[{ required: true, message: 'Không được để trống' }]}
+                        >
+                          <Upload name='productImages'
+                            {...props}
+                            onChange={handleImageChange}
+                            onRemove={handleImageProductRemove}
+                            maxCount={3}
+                          >
+                            <div>
+                              <PlusOutlined />
+                              <div>Upload </div>
+                            </div>
+                          </Upload>
+                        </Form.Item>
+                      </Form>
                       <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Sản phẩm trả hàng</label>
                         <div className="relative overflow-x-auto">
@@ -441,6 +523,7 @@ const OrderDetail = () => {
 
                                                 <tr className="bg-white ">
                                                   <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
+                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
                                                   <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
                                                   <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
                                                   <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
@@ -490,13 +573,6 @@ const OrderDetail = () => {
                                 );
                               })}
                             </tbody>
-                            <tfoot>
-                              <tr className="font-semibold text-gray-900 dark:text-gray">
-                                <th scope="row" className="px-6 py-3 text-base">Total</th>
-                                <td className="px-6 py-3">3</td>
-                                <td className="px-6 py-3">21,000</td>
-                              </tr>
-                            </tfoot>
                           </table>
                         </div>
 

@@ -123,14 +123,14 @@ const Product_Collection = () => {
             </>
           }) : <div className="text-center w-full">Hiện chưa có sản phẩm nào</div>}
         </div>
-        <div className="text-center">
+        {/* <div className="text-center">
           <Link
             to=""
             className="py-[15px] text-center inline-block w-[400px] rounded border border-black uppercase hover:bg-black hover:text-white transition-all"
           >
             Xem tất cả <span className="font-bold"> áo polo</span>
           </Link>
-        </div>
+        </div> */}
       </div>
     </div >
   );
