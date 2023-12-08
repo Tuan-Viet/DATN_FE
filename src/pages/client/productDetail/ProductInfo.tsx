@@ -7,7 +7,7 @@ import { useGetOneProductDetailQuery, useListProductDetailQuery, useUpdateProduc
 import { useFetchListProductQuery, useFetchOneProductByAdminQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { getOneIdProductDetailSlice, listProductDetailFilter, listProductDetailFilterSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
+import { getOneIdProductDetailSlice, listProductDetailFilter, listProductDetailFilterSlice, listProductDetailRelatedSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { useFetchOneCategoryQuery } from "../../../store/category/category.service";
 import { listProductRelated, listProductRelatedSlice } from "../../../store/product/productSlice";
 import axios from "axios";
@@ -15,7 +15,7 @@ import { useForm } from "react-hook-form";
 import { CartSchema, cartForm } from "../../../Schemas/Cart";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { productDetailForm, productDetailSchema } from "../../../Schemas/ProductDetail";
-import { addCartLocalSlice, addCartSlice } from "../../../store/cart/cartSlice";
+import { addCartSlice } from "../../../store/cart/cartSlice";
 import { useAddCartMutation } from "../../../store/cart/cart.service";
 import {
   Avatar,
@@ -59,9 +59,6 @@ const ProductInfo = () => {
       dispatch(listReviewByRateSlice(listReviewByProductId))
     }
   }, [isSuccessReview, id])
-  // useEffect(() => {
-
-  // }, [dispatch])
   const navigate = useNavigate()
   if (id) {
     const {
@@ -81,9 +78,19 @@ const ProductInfo = () => {
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
-    const userStore = useSelector((state: any) => state.user);
-    // console.log()
+    const userStore = useSelector((state: any) => state.user)
+    const productDetailRelatedState = useSelector((state: RootState) => state.productDetailRelatedReducer.productDetails)
     const [rateAver, setRateAver] = useState<number>(0)
+    useEffect(() => {
+      if (getOneProduct) {
+        dispatch(listProductDetailSlice(getOneProduct?.variants))
+      }
+    }, [getOneProduct])
+    useEffect(() => {
+      if (listProductDetailApi) {
+        dispatch(listProductDetailRelatedSlice(listProductDetailApi))
+      }
+    }, [isSuccessProductDetail])
     useEffect(() => {
       if (reviewState) {
         const rates = reviewState?.map((review) => review.rating)
@@ -109,14 +116,6 @@ const ProductInfo = () => {
     const renderContent = () => {
       switch (currentTab && currentTab) {
         case 1:
-          return (
-            <div className="mb-[40px]">
-              <p>
-                {getOneProduct?.description}
-              </p>
-            </div>
-          );
-        case 2:
           return <>
             <div className="bg-[#fffbf8] px-[24px] py-4 ">
               <div className="flex w-[80%] mx-auto">
@@ -191,6 +190,15 @@ const ProductInfo = () => {
               )}
             </div>
           </>
+        case 2:
+          return (
+            <div className="mb-[40px]">
+              <p>
+                {getOneProduct?.description}
+              </p>
+            </div>
+          );
+
         case 3:
           return (
             <div className="text-sm mb-[40px]">
@@ -411,12 +419,12 @@ const ProductInfo = () => {
                 userId: userStore?.current?._id,
                 productDetailId: productDetailGetOneId[0]?._id,
                 quantity: quantity,
-                totalMoney: getOneProduct?.discount * quantity
+                totalMoney: (getOneProduct?.price - getOneProduct?.discount) * quantity
               }).then(() => dispatch(addCartSlice({
                 userId: userStore?.current?._id,
                 productDetailId: productDetailGetOneId[0]?._id!,
                 quantity: quantity,
-                totalMoney: getOneProduct?.discount * quantity
+                totalMoney: (getOneProduct?.price - getOneProduct?.discount) * quantity
               }))).then(() => {
                 const overlayCart = document.querySelector(".overlay-cart")
                 const overlay = document.querySelector(".overlay")
@@ -432,7 +440,7 @@ const ProductInfo = () => {
               await dispatch(addCartSlice({
                 productDetailId: productDetailGetOneId[0]?._id!,
                 quantity: quantity,
-                totalMoney: getOneProduct?.discount * quantity
+                totalMoney: (getOneProduct?.price - getOneProduct?.discount) * quantity
               }))
               const overlayCart = document.querySelector(".overlay-cart")
               const overlay = document.querySelector(".overlay")
@@ -444,11 +452,6 @@ const ProductInfo = () => {
                 dropdown?.classList.add("pointer-events-none")
               }
             }
-            // let { _id, sold } = productDetailGetOneId[0]
-            // let newProDetail = { sold: sold += 1 }
-
-            // onUpdateProDetail({ id: _id, ...newProDetail })
-            // message.success("Thêm vào giỏ hàng thành công!")
           }
         }
       } catch (error) {
@@ -465,19 +468,16 @@ const ProductInfo = () => {
     // lay ra mau [0]
     useEffect(() => {
       if (productDetailState && getOneProduct) {
-        const firstColor = productDetailState?.filter((pro) => pro?.product_id === getOneProduct?._id).map((colors) => colors?.nameColor);
+        const firstColor = productDetailState?.filter((pro) => pro?.product_id && pro?.product_id?.includes(getOneProduct._id!)).map((colors) => colors?.nameColor);
         if (firstColor && firstColor.length > 0) {
           const firstColorString = JSON.stringify(firstColor[0]);
           localStorage.setItem("firstColor", firstColorString);
-
           const getFirstColor = localStorage.getItem("firstColor");
           if (listProductDetailApi && getFirstColor) {
             const parsedFirstColor = JSON.parse(getFirstColor);
-            dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: parsedFirstColor, productDetails: listProductDetailApi }));
+            dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: parsedFirstColor, productDetails: getOneProduct.variants }));
           }
         }
-      } else {
-        console.log(1);
       }
     }, [productDetailState, getOneProduct]);
 
@@ -488,7 +488,7 @@ const ProductInfo = () => {
       setValue("nameColor", name)
       try {
         if (listProductDetailApi) {
-          await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: listProductDetailApi }))
+          await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: getOneProduct?.variants }))
         }
       } catch (error) {
         console.log(error);
@@ -499,11 +499,7 @@ const ProductInfo = () => {
         dispatch(listProductRelated(getCategoryById?.products))
       }
     }, [getCategoryById])
-    useEffect(() => {
-      if (isSuccessProductDetail) {
-        dispatch(listProductDetailSlice(listProductDetailApi))
-      }
-    }, [isSuccessProductDetail])
+
 
     function filterAndTransformVariants(inputVariants: any) {
       const resultVariants = [];
@@ -539,15 +535,11 @@ const ProductInfo = () => {
       for (const colorKey in colorMap) {
         resultVariants.push(colorMap[colorKey]);
       }
-      console.log(resultVariants);
       return resultVariants;
     }
 
-    // const [productDetails, setProductDetails] = useState<any[]>([]);
     const productDetails = filterAndTransformVariants(getOneProduct?.variants)
     const colorProduct = productDetails.map((product: any) => product.nameColor)
-    console.log(productDetailFilterState);
-    // console.log(productDetails);
 
 
     let sizeProduct: any = [];
@@ -577,7 +569,7 @@ const ProductInfo = () => {
 
     useEffect(() => {
       window.scrollTo({ top: 0, left: 0 });
-    }, []);
+    }, [id]);
     return (
       <div className=" mx-3 mb-[70px] my-10" id="scroller ">
         {/* <ScrollToTop /> */}
@@ -617,7 +609,7 @@ const ProductInfo = () => {
                   className="w-[400px] mx-auto"
                 >
                   {listImages.map((imageUrl, index) => {
-                    return <SwiperSlide key={index} className="w-20 h-24 ">
+                    return <SwiperSlide key={index} className="w-20 h-24 cursor-pointer">
                       <div
                         onClick={() => handleImageClick(index)}
                         className={`h-20 w-16 overflow-hidden mb-3 relative group transform transition-transform hover:scale-110 
@@ -679,15 +671,18 @@ const ProductInfo = () => {
                 ) : (
                   <div className="flex items-center gap-x-[109px] py-4 mb-2">
                     <span className="text-sm font-bold">Giá:</span>
+
                     <div className="font-bold text-xl text-[#FF2C26]">
-                      {getOneProduct?.discount?.toLocaleString("vi-VN")}đ
+                      {(getOneProduct?.price - getOneProduct.discount).toLocaleString("vi-VN")}đ
                       <del className="font-bold text-sm text-[#ccc] ml-2">
-                        {getOneProduct?.price?.toLocaleString("vi-VN")}đ
+                        {getOneProduct.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
+                          <del>{getOneProduct.price?.toLocaleString("vi-VN")}đ</del>
+                        </span>}
                       </del>
                     </div>
-                    {getOneProduct && getOneProduct?.price > getOneProduct?.discount ? <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
-                      -{`${((getOneProduct?.price - getOneProduct?.discount) / getOneProduct?.price * 100).toFixed(0)}`}%
-                    </span> : ""}
+                    {getOneProduct && getOneProduct.discount !== 0 && <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
+                      -{`${((getOneProduct?.price - (getOneProduct.price - getOneProduct.discount)) / getOneProduct?.price * 100).toFixed(0)}`}%
+                    </span>}
                   </div>
                 )}
 
@@ -711,7 +706,7 @@ const ProductInfo = () => {
                     </div>
                   ) : (
                     <div className="">
-                      {productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
+                      {[...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
                         <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
 
                         <div className="flex my-6">
@@ -737,19 +732,8 @@ const ProductInfo = () => {
                                 </label>
                               </div>
                             ))}
-                            {/* {[...new Set(productDetailState?.filter((product) => product.product_id === getOneProduct?._id).map((item) => item?.color))].map((nameColor) => {
-                          return <div className="mx-1">
-                            <input type="radio" value={nameColor} onClick={() => handleColorProductDetail(nameColor)} id={nameColor} name="color" className="hidden peer" />
-                            <label htmlFor={nameColor}
-                              className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                            >
-                              {nameColor}
-                            </label>
-                          </div>
-                        })} */}
                           </div>
                         </div>
-
                         <div className="flex my-6">
                           {/* size */}
                           <div className="w-[13%] text-sm font-bold">Kích thước</div>
@@ -822,11 +806,8 @@ const ProductInfo = () => {
                               Mua ngay
                             </button>
                           </div>
-                          {/* <div className="w-[687px] border flex items-center justify-center cursor-pointer h-[52px] text-sm hover:bg-black rounded font-semibold text-white uppercase bg-[#333] transition-all">
-                        Click vào đây để nhận ưu đãi
-                      </div> */}
                         </div>
-                      </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div> : ""}
+                      </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
                     </div>
                   )}
 
@@ -883,7 +864,7 @@ const ProductInfo = () => {
                   } text-lg font-semibold pb-2`}
                 onClick={() => setCurrentTab(1)}
               >
-                Mô tả sản phẩm
+                Đánh giá - Nhận xét từ khách hàng
               </button>
             </div>
             <div>
@@ -894,7 +875,7 @@ const ProductInfo = () => {
                   } text-lg font-semibold pb-2`}
                 onClick={() => setCurrentTab(2)}
               >
-                Đánh giá - Nhận xét từ khách hàng
+                Mô tả sản phẩm
               </button>
             </div>
             <div>
@@ -937,64 +918,39 @@ const ProductInfo = () => {
             >
               {productRelated?.map((product, index) => {
                 return <SwiperSlide key={index}>
-                  <div className="relative group">
-                    <Link onClick={() => {
-                      window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-                    }} to={`/products/${product._id}`}>
+                  <div className={`relative group ${[...new Set(productDetailRelatedState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
+                    {[...new Set(productDetailRelatedState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>}
+                    <Link to={`/products/${product._id}`}>
                       <img
                         src={product.images?.[0]}
-                        className="mx-auto h-[351px] w-full"
+                        className="mx-auto h-[375px] w-full"
                         alt=""
                       />
                     </Link>
                     <div className="product-info p-[8px] bg-white">
                       <div className="text-sm flex justify-between mb-3">
-                        <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
-                        <div className="flex">+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.size))].length : 0}
+                        <span>+{productDetailRelatedState ? [...new Set(productDetailRelatedState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
+                        <div className="flex">+{productDetailRelatedState ? [...new Set(productDetailRelatedState?.filter((item) => item.product_id === product._id).map((pro) => pro.size))].length : 0}
                           <p className="ml-1">Kích thước</p>
                         </div>
                       </div>
-                      <Link to="" className="font-medium">
-                        {product?.title}
-
+                      <Link to="" className="block font-medium h-12">
+                        {product.title}
                       </Link>
                       <div className="price flex gap-x-[8px] items-baseline">
                         <span className="text-sm text-[#FF2C26] font-semibold">
-                          {product?.discount?.toLocaleString("vi-VN")}đ
+                          {(product?.price - product.discount).toLocaleString("vi-VN")}đ
                         </span>
-                        <span className="text-[13px] text-[#878C8F]">
-                          <del>{product?.price?.toLocaleString("vi-VN")}đ
-                          </del>
-                        </span>
+                        {product.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
+                          <del>{product.price?.toLocaleString("vi-VN")}đ</del>
+                        </span>}
                       </div>
                     </div>
                     <div>
-                      {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                        {`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
-                      </span> : ""}
+                      {product.discount > 0 && <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                        -{`${((product?.price - (product?.price - product?.discount)) / product?.price * 100).toFixed(0)}`}%
+                      </span>}
                     </div>
-                    <Link
-                      to=""
-                      className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-                        />
-                      </svg>
-                      <button type="button" className="uppercase text-xs font-semibold">
-                        Thêm vào giỏ
-                      </button>
-                    </Link>
                   </div>
                 </SwiperSlide>
               })}

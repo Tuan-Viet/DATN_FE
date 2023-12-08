@@ -9,6 +9,7 @@ import { AddressForm, AddressSchema } from "../../../Schemas/Auth";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import { Button, Modal } from "antd";
+import axios from "axios";
 
 const myAddress = () => {
   const [addAddress] = useAddAddressMutation()
@@ -81,6 +82,14 @@ const myAddress = () => {
   const handleCancelUpdate = () => {
     setIsModalUpdateOpen(false);
   };
+
+  // const getApiProvinces = async () => {
+  //   const { data: city } = await axios.get('https://provinces.open-api.vn/api')
+  // }
+
+  // useEffect(() => {
+  //   getApiProvinces()
+  // }, [])
 
   const getAddress = async (id: string) => {
     showModalUpdate()
@@ -270,7 +279,7 @@ const myAddress = () => {
 
                   )
                 })}
-                <Modal title="Basic Modal" open={isModalUpdateOpen} onOk={handleSubmit(updateAddress)} onCancel={handleCancelUpdate}>
+                <Modal title="Basic Modal" open={isModalUpdateOpen} onOk={handleSubmit(updateAddress)} onCancel={handleCancelUpdate} okButtonProps={{ className: "text-white bg-blue-500" }}>
                   <form className="max-w-sm" onSubmit={handleSubmit(updateAddress)}>
                     <input type="hidden" {...register('_id')} name="_id" />
                     <div className="mb-5">
@@ -288,6 +297,17 @@ const myAddress = () => {
                       <input {...register('phone')} type="text" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                       <p className="text-red-500 italic text-sm">{errors ? errors.phone?.message : ""}</p>
                     </div>
+                    {/* <div className="mb-5">
+                      <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an option</label>
+                      <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected>Choose a country</option>
+                        <option value="US">United States</option>
+                        <option value="CA">Canada</option>
+                        <option value="FR">France</option>
+                        <option value="DE">Germany</option>
+                      </select>
+                    </div> */}
+
                     {/* <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button> */}
                   </form>
                 </Modal>
@@ -296,7 +316,7 @@ const myAddress = () => {
                 <Button type="primary" onClick={showModal} className="bg-blue-500">
                   Thêm địa chỉ
                 </Button>
-                <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onAddAddress)} onCancel={handleCancel}>
+                <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onAddAddress)} onCancel={handleCancel} okButtonProps={{ className: "text-white bg-blue-500" }}>
                   <form className="max-w-sm" onSubmit={handleSubmit(onAddAddress)}>
                     <div className="mb-5">
                       <label htmlFor="fullname" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
@@ -313,6 +333,21 @@ const myAddress = () => {
                       <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Số điện thoại</label>
                       <input {...register('phone')} type="text" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                       <p className="text-red-500 italic text-sm">{errors ? errors.phone?.message : ""}</p>
+                    </div>
+                    <div className="mb-5">
+                      {/* {city.map((item, index) => {
+                        return <>
+                          <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn tỉnh thành</label>
+                          <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option selected>Chọn tỉnh thành</option>
+                            <option value="">{item.name}</option>
+                          </select>
+                        </>
+                      })} */}
+                      {/* <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn tỉnh thành</label>
+                      <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <option selected>Chọn tỉnh thành</option>
+                      </select> */}
                     </div>
                     {/* <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button> */}
                   </form>

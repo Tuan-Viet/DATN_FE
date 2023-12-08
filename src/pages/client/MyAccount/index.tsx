@@ -168,7 +168,7 @@ const myAccount = () => {
                   <Button type="primary" onClick={showModal} className="bg-blue-500">
                     Thay đổi thông tin
                   </Button>
-                  <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onUpdateAccount)} onCancel={handleCancel}>
+                  <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onUpdateAccount)} onCancel={handleCancel} okButtonProps={{ className: "text-white bg-blue-500" }}>
                     <form className="max-w-sm" onSubmit={handleSubmit(onUpdateAccount)}>
                       <input type="hidden" {...register('_id')} />
                       <div className="mb-5">
