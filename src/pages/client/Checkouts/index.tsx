@@ -142,7 +142,8 @@ const CheckoutsPage = () => {
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
             .then(({ data }) => window.location.href = data)
         }
-        ).then(() => refetchUser()).then(() => refetchCart())
+      }
+      ).then(() => refetchUser()).then(() => refetchCart())
     } catch (error) {
       console.log(error);
     }
