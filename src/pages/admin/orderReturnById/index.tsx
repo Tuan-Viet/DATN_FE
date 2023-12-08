@@ -4,29 +4,21 @@ import {
     Button,
     Form,
     Input,
-    Select,
     message,
     Upload,
-    Spin,
     Breadcrumb,
     Table,
     Modal,
-    Popconfirm,
-    Image
 } from 'antd';
 import {
-    CheckCircleOutlined,
-    FrownOutlined,
     FormOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../../store/orderReturn/order.service';
-import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../../../store/orderDetail/orderDetail.service';
-const { Dragger } = Upload;
+import { useAddOrderByAdminMutation } from '../../../store/order/order.service';
 const { TextArea } = Input;
 
 interface DataType {
@@ -39,53 +31,19 @@ interface DataType {
     price: number;
 }
 
-const SubmitButton = ({ form }: { form: FormInstance }) => {
-    const [submittable, setSubmittable] = React.useState(false);
-
-    // Watch all values
-    const values = Form.useWatch([], form);
-
-    React.useEffect(() => {
-        form.validateFields({ validateOnly: true }).then(
-            () => {
-                setSubmittable(true);
-            },
-            () => {
-                setSubmittable(false);
-            },
-        );
-    }, [values]);
-
-    return (
-        <Button type="primary" htmlType="submit" disabled={!submittable} className='bg-blue-500'>
-            Cập nhật
-        </Button>
-    );
-};
-
 const orderReturnById = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const { id } = useParams();
-    const [onUpdate] = useUpdateOrderMutation()
+
+    const [onAddOrderByAdmin] = useAddOrderByAdminMutation()
     const [onUpdateOrderReturn] = useUpdateOrderReturnMutation()
-    const [onUpdateOrderDetail] = useUpdateOrderDetailMutation()
-    const [onRemoveOrderDetail] = useDeleteOrderDetailMutation()
-    const { data: order } = useGetOneOrderQuery(id || '');
+    const { data: orderReturn } = useGetOneOrderReturnQuery(id!);
 
-
-    const { data: orderReturn } = useGetOneOrderReturnQuery(id || '');
-
-    const ListOrderDeatils = order?.orderDetails;
     const ListOrderReturnDetail = orderReturn?.orderReturnDetails;
 
-    const [openFormUpdateNote, setOpenFormUpdateNote] = useState(false);
-    const [openFormUpdateInfo, setOpenFormUpdateInfo] = useState(false);
     const [openFormCreateOrder, setOpenFormCreateOrder] = useState(false);
-    const [openFormConfirmOrderReturn, setOpenFormConfirmOrderReturn] = useState(false);
-    const [orderDetail, setOrderDetail] = useState<any[]>([]);
     const [orderReturnDetail, setOrderReturnDetail] = useState<any[]>([]);
-    console.log(orderReturnDetail);
 
     useEffect(() => {
         if (ListOrderReturnDetail) {
@@ -122,7 +80,7 @@ const orderReturnById = () => {
         fullName: orderReturn?.fullName,
         address: orderReturn?.address,
         phoneNumber: orderReturn?.phoneNumber,
-        note: order?.note
+        note: orderReturn?.note
     });
     const columns: ColumnsType<DataType> = [
         {
@@ -159,9 +117,6 @@ const orderReturnById = () => {
     ];
     let data: DataType[] = [];
 
-
-    console.log(orderReturnDetail);
-
     data = orderReturnDetail.map((order: any) => ({
         key: order._id,
         image: order.productInfo.imageColor,
@@ -172,19 +127,35 @@ const orderReturnById = () => {
         price: order.price,
     }));
 
+    const listOrderDetail = orderReturnDetail.map((order) => ({
+        productDetailId: order.productDetailId,
+        costPrice: order.costPrice,
+        price: order.price,
+        quantity: order.quantity,
+        color: order.color,
+        size: order.size,
+        totalMoney: order.quantity * order.price
+    }));
+    const totalOrderAmount = listOrderDetail.reduce((total, order) => {
+        return total + order.totalMoney;
+    }, 0);
+
     const onFinish = async (values: any) => {
         try {
-            const listIdProductDetail = ListOrderReturnDetail.map((order: any) => order.productDetailId)
-
             const valueCreate = {
                 ...values,
+                note: values.note === undefined ? "" : values.note,
                 userId: orderReturn?.userId,
-                orderDetails: listIdProductDetail
+                items: listOrderDetail,
+                totalMoney: totalOrderAmount,
+                paymentStatus: 0
             }
-            console.log(valueCreate);
-
+            await onAddOrderByAdmin(valueCreate)
+            const updateStatus = { ...orderReturn, status: 3 }
+            const idOrderreturn = orderReturn?._id
+            await onUpdateOrderReturn({ id: idOrderreturn, ...updateStatus })
             setOpenFormCreateOrder(false)
-            message.success(`Cập nhật thành công`);
+            message.success(`Thêm mới thành công`);
         } catch (error) {
             console.log(error);
         }
@@ -200,6 +171,8 @@ const orderReturnById = () => {
                 return "Chờ xử lí";
             case 3:
                 return "Đang xử lí";
+            case 3:
+                return "Hoàn thành";
             default:
                 return "Trạng thái không xác định";
         }
@@ -246,7 +219,12 @@ const orderReturnById = () => {
                             />
                         </div>
                         <div className=' flex justify-end py-3 px-5'>
-                            <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormCreateOrder(true)}>Tạo đơn hàng</Button>
+                            {orderReturn?.status === 2 && (
+                                <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormCreateOrder(true)}>Tạo đơn hàng</Button>
+                            )}
+                            {orderReturn?.status === 3 && (
+                                <span className='border rounded-lg p-2 font-medium text-xs bg-blue-300 text-blue-700'>Đang xử lí yêu cầu</span>
+                            )}
                             <Modal
                                 title="Tạo mới đơn hàng"
                                 centered
@@ -329,11 +307,11 @@ const orderReturnById = () => {
                         <div className="flex mb-2 items-center justify-between">
                             <h2 className='text-sm font-medium text-gray-900 '>Ghi chú</h2>
                         </div>
-                        {order?.note === "" ? (
+                        {orderReturn?.note === "" ? (
                             <span>Không có ghi chú</span>
                         ) : (
                             <span>
-                                {order?.note}
+                                {orderReturn?.note}
                             </span>
                         )}
                     </div>
@@ -344,7 +322,7 @@ const orderReturnById = () => {
                         </div>
                         <div className="border-b p-4">
                             <h2 className='text-sm mb-2 font-medium text-gray-900 '>Thông tin liên hệ</h2>
-                            <span className='block'>{(order as any)?.userId?.email}</span>
+                            <span className='block'>{(orderReturn as any)?.userId?.email}</span>
                         </div>
                         <div className="border-b p-4">
                             <div className="flex mb-2 items-center justify-between">
