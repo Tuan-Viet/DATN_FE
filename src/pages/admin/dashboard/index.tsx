@@ -9,7 +9,7 @@ import { useGetDashboardStatisticQuery, useGetOrderRevenueByMonthQuery, useGetOr
 import Highcharts from 'highcharts';
 import { MonthlyStatistics, DashboardStatistic } from '../../../store/statistic/statistic.interface';
 import HighchartsReact from 'highcharts-react-official';
-import { List, Rate, Skeleton, Spin, TreeSelect } from 'antd';
+import { Card, Empty, Image, List, Rate, Skeleton, Spin, TreeSelect } from 'antd';
 import { useFetchListProductQuery } from '../../../store/product/product.service';
 import { useListOrderQuery } from '../../../store/order/order.service';
 import { useState } from 'react';
@@ -18,6 +18,7 @@ import OrderRevanueByMonth from '../statistic/OrderRevanueByMonth';
 import OrderRevanueByQuarter from '../statistic/OrderRevanueByQuarter';
 import OrderStatistic from '../statistic/OrderStatistic';
 import ProductStatistic from '../statistic/ProductStatistic';
+import { Link } from 'react-router-dom';
 
 const DashboardPage = () => {
     const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
@@ -186,7 +187,7 @@ const DashboardPage = () => {
 
 
         <div className='flex justify-between'>
-            <div className='w-2/3'>
+            <div className='w-2/3 p-4'>
                 <h3 className='px-4 text-lg font-medium'>Tổng quan báo cáo</h3>
                 <label htmlFor="" className='block ml-10 text my-3'>Loại báo cáo:
                     <TreeSelect
@@ -200,37 +201,96 @@ const DashboardPage = () => {
                     />
                 </label>
                 {renderComponent()}
-            </div>
-            <div className='w-1/4 flex flex-col'>
-                <div className='my-4'>
-                    <h3 className='text-2xl font-medium'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
-                    {dashboardStatistic.bestSellingProduct && (
-                        <div>
-                            <p className='my-1 text-md text-md'>Tên sản phẩm: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0]?.title}</span></p>
-                            <p className='my-1 text-xs'>Số lượng bán: <span className='font-bold'>{dashboardStatistic.bestSellingProduct[0]?.totalQuantitySold}</span></p>
+                <div>                
+                    <h3 className='text-2xl font-medium'>Đánh giá gần đây</h3>
+
+                {dashboardStatistic.newReviews.length > 0 ? (
+                        <List
+                            itemLayout="vertical"
+                            size="large"
+                            pagination={{
+                                onChange: (page) => {
+                                    console.log(page);
+                                },
+                                pageSize: 10,
+                            }}
+                            dataSource={dashboardStatistic.newReviews}
+                            renderItem={(item) => (
+                                <List.Item
+                                    extra={
+                                        <Image.PreviewGroup
+                                            preview={{
+                                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                            }}
+                                        >
+                                            {item.images.map((image) => (
+                                                <Image height={70} src={image.url} alt="" className="pr-1" />
+
+                                            ))}
+                                        </Image.PreviewGroup>
+                                    }
+                                >
+                                    <div className="">
+                                        <div className="flex items-center space-x-2">
+                                            <span className=""><Link to={``}>{item.productId.title}</Link></span>
+                                            <span className="block"><Rate value={item.rating} disabled className="text-xs mb-0"></Rate></span>
+                                        </div>
+                                        <div className="flex mt-0 items-center ">
+                                            <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{item.createdAt}</span>
+                                            <div className="px-1">
+                                                <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
+                                            </div>
+                                        </div>
+                                        <span className="block my-2">{item.comment}</span>
+                                    </div>
+                                </List.Item>
+                            )}
+                        />
+                    ) : (
+                        <div className="py-14">
+                            <Empty description={(
+                                <span className="text-blue-500 text-lg">
+                                    {/* Hiện tại chưa có đánh giá nào */}
+                                </span>
+                            )} />
                         </div>
                     )}
-                </div>
-                <div>                <h3 className='text-2xl font-medium'>Đánh giá gần đây</h3>
+                    </div>
+            </div>
+            <div className='w-1/3 flex flex-col'>
+                <div className='my-4'>
+                    <h3 className='text-2xl font-medium'><InboxOutlined />Sản phẩm bán chạy nhất</h3>
+                    {dashboardStatistic.bestSellingProduct && dashboardStatistic.bestSellingProduct.map((item) => {
+                        return <div>
 
+                        </div>
+                    })}
                     <List
-                        className="demo-loadmore-list"
-                        itemLayout="horizontal"
-                        dataSource={dashboardStatistic?.newReviews}
-                        renderItem={(review) => (
-                            <List.Item
-                                actions={[<a className='text-xs'>Chi tiết</a>]}
-                            >
-                                <Skeleton avatar title={false} loading={false} active>
-                                    <List.Item.Meta
-                                        title={<a className='text-xs'>{review.productId?.title}</a>}
-                                        description={<span className='text-xs'>{review.comment}</span>}
-                                    />
-                                    <Rate className='text-xs' disabled defaultValue={review.rating} />
-                                </Skeleton>
+
+                        grid={{
+                            gutter: 16,
+                            column: 1,
+                            xs: 16,
+
+                        }}
+                        dataSource={dashboardStatistic?.bestSellingProduct}
+                        renderItem={(item) => (
+                            <List.Item>
+                                <Card>
+                                    <div className='grid gap-1 grid-cols-2 '>
+                                        <Image style={{ maxWidth: 100 }} src={item.images[0]} />
+                                        <div className=''>
+                                            <h3>Tên sản phẩm:</h3>
+                                            <Link className='font-medium' to={`/admin/product/${item._id}`}>{item.title}</Link>
+                                            <p>Số lượng: {item.totalQuantitySold}</p>
+                                        </div>
+                                    </div>
+                                </Card>
                             </List.Item>
                         )}
-                    /></div>
+                    />
+                </div>
+
             </div>
         </div>
 
