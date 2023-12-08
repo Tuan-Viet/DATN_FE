@@ -98,8 +98,12 @@ const orderUpdate = () => {
     const [openFormConfirmOrderReturn, setOpenFormConfirmOrderReturn] = useState(false);
     const [orderDetail, setOrderDetail] = useState<any[]>([]);
     const [orderReturnDetail, setOrderReturnDetail] = useState<any[]>([]);
+    const [sumTotalMoney, setSumTotalMoney] = useState<number>()
 
     useEffect(() => {
+        if (order) {
+            setSumTotalMoney(order?.totalMoney)
+        }
         if (ListOrderDeatils) {
             const fetchData = async () => {
                 const productDetails = [];
@@ -151,7 +155,7 @@ const orderUpdate = () => {
             };
             fetchData();
         }
-    }, [ListOrderDeatils, ListOrderReturnDetail]);
+    }, [order, ListOrderDeatils, ListOrderReturnDetail]);
     orderDetails = orderDetail
 
 
@@ -277,55 +281,64 @@ const orderUpdate = () => {
             console.log(error);
         }
     };
-    const processOrderDetails = () => {
-        const orderDetailsArray = order?.orderDetails;
-        const listIdOrderDetailsArray = order?.orderDetails.map((order) => order._id);
-        const orderReturnDetailsArray = orderReturn?.orderReturnDetails;
-
-        orderDetailsArray.map((orderDetail) => {
-            const matchingOrderReturnDetail = orderReturnDetailsArray.find(
-                (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
-            );
-
-            if (matchingOrderReturnDetail) {
-                if (orderDetail.quantity > matchingOrderReturnDetail.quantity) {
-                    const valueUpdate = {
-                        ...orderDetail,
-                        totalMoney: orderDetail.price * (orderDetail.quantity - matchingOrderReturnDetail.quantity),
-                        quantity: orderDetail.quantity - matchingOrderReturnDetail.quantity,
-                    };
-
-                    onUpdateOrderDetail({ _id: orderDetail._id, order: valueUpdate });
-
-                    const totalMoneyUpdate = (order?.totalMoney || 0) - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
-                    const valueOrderUpdate = { ...order, totalMoney: totalMoneyUpdate };
-                    onUpdate({ id, ...valueOrderUpdate });
-                }
-
-                if (orderDetail.quantity === matchingOrderReturnDetail.quantity) {
-                    onRemoveOrderDetail(orderDetail._id)
-                    const totalMoneyUpdate = (order?.totalMoney || 0) - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
-                    const valueOrderUpdate = { ...order, totalMoney: totalMoneyUpdate };
-
-                    onUpdate({ id, ...valueOrderUpdate });
-                }
-            }
-        });
-    };
-    console.log(order);
 
     const confirmOrderReturn = async () => {
         try {
-            await processOrderDetails();
+            const orderDetailsArray = order?.orderDetails;
+            const orderReturnDetailsArray = orderReturn?.orderReturnDetails;
 
-            const value = { ...order, status: 5 };
-            await onUpdate({ id, ...value });
+            const updatePromises = orderDetailsArray?.map(async (orderDetail) => {
+                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+                );
+
+                if (matchingOrderReturnDetail) {
+                    if (orderDetail.quantity > matchingOrderReturnDetail?.quantity) {
+                        const valueUpdate = {
+                            ...orderDetail,
+                            totalMoney: orderDetail.price * (orderDetail.quantity - matchingOrderReturnDetail.quantity),
+                            quantity: orderDetail.quantity - matchingOrderReturnDetail.quantity,
+                        };
+
+                        await onUpdateOrderDetail({ _id: orderDetail._id, order: valueUpdate });
+
+                        let totalMoneyUpdate =
+                            sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
+                        setSumTotalMoney(totalMoneyUpdate);
+                        console.log(1);
+                    }
+                    if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
+                        await onRemoveOrderDetail(orderDetail._id)
+                        let totalMoneyUpdate =
+                            sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
+                        setSumTotalMoney(totalMoneyUpdate);
+
+                    }
+                }
+            });
+
+            await Promise.all(updatePromises);
+
+            const updatedTotalMoney = orderDetailsArray?.reduce((total, orderDetail) => {
+                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+                );
+
+                if (matchingOrderReturnDetail) {
+                    total -= matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price;
+                }
+
+                return total;
+            }, sumTotalMoney);
+
+            const updatedOrder = { ...order, status: 5, totalMoney: updatedTotalMoney };
+            await onUpdate({ id, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 2 };
             const idOrderReturn = order?.orderReturn?._id;
             onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
-            setOpenFormConfirmOrderReturn(false);
 
+            setOpenFormConfirmOrderReturn(false);
             message.info(`Xác nhận yêu cầu đổi hàng`);
         } catch (error) {
             console.log(error);
@@ -374,7 +387,7 @@ const orderUpdate = () => {
                         Trạng thái: {order && order.status === 5 ? (
                             <span className='text-green-500'>Hoàn thành</span>
                         ) : (
-                            <span className='text-blue-500'>{mapStatusToText(order?.status)}</span>
+                            <span className='text-blue-500'>{mapStatusToText(Number(order?.status))}</span>
                         )}
                     </span>
                 </div>
@@ -402,7 +415,7 @@ const orderUpdate = () => {
                                             <Table.Summary.Row className=''>
                                                 <Table.Summary.Cell index={0} colSpan={3}>
                                                     <span className='block'>Tổng sản phẩm</span>
-                                                    <span className='block'>Giao hàng</span>
+                                                    <span className='block'>Vận chuyển</span>
                                                     <span className='block'>Tổng</span>
                                                 </Table.Summary.Cell>
                                                 <Table.Summary.Cell index={1}>
@@ -410,7 +423,7 @@ const orderUpdate = () => {
                                                         {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                     </div>
                                                     <div className='text-end'>
-                                                        Miễn phí
+                                                        {order?.totalMoney > 500000 ? "Miễn phí" : "40,000đ"}
                                                     </div>
                                                     <div className='text-end'>
                                                         {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}

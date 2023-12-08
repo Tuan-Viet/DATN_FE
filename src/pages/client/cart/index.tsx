@@ -128,158 +128,183 @@ const cartPage = () => {
                     </div>
                     <hr className="py-4" />
                     <div className="py-4">
-                        <h1 className="tracking-wide">Bạn cần mua thêm <strong className="text-red-400">50.000đ</strong> để có thể <strong className="uppercase">miễn phí vận chuyển</strong></h1>
+                        <h1 className="tracking-wide py-[10px] text-[16px]">
+                            Bạn {totalCart < 500000 ? <span className="">
+                                cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ</strong>
+                                <strong className="uppercase ml-2">miễn phí vận chuyển</strong>
+                            </span> : <span>đã được <strong>Miễn phí vận chuyển</strong></span>}
+                        </h1>
                     </div>
                     {cartState?.map((cart, index) => {
                         return <div key={index}>
-                            {
-                                productDetailState?.filter((proDetail, index) => proDetail?._id === cart?.productDetailId).map((item) => {
-                                    return <>
-                                        {productState.filter((product) => product._id === item.product_id).map((pro) => {
-                                            return <div className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative">
-                                                <img src={item.imageColor} alt="product-image" className="w-[80px] rounded-lg sm:w-[80px] h-[90px]" />
-                                                <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
-                                                    <div className="mt-5 sm:mt-0">
-                                                        {/* name */}
-                                                        <h2 className="text-lg font-bold text-gray-900">{pro.title}</h2>
-                                                        {/* color and size */}
-                                                        <p className="mt-1 text-xs text-gray-700">{item.nameColor} / {item.size}</p>
-                                                        {/* price product */}
-                                                        <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">{(pro.price - pro.discount).toLocaleString("vi-VN")}đ</p>
-                                                    </div>
-                                                    {user?.current?._id ? (
-                                                        <div
-                                                            className="absolute right-[10px] top-[10px]"
-                                                            onClick={() => removeCart(cart._id!)}
+                            {productState
+                                ?.filter(
+                                    (product) => product._id === cart.productDetailId.product_id
+                                )
+                                .map((pro, index) => {
+                                    return (
+                                        <div
+                                            className="justify-between mb-6 rounded-lg border-2 bg-white p-6 max-h-[140px] shadow-md sm:flex sm:justify-start relative"
+                                            key={index}
+                                        >
+                                            <Link to={`/products/${pro._id}`}>
+                                                <img
+                                                    src={cart.productDetailId?.imageColor}
+                                                    alt="product-image"
+                                                    className="w-[80px] rounded-lg sm:w-[80px] h-[90px]"
+                                                />
+                                            </Link>
+                                            <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
+                                                <div className="mt-5 sm:mt-0">
+                                                    <h2 className="text-lg font-bold text-gray-900">
+                                                        {pro?.title}
+                                                    </h2>
+                                                    {/* color and size */}
+                                                    <p className="mt-1 text-xs text-gray-700">
+                                                        {cart.productDetailId?.nameColor} / {cart.productDetailId?.size}
+                                                    </p>
+                                                    {/* price product */}
+                                                    <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
+                                                        {(pro.price - pro.discount).toLocaleString("vi-VN")}
+                                                        đ
+                                                    </p>
+                                                </div>
+                                                {user?.current?._id ? (
+                                                    <div
+                                                        className="absolute right-[10px] top-[10px]"
+                                                        onClick={() => removeCart(cart._id!)}
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke-width="1.5"
+                                                            stroke="currentColor"
+                                                            className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
                                                         >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke-width="1.5"
-                                                                stroke="currentColor"
-                                                                className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                                                            >
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    d="M6 18L18 6M6 6l12 12"
-                                                                />
-                                                            </svg>
-                                                        </div>
-                                                    ) : (
-                                                        <div
-                                                            className="absolute right-[10px] top-[10px]"
-                                                            onClick={() =>
-                                                                removeCart(cart.productDetailId!)
-                                                            }
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                fill="none"
-                                                                viewBox="0 0 24 24"
-                                                                stroke-width="1.5"
-                                                                stroke="currentColor"
-                                                                className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
-                                                            >
-                                                                <path
-                                                                    stroke-linecap="round"
-                                                                    stroke-linejoin="round"
-                                                                    d="M6 18L18 6M6 6l12 12"
-                                                                />
-                                                            </svg>
-                                                        </div>
-                                                    )}
-                                                    {/* <div className="absolute right-[10px] top-[10px]" onClick={() => removeCart(cart._id!)}>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                                        </svg>
-                                                    </div> */}
-                                                    <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
-                                                        <div className="flex items-center">
-                                                            <p className="font-bold tracking-wide text-[15px]">{cart.totalMoney.toLocaleString("vi-VN")}đ</p>
-                                                        </div>
-                                                        <div className="flex items-center w-[100px] border border-gray-300 rounded">
-                                                            {user?.current?._id ? <button
-                                                                onClick={() =>
-                                                                    decreaseCart(
-                                                                        cart._id!,
-                                                                        (pro.price - pro.discount)
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    cart?.quantity == 1
-                                                                }
-                                                                type="button"
-                                                                className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
-                                                            >
-                                                                -
-                                                            </button> : <button
-                                                                onClick={() =>
-                                                                    decreaseCart(
-                                                                        cart.productDetailId!,
-                                                                        (pro.price - pro.discount)
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    cart?.quantity == 1
-                                                                }
-                                                                type="button"
-                                                                className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
-                                                            >
-                                                                -
-                                                            </button>}
-                                                            <input
-                                                                type="number"
-                                                                id="Quantity"
-                                                                value={cart?.quantity}
-                                                                min="1"
-                                                                max={item?.quantity}
-                                                                className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                d="M6 18L18 6M6 6l12 12"
                                                             />
-                                                            {user?.current?._id ? <button
-                                                                onClick={() =>
-                                                                    increaseCart(
-                                                                        cart._id!,
-                                                                        (pro.price - pro.discount)
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    item?.quantity === cart?.quantity
-                                                                }
-                                                                type="button"
-                                                                className={`${item?.quantity === cart?.quantity
-                                                                    ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
-                                                                    : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
-                                                                    } `}
-                                                            >
-                                                                +
-                                                            </button> : <button
-                                                                onClick={() =>
-                                                                    increaseCart(
-                                                                        cart.productDetailId!,
-                                                                        (pro.price - pro.discount)
-                                                                    )
-                                                                }
-                                                                disabled={
-                                                                    item?.quantity === cart?.quantity
-                                                                }
-                                                                type="button"
-                                                                className={`${item?.quantity === cart?.quantity
-                                                                    ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
-                                                                    : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
-                                                                    } `}
-                                                            >
-                                                                +
-                                                            </button>}
-                                                        </div>
+                                                        </svg>
+                                                    </div>
+                                                ) : (
+                                                    <div
+                                                        className="absolute right-[10px] top-[10px]"
+                                                        onClick={() =>
+                                                            removeCart(cart.productDetailId?._id!)
+                                                        }
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            fill="none"
+                                                            viewBox="0 0 24 24"
+                                                            stroke-width="1.5"
+                                                            stroke="currentColor"
+                                                            className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500"
+                                                        >
+                                                            <path
+                                                                stroke-linecap="round"
+                                                                stroke-linejoin="round"
+                                                                d="M6 18L18 6M6 6l12 12"
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                )}
+                                                <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
+                                                    <div className="flex items-center">
+                                                        <p className="font-bold tracking-wide text-[15px]">
+                                                            {cart?.totalMoney?.toLocaleString(
+                                                                "vi-VN"
+                                                            )}
+                                                            đ
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center w-[100px] border border-gray-300 rounded">
+                                                        {user?.current?._id ? <button
+                                                            onClick={() =>
+                                                                decreaseCart(
+                                                                    cart._id!,
+                                                                    (pro.price - pro.discount)
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                cart?.quantity == 1
+                                                            }
+                                                            type="button"
+                                                            className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
+                                                        >
+                                                            -
+                                                        </button> : <button
+                                                            onClick={() =>
+                                                                decreaseCart(
+                                                                    cart.productDetailId._id!,
+                                                                    (pro.price - pro.discount)
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                cart?.quantity == 1
+                                                            }
+                                                            type="button"
+                                                            className={`${cart?.quantity == 1 ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 opacity-75 text-gray-700 transition hover:opacity-75" : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"}`}
+                                                        >
+                                                            -
+                                                        </button>}
+                                                        <input
+                                                            type="number"
+                                                            id="Quantity"
+                                                            value={cart.quantity}
+                                                            // value={Number(cartState.reduce((acc: number, curr: any) => {
+                                                            //   if (curr.productDetailId == item._id) {
+                                                            //     return acc += curr.quantity
+                                                            //   }
+                                                            // }, 0))}
+                                                            min="1"
+                                                            max={cart.productDetailId?.quantity}
+                                                            className="outline-none  font-semibold h-8 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                                        />
+                                                        {user?.current?._id ? <button
+                                                            onClick={() =>
+                                                                increaseCart(
+                                                                    cart._id!,
+                                                                    (pro.price - pro.discount)
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                cart.productDetailId?.quantity === cart?.quantity
+                                                            }
+                                                            type="button"
+                                                            className={`${cart.productDetailId?.quantity === cart?.quantity
+                                                                ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                                                : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                                                } `}
+                                                        >
+                                                            +
+                                                        </button> : <button
+                                                            onClick={() =>
+                                                                increaseCart(
+                                                                    cart.productDetailId._id!,
+                                                                    (pro.price - pro.discount)
+                                                                )
+                                                            }
+                                                            disabled={
+                                                                cart.productDetailId?.quantity === cart?.quantity
+                                                            }
+                                                            type="button"
+                                                            className={`${cart.productDetailId?.quantity === cart?.quantity
+                                                                ? "w-10 h-8 flex items-center justify-center leading-10 bg-gray-200 text-gray-300 transition hover:opacity-75"
+                                                                : "w-10 h-8 flex items-center justify-center leading-10 bg-gray-300 text-gray-700 transition hover:opacity-75"
+                                                                } `}
+                                                        >
+                                                            +
+                                                        </button>}
                                                     </div>
                                                 </div>
                                             </div>
-                                        })}
-                                    </>
-                                })
-                            }
+                                        </div>
+                                    );
+                                })}
                         </div>
                     })}
                     <div className="bg-gray-100 w-full p-4">

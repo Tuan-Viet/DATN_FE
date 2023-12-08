@@ -85,6 +85,7 @@ const orderReturnById = () => {
     const [openFormConfirmOrderReturn, setOpenFormConfirmOrderReturn] = useState(false);
     const [orderDetail, setOrderDetail] = useState<any[]>([]);
     const [orderReturnDetail, setOrderReturnDetail] = useState<any[]>([]);
+    console.log(orderReturnDetail);
 
     useEffect(() => {
         if (ListOrderReturnDetail) {
@@ -170,33 +171,6 @@ const orderReturnById = () => {
         quantity: order.quantity,
         price: order.price,
     }));
-
-    // const [onUpdate] = useUpdateProductMutation()
-    const updateNote = async (values: any) => {
-        try {
-            console.log("value:", values);
-            const newNote = { ...order, note: values.note }
-            await onUpdate({ id, ...newNote });
-            setOpenFormUpdateNote(false)
-            message.success(`Cập nhật thành công`);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const updateInfo = async (values: any) => {
-        try {
-            const newValue = { ...order, fullName: values.fullName, phoneNumber: values.phoneNumber, address: values.address }
-            await onUpdate({ id, ...newValue });
-            setOpenFormUpdateInfo(false)
-            message.success(`Cập nhật thành công`);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-
-
 
     const onFinish = async (values: any) => {
         try {

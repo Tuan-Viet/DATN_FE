@@ -21,10 +21,12 @@ import voucherSlice, { listVoucherSlice } from "../../../store/vouchers/voucherS
 import { IVoucher } from "../../../store/vouchers/voucher.interface";
 import { toast } from "react-toastify";
 import { useGetInfoUserQuery } from "../../../store/user/user.service";
+import { ICart } from "../../../store/cart/cart.interface";
+import { IOrder } from "../../../store/order/order.interface";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
-  const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery()
+  const { data: listCart, isSuccess: isSuccessCart, refetch: refetchCart } = useListCartQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
@@ -42,8 +44,10 @@ const CheckoutsPage = () => {
   const [codeVoucher, setcodeVoucher] = useState<string>("")
   const [idVoucher, setIdVoucher] = useState<string>("")
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
-  const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
-  console.log(cartState)
+  const { data: InfoUser, refetch: refetchUser } = useGetInfoUserQuery(user?.current?._id)
+
+  console.log(InfoUser);
+
   useEffect(() => {
     if (listCart) {
       if (user?.current?._id) {
@@ -75,7 +79,6 @@ const CheckoutsPage = () => {
   }, [InfoUser])
 
   const myVoucher = InfoUser?.voucherwallet
-  console.log(myVoucher);
 
   const {
     register,
@@ -96,6 +99,27 @@ const CheckoutsPage = () => {
       setValue("voucher_code", getOneVoucher?.code)
     }
   }, [setValue, current])
+  useEffect(() => {
+    const cartValues = cartState
+      .map((item) => {
+        if (item.productDetailId?._id) {
+          return {
+            productDetailId: item.productDetailId._id,
+            price: item.totalMoney / item.quantity,
+            quantity: item.quantity,
+            color: item.productDetailId.nameColor,
+            size: item.productDetailId.size,
+            totalMoney: item.totalMoney
+          };
+        }
+        return undefined;
+      })
+      .filter((item): item is { productDetailId: string; price: number; quantity: number; color: string; size: string; totalMoney: number } => !!item);
+    if (cartValues.length > 0) {
+      setValue("carts", cartValues);
+    }
+
+  }, [cartState])
   const onSubmitOrder = async (data: orderForm) => {
     try {
       if (cartState?.length === 0) {
@@ -104,10 +128,10 @@ const CheckoutsPage = () => {
         return
       }
       setLoading(true);
-      console.log(data);
-
       await onAddOrder(data).then(({ data }: any) => {
+        console.log(cartState)
         console.log(data);
+        refetchCart().then(() => dispatch(listCartSlice(listCart!)))
         if (data?.pay_method === "COD") {
           setTimeout(async () => {
             setLoading(false);
@@ -120,6 +144,7 @@ const CheckoutsPage = () => {
         }
       }
       )
+      // .then(() => refetchUser()).then(() => refetchCart())
     } catch (error) {
       console.log(error);
     }
@@ -130,20 +155,23 @@ const CheckoutsPage = () => {
       await setIdVoucher(voucherId)
     }
   }
+
   useEffect(() => {
     if (getOneVoucher) {
       setValue("voucher_code", getOneVoucher.code)
       setcodeVoucher(getOneVoucher.code!)
     }
   }, [getOneVoucher])
+
+  const [totalVoucher, setTotalVoucher] = useState<number>(0)
   const handleVoucherUpdate = (voucherId: string) => {
     if (voucherId) {
       setcodeVoucher("")
       setIdVoucher("")
       setValue("voucher_code", "")
+      setTotalVoucher(0)
     }
   }
-
   useEffect(() => {
     let total = 0
     if (cartState) {
@@ -151,29 +179,38 @@ const CheckoutsPage = () => {
         total += cart.totalMoney
       })
     }
-
+    setTotalCart(total);
+  }, [totalVoucher])
+  useEffect(() => {
+    let total = 0
+    if (cartState) {
+      cartState.map((cart) => {
+        total += cart.totalMoney
+      })
+    }
     if (getOneVoucher && getOneVoucher?.type === "percent") {
-      total = total - (total * getOneVoucher?.discount) / 100
-      if (total) {
-        setValue("totalMoney", total)
-        setTotalCart(total)
+      let totalPer = total - (total * getOneVoucher?.discount) / 100
+      if (totalPer) {
+        const totalShip = totalPer >= 500000 ? totalPer : totalPer + 40000
+        setValue("totalMoney", totalShip)
+        setTotalVoucher(totalPer)
       }
-
     } else if (getOneVoucher && getOneVoucher?.type === "value") {
-      total = total - getOneVoucher?.discount
-      if (total) {
-        setValue("totalMoney", total)
-        setTotalCart(total)
+      let totalValue = total - getOneVoucher?.discount
+      if (totalValue) {
+        const totalShip = totalValue >= 500000 ? totalValue : totalValue + 40000
+        setValue("totalMoney", totalShip)
+        setTotalVoucher(totalValue)
       }
     } else {
       if (total) {
-        setValue("totalMoney", total)
-        setTotalCart(total)
+        const totalShip = total >= 500000 ? total : total + 40000
+        setValue("totalMoney", totalShip);
+        setTotalCart(total);
       }
     }
 
   }, [cartState, getOneVoucher])
-
   const handleFindVoucher = () => {
     if (codeVoucher && voucherState) {
       const voucherByCode = voucherState?.find((voucher) => voucher.code === codeVoucher)
@@ -203,9 +240,9 @@ const CheckoutsPage = () => {
         </div>
       )}
       <Header></Header>
-      <div className="container-2">
+      <div className="container-2 px-10">
         <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px] mt-10 mb-10">
-          <div className="">
+          <div className="w-1/2">
 
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
@@ -213,17 +250,34 @@ const CheckoutsPage = () => {
                   <h3 className="text-lg mb-5 font-bold">
                     Thông tin giao hàng
                   </h3>
-                  <p className="text-sm">
-                    Bạn đã có tài khoản?{" "}
-                    <Link
-                      to=""
-                      className="text-primary font-semibold text-blue-500"
-                    >
-                      Đăng nhập
-                    </Link>
-                  </p>
+                  {!user?.current?._id
+                    ?
+                    <p className="text-sm">
+                      Bạn đã có tài khoản?{" "}
+                      <Link
+                        to={`/signin`}
+                        className="text-primary font-semibold text-blue-500"
+                      >
+                        Đăng nhập
+                      </Link>
+                    </p>
+                    : <span>Xin chào,{user?.current?.fullname}</span>
+                  }
+
                 </div>
                 <div>
+                  {/* <div className="mb-3">
+
+                    <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn địa chỉ giao hàng</label>
+                    <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option selected>Địa chỉ của bạn</option>
+                      {InfoUser?.addresses?.map((item, index) =>
+                        <option value="US">{item.address}</option>
+                      )}
+                     
+                    </select>
+
+                  </div> */}
                   <div className="mb-3">
                     <input
 
@@ -347,44 +401,32 @@ const CheckoutsPage = () => {
             <div className="pt-7 border-t-[1px] border-b-[1px] h-[250px] overflow-auto pb-2">
               {cartState?.map((cart, index) => {
                 return <div key={index}>
-                  <input type="text" value={cart.productDetailId} className="hidden" {...register(`carts.${index}.productDetailId`)} />
-                  <input type="number" value={cart.quantity} className="hidden" {...register(`carts.${index}.quantity`)} />
-                  <input type="text" value={cart.totalMoney} className="hidden" {...register(`carts.${index}.totalMoney`)} />
-                  {
-                    productDetailState?.filter((proDetail, index) => proDetail?._id === cart?.productDetailId).map((item) => {
-                      return <div key={index}>
-                        <input type="text" value={item.nameColor} className="hidden" {...register(`carts.${index}.color`)} />
-                        <input type="text" value={item.size} className="hidden" {...register(`carts.${index}.size`)} />
-                        {productState?.filter((product, index) => product._id === item.product_id).map((pro) => {
-                          return <div className="mb-6 flex relative gap-x-20">
-                            <input type="text" value={pro.price - pro.discount} className="hidden" {...register(`carts.${index}.price`)} />
-                            <div className="border rounded-lg relative w-[125px] h-[185px]">
-                              <img
-                                src={item.imageColor}
-                                className="w-full h-full rounded-lg object-cover"
-                              />
-                              <p className="w-5 h-5 bg-primary absolute top-[-5px] right-[-5px] flex bg-black justify-center items-center text-sm text-white font-semibold rounded-full">
-                                {cart.quantity}
-                              </p>
-                            </div>
-                            <div>
-                              <h3 className="font-bold mb-3">
-                                {pro.title}
-                              </h3>
-                              <p className="text-[15px] font-semibold mb-3">{item.nameColor} / {item.size}</p>
-                              <p className="text-[15px] font-semibold mb-3">Số lượng: {cart.quantity}</p>
-                              <p className="font-medium">
-                                Giá:{" "}
-                                <span className="text-red-500 text-xl font-bold">
-                                  {cart.totalMoney.toLocaleString("vi-VN")}₫
-                                </span>
-                              </p>
-                            </div>
-                          </div>
-                        })}
+                  {productState?.filter((product, index) => product._id === cart.productDetailId?.product_id).map((pro) => {
+                    return <div className="mb-6 flex relative gap-x-20">
+                      <div className="border rounded-lg relative w-[125px] h-[185px]">
+                        <img
+                          src={cart.productDetailId?.imageColor}
+                          className="w-full h-full rounded-lg object-cover"
+                        />
+                        <p className="w-5 h-5 bg-primary absolute top-[-5px] right-[-5px] flex bg-black justify-center items-center text-sm text-white font-semibold rounded-full">
+                          {cart.quantity}
+                        </p>
                       </div>
-                    })
-                  }
+                      <div>
+                        <h3 className="font-bold mb-3">
+                          {pro.title}
+                        </h3>
+                        <p className="text-[15px] font-semibold mb-3">{cart.productDetailId?.nameColor} / {cart.productDetailId?.size}</p>
+                        <p className="text-[15px] font-semibold mb-3">Số lượng: {cart.quantity}</p>
+                        <p className="font-medium">
+                          Giá:{" "}
+                          <span className="text-red-500 text-xl font-bold">
+                            {cart.totalMoney.toLocaleString("vi-VN")}₫
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  })}
                 </div>
               })}
             </div>
@@ -425,18 +467,41 @@ const CheckoutsPage = () => {
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
-                <span className="font-medium">{(totalCart).toLocaleString("vi-VN")}₫</span>
+                <span className="font-medium text-sm">{(totalCart).toLocaleString("vi-VN")}₫</span>
               </div>
-              <div className="flex justify-between">
+
+              {totalVoucher && totalVoucher !== 0 ?
+                <div className="flex justify-between mb-4">
+                  <span></span>
+                  <span className="text-right font-semibold text-[12px] text-red-500">-{(getOneVoucher?.type === "value" ? Number(getOneVoucher?.discount) : ((Number(getOneVoucher?.discount)) * totalCart) / 100).toLocaleString("vi-VN")}₫</span>
+                </div>
+                : ""}
+              {totalVoucher != 0 &&
+                <div className="flex justify-between mb-4">
+                  <span></span>
+                  <span className="text-right font-semibold">{(totalVoucher).toLocaleString("vi-VN")}₫</span>
+                </div>
+              }
+              {totalVoucher !== 0 ? <div className="flex justify-between">
                 <span>Giao hàng tận nơi</span>
-                <span className="font-medium">Miễn phí</span>
-                {/* <span className="font-medium">40.000₫</span> */}
-              </div>
+                <span className="font-semibold">{totalVoucher >= 500000 ? <span>Miễn phí</span> : <span>40.000đ</span>}</span>
+              </div> : <div className="flex justify-between">
+                <span>Giao hàng tận nơi</span>
+                <span className="font-semibold">{totalCart >= 500000 ? <span>Miễn phí</span> : <span>40.000đ</span>}</span>
+              </div>}
+
+              <h1 className="tracking-wide py-[10px] text-[14px] text-yellow-600 italic text-right">
+                {totalCart < 500000 && <span className="">*Bạn
+                  cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ </strong>
+                  để miễn phí vận chuyển
+                </span>}
+              </h1>
             </div>
             {getOneVoucher?.code ? <p onClick={() => handleVoucherUpdate(getOneVoucher?._id!)} className="text-red-600 text-[14px] text-right mt-2 font-semibold cursor-pointer hover:font-bold">Xóa mã giảm giá {getOneVoucher?.code}?</p> : ""}
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
-              <span className="text-black text-2xl font-bold">{(totalCart).toLocaleString("vi-VN")}₫</span>
+              {totalVoucher == 0 ? <span className="text-black text-2xl font-bold">{(totalCart >= 500000 ? totalCart : totalCart + 40000).toLocaleString("vi-VN")}₫</span> : <span className="text-black text-2xl font-bold">{(totalVoucher >= 500000 ? totalVoucher : totalVoucher + 40000).toLocaleString("vi-VN")}₫</span>}
+
 
             </div>
             <div className="flex justify-between">
@@ -463,10 +528,10 @@ const CheckoutsPage = () => {
               </Link>
 
               <div className="flex flex-col">
-                <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
+                {user?.current?._id ? <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                   Đặt hàng
-                </button>
-                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors?.userId?.message : ""}</Link>
+                </button> : <Link to={"/signin"} className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">Bạn cần phải đăng nhập</Link>}
+
               </div>
             </div>
           </div>

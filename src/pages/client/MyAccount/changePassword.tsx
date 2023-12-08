@@ -130,14 +130,20 @@ const ChangePassword = () => {
                                         <div className="mb-5">
                                             <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Mật khẩu hiện tại</label>
                                             <input {...register("oldPassword")} type="password" id="password" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                            <p className="text-red-500 italic text-sm">{errors ? errors.oldPassword?.message : ""}</p>
+
                                         </div>
                                         <div className="mb-5">
                                             <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Mật khẩu mới</label>
                                             <input {...register("newPassword")} type="password" id="newPassword" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                            <p className="text-red-500 italic text-sm">{errors ? errors.newPassword?.message : ""}</p>
+
                                         </div>
                                         <div className="mb-5">
                                             <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Nhập lại mật khẩu</label>
                                             <input {...register("confirmNewPassword")} type="password" id="confirmPassword" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                            <p className="text-red-500 italic text-sm">{errors ? errors.confirmNewPassword?.message : ""}</p>
+
                                         </div>
                                         <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Thay đổi</button>
                                     </form>
