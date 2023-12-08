@@ -49,7 +49,6 @@ const Product_Collection = () => {
   const listCate = categoryState.filter((cate) => cate.name !== "Chưa phân loại")
   return (
     <div className="py-[60px] mb-[60px]" >
-
       <div className="max-w-[1500px] mx-auto">
         <div className="tabs flex justify-center items-center gap-[40px] mb-[50px]">
           {listCate?.map((cate, index) => {
@@ -58,20 +57,29 @@ const Product_Collection = () => {
             </div>
           })}
         </div>
-        <div className="outstanding-product mb-12 grid grid-cols-5 gap-[10px]">
+        <div className="outstanding-product mb-12 grid grid-cols-5 gap-[10px] transition-all ease-linear">
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <>
-              <div className={`relative group ${[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
+              <div className={`relative group overflow-hidden ${[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
                 {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>}
                 <Link to={`/products/${product._id}`}>
-                  <img
-                    src={product.images?.[0]}
-                    className="mx-auto h-[395px] w-full"
-                    alt=""
-                  />
+                  <div className="min-h-[375px] max-h-[395px] overflow-hidden">
+                    <img
+                      src={product.images?.[0]}
+                      className="mx-auto max-h-[375px] w-full group-hover:opacity-0 group-hover:scale-100 absolute transition-all ease-linear duration-200"
+                      alt=""
+                    />
+
+                    <img
+                      src={product.images?.[1] ? product.images?.[1] : productDetailState?.find((proDetail) => proDetail?.product_id && proDetail?.product_id?.includes(product._id!))?.imageColor
+                      }
+                      className="mx-auto max-h-[375px] min-h-[375px] w-full duration-999 absolute opacity-0 group-hover:opacity-100 transition-all ease-linear"
+                      alt=""
+                    />
+                  </div>
                 </Link>
                 <div className="product-info p-[8px] bg-white">
-                  <div className="text-sm flex justify-between mb-3">
+                  <div className="text-sm flex justify-between mb-1">
                     <span>+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
                     <div className="flex">+{productDetailState ? [...new Set(productDetailState?.filter((item) => item.product_id === product._id).map((pro) => pro.size))].length : 0}
                       <p className="ml-1">Kích thước</p>
