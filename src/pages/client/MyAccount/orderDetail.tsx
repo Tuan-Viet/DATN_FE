@@ -17,7 +17,7 @@ import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
-import { useAddOrderMutation } from "../../../store/orderReturn/order.service";
+import { useAddOrderReturnMutation } from "../../../store/orderReturn/order.service";
 import { current } from "@reduxjs/toolkit";
 import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
@@ -243,7 +243,7 @@ const OrderDetail = () => {
     resolver: yupResolver(orderReturnSchema)
   })
 
-  const [addOrderReturn] = useAddOrderMutation()
+  const [addOrderReturn] = useAddOrderReturnMutation()
   const [updatedOrder] = useUpdateOrderMutation()
 
   const onAddOrderReturn = async (data: orderReturnForm) => {
@@ -435,13 +435,13 @@ const OrderDetail = () => {
                       <input type="hidden" value={order?._id} {...registerOrder("orderId")} id="orderId" />
                       <div className="mb-5">
                         <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Họ tên người gửi</label>
-                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                         <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.fullName?.message : ""}</p>
 
                       </div>
                       <div className="mb-5">
                         <label htmlFor="base-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Số điện thoại người gửi</label>
-                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                         <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.phoneNumber?.message : ""}</p>
 
                       </div>
@@ -468,8 +468,8 @@ const OrderDetail = () => {
                           name="productImages"
                           label="Ảnh Sản phẩm"
                           className="relative"
+                          rules={[{ required: true, message: 'Không được để trống' }]}
                         >
-                          <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">{countProductUpload}/3</span>
                           <Upload name='productImages'
                             {...props}
                             onChange={handleImageChange}
@@ -573,13 +573,6 @@ const OrderDetail = () => {
                                 );
                               })}
                             </tbody>
-                            <tfoot>
-                              <tr className="font-semibold text-gray-900 dark:text-gray">
-                                <th scope="row" className="px-6 py-3 text-base">Total</th>
-                                <td className="px-6 py-3">3</td>
-                                <td className="px-6 py-3">21,000</td>
-                              </tr>
-                            </tfoot>
                           </table>
                         </div>
 

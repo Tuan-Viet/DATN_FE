@@ -62,7 +62,7 @@ const ProductPage = () => {
             return false;
         }
         // Lọc theo giá
-        const productPrice = (product.discount === 0 ? product.price : product.discount);
+        const productPrice = (product.discount > 0 ? product.price - product.discount : product.price);
         if ((minPrice > 0 && productPrice < minPrice) || (maxPrice > 0 && productPrice > maxPrice)) {
             return false;
         }
@@ -127,11 +127,19 @@ const ProductPage = () => {
             break;
         case 3:
             // Giá: Tăng dần
-            sortedProducts.sort((a, b) => a.discount - b.discount);
+            sortedProducts.sort((a, b) => {
+                const discountA = a.discount > 0 ? a.price - a.discount : a.price;
+                const discountB = b.discount > 0 ? b.price - b.discount : b.price;
+                return discountA - discountB;
+            });
             break;
         case 4:
             // Giá: Giảm dần
-            sortedProducts.sort((a, b) => b.discount - a.discount);
+            sortedProducts.sort((a, b) => {
+                const discountA = a.discount > 0 ? a.price - a.discount : a.price;
+                const discountB = b.discount > 0 ? b.price - b.discount : b.price;
+                return discountB - discountA;
+            });
             break;
         case 5:
             // Tên: A - Z
@@ -394,7 +402,7 @@ const ProductPage = () => {
                                                 </Link>
                                                 <div className="price flex gap-x-[8px] items-baseline">
                                                     <span className="text-sm text-[#FF2C26] font-semibold">
-                                                        {product.discount ? product.discount.toLocaleString("vi-VN") + 'đ' : product.price.toLocaleString("vi-VN")}đ
+                                                        {product.discount ? (product.price - product.discount).toLocaleString("vi-VN") + 'đ' : product.price.toLocaleString("vi-VN")}đ
                                                     </span>
                                                     {!product.discount ? "" : <span className="text-[13px] text-[#878C8F] ">
                                                         <del>{product.price.toLocaleString("vi-VN")}đ</del>
@@ -402,8 +410,8 @@ const ProductPage = () => {
                                                 </div>
                                             </div>
                                             <div>
-                                                {product?.price > product?.discount ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                                                    -{`${((product?.price - product?.discount) / product?.price * 100).toFixed(0)}`}%
+                                                {product?.discount > 0 ? <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                                                    -{Math.ceil((product.discount / product.price) * 100)}%
                                                 </span> : ""}
                                             </div>
                                             <Link to="" className="rounded-lg opacity-0 absolute bottom-[140px] left-2/4 -translate-x-2/4 bg-white flex gap-x-[5px] items-center p-3 w-[175px] justify-center group-hover:opacity-100 hover:bg-black hover:text-white transition-all">

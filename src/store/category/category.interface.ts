@@ -5,6 +5,7 @@ export interface ICategory {
     products: IProduct[]
     images: Url
     name: string
+    createdAt: string
 }
 
 export interface Url {

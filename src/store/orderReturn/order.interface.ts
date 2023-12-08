@@ -10,9 +10,12 @@ export interface IOrderReturn {
     phoneNumber: string
     address: string
     reason: string
+    images: any
     totalMoney: number
     orderDetailIds: IOrderDetail[]
     createdAt: any
+    orderReturnDetails: any
+    status: number
 }
 
 export interface IOrderReturnState {

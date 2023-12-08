@@ -22,10 +22,11 @@ import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { ColumnsType, TableProps } from 'antd/es/table';
-import { useListOrderQuery } from '../../../store/order/order.service';
+
 import { listOrderSearchSlice, listOrderSlice } from '../../../store/order/orderSlice';
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
+import { useListOrderReturnQuery } from '../../../store/orderReturn/order.service';
 
 interface DataType {
     key: React.Key;
@@ -38,9 +39,9 @@ interface DataType {
 }
 
 
-const ordersPage = () => {
+const ordersReturnPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
-    const { data: orders, isLoading, isError, isSuccess } = useListOrderQuery()
+    const { data: orders, isLoading, isError, isSuccess } = useListOrderReturnQuery()
     const { handleSubmit } = useForm();
     const [search, setSearch] = useState<string>("")
     const orderState = useSelector((state: RootState) => state.orderSlice.orders)
@@ -85,11 +86,11 @@ const ordersPage = () => {
         {
             title: 'MÃ ĐƠN HÀNG',
             key: '_id',
-            render: (record: any) => (<Link to={`/admin/order/${record?._id}`} className='uppercase'>#{record?._id}</Link>),
+            render: (record: any) => (<Link to={`/admin/orderreturn/${record?._id}`} className='uppercase'>#{record?._id}</Link>),
             className: 'w-1/6',
         },
         {
-            title: 'NGÀY ĐẶT',
+            title: 'NGÀY',
             dataIndex: 'date',
             key: 'date',
             sorter: (a, b) => {
@@ -128,70 +129,24 @@ const ordersPage = () => {
             className: 'w-1/4',
         },
         {
-            title: 'TỔNG',
-            dataIndex: 'totalMoney',
-            key: 'totalMoney',
-            sorter: (a, b) => a.totalMoney - b.totalMoney, // Sắp xếp theo số
-            sortDirections: ['ascend', 'descend'],
-            showSorterTooltip: false,
-            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-        },
-        {
-            title: 'THANH TOÁN',
-            key: 'paymentStatus',
-            render: (value: any) => (value.paymentStatus === 1 ? (
-                <span className=' bg-green-300 text-green-700 border rounded-lg px-2 py-1 text-xs'>
-                    Đã thanh toán
-                </span>
-            ) : (
-                <span className=' bg-gray-200 text-gray-700  border rounded-lg px-2 py-1 text-xs'>
-                    Chưa thanh toán
-                </span>
-            )),
-            sorter: (a, b) => a.paymentStatus - b.paymentStatus, // Sắp xếp theo số
-            sortDirections: ['ascend', 'descend'],
-            showSorterTooltip: false,
-        },
-        {
             title: 'TRẠNG THÁI',
             key: 'status',
             render: (value: any) => {
                 let statusText, statusColor;
 
                 switch (value.status) {
-                    case 0:
-                        statusText = 'Hủy đơn hàng';
-                        statusColor = 'bg-red-300 text-red-700';
-                        break;
-                    case 1:
+                    case 2:
                         statusText = 'Chờ xử lí';
                         statusColor = 'bg-gray-200 text-gray-700';
                         break;
-                    case 2:
+                    case 3:
                         statusText = 'Chờ lấy hàng';
                         statusColor = 'bg-cyan-300 text-cyan-700';
-                        break;
-                    case 3:
-                        statusText = 'Đang giao';
-                        statusColor = 'bg-blue-300 text-blue-700';
-                        break;
-                    case 4:
-                        statusText = 'Đã nhận hàng';
-                        statusColor = 'bg-teal-300 text-teal-700';
-                        break;
-                    case 5:
-                        statusText = 'Hoàn thành';
-                        statusColor = 'bg-green-300 text-green-700 ';
-                        break;
-                    case 6:
-                        statusText = 'Y/c trả hàng';
-                        statusColor = 'bg-yellow-200 text-yellow-700';
                         break;
                     default:
                         statusText = '';
                         statusColor = '';
                 }
-
                 return (
 
                     <span className={`border rounded-lg px-2 py-1 text-xs  ${statusColor}`}>
@@ -216,7 +171,7 @@ const ordersPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/order/${record?._id}`}>
+                    <Link to={`/admin/orderreturn/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-500' />
                     </Link>
                 </Space>
@@ -243,17 +198,19 @@ const ordersPage = () => {
     let data: DataType[] = [];
 
     if (orderState) {
-        data = sortOrder?.map((order: any, index) => ({
-            key: index + 1,
-            _id: order._id,
-            date: order.createdAt,
-            fullName: order.fullName,
-            status: order.status,
-            pay_method: order.pay_method,
-            paymentStatus: order.paymentStatus,
-            totalMoney: order.totalMoney,
+        data = sortOrder
+            .filter(order => order.status !== 1)
+            .map((order: any, index) => ({
+                key: index + 1,
+                _id: order._id,
+                date: order.createdAt,
+                fullName: order.fullName,
+                status: order.status,
+                pay_method: order.pay_method,
+                paymentStatus: order.paymentStatus,
+                totalMoney: order.totalMoney,
 
-        }));
+            }));
     }
 
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
@@ -264,7 +221,7 @@ const ordersPage = () => {
             <Space className='mb-5'>
                 <div className="">
                     <span className="block text-xl text-[#1677ff]">
-                        QUẢN LÝ ĐƠN HÀNG
+                        QUẢN LÝ ĐỔI HÀNG
                     </span>
                     {/* <span className="block text-base  text-[#1677ff]">
                         Manage your orders
@@ -312,4 +269,4 @@ const ordersPage = () => {
         </div>
     )
 }
-export default ordersPage;
+export default ordersReturnPage;

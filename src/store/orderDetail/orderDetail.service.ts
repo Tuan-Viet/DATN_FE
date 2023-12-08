@@ -24,8 +24,15 @@ const orderDetailAPI = createApi({
             }),
             invalidatesTags: ["orderDetail"]
         }),
+        deleteOrderDetail: builer.mutation({
+            query: (id) => ({
+                method: "DELETE",
+                url: `/orderDetails/${id}`
+            }),
+            invalidatesTags: ["orderDetail"]
+        }),
     })
 })
 
-export const { useListOrderDetailQuery, useGetOneOrderDetailQuery, useUpdateOrderDetailMutation } = orderDetailAPI
+export const { useListOrderDetailQuery, useGetOneOrderDetailQuery, useUpdateOrderDetailMutation, useDeleteOrderDetailMutation } = orderDetailAPI
 export default orderDetailAPI
