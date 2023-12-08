@@ -60,6 +60,10 @@ function mapStatusToText(statusCode) {
       return "Đang giao";
     case 4:
       return "Đã nhận hàng";
+    case 5:
+      return "Hoàn thành";
+    case 6:
+      return "Yêu cầu đổi hàng";
     default:
       return "Trạng thái không xác định";
   }
@@ -400,19 +404,16 @@ const OrderDetail = () => {
                         {mapStatusToText(order?.status)}
                       </span>
                     </h1>
-                    {order?.status !== 0 && order?.status !== 1 && order?.status !== 2 && (
-                      <>
-                        <p>
-                          Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
-                          <button
-                            onClick={handleConfirmReceived}
-                            className="text-blue-500 underline"
-                          >
-                            xác thực đơn hàng
-                          </button>
-                        </p>
-
-                      </>
+                    {order?.status === 3 && (
+                      <p>
+                        Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
+                        <button
+                          onClick={handleConfirmReceived}
+                          className="text-blue-500 underline"
+                        >
+                          xác thực đơn hàng
+                        </button>
+                      </p>
                     )}
                     {order?.status == 4 && (
                       <Button type="primary" onClick={showOrderModal} className="text-white bg-blue-700"  >
@@ -582,14 +583,22 @@ const OrderDetail = () => {
 
                   </Modal>
                   <div className="text-right">
-                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
+                    {/* {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
                       order?.paymentStatus && Number(order?.paymentStatus) !== 1 && <button
                         onClick={() => handleCancelOrder(id!)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                       >
                         Hủy đơn hàng
                       </button>
-                    }
+                    } */}
+                    {order?.status === 1 && Number(order?.paymentStatus) !== 1 ? (
+                      <button
+                        onClick={() => handleCancelOrder(id!)}
+                        className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
+                      >
+                        Hủy đơn hàng
+                      </button>
+                    ) : ""}
                     <Link
                       to="/account"
                       className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"

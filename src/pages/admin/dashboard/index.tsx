@@ -133,8 +133,8 @@ const DashboardPage = () => {
                     <TeamOutlined className="text-3xl text-violet-500 transform transition-transform duration-500 ease-in-out" />
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl">1,234</p>
-                    <p>Lượt truy cập</p>
+                    <p className="text-2xl">{dashboardStatistic.newUsersCount}</p>
+                    <p>Người dùng mới</p>
                 </div>
             </div>
 

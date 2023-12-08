@@ -43,7 +43,11 @@ function orderStatus(satus: number) {
     case 3:
       return "Đang giao";
     case 4:
-      return "Hoàn thành"
+      return "Đã nhận hàng"
+    case 5:
+      return "Hoàn Thành"
+    case 6:
+      return "Yêu cầu đổi hàng"
     default:
       return "Trạng thái không xác định";
   }

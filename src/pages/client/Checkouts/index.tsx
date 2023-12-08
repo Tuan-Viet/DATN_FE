@@ -142,6 +142,10 @@ const CheckoutsPage = () => {
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
             .then(({ data }) => window.location.href = data)
         }
+        else if (data?.pay_method === "MOMO") {
+          axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/momo_payment`, data)
+            .then(({ data }) => window.location.href = data)
+        }
       }
       )
       // .then(() => refetchUser()).then(() => refetchCart())
@@ -225,6 +229,20 @@ const CheckoutsPage = () => {
       }
     }
   }
+  const [myAddress, setMyAddress] = useState<any>("")
+  // const [myAddress, setMyAddress] = useState<any>("")
+  useEffect(() => {
+    if (myAddress !== '') {
+      const myAddressbyId = InfoUser?.addresses.find((address) => address._id && address._id === myAddress)
+      setValue('address', myAddressbyId.address),
+        setValue('phoneNumber', myAddressbyId.phone),
+        setValue('fullName', myAddressbyId.fullname)
+    } else {
+      setValue('address', ""),
+        setValue('phoneNumber', ""),
+        setValue('fullName', "")
+    }
+  }, [myAddress])
   useEffect(() => {
     handleFindVoucher()
   }, [])
@@ -266,18 +284,16 @@ const CheckoutsPage = () => {
 
                 </div>
                 <div>
-                  {/* <div className="mb-3">
-
+                  <div className="mb-3">
                     <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn địa chỉ giao hàng</label>
-                    <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option selected>Địa chỉ của bạn</option>
+                    <select onChange={(e) => setMyAddress(e.target.value)} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option value={''} selected>Địa chỉ khác ...</option>
                       {InfoUser?.addresses?.map((item, index) =>
-                        <option value="US">{item.address}</option>
-                      )}
-                     
-                    </select>
+                        <option value={item._id}>{item.fullname},{item.address}</option>
 
-                  </div> */}
+                      )}
+                    </select>
+                  </div>
                   <div className="mb-3">
                     <input
 
@@ -389,6 +405,18 @@ const CheckoutsPage = () => {
                           value="VNBANK"
                         />
                         <label htmlFor="vnbank">Thanh toán bằng ví VN Pay</label>
+                      </div>
+                    </div>
+                    <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
+                      <div className="flex gap-3 items-center">
+                        <input
+                          id="momo"
+                          {...register("pay_method")}
+                          type="radio"
+                          className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+                          value="MOMO"
+                        />
+                        <label htmlFor="momo">Thanh toán bằng ví MOMO</label>
                       </div>
                     </div>
                   </div>

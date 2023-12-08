@@ -33,8 +33,16 @@ const orderAPI = createApi({
             }),
             invalidatesTags: ["order"]
         }),
+        addOrderByAdmin: builer.mutation<orderForm[], orderForm>({
+            query: (order) => ({
+                url: "/orders/admin/add",
+                method: "POST",
+                body: order
+            }),
+            invalidatesTags: ["order"]
+        }),
     })
 })
 
-export const { useListOrderQuery, useAddOrderMutation, useGetOneOrderQuery, useUpdateOrderMutation } = orderAPI
+export const { useListOrderQuery, useAddOrderMutation, useGetOneOrderQuery, useUpdateOrderMutation, useAddOrderByAdminMutation } = orderAPI
 export default orderAPI

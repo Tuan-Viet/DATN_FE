@@ -140,8 +140,12 @@ const ordersReturnPage = () => {
                         statusColor = 'bg-gray-200 text-gray-700';
                         break;
                     case 3:
-                        statusText = 'Chờ lấy hàng';
-                        statusColor = 'bg-cyan-300 text-cyan-700';
+                        statusText = 'Đang xử lí';
+                        statusColor = 'bg-blue-300 text-blue-700';
+                        break;
+                    case 3:
+                        statusText = 'Hoàn thành';
+                        statusColor = 'bg-green-300 text-green-700';
                         break;
                     default:
                         statusText = '';
