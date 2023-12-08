@@ -43,7 +43,8 @@ const routes = {
     adminOrderRevanueByWeek: "/admin/statistic/by_week",
     adminOrderRevanueByMonth: "/admin/statistic/by_month",
     adminOrderRevanueByQuarter: "/admin/statistic/by_quarter",
-
+    adminOrderReturnPage: "/admin/orderreturn",
+    adminOrderReturnGetOne: "/admin/orderreturn/:id",
 }
 
 export default routes;

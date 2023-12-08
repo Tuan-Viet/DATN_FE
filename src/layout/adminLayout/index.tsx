@@ -10,7 +10,8 @@ import {
   UserOutlined,
   TagOutlined,
   SolutionOutlined,
-  BarChartOutlined
+  BarChartOutlined,
+  EyeOutlined
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, message, theme } from 'antd';
@@ -45,12 +46,13 @@ const items: MenuItem[] = [
     getItem(<Link to={"/admin/category/add"}>Tạo mới danh mục</Link >, '5'),
     getItem(<Link to={"/admin/category"}>Quản lý danh mục</Link >, '6'),
   ]),
-  getItem(<Link to={"/admin/user"}>Quản lý người dùng</Link >, '7', <UserOutlined />),
-  getItem(<Link to={"/admin/order"}>Đơn hàng</Link >, '8', <SolutionOutlined />),
-  getItem('Khuyến mại', 'sub3', <TagOutlined />, [
-    // getItem(<Link to={"/admin/voucher"}>Quản lý khuyến mại</Link >, '9'),
-    getItem(<Link to={"/admin/voucher"}>Quản lý Voucher</Link >, '10'),
+  getItem(<Link to={"/admin/user"}>Khách hàng</Link >, '7', <UserOutlined />),
+  getItem('Đơn hàng', 'sub3', <SolutionOutlined />, [
+    getItem(<Link to={"/admin/order"}>Danh sách đơn hàng</Link >, '8'),
+    getItem(<Link to={"/admin/orderreturn"}>Danh sách trả hàng</Link >, '9'),
   ]),
+  getItem(<Link to={"/admin/voucher"}>Khuyến mại</Link >, '10', <TagOutlined />,),
+
   getItem('Thống kê', 'sub4', <BarChartOutlined />, [
     getItem(<Link to={"/admin/statistic"}>Báo cáo bán hàng</Link >, '9'),
   ]),
@@ -90,6 +92,12 @@ const AdminLayout = ({ children }: Props) => {
           bottom: 0,
         }}
       >
+        <div className="my-3 flex justify-between items-center px-3">
+          <img className="w-[130px]" src="../../public/images/logo/Layer12.png" alt="" />
+          <div className="">
+            <Link to={`/`}> <EyeOutlined className="text-xl text-gray-300" /></Link>
+          </div>
+        </div>
         <Menu
           theme="dark"
           defaultSelectedKeys={["1"]}

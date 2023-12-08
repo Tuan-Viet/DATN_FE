@@ -17,7 +17,7 @@ import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
-import { useAddOrderMutation } from "../../../store/orderReturn/order.service";
+import { useAddOrderReturnMutation } from "../../../store/orderReturn/order.service";
 import { current } from "@reduxjs/toolkit";
 import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
@@ -217,7 +217,7 @@ const OrderDetail = () => {
     resolver: yupResolver(orderReturnSchema)
   })
 
-  const [addOrderreturn] = useAddOrderMutation()
+  const [addOrderreturn] = useAddOrderReturnMutation()
   const [updatedOrder] = useUpdateOrderMutation()
 
   const onAddOrderReturn = async (data: orderReturnForm) => {

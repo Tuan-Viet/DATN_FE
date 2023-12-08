@@ -638,7 +638,7 @@ const ProductInfo = () => {
                   <Skeleton.Input active={true} style={{ width: '380px', height: '39px' }} />
                 </div>
                 <div className="mt-3">
-                  <Skeleton.Input active={true} style={{ width: '550px', height: '20px' }} />
+                  <Skeleton.Input active={true} style={{ width: '450px', height: '20px' }} />
                 </div>
               </div>
             ) : (
@@ -664,11 +664,11 @@ const ProductInfo = () => {
             <form onSubmit={handleSubmit(handleFormProductDetail)}>
               <div className="px-4">
                 {!isSuccessProduct ? (
-                  <div className="my-5 mt-14">
-                    <Skeleton.Input active={true} style={{ width: '500px', height: '60px' }} />
+                  <div className="mb-8 mt-10 ">
+                    <Skeleton.Input active={true} style={{ width: '220px', height: '40px' }} />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-x-[109px] py-4 mb-2">
+                  <div className="flex items-center gap-x-[109px] py-3 mb-5">
                     <span className="text-sm font-bold">Giá:</span>
 
                     <div className="font-bold text-xl text-[#FF2C26]">

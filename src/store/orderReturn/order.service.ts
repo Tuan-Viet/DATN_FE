@@ -9,11 +9,11 @@ const orderReturnAPI = createApi({
     }),
     tagTypes: ["orderReturn"],
     endpoints: (builer) => ({
-        listOrder: builer.query<IOrderReturn[], void>({
+        listOrderReturn: builer.query<IOrderReturn[], void>({
             query: () => `/orderReturns`,
             providesTags: ["orderReturn"]
         }),
-        addOrder: builer.mutation<orderReturnForm[], orderReturnForm>({
+        addOrderReturn: builer.mutation<orderReturnForm[], orderReturnForm>({
             query: (orderReturn) => ({
                 url: "/orderReturns/add",
                 method: "POST",
@@ -21,11 +21,11 @@ const orderReturnAPI = createApi({
             }),
             invalidatesTags: ["orderReturn"]
         }),
-        getOneOrder: builer.query<IOrderReturn, string>({
+        getOneOrderReturn: builer.query<IOrderReturn, string>({
             query: (id) => `/orderReturns/` + id,
             providesTags: ["orderReturn"]
         }),
-        updateOrder: builer.mutation({
+        updateOrderReturn: builer.mutation({
             query: ({ id, ...orderReturn }) => ({
                 url: `/orderReturns/${id}`,
                 method: "PATCH",
@@ -36,5 +36,5 @@ const orderReturnAPI = createApi({
     })
 })
 
-export const { useListOrderQuery, useAddOrderMutation, useGetOneOrderQuery, useUpdateOrderMutation } = orderReturnAPI
+export const { useListOrderReturnQuery, useAddOrderReturnMutation, useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } = orderReturnAPI
 export default orderReturnAPI

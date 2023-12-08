@@ -36,6 +36,8 @@ import OrderRevanue from "../pages/admin/statistic/OrderRevanueByMonth";
 import OrderRevanueByMonth from "../pages/admin/statistic/OrderRevanueByMonth";
 import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
 import productById from "../pages/admin/productById";
+import orderReturnPage from "../pages/admin/orderReturnPage";
+import orderReturnById from "../pages/admin/orderReturnById";
 
 
 export const publicRoutes = [
@@ -82,6 +84,8 @@ export const privateRoutes = [
   { path: routes.adminProductRevanue, Component: ProductRevanue },
   { path: routes.adminOrderRevanue, Component: OrderRevanue },
   { path: routes.adminOrderRevanueByMonth, Component: OrderRevanueByMonth },
+  { path: routes.adminOrderReturnPage, Component: orderReturnPage },
+  { path: routes.adminOrderReturnGetOne, Component: orderReturnById },
 
 
 

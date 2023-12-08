@@ -35,7 +35,10 @@ const productById = () => {
     const { id } = useParams();
     // const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductQuery(id || '')
     const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id || '')
+
     const { data: productRevanue, isSuccess: isSuccessProductStatistic } = useGetProductRevenueQuery();
+    console.log(productRevanue);
+
     const productStatistic = productRevanue?.filter(pro => pro.productId === id);
 
     const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
@@ -327,7 +330,7 @@ const productById = () => {
                         )}
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
-                        <span className="block text-sm text-gray-400">HÀNG CÓ SẴN:</span>
+                        <span className="block text-sm text-gray-400">ĐÃ BÁN:</span>
                         {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
@@ -339,7 +342,7 @@ const productById = () => {
                         )}
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
-                        <span className="block text-sm text-gray-400">TỔNG DOANH THU:</span>
+                        <span className="block text-sm text-gray-400">DOANH THU:</span>
                         {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
