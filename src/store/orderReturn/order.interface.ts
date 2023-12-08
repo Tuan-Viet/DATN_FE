@@ -10,7 +10,7 @@ export interface IOrderReturn {
     phoneNumber: string
     address: string
     reason: string
-    images: any
+    note: string
     totalMoney: number
     orderDetailIds: IOrderDetail[]
     createdAt: any
