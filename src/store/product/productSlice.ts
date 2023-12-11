@@ -16,7 +16,7 @@ const productSlice = createSlice({
     initialState: initialStateProduct,
     reducers: ({
         listProductSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            state.products = actions.payload
+            state.products = actions.payload.filter((product) => product.hide === false)
         },
         deleteProductSlice: (state: IProductState, actions: PayloadAction<string>) => {
             state.products = state.products.filter((product) => product._id !== actions.payload)
@@ -37,12 +37,12 @@ const productFilterSlice = createSlice({
     initialState: initialProductFilter,
     reducers: ({
         listProductFilterSlice: (state: IProductFilterState, actions: PayloadAction<IProduct[]>) => {
-            state.products = actions.payload
+            state.products = actions.payload.filter((product) => product.hide === false)
         },
 
         listProductCategorySlice: (state: IProductFilterState, actions: PayloadAction<IProductFilterState>) => {
             const nameTerm = actions.payload.nameTerm.trim()
-            const listProductFilter = actions.payload?.products?.filter((product) => product.categoryId?._id && product.categoryId._id.includes(nameTerm))
+            const listProductFilter = actions.payload?.products?.filter((product) => product.hide === false && product.categoryId?._id && product.categoryId._id.includes(nameTerm))
             state.products = listProductFilter
         },
     })
@@ -52,10 +52,10 @@ const productSaleSlice = createSlice({
     initialState: initialStateProduct,
     reducers: ({
         listProductSale: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            state.products = actions.payload
+            state.products = actions.payload.filter((product) => product.hide === false)
         },
         listProductSaleSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            const productSales = actions.payload.filter((product) => product.discount > 0)
+            const productSales = actions.payload.filter((product) => product.discount > 0 && product.hide === false)
             state.products = productSales
         },
     })
@@ -95,7 +95,7 @@ const productOutstandSlice = createSlice({
     initialState: initialStateProduct,
     reducers: ({
         listProductOutStand: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            state.products = actions.payload
+            state.products = actions.payload.filter((product) => product.hide === false)
         },
         listProductOutStandSlice: (state: IProductState, actions: PayloadAction<IProduct>) => {
             // state.products = state.products.map((product) => product.s)
@@ -107,10 +107,10 @@ const productRelatedSlice = createSlice({
     initialState: initialStateProduct,
     reducers: ({
         listProductRelated: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            state.products = actions.payload
+            state.products = actions.payload.filter((product) => product.hide === false)
         },
         listProductRelatedSlice: (state: IProductState, actions: PayloadAction<IProduct[]>) => {
-            const productOutStand = actions.payload.filter((product) => product && product.variants)
+            const productOutStand = actions.payload.filter((product) => product && product.variants && product.hide === false)
             state.products = productOutStand
         },
     })
