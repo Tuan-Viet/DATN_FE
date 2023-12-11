@@ -37,7 +37,7 @@ const Sale = () => {
           <div className="w-3 h-3 rounded-full animate-ping bg-red-500"></div>
           <h1 className="text-[37px] font-semibold uppercase">Sale vô cực</h1>
         </div>
-        <div className="product-sale mb-12">
+        <div className="product-sale mb-12 grid">
           <Swiper
             grabCursor={"true"}
             spaceBetween={25}
@@ -48,7 +48,6 @@ const Sale = () => {
               return <SwiperSlide key={index}
               >
                 {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <div className={`relative group overflow-hidden`}>
-
                   <Link to={`/products/${product._id}`}>
                     <div className="min-h-[305px] max-h-[395px] overflow-hidden">
                       <img
@@ -90,6 +89,7 @@ const Sale = () => {
                     </span>}
                   </div>
                 </div> : <div className={`relative group opacity-30`}>
+                  <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>
                   <Link to={`/products/${product._id}`}>
                     <img
                       src={product.images?.[0]}

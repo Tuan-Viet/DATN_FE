@@ -148,7 +148,6 @@ const CheckoutsPage = () => {
         }
       }
       )
-      // .then(() => refetchUser()).then(() => refetchCart())
     } catch (error) {
       console.log(error);
     }
@@ -233,7 +232,7 @@ const CheckoutsPage = () => {
   // const [myAddress, setMyAddress] = useState<any>("")
   useEffect(() => {
     if (myAddress !== '') {
-      const myAddressbyId = InfoUser?.addresses.find((address) => address._id && address._id === myAddress)
+      const myAddressbyId = InfoUser?.addresses?.find((address) => address._id && address._id === myAddress)
       setValue('address', myAddressbyId.address),
         setValue('phoneNumber', myAddressbyId.phone),
         setValue('fullName', myAddressbyId.fullname)
