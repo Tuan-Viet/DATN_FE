@@ -88,7 +88,8 @@ const Sale = () => {
                       -{`${((product?.price - (product?.price - product?.discount)) / product?.price * 100).toFixed(0)}`}%
                     </span>}
                   </div>
-                </div> : <div className={`relative group opacity-30`}>
+                </div> : <div className={`relative group opacity-50`}>
+                  <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>
                   <Link to={`/products/${product._id}`}>
                     <img
                       src={product.images?.[0]}

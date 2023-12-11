@@ -41,6 +41,7 @@ const items: MenuItem[] = [
   getItem('Sản phẩm', 'sub1', <CodeSandboxOutlined />, [
     getItem(<Link to={"/admin/product/add"}>Tạo mới sản phẩm</Link >, '3'),
     getItem(<Link to={"/admin/product"}>Quản lý sản phẩm</Link >, '4'),
+    getItem(<Link to={"/admin/outfit"}>Quản lý Outfit</Link >, '12'),
   ]),
   getItem('Danh mục', 'sub2', <AppstoreAddOutlined />, [
     getItem(<Link to={"/admin/category/add"}>Tạo mới danh mục</Link >, '5'),
@@ -48,13 +49,13 @@ const items: MenuItem[] = [
   ]),
   getItem(<Link to={"/admin/user"}>Khách hàng</Link >, '7', <UserOutlined />),
   getItem('Đơn hàng', 'sub3', <SolutionOutlined />, [
-    getItem(<Link to={"/admin/order"}>Danh sách đơn hàng</Link >, '8'),
-    getItem(<Link to={"/admin/orderreturn"}>Danh sách trả hàng</Link >, '9'),
+    getItem(<Link to={"/admin/order"}>Quản lý đơn hàng</Link >, '8'),
+    getItem(<Link to={"/admin/orderreturn"}>Quản lý đổi hàng</Link >, '9'),
   ]),
   getItem(<Link to={"/admin/voucher"}>Khuyến mại</Link >, '10', <TagOutlined />,),
 
   getItem('Thống kê', 'sub4', <BarChartOutlined />, [
-    getItem(<Link to={"/admin/statistic"}>Báo cáo bán hàng</Link >, '9'),
+    getItem(<Link to={"/admin/statistic"}>Báo cáo bán hàng</Link >, '11'),
   ]),
 ];
 
