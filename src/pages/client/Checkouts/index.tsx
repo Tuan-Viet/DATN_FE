@@ -148,7 +148,6 @@ const CheckoutsPage = () => {
         }
       }
       )
-      // .then(() => refetchUser()).then(() => refetchCart())
     } catch (error) {
       console.log(error);
     }
@@ -233,7 +232,7 @@ const CheckoutsPage = () => {
   // const [myAddress, setMyAddress] = useState<any>("")
   useEffect(() => {
     if (myAddress !== '') {
-      const myAddressbyId = InfoUser?.addresses.find((address) => address._id && address._id === myAddress)
+      const myAddressbyId = InfoUser?.addresses?.find((address) => address._id && address._id === myAddress)
       setValue('address', myAddressbyId.address),
         setValue('phoneNumber', myAddressbyId.phone),
         setValue('fullName', myAddressbyId.fullname)
@@ -519,6 +518,7 @@ const CheckoutsPage = () => {
               </div>}
 
               <h1 className="tracking-wide py-[10px] text-[14px] text-yellow-600 italic text-right">
+
                 {totalCart < 500000 && <span className="">*Bạn
                   cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ </strong>
                   để miễn phí vận chuyển

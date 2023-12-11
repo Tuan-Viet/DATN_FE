@@ -50,7 +50,6 @@ const ProductInfo = () => {
   const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
   const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
   const reviewByRateState = useSelector((state: RootState) => state.reviewByRatingReducer.reviews)
-  // console.log())
   const reviewByRateStateVer = reviewByRateState?.slice().reverse()
   useEffect(() => {
     if (listReview && id) {
@@ -73,7 +72,6 @@ const ProductInfo = () => {
 
     const [currentTab, setCurrentTab] = useState(1);
     const { data: listProduct } = useFetchListProductQuery()
-    // const { data: getOneProduct, isSuccess: isSuccessProduct, isLoading: productLoading } = useFetchOneProductQuery(id)
     const { data: getOneProduct, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id)
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const categoryId = getOneProduct?.categoryId?._id;
@@ -393,10 +391,8 @@ const ProductInfo = () => {
     useEffect(() => {
       setValue("quantity", quantity)
     }, [setValue, quantity])
-    // lay ra productDetailId
     const handleFormProductDetail = async (data: productDetailForm) => {
       try {
-
         if (data && data.nameColor && getOneProduct) {
           await dispatch(getOneIdProductDetailSlice({ product_id: id, nameColor: data.nameColor, sizeTerm: data.size, productDetails: productDetailFilterState }))
           setFormProductDetailClicked(true)
@@ -486,6 +482,7 @@ const ProductInfo = () => {
     const handleColorProductDetail = async (name: string) => {
       setValue("product_id", id)
       setValue("nameColor", name)
+      console.log(name)
       try {
         if (listProductDetailApi) {
           await dispatch(listProductDetailFilterSlice({ _id: id, nameTerm: name, productDetails: getOneProduct?.variants }))
