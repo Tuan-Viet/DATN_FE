@@ -27,6 +27,7 @@ import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../../store/orderReturn/order.service';
 import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../../../store/orderDetail/orderDetail.service';
+import { useListVoucherQuery } from '../../../store/vouchers/voucher.service';
 const { Dragger } = Upload;
 const { TextArea } = Input;
 
@@ -84,6 +85,8 @@ const orderUpdate = () => {
     const [onRemoveOrderDetail] = useDeleteOrderDetailMutation()
     let orderDetails = []
     const { data: order } = useGetOneOrderQuery(id || '');
+    const { data: voucher } = useListVoucherQuery();
+    const voucherByOrder = voucher?.filter(voucher => voucher.code === order?.voucher_code)
 
     const idOrderReturn = order?.orderReturn?._id
 
@@ -365,6 +368,12 @@ const orderUpdate = () => {
         }
     }
 
+    const totalCart = ListOrderDeatils?.reduce((total, order) => {
+        return total + order.totalMoney;
+    }, 0);
+    console.log(order);
+
+
     return <>
         <Breadcrumb className='pb-3'
             items={[
@@ -415,15 +424,20 @@ const orderUpdate = () => {
                                             <Table.Summary.Row className=''>
                                                 <Table.Summary.Cell index={0} colSpan={3}>
                                                     <span className='block'>Tổng sản phẩm</span>
+                                                    {order?.voucher_code ? <span className='block'>Khuyến mãi</span> : ""}
                                                     <span className='block'>Vận chuyển</span>
                                                     <span className='block'>Tổng</span>
                                                 </Table.Summary.Cell>
                                                 <Table.Summary.Cell index={1}>
                                                     <div className='text-end'>
-                                                        {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                        {totalCart?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                     </div>
+                                                    {order?.voucher_code && <div className='text-end'>
+                                                        -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                        {/* {totalCart?} */}
+                                                    </div>}
                                                     <div className='text-end'>
-                                                        {order?.totalMoney > 500000 ? "Miễn phí" : "40,000đ"}
+                                                        {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
                                                     </div>
                                                     <div className='text-end'>
                                                         {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -642,7 +656,7 @@ const orderUpdate = () => {
                                                                             allowClear
                                                                             options={[
                                                                                 { value: 0, label: 'Hủy đơn hành' },
-                                                                                { value: 1, label: 'Đang xử lí' },
+                                                                                { value: 1, label: 'Chờ xử lí' },
                                                                                 { value: 2, label: 'Chờ lấy hàng' },
                                                                                 { value: 3, label: 'Đang giao' },
                                                                                 { value: 4, label: 'Hoàn thành', disabled: true },

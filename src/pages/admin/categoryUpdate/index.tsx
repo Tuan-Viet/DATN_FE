@@ -7,6 +7,8 @@ import {
     PlusOutlined
 } from "@ant-design/icons";
 import { RcFile } from 'antd/es/upload';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../store';
 
 
 const SubmitButton = ({ form }: { form: FormInstance }) => {
@@ -46,24 +48,15 @@ const categoryUpdate = () => {
     const navigate = useNavigate();
     const [onUpdate] = useUpdateCategoryMutation()
     const { id } = useParams();
-    const { data: fetchOneCategory, isSuccess } = useFetchOneCategoryQuery(id)
+    const { data: fetchOneCategory, isSuccess: isSuccessGetCate } = useFetchOneCategoryQuery(id)
     const [newImage, setNewImage] = useState(false);
-
-
-
-    // if (!isSuccess) {
-    //     return <>
-    //         <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
-    //             <Spin size='large' />
-    //         </div>
-    //     </>;
-    // }
+    const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+    const cateById = categoryState.find(category => category._id === id);
 
     form.setFieldsValue({
         _id: fetchOneCategory?._id,
         name: fetchOneCategory?.name,
         images: fetchOneCategory?.images,
-
     });
 
     const [previewOpen, setPreviewOpen] = useState(false);
@@ -75,9 +68,10 @@ const categoryUpdate = () => {
             uid: `1`,
             name: 'image',
             status: 'done',
-            url: (fetchOneCategory && fetchOneCategory.images ? fetchOneCategory.images.url : ''),
+            url: (cateById && cateById.images ? cateById.images.url : ''),
         },
     ]);
+    console.log(fileList);
 
     const handleCancel = () => setPreviewOpen(false);
 

@@ -2,12 +2,13 @@ import { IProductDetail } from "../productDetail/productDetail.interface"
 
 export interface IOutfit {
     _id?: string
-    title: String
+    title: string
     description: string
-    image: string
+    image: { url: string, publicId: string }
     sku: string
     items: IProductDetail[]
     hidden: boolean
+    createdAt: string
 }
 
 export interface IOutfitState {
@@ -15,6 +16,6 @@ export interface IOutfitState {
 }
 
 export interface ISearchOutfitState {
-    searchTerm: "",
+    searchTerm: string,
     outfits: IOutfit[]
 }

@@ -417,7 +417,7 @@ const OrderDetail = () => {
                     )}
                     {order?.status == 4 && (
                       <Button type="primary" onClick={showOrderModal} className="text-white bg-blue-700"  >
-                        Trả hàng
+                        Đổi hàng
                       </Button>
                     )}
                   </div>
