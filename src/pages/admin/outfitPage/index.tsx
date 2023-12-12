@@ -25,63 +25,58 @@ import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchBySkuSlice, listProductSearchSlice } from '../../../store/product/productSlice';
-import { ICategory } from '../../../store/category/category.interface';
 import { useForm } from "react-hook-form";
-import { listCategorySlice } from '../../../store/category/categorySlice';
-import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import moment from 'moment';
+import { useFetchListOutfitQuery, useRemoveOutfitMutation } from '../../../store/outfit/outfit.service';
+import { deleteOutfitSlice, listSearchOutfit, listSearchOutfitBySkuSlice, listSearchOutfitByTitleSlice } from '../../../store/outfit/outfitSlice';
 
 interface DataType {
     _id: React.Key;
     sku: string;
     title: string;
-    images: any[];
-    price: number;
-    discount: number;
+    image: any[];
+    productOne: string;
+    productTwo: string;
     description: string;
-    categoryId: string;
     createdAt: string;
 }
 
 const outfitPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { handleSubmit } = useForm();
-    const [onRemove] = useRemoveProductMutation()
+    const [onRemove] = useRemoveOutfitMutation()
     const [search, setSearch] = useState<string>("")
     const [messageApi, contextHolder] = message.useMessage();
-    const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductByAdminQuery()
-    const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
-    const { data: listCategory } = useFetchListCategoryQuery()
-    // const productState = useSelector((state: RootState) => state.productSlice.products)
-    const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
+    const { data: listOutfit, isLoading, isError, isSuccess } = useFetchListOutfitQuery()
+    const outfitSearchState = useSelector((state: RootState) => state.searchOutfitReducer.outfits)
+    console.log(listOutfit);
 
-    const [selectedCategories, setSelectedCategories] = useState<any[]>([]);
-    const [sortOption, setSortOption] = useState<Number>(1);
-    const [minPrice, setMinPrice] = useState(0);
-    const [maxPrice, setMaxPrice] = useState(0);
+    // const productState = useSelector((state: RootState) => state.productSlice.products)
+    const [sortOption, setSortOption] = useState<Number>(1)
+
     useEffect(() => {
-        if (listProduct) {
+        if (listOutfit) {
             if (search === "" || !search) {
-                dispatch(listProductSearch(listProduct))
+                dispatch(listSearchOutfit(listOutfit))
             }
         }
-        if (listCategory) {
-            dispatch(listCategorySlice(listCategory));
-        }
-    }, [isSuccess, search, listCategory])
+
+    }, [listOutfit, search])
+
     const handleSearch = () => {
-        if (listProduct && search) {
-            dispatch(listProductSearchSlice({ searchTerm: search, products: listProduct }));
+        if (listOutfit && search) {
+            console.log(1)
+            dispatch(listSearchOutfitByTitleSlice({ searchTerm: search, outfits: listOutfit }));
         }
     };
     useEffect(() => {
-        if (productSearchState?.length === 0 && listProduct) {
+        if (outfitSearchState?.length === 0 && listOutfit) {
             if (search) {
-                dispatch(listProductSearchBySkuSlice({ searchTerm: search, products: listProduct }));
+                dispatch(listSearchOutfitBySkuSlice({ searchTerm: search, outfits: listOutfit }));
             }
         }
-    }, [productSearchState.length === 0]);
+    }, [outfitSearchState.length === 0]);
     if (isError) {
         return <>error</>;
     }
@@ -96,7 +91,7 @@ const outfitPage = () => {
     const confirm = async (id: string) => {
         try {
             if (id) {
-                await onRemove(id).then(() => dispatch(deleteProductSearchSlice(id)))
+                await onRemove(id).then(() => dispatch(deleteOutfitSlice(id)))
                 messageApi.open({
                     type: 'success',
                     content: 'Xóa thành công',
@@ -114,18 +109,18 @@ const outfitPage = () => {
             className: 'w-[100px]'
         },
         {
-            title: 'MÃ SẢN PHẨM',
+            title: 'MÃ OUTFIT',
             dataIndex: 'sku',
         },
         {
-            title: 'TÊN SẢN PHẨM',
+            title: 'TÊN OUTFIT',
             key: 'name',
             render: (record: any) => (
                 <div className="flex items-center  ">
                     <Image.PreviewGroup items={record?.images?.map((image: any, index: number) => ({ src: image, alt: `Product Image ${index}` }))}>
                         <Image
                             width={70}
-                            src={record?.images[0]}
+                            src={record?.image.url}
                         />
                     </Image.PreviewGroup>
 
@@ -138,53 +133,54 @@ const outfitPage = () => {
             className: 'w-1/4',
         },
         {
-            title: 'GIÁ',
-            dataIndex: 'price',
-            key: 'price',
-            render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
-            sorter: (a, b) => a.price - b.price, // Sắp xếp theo số
-            sortDirections: ['ascend', 'descend'],
-            showSorterTooltip: false,
+            title: 'SẢN PHẨM ÁO',
+            dataIndex: 'productOne',
+            key: 'productOne',
+            render: (value: any) => (
+                <div className="flex items-center space-x-2 ">
+                    <Image
+                        height={70}
+                        width={54}
+                        src={value?.imageColor}
+                    />
+                    <div className="">
+                        <span className='block text-[13px]'>Phân loại:</span>
+                        <a className='w-full overflow-hidden text-[13px]'>{value?.nameColor}-{value?.size}</a>
+                    </div>
+                </div>
+            ),
         },
         {
-            title: 'GIẢM GIÁ',
-            dataIndex: 'discount',
-            key: 'discount',
-            render: (value: number) => value > 0 ? (`-${value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`) : "",
-            sorter: (a, b) => a.discount - b.discount, // Sắp xếp theo số
-            sortDirections: ['ascend', 'descend'],
-            showSorterTooltip: false,
-        },
-        // {
-        //     title: 'Description',
-        //     dataIndex: 'description',
-        //     key: 'description',
-        // },
-        {
-            title: 'DANH MỤC',
-            dataIndex: 'categoryId',
-            key: 'categoryId',
-            render: (cateId: string) => {
-                const category = categoryState.find((cate) => cate._id === (cateId && cateId?._id));
-                return category ? category.name : 'N/A';
-            },
-            className: 'w-[150px]',
+            title: 'SẢN PHẨM QUẦM',
+            dataIndex: 'productTwo',
+            key: 'productOne',
+            render: (value: any) => (
+                <div className="flex items-center space-x-2 ">
+                    <Image
+                        height={70}
+                        width={54}
+                        src={value?.imageColor}
+                    />
+                    <div className="">
+                        <span className='block text-[13px]'>Phân loại:</span>
+                        <a className='w-full overflow-hidden text-[13px]'>{value?.nameColor}-{value?.size}</a>
+                    </div>
+                </div>
+            ),
         },
         {
             title: 'NGÀY KHỞI TẠO',
             dataIndex: 'createdAt',
             render: (value) => moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
         },
-
-
         {
             title: '',
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/product/${record?._id}`}>
+                    {/* <Link to={`/admin/product/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-400' />
-                    </Link>
+                    </Link> */}
                     <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
@@ -204,42 +200,7 @@ const outfitPage = () => {
 
     ];
 
-    const toggleCategory = (categoryId: any) => {
-        if (selectedCategories.includes(categoryId)) {
-            setSelectedCategories(selectedCategories.filter(id => id !== categoryId));
-        } else {
-            setSelectedCategories([...selectedCategories, categoryId]);
-        }
-    };
-
-    const filteredProducts = productSearchState?.filter((product: any) => {
-        // Lọc theo danh mục đã chọn
-        if (selectedCategories.length > 0 && !selectedCategories.includes(product.categoryId._id)) {
-            return false;
-        }
-        // Lọc theo giá
-        // const productPrice = product.discount || 0;
-        const productPrice = (product.discount === 0 ? product.price : product.discount);
-        if ((minPrice > 0 && productPrice < minPrice) || (maxPrice > 0 && productPrice > maxPrice)) {
-            return false;
-        }
-        return true;
-    });
-    const handleResetClick = () => {
-        setSelectedCategories([]);
-    };
-
-    const handleResetPrice = () => {
-        setSelectedCategories([]);
-        setMinPrice(0);
-        setMaxPrice(0);
-    };
-    const handlePriceFilter = (min: number, max: number) => {
-        setMinPrice(min);
-        setMaxPrice(max);
-    };
-
-    const sortedProducts = [...filteredProducts];
+    const sortedProducts = [...outfitSearchState];
 
     switch (sortOption) {
         case 1:
@@ -251,27 +212,10 @@ const outfitPage = () => {
             sortedProducts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
             break;
         case 3:
-            // Giá: Tăng dần
-            sortedProducts.sort((a, b) => {
-                const discountA = a.discount > 0 ? a.price - a.discount : a.price;
-                const discountB = b.discount > 0 ? b.price - b.discount : b.price;
-                return discountA - discountB;
-            });
-
-            break;
-        case 4:
-            // Giá: Giảm dần
-            sortedProducts.sort((a, b) => {
-                const discountA = a.discount > 0 ? a.price - a.discount : a.price;
-                const discountB = b.discount > 0 ? b.price - b.discount : b.price;
-                return discountB - discountA;
-            });
-            break;
-        case 5:
             // Tên: A - Z
             sortedProducts.sort((a, b) => a.title.localeCompare(b.title));
             break;
-        case 6:
+        case 4:
             // Tên: Z - A
             sortedProducts.sort((a, b) => b.title.localeCompare(a.title));
             break;
@@ -283,20 +227,19 @@ const outfitPage = () => {
         _id: product._id!,
         sku: product.sku,
         title: product.title,
-        images: product.images,
-        price: product.price,
-        discount: product.discount,
+        image: product.image,
+        productOne: product.items && product.items[0],
+        productTwo: product.items && product.items[1],
         description: product.description,
-        categoryId: product.categoryId,
         createdAt: product.createdAt,
     }));
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
 
-    useEffect(() => {
-        window.scrollTo({ top: 0, left: 0 });
-    }, []);
+    // useEffect(() => {
+    //     window.scrollTo({ top: 0, left: 0 });
+    // }, []);
     return (
         <div className="">
             {contextHolder}
@@ -347,10 +290,8 @@ const outfitPage = () => {
                             options={[
                                 { value: 1, label: 'Mới nhất' },
                                 { value: 2, label: 'Cũ nhất' },
-                                { value: 3, label: 'Giá: Tăng dần' },
-                                { value: 4, label: 'Giá: Giảm dần' },
-                                { value: 5, label: 'Tên: A - Z' },
-                                { value: 6, label: 'Tên: Z - A' },
+                                { value: 3, label: 'Tên: A - Z' },
+                                { value: 4, label: 'Tên: Z - A' },
 
                             ]}
                             onChange={(value: Number) => setSortOption(value)}

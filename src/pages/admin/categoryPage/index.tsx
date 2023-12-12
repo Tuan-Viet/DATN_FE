@@ -124,7 +124,7 @@ const categoryPage = () => {
                         style={{ width: 400 }}
                         placeholder="Tìm kiếm tên sản phẩm, mã sản phẩm "
                         optionFilterProp="children"
-                        filterOption={(input, option) => {
+                        filterOption={(input: any, option: any) => {
                             const labelIncludesInput = (option?.label ?? '').includes(input);
                             const skuIncludesInput = (option?.sku ?? '').includes(input);
                             return labelIncludesInput || skuIncludesInput;

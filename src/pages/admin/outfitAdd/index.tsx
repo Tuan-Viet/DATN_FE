@@ -4,33 +4,27 @@ import {
     Button,
     Form,
     Input,
-    InputNumber,
     Select,
     Space,
     message,
     Upload,
     Spin,
-    Card,
     Typography,
     Breadcrumb,
-    Switch,
-    Tag,
     Tooltip
 } from 'antd';
 import {
     PlusOutlined,
-    InfoCircleOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate } from 'react-router-dom';
-import { useFetchListCategoryQuery } from '../../../store/category/category.service';
-import { ICategory } from '../../../store/category/category.interface';
-import { useAddProductMutation, useFetchListProductByAdminQuery } from '../../../store/product/product.service';
+import { useFetchListProductByAdminQuery } from '../../../store/product/product.service';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../store';
+import { useAddOutfitMutation, useFetchListOutfitQuery } from '../../../store/outfit/outfit.service';
+import { useListProductDetailQuery } from '../../../store/productDetail/productDetail.service';
 const { Dragger } = Upload;
-const { TextArea } = Input;
 const { Option } = Select;
 
 const SubmitButton = ({ form }: { form: FormInstance }) => {
@@ -62,46 +56,90 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
 const outfitAdd = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
-    const [onAdd] = useAddProductMutation()
+    const [onAdd] = useAddOutfitMutation()
     const [description, setDescription] = useState('');
     const [valueHide, setValueHide] = useState(false);
-    const { data: listProduct, isLoading, isError, isSuccess } = useFetchListProductByAdminQuery()
-    const listSku = listProduct?.map((product) => product.sku);
+    const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductByAdminQuery()
+    const { data: listOutfit, isSuccess: isSuccessListOutfit } = useFetchListOutfitQuery()
+    const { data: listProductDeatil, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery()
+
+    const filteredProducts = listProduct?.filter(product => !product.hide) || [];
+
+
+    const listSku = listOutfit?.map((outfit: any) => outfit.sku);
     const handleCheckSku = async (rule: any, value: any) => {
         if (listSku?.includes(value)) {
-            throw new Error('Mã sản phẩm đã tồn tại. Vui lòng chọn mã khác.');
+            throw new Error('Mã đã tồn tại. Vui lòng chọn mã khác.');
         }
     };
 
-    const onFinish = async (values: any) => {
-        console.log(values);
-        let newImages;
+    const [productOne, setProductOne] = useState<any>()
+    const [productTwo, setProductTwo] = useState<any>()
 
-        if (values.images && values.images.fileList) {
-            newImages = values.images.fileList.map(({ response }: any) => response[0].url);
-        } else if (values.images && values.images.file) {
-            newImages = values.images.file.response[0].url;
+    const [productDetailByOne, setProductDetailByOne] = useState<any[]>()
+    const [productDetailByTwo, setProductDetailByTwo] = useState<any[]>()
+
+    const [productDeatilOne, setProductDetailOne] = useState<any>()
+    const [productDetailTwo, setProductDetailTwo] = useState<any>()
+
+    const handleProductOneChange = (selectedProductId: any) => {
+        const listProductDetail = listProductDeatil?.filter((productDetail: any) => {
+            return productDetail.product_id === selectedProductId;
+        });
+        const productById = filteredProducts?.find((product: any) => product._id === selectedProductId);
+
+        setProductOne(productById)
+        setProductDetailByOne(listProductDetail);
+
+    };
+    const handleProductTwoChange = (selectedProductId: any) => {
+        const listProductDetail = listProductDeatil?.filter((productDetail: any) => {
+            return productDetail.product_id === selectedProductId;
+        });
+        const productById = filteredProducts?.find((product: any) => product._id === selectedProductId);
+
+        setProductTwo(productById)
+        setProductDetailByTwo(listProductDetail);
+
+    };
+
+    const handleSetproductDetailOne = (productDetail: any) => {
+        setProductDetailOne(productDetail)
+    };
+    const handleSetproductDetailTwo = (productDetail: any) => {
+        setProductDetailTwo(productDetail)
+    };
+
+    const validateProducts = (fieldName: any, otherFieldName: any, value: any, callback: any) => {
+        const formValues = form.getFieldsValue();
+        const otherValue = formValues[otherFieldName];
+
+        if (otherValue === value) {
+            callback(`Bạn đã chọn sản phẩm này rồi. Vui lòng chọn sản phẩm khác`);
         } else {
-            newImages = [];
+            callback();
+        }
+    };
+    const onFinish = async (values: any) => {
+        let valueImage;
+
+        if (values.image && values.image.file) {
+            valueImage = values.image.file.response[0];
+        } else {
+            valueImage = [];
         }
 
-        if (values.variants && values.variants.length > 0) {
-            values.variants.forEach((variant: any) => {
-                if (variant.imageColor) {
-                    if (variant.imageColor.fileList && variant.imageColor.fileList.length === 1) {
-                        variant.imageColor = variant.imageColor.fileList[0].response[0].url;
-                    }
-                }
-            });
-        }
-        const newValues = { ...values, hide: valueHide, description: description, images: newImages, colors: colors, sizes: sizes };
+        const valueAdd: any = {
+            title: values.title,
+            sku: values.sku,
+            items: [productDeatilOne, productDetailTwo],
+            description: description,
+            image: valueImage
+        };
 
-        console.log(newImages);
-        console.log("Values Data:", newValues);
-
-        await onAdd(newValues)
+        await onAdd(valueAdd)
         message.success(`Tạo mới thành công`);
-        navigate("/admin/product");
+        navigate("/admin/outfit");
     };
 
     const props: UploadProps = {
@@ -138,15 +176,10 @@ const outfitAdd = () => {
                 layout="vertical"
                 onFinish={onFinish}
                 autoComplete="off"
-                initialValues={{
-                    items: [
-                        {}, {}
-                    ]
-                }}
                 className="mx-auto"
             >
                 <div className="flex space-x-10">
-                    <div className="w-3/4 space-y-5">
+                    <div className="w-3/4 mx-auto space-y-5">
                         <div className="bg-white border space-y-3 rounded-sm">
                             <h1 className='border-b p-5 font-medium text-lg'>Thông tin chung</h1>
                             <div className="px-5">
@@ -224,10 +257,11 @@ const outfitAdd = () => {
                                 </Tooltip> */}
                             </div>
                             <Form.Item
-                                name="images"
+                                name="image"
                                 rules={[{ required: true, message: 'Không được để trống!' }]}
                             >
                                 <Dragger
+                                    maxCount={1}
                                     {...props}
                                     className='text-gray-500'
 
@@ -235,133 +269,261 @@ const outfitAdd = () => {
                                     <PlusOutlined className='pr-5 text-lg' />  Kéo thả hoặc <a className='text-blue-500'>tải ảnh lên từ thiết bị</a>
                                 </Dragger>
                             </Form.Item>
-
                         </div>
                         <div className="bg-white border space-y-3 rounded-sm">
-                            <h1 className='border-b p-5 font-medium text-lg'>Bộ sưu tập</h1>
-                            <div className="flex px-5 space-x-5">
-                                <Form.Item
-                                    name='productOne'
-                                    rules={[{ required: true, message: 'Không được để trống' }]}
-                                >
-                                    <Select
-                                        showSearch
-                                        style={{ width: 400, height: 60 }}
-                                        placeholder="Tìm kiếm tên sản phẩm, mã sản phẩm"
-                                        optionFilterProp="children"
-                                        filterOption={(input, option) => {
-                                            const labelIncludesInput = (option?.label ?? '').includes(input);
-                                            const skuIncludesInput = (option?.sku ?? '').includes(input);
-                                            return labelIncludesInput || skuIncludesInput;
-                                        }}
-                                        filterSort={(optionA, optionB) =>
-                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                        }
-                                        optionLabelProp="customLabel"
-                                        dropdownRender={menu => (
-                                            <div>
-                                                {menu}
-                                            </div>
-                                        )}
+                            <h1 className='border-b p-5 font-medium text-lg'>Set Outfit</h1>
+                            <div className=" px-5 ">
+                                <div className="flex space-x-5">
+                                    <Form.Item
+                                        name='productOne'
+                                        label='Sản phẩm áo'
+                                        rules={[
+                                            { required: true, message: 'Không được để trống' },
+                                            { validator: (_, value, callback) => validateProducts('productOne', 'productTwo', value, callback) },
+                                        ]}
+                                        className='w-1/2'
                                     >
-                                        {listProduct?.map((product: any) => (
-                                            <Option key={product._id}
-                                                value={product._id}
-                                                label={product.title}
-                                                sku={product.sku}
-                                                customLabel={
+                                        <Select
+                                            showSearch
+                                            onChange={(selectedValue) => handleProductOneChange(selectedValue)}
+                                            style={{ height: 60 }}
+                                            placeholder="Tìm kiếm theo tên sản phẩm, mã sản phẩm"
+                                            optionFilterProp="children"
+                                            filterOption={(input: any, option: any) => {
+                                                const labelIncludesInput = (option?.label ?? '').includes(input);
+                                                const skuIncludesInput = (option?.sku ?? '').includes(input);
+                                                return labelIncludesInput || skuIncludesInput;
+                                            }}
+                                            filterSort={(optionA, optionB) =>
+                                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                            }
+                                            optionLabelProp="customLabel"
+                                            dropdownRender={menu => (
+                                                <div>
+                                                    {menu}
+                                                </div>
+                                            )}
+                                        >
+                                            {filteredProducts?.map((product: any) => (
+                                                <Option key={product._id}
+                                                    value={product._id}
+                                                    label={product.title}
+                                                    sku={product.sku}
+                                                    customLabel={
+                                                        <div className='flex items-center space-x-2'>
+                                                            <img className='h-14' src={product.images[0]} alt="" />
+                                                            <span>{product.title} {product.sku}</span>
+                                                        </div>
+                                                    }
+
+                                                >
                                                     <div className='flex items-center space-x-2'>
                                                         <img className='h-14' src={product.images[0]} alt="" />
                                                         <span>{product.title} {product.sku}</span>
                                                     </div>
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                    {productDetailByOne && productDetailByOne?.length > 0 ? (
+                                        <Form.Item
+                                            name='productDetailOne'
+                                            label='Chi tiết sản phẩm'
+                                            rules={[{ required: true, message: 'Không được để trống' }]}
+                                            className='w-1/2'
+                                        >
+                                            <Select
+                                                showSearch
+                                                onChange={(productDetailId) => handleSetproductDetailOne(productDetailId)}
+                                                style={{ height: 60 }}
+                                                placeholder="Tìm kiếm theo kích thước, màu sắc"
+                                                optionFilterProp="children"
+                                                filterOption={(input: any, option: any) => {
+                                                    const sizeIncludesInput = (option?.size ?? '').includes(input);
+                                                    const colorIncludesInput = (option?.color ?? '').includes(input);
+                                                    return colorIncludesInput || sizeIncludesInput;
+                                                }}
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-
+                                                optionLabelProp="customLabel"
+                                                dropdownRender={menu => (
+                                                    <div>
+                                                        {menu}
+                                                    </div>
+                                                )}
                                             >
-                                                <div className='flex items-center space-x-2'>
-                                                    <img className='h-14' src={product.images[0]} alt="" />
-                                                    <span>{product.title} {product.sku}</span>
-                                                </div>
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
-                                <Form.Item name='productTwo' rules={[{ required: true, message: 'Không được để trống' }]}>
-                                    <Select
-                                        showSearch
-                                        style={{ width: 400, height: 60 }}
-                                        placeholder="Tìm kiếm tên sản phẩm, mã sản phẩm"
-                                        optionFilterProp="children"
-                                        filterOption={(input, option) => {
-                                            const labelIncludesInput = (option?.label ?? '').includes(input);
-                                            const skuIncludesInput = (option?.sku ?? '').includes(input);
-                                            return labelIncludesInput || skuIncludesInput;
-                                        }}
-                                        filterSort={(optionA, optionB) =>
-                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                        }
-                                        optionLabelProp="customLabel"
-                                        dropdownRender={menu => (
-                                            <div>
-                                                {menu}
-                                            </div>
-                                        )}
+                                                {productDetailByOne && Array.isArray(productDetailByOne) && productDetailByOne?.map((product: any) => (
+                                                    <Option key={product._id}
+                                                        value={product._id}
+                                                        label={product.nameColor}
+                                                        size={product.size}
+                                                        color={product.nameColor}
+                                                        customLabel={
+                                                            <div className='flex items-center space-x-2'>
+                                                                <div className="">
+                                                                    <img className='h-14' src={product.imageColor} alt="" />
+                                                                </div>
+                                                                <div className="space-x-1">
+                                                                    <span className='block'>{productOne.title} {productOne.sku}</span>
+
+                                                                    <span className='block text-[12px] text-blue-500'>{product.nameColor}-{product.size}</span>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        className='cursor-pointer'
+
+                                                    >
+                                                        <div className='flex items-center space-x-2'>
+                                                            <div className="">
+                                                                <img className='h-14' src={product.imageColor} alt="" />
+                                                            </div>
+                                                            <div className="space-x-1">
+                                                                <span className='block'>{productOne.title} {productOne.sku}</span>
+
+                                                                <span className='block text-[12px] text-blue-500'>{product.nameColor}-{product.size}</span>
+                                                            </div>
+                                                        </div>
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                    ) : ""}
+
+                                </div>
+                                <div className="flex space-x-5">
+                                    <Form.Item
+                                        name='productTwo'
+                                        label='Sản phẩm quần'
+                                        rules={[
+                                            { required: true, message: 'Không được để trống' },
+                                            { validator: (_, value, callback) => validateProducts('productTwo', 'productOne', value, callback) },
+                                        ]}
+                                        className='w-1/2'
                                     >
-                                        {listProduct?.map((product: any) => (
-                                            <Option key={product._id}
-                                                value={product._id}
-                                                label={product.title}
-                                                sku={product.sku}
-                                                customLabel={
+                                        <Select
+                                            showSearch
+                                            onChange={(selectedValue) => handleProductTwoChange(selectedValue)}
+                                            style={{ height: 60 }}
+                                            placeholder="Tìm kiếm theo tên sản phẩm, mã sản phẩm"
+                                            optionFilterProp="children"
+                                            filterOption={(input: any, option: any) => {
+                                                const labelIncludesInput = (option?.label ?? '').includes(input);
+                                                const skuIncludesInput = (option?.sku ?? '').includes(input);
+                                                return labelIncludesInput || skuIncludesInput;
+                                            }}
+                                            filterSort={(optionA, optionB) =>
+                                                (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                            }
+                                            optionLabelProp="customLabel"
+                                            dropdownRender={menu => (
+                                                <div>
+                                                    {menu}
+                                                </div>
+                                            )}
+                                        >
+                                            {filteredProducts?.map((product: any) => (
+                                                <Option key={product._id}
+                                                    value={product._id}
+                                                    label={product.title}
+                                                    sku={product.sku}
+                                                    customLabel={
+                                                        <div className='flex items-center space-x-2'>
+                                                            <img className='h-14' src={product.images[0]} alt="" />
+                                                            <span>{product.title} {product.sku}</span>
+                                                        </div>
+                                                    }
+
+                                                >
                                                     <div className='flex items-center space-x-2'>
                                                         <img className='h-14' src={product.images[0]} alt="" />
                                                         <span>{product.title} {product.sku}</span>
                                                     </div>
+                                                </Option>
+                                            ))}
+                                        </Select>
+                                    </Form.Item>
+                                    {productDetailByTwo && productDetailByTwo?.length > 0 ? (
+                                        <Form.Item
+                                            name='productDetailTwo'
+                                            label='Chi tiết sản phẩm'
+                                            rules={[{ required: true, message: 'Không được để trống' }]}
+                                            className='w-1/2'
+                                        >
+                                            <Select
+                                                showSearch
+                                                onChange={(productDetailId) => handleSetproductDetailTwo(productDetailId)}
+                                                style={{ height: 60 }}
+                                                placeholder="Tìm kiếm theo kích thước, màu sẵc"
+                                                optionFilterProp="children"
+                                                filterOption={(input: any, option: any) => {
+                                                    const sizeIncludesInput = (option?.size ?? '').includes(input);
+                                                    const colorIncludesInput = (option?.color ?? '').includes(input);
+                                                    return colorIncludesInput || sizeIncludesInput;
+                                                }}
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                 }
-
+                                                optionLabelProp="customLabel"
+                                                dropdownRender={menu => (
+                                                    <div>
+                                                        {menu}
+                                                    </div>
+                                                )}
                                             >
-                                                <div className='flex items-center space-x-2'>
-                                                    <img className='h-14' src={product.images[0]} alt="" />
-                                                    <span>{product.title} {product.sku}</span>
-                                                </div>
-                                            </Option>
-                                        ))}
-                                    </Select>
-                                </Form.Item>
+                                                {productDetailByTwo && Array.isArray(productDetailByTwo) && productDetailByTwo?.map((product: any) => (
+                                                    <Option key={product._id}
+                                                        value={product._id}
+                                                        label={product.nameColor}
+                                                        size={product.size}
+                                                        color={product.nameColor}
+                                                        customLabel={
+                                                            <div className='flex items-center space-x-2'>
+                                                                <div className="">
+                                                                    <img className='h-14' src={product.imageColor} alt="" />
+                                                                </div>
+                                                                <div className="space-x-1">
+                                                                    <span className='block'>{productTwo.title} {productTwo.sku}</span>
+
+                                                                    <span className='block text-[12px] text-blue-500'>{product.nameColor}-{product.size}</span>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                        className='cursor-pointer'
+
+                                                    >
+                                                        <div className='flex items-center space-x-2'>
+                                                            <div className="">
+                                                                <img className='h-14' src={product.imageColor} alt="" />
+                                                            </div>
+                                                            <div className="space-x-1">
+                                                                <span className='block'>{productTwo.title} {productTwo.sku}</span>
+                                                                <span className='block text-[12px] text-blue-500'>{product.nameColor}-{product.size}</span>
+                                                            </div>
+                                                        </div>
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                    ) : ""}
+
+                                </div>
+
                             </div>
                         </div>
                     </div>
-                    <div className="w-1/4">
-                        <div className="bg-white border rounded-sm">
-                            <Form.Item
-                                name="hide"
-                                valuePropName="checked"
-                                initialValue={false}
-                                className='px-3 space-y-3'
-                            >
-                                <h1 className='border-b py-2 font-semibold'>Trạng thái</h1>
-                                <Space className="flex justify-between py-2" >
-                                    <span className='block'>Cho phép bán</span>
-                                    <Switch
-                                        size="small"
-                                        className=''
-                                        defaultChecked={true}
-                                        onChange={(checked) => handleSwitchChange(checked)}
-                                    />
-                                </Space>
-                            </Form.Item>
-                        </div>
-                    </div>
+
                 </div >
 
-                <Form.Item noStyle shouldUpdate>
+                {/* <Form.Item noStyle shouldUpdate>
                     {() => (
                         <Typography>
                             <pre>{JSON.stringify(form.getFieldsValue(), null, 2)}</pre>
                         </Typography>
                     )}
-                </Form.Item>
+                </Form.Item> */}
 
-                <Form.Item className='my-5'>
+                <Form.Item className='my-5 w-3/4 mx-auto'>
                     <Space>
                         <SubmitButton form={form} />
                         <Button htmlType="reset">Reset</Button>
