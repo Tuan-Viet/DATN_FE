@@ -54,7 +54,7 @@ const Outstanding_Product = () => {
         <div className="w-[277px] bg-black h-[1.5px] mx-auto"></div>
       </div>
       <div className="outstanding-product mb-12  gap-x-[25px] grid grid-cols-5 gap-y-[30px]">
-        {productOutStandState?.map((product, index) => {
+        {productOutStandState?.slice(0, 10).map((product, index) => {
           return <div key={index} className={`relative overflow-hidden group ${[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
             {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>}
             <Link to={`/products/${product._id}`}>

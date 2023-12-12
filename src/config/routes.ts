@@ -18,6 +18,7 @@ const routes = {
     addresses: "/account/addresses",
     orderDetail: "/account/orders/:id",
     searchResult: "/search",
+    outfit: "/outfit",
 
     // Admin 
     admin: "/admin",

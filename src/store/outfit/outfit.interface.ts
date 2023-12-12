@@ -4,7 +4,7 @@ export interface IOutfit {
     _id?: string
     title: String
     description: string
-    image: string
+    image: { url: string, publicId: string }
     sku: string
     items: IProductDetail[]
     hidden: boolean
@@ -15,6 +15,6 @@ export interface IOutfitState {
 }
 
 export interface ISearchOutfitState {
-    searchTerm: "",
+    searchTerm: string,
     outfits: IOutfit[]
 }

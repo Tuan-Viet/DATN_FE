@@ -129,6 +129,8 @@ const Header = () => {
   // xu li cart
   const removeCart = async (id: string) => {
     try {
+      console.log(id)
+
       if (id) {
         if (user?.current?._id) {
           const isConfirm = window.confirm("Ban co chac chan muon xoa khong?");

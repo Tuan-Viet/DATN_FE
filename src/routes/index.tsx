@@ -38,6 +38,7 @@ import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
 import productById from "../pages/admin/productById";
 import orderReturnPage from "../pages/admin/orderReturnPage";
 import orderReturnById from "../pages/admin/orderReturnById";
+import OutfitPage from "../pages/client/Outfit";
 
 
 export const publicRoutes = [
@@ -59,6 +60,7 @@ export const publicRoutes = [
   { path: routes.orderDetail, Component: OrderDetail },
   { path: routes.products, Component: ProductPage },
   { path: routes.searchResult, Component: SearchResult },
+  { path: routes.outfit, Component: OutfitPage },
 
 ]
 
