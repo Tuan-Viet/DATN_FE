@@ -142,6 +142,7 @@ const productViewedSlice = createSlice({
         // },
     })
 })
+
 // product
 export const { listProductSlice, deleteProductSlice } = productSlice.actions
 // productbyCategory

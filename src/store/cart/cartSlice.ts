@@ -29,10 +29,9 @@ const cartSlice = createSlice({
             }
         },
         addCartSlice: (state: ICartState, actions: PayloadAction<ICart>) => {
-            console.log(actions.payload.totalMoney)
             const cartExistIndex = state.carts.findIndex((cart) => cart.productDetailId._id === actions.payload.productDetailId._id)
             const { current: userStore } = JSON.parse(localStorage.getItem("persist:user")!);
-            if (JSON.parse(userStore)?._id) {
+            if (userStore && JSON.parse(userStore)?._id) {
                 if (cartExistIndex !== -1) {
                     state.carts[cartExistIndex].quantity += actions.payload.quantity
                 } else {

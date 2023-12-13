@@ -20,6 +20,7 @@ const outfitSlice = createSlice({
         },
     })
 })
+
 const searchOutfitSlice = createSlice({
     name: "outfits",
     initialState: initialSearchOutfitState,
@@ -41,10 +42,17 @@ const searchOutfitSlice = createSlice({
                 state.outfits = listProductBySku
             }
         },
+        listSearchOutfitByProductIdSlice: (state: ISearchOutfitState, actions: PayloadAction<ISearchOutfitState>) => {
+            const productId = actions.payload.searchTerm.trim().toLowerCase();
+            const outfitsContainingProductId = actions.payload.outfits.filter((outfit) =>
+                outfit.items.some((item) => item.product_id === productId)
+            );
+            state.outfits = outfitsContainingProductId
+        },
     })
 })
 
 export const { listOutfitSlice, deleteOutfitSlice } = outfitSlice.actions
-export const { listSearchOutfit, listSearchOutfitByTitleSlice, listSearchOutfitBySkuSlice } = searchOutfitSlice.actions
+export const { listSearchOutfit, listSearchOutfitByTitleSlice, listSearchOutfitBySkuSlice, listSearchOutfitByProductIdSlice } = searchOutfitSlice.actions
 export default outfitSlice.reducer
 export const searchOutfitReducer = searchOutfitSlice.reducer

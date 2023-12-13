@@ -84,8 +84,8 @@ const outfitUpdate = () => {
     const [productDetailByOne, setProductDetailByOne] = useState<any[]>()
     const [productDetailByTwo, setProductDetailByTwo] = useState<any[]>()
 
-    const [productDeatilOne, setProductDetailOne] = useState<any>(outfitById?.items[0]._id)
-    const [productDetailTwo, setProductDetailTwo] = useState<any>(outfitById?.items[1]._id)
+    const [productDeatilOne, setProductDetailOne] = useState<any>()
+    const [productDetailTwo, setProductDetailTwo] = useState<any>()
 
     useEffect(() => {
         if (outfitById && listProduct && listProductDeatil) {
@@ -104,6 +104,9 @@ const outfitUpdate = () => {
 
             setProductDetailByOne(listProductDetailOne);
             setProductDetailByTwo(listProductDetailTwo);
+
+            setProductDetailOne(outfitById?.items[0]?._id)
+            setProductDetailTwo(outfitById?.items[1]?._id)
 
             form.setFieldsValue({
                 _id: outfitById?._id,

@@ -89,7 +89,6 @@ const OrderDetail = () => {
     resolver: yupResolver(ReviewSchema)
   })
   const [countUpload, setCountUpload] = useState([0]);
-  console.log(countUpload);
 
   const user = useSelector((state: any) => state.user);
   useEffect(() => {
@@ -149,7 +148,6 @@ const OrderDetail = () => {
     const updatedImageList = imageList.filter((url) => url !== file.response[0].url);
     setImageList(updatedImageList);
   };
-  console.log(imageList);
 
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
@@ -626,9 +624,9 @@ const OrderDetail = () => {
                         <th scope="col" className="px-6 py-3">
                           Thành tiền
                         </th>
-                        {order && order.status === 4 && <th scope="col" className="px-6 py-3">
+                        {order && order.status === 4 || order?.status === 5 ? <th scope="col" className="px-6 py-3">
                           Đánh giá
-                        </th>}
+                        </th> : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -688,8 +686,8 @@ const OrderDetail = () => {
                                             ₫
                                           </td>
                                           <td>
-                                            {order && order.status === 4 && product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
-                                            {order && order.status === 4 && product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
+                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div> : null}
+                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div> : null}
                                           </td>
                                         </tr>
                                       ))}
