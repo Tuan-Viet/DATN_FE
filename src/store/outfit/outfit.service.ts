@@ -28,7 +28,7 @@ const outfitAPI = createApi({
         }),
         updateOutfit: builer.mutation<IOutfit[], IOutfit>({
             query: ({ _id, ...outfit }) => ({
-                url: "/outfit/edit" + _id,
+                url: `/outfit/${_id}/edit`,
                 method: "PATCH",
                 body: outfit
             }),

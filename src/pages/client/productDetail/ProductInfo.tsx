@@ -47,6 +47,7 @@ const ProductInfo = () => {
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
   const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
+
   const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
   const [onAddCart] = useAddCartMutation()
   const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
@@ -724,7 +725,6 @@ const ProductInfo = () => {
                     <div className="">
                       {[...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
                         <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
-
                         <div className="flex my-6">
                           <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                           <div className="flex">

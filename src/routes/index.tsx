@@ -39,6 +39,9 @@ import productById from "../pages/admin/productById";
 import orderReturnPage from "../pages/admin/orderReturnPage";
 import orderReturnById from "../pages/admin/orderReturnById";
 import OutfitPage from "../pages/client/Outfit";
+import outfitPage from "../pages/admin/outfitPage";
+import outfitAdd from "../pages/admin/outfitAdd";
+import outfitUpdate from "../pages/admin/outfitUpdate/indext";
 
 
 export const publicRoutes = [
@@ -71,6 +74,9 @@ export const privateRoutes = [
   { path: routes.adminProductAdd, Component: productAdd },
   { path: routes.adminProductUpdate, Component: productUpdate },
   { path: routes.adminProductById, Component: productById },
+  { path: routes.adminOutfitPage, Component: outfitPage },
+  { path: routes.adminOutfitAdd, Component: outfitAdd },
+  { path: routes.adminOutfitUpdate, Component: outfitUpdate },
   { path: routes.adminCategorys, Component: categoryPage },
   { path: routes.adminCategoryAdd, Component: categoryAdd },
   { path: routes.adminCategoryUpdate, Component: categoryUpdate },
