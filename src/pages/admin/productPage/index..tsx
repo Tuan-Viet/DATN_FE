@@ -8,7 +8,9 @@ import {
     Spin,
     Slider,
     InputNumber,
-    Select
+    Select,
+    MenuProps,
+    Dropdown
 } from 'antd';
 import {
     EditFilled,
@@ -60,6 +62,10 @@ const productPage = () => {
     const [sortOption, setSortOption] = useState<Number>(1);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(0);
+
+    const [visibleCate, setVisibleCate] = useState(false);
+    const [visiblePrice, setVisiblePrice] = useState(false);
+
     useEffect(() => {
         if (listProduct) {
             if (search === "" || !search) {
@@ -230,7 +236,7 @@ const productPage = () => {
     };
 
     const handleResetPrice = () => {
-        setSelectedCategories([]);
+        // setSelectedCategories([]);
         setMinPrice(0);
         setMaxPrice(0);
     };
@@ -294,6 +300,195 @@ const productPage = () => {
         console.log('params', pagination, filters, sorter, extra);
     };
 
+
+
+    const handleClickFilterCate = () => {
+        setVisibleCate(!visibleCate);
+    };
+    const handleClickFilterPrice = () => {
+        setVisiblePrice(!visiblePrice);
+    };
+
+
+    const filterCate: MenuProps['items'] = [
+        {
+            label: (
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">{selectedCategories?.length} đã chọn</span>
+
+                    <button
+                        type="button"
+                        className="text-sm text-gray-900 underline underline-offset-4"
+                        onClick={handleResetClick}
+                    >
+                        Reset
+                    </button>
+                </div>
+            ),
+            key: '0',
+        },
+        {
+            type: 'divider',
+        },
+        ...(categoryState?.map((cate: any) => ({
+            label: (
+                <label htmlFor={`FilterPrice-${cate._id}`} className="inline-flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id={`FilterPrice-${cate._id}`}
+                        className="h-5 w-5 rounded border-gray-300"
+                        checked={selectedCategories?.includes(cate._id)}
+                        onChange={() => toggleCategory(cate._id)}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">{cate.name}</span>
+                    {/* ({cate.products.length - 1}) */}
+                </label>
+            ),
+            key: cate._id,
+        })) || []),
+    ];
+    const filterPrice: MenuProps['items'] = [
+        {
+            label: (
+                <div className="flex items-center justify-between p-4">
+                    <span className="text-sm text-gray-700">Giá cao nhất 1,000,000đ</span>
+                    <button
+                        type="button"
+                        className="text-sm text-gray-900 underline underline-offset-4"
+                        onClick={handleResetPrice}
+                    >
+                        Reset
+                    </button>
+                </div>
+            ),
+            key: '0',
+        },
+        {
+            type: 'divider',
+        },
+        {
+            label: (
+                <label htmlFor="FilterPrice" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterPrice"
+                        type="radio"
+                        id="FilterPrice"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => handlePriceFilter(0, 150000)}
+                        checked={minPrice >= 0 && maxPrice === 150000}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        0đ - 150,000đ
+                    </span>
+                </label>
+            ),
+            key: '1',
+        },
+        {
+            label: (
+                <label htmlFor="FilterPrice" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterPrice"
+                        type="radio"
+                        id="FilterPrice"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => handlePriceFilter(150000, 300000)}
+                        checked={minPrice >= 150000 && maxPrice === 300000}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        150,000đ - 300,000đ
+                    </span>
+                </label>
+            ),
+            key: '2',
+        },
+        {
+            label: (
+                <label htmlFor="FilterPrice" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterPrice"
+                        type="radio"
+                        id="FilterPrice"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => handlePriceFilter(300000, 450000)}
+                        checked={minPrice >= 300000 && maxPrice === 450000}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        300,000đ - 450,000đ
+                    </span>
+                </label>
+            ),
+            key: '3',
+        },
+        {
+            label: (
+                <label htmlFor="FilterPrice" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterPrice"
+                        type="radio"
+                        id="FilterPrice"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => handlePriceFilter(450000, 1000000)}
+                        checked={minPrice === 450000 && 1000000 >= maxPrice}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        450,000đ trở lên
+                    </span>
+                </label>
+            ),
+            key: '4',
+        },
+        {
+            type: 'divider',
+        },
+        {
+            label: (
+                <div className="border-t border-gray-200 p-4 ">
+                    <div className="flex justify-between gap-4 items-center">
+                        <InputNumber
+                            formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            value={minPrice}
+                            min={0}
+                            onChange={(value: any) => setMinPrice(value)} />
+                        <span className="text-gray-400 font-light text-sm">đến</span>
+                        <InputNumber
+                            formatter={(value) => ` ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            value={(maxPrice)}
+                            min={0}
+                            onChange={(value: any) => setMaxPrice(value)} />
+                    </div>
+                </div>
+
+            ),
+            key: '5',
+        },
+        {
+            label: (
+                <div className="px-4">
+                    <Slider
+                        range
+                        min={0}
+                        max={1000000}
+                        step={1000}
+                        tooltip={{ formatter: null }}
+                        value={[minPrice, maxPrice]}
+                        // defaultValue={[minPrice, maxPrice]}
+                        onChange={(values: [number, number]) => {
+                            setMinPrice(values[0]);
+                            setMaxPrice(values[1]);
+                        }}
+                    />
+                </div>
+            ),
+            key: '6',
+        },
+
+    ];
     // useEffect(() => {
     //     window.scrollTo({ top: 0, left: 0 });
     // }, []);
@@ -338,9 +533,39 @@ const productPage = () => {
 
 
                 </div>
-                <div className="flex justify-between items-start">
-                    <div className="flex items-start  space-x-3 ">
-                        <details className="z-50 overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidde">
+                <div className="flex justify-between  items-center">
+                    <div className="flex  space-x-3 ">
+                        <Dropdown
+                            menu={{ items: filterCate }}
+                            trigger={['click']}
+                            visible={visibleCate}
+                            onOpenChange={handleClickFilterCate}
+                        >
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Button className='w-[200px]'>
+                                    <Space className='flex justify-between' >
+                                        <span>  Lọc theo danh mục</span>
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </a>
+                        </Dropdown>
+                        <Dropdown
+                            menu={{ items: filterPrice }}
+                            trigger={['click']}
+                            visible={visiblePrice}
+                            onOpenChange={handleClickFilterPrice}
+                        >
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Button className='w-[200px]'>
+                                    <Space className='flex justify-between' >
+                                        <span>  Lọc theo Giá</span>
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </a>
+                        </Dropdown>
+                        {/* <details className="z-50 overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidde">
                             <summary
                                 className="flex w-[250px] cursor-pointer items-center justify-between gap-2 bg-white px-3 py-2 text-gray-900 transition"
                             >
@@ -374,16 +599,14 @@ const productPage = () => {
 
                                                 <span className="text-sm font-medium text-gray-700">
                                                     {cate.name}
-                                                    {/* ({cate.products.length - 1}) */}
                                                 </span>
                                             </label>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
-                        </details>
-
-                        <details className="z-50 overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidden">
+                        </details> */}
+                        {/* <details className="z-50 overflow-hidden rounded-lg border border-gray-300 [&_summary::-webkit-details-marker]:hidden">
                             <summary
                                 className="flex w-[300px] cursor-pointer items-center justify-between gap-2 bg-white px-3 py-2 text-gray-900 transition"
                             >
@@ -501,13 +724,13 @@ const productPage = () => {
                                     />
                                 </div>
                             </div>
-                        </details>
+                        </details> */}
                     </div>
                     <div className="flex items-center">
                         <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
                         <Select
                             defaultValue={1}
-                            style={{ width: 200, height: 36 }}
+                            style={{ width: 200 }}
                             options={[
                                 { value: 1, label: 'Mới nhất' },
                                 { value: 2, label: 'Cũ nhất' },

@@ -50,7 +50,6 @@ const outfitPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listOutfit, isLoading, isError, isSuccess } = useFetchListOutfitQuery()
     const outfitSearchState = useSelector((state: RootState) => state.searchOutfitReducer.outfits)
-    console.log(listOutfit);
 
     // const productState = useSelector((state: RootState) => state.productSlice.products)
     const [sortOption, setSortOption] = useState<Number>(1)
@@ -151,7 +150,7 @@ const outfitPage = () => {
             ),
         },
         {
-            title: 'SẢN PHẨM QUẦM',
+            title: 'SẢN PHẨM QUẦN',
             dataIndex: 'productTwo',
             key: 'productOne',
             render: (value: any) => (
@@ -286,7 +285,7 @@ const outfitPage = () => {
                         <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
                         <Select
                             defaultValue={1}
-                            style={{ width: 200, height: 36 }}
+                            style={{ width: 200 }}
                             options={[
                                 { value: 1, label: 'Mới nhất' },
                                 { value: 2, label: 'Cũ nhất' },

@@ -267,7 +267,7 @@ const categoryPage = () => {
                         <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
                         <Select
                             defaultValue={1}
-                            style={{ width: 200, height: 36 }}
+                            style={{ width: 200 }}
                             options={[
                                 { value: 1, label: 'Mới nhất' },
                                 { value: 2, label: 'Cũ nhất' },
