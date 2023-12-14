@@ -46,7 +46,6 @@ const CheckoutsPage = () => {
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
   const { data: InfoUser, refetch: refetchUser } = useGetInfoUserQuery(user?.current?._id)
 
-  console.log(InfoUser);
 
   useEffect(() => {
     if (listCart) {
@@ -131,7 +130,7 @@ const CheckoutsPage = () => {
       await onAddOrder(data).then(({ data }: any) => {
         console.log(cartState)
         console.log(data);
-        refetch().then(() => dispatch(listCartSlice(listCart!)))
+        refetchCart().then(() => dispatch(listCartSlice(listCart!)))
         if (data?.pay_method === "COD") {
           setTimeout(async () => {
             setLoading(false);
@@ -143,7 +142,7 @@ const CheckoutsPage = () => {
             .then(({ data }) => window.location.href = data)
         }
       }
-      ).then(() => refetchUser()).then(() => refetchCart())
+      ).then(() => refetchUser())
     } catch (error) {
       console.log(error);
     }
@@ -209,6 +208,132 @@ const CheckoutsPage = () => {
     }
 
   }, [cartState, getOneVoucher])
+  const [myAddress, setMyAddress] = useState<any>("")
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedWard, setSelectedWards] = useState('');
+  const [selectedNameProvince, setSelectedNameProvince] = useState("");
+  const [selectedNameDistrict, setSelectednameDistrict] = useState('');
+  const [selectedNameWard, setSelectednameWard] = useState('');
+  // console.log(myProvince);
+
+  useEffect(() => {
+    // Gọi API để lấy dữ liệu tỉnh/thành phố
+    axios.get('https://provinces.open-api.vn/api/p/')
+      .then(response => setProvinces(response.data))
+      .catch(error => console.error('Error fetching provinces:', error));
+
+  }, []);
+
+  const handleProvinceChange = (e) => {
+    const provinceCode = e.target.value;
+    const nameProvince = provinces.find((item) => item.code == provinceCode)
+    // myProvince = {
+    //   code: nameProvice.code,
+    //   name: nameProvince.name
+    // }
+    setSelectedNameProvince(nameProvince.name);
+
+    setSelectedProvince(provinceCode);
+
+    // Gọi API để lấy dữ liệu quận/huyện dựa trên tỉnh/thành phố được chọn
+    axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+      .then(response => setDistricts(response.data))
+      .catch(error => console.error('Error fetching districts:', error));
+
+
+
+  };
+
+  const handleDistrictChange = (e) => {
+    const districtCode = e.target.value;
+    setSelectedDistrict(districtCode);
+
+    const nameDistrict = districts.districts.find((item) => item.code == districtCode)
+    setSelectednameDistrict(nameDistrict.name);
+
+
+    // Gọi API để lấy dữ liệu xã/phường dựa trên quận/huyện được chọn
+    axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+      .then(response => setWards(response.data))
+      .catch(error => console.error('Error fetching wards:', error));
+  };
+
+  const handleWardChange = (e) => {
+    const wardCode = e.target.value;
+    setSelectedWards(wardCode);
+
+    const nameWard = wards.wards.find((item) => item.code == wardCode)
+    setSelectednameWard(nameWard.name);
+
+  };
+
+  useEffect(() => {
+    setValue('address.myProvince', selectedNameProvince)
+  }, [selectedNameProvince])
+  useEffect(() => {
+    setValue('address.myDistrict', selectedNameDistrict)
+  }, [selectedNameDistrict])
+  useEffect(() => {
+    setValue('address.myWard', selectedNameWard)
+  }, [selectedNameWard])
+  // const [myAddress, setMyAddress] = useState<any>("")
+  const getMyAddress = async (addressUpdate) => {
+    const provinceCode = provinces.find((item) => item.name == addressUpdate.myProvince)
+    setSelectedProvince(provinceCode.code)
+
+    // Lấy districts dựa trên provinceCode
+    const response1 = await axios.get(`https://provinces.open-api.vn/api/p/${provinceCode.code}?depth=2`);
+    console.log(response1.data);
+
+    // Lưu districts vào state
+    setDistricts(response1.data);
+
+    // Tìm districtCode dựa trên tên quận/huyện (addressUpdate.myDistrict)
+    const districtCode = response1.data.districts.find((item) => item.name == addressUpdate.myDistrict);
+    console.log(districtCode.code);
+    console.log(districtCode);
+
+    // Lưu districtCode vào state hoặc biến khác để sử dụng sau này
+    setSelectedDistrict(districtCode.code);
+
+    // Kiểm tra xem selectedDistrictCode đã được xác định chưa
+    // Sử dụng districtCode để lấy thông tin wards
+    const response2 = await axios.get(`https://provinces.open-api.vn/api/d/${districtCode.code}?depth=2`);
+
+    console.log(response2.data);
+
+    // Lưu thông tin wards vào state
+    setWards(response2.data);
+
+    // Tìm wardCode dựa trên tên phường/xã (addressUpdate.myWard)
+    const wardCode = response2.data.wards.find((item) => item.name == addressUpdate.myWard).code;
+
+    // Lưu wardCode vào state hoặc biến khác để sử dụng sau này
+    setSelectedWards(wardCode);
+  }
+  useEffect(() => {
+    if (myAddress !== '') {
+      const myAddressbyId = InfoUser?.addresses.find((address) => address._id && address._id === myAddress)
+      setValue('address', { myProvince: myAddressbyId.myProvince, myDistrict: myAddressbyId.myDistrict, myWard: myAddressbyId.myWard, detailAddress: myAddressbyId.address }),
+        setValue('phoneNumber', myAddressbyId.phone),
+        setValue('fullName', myAddressbyId.fullname)
+      // setValue('myProvince', myAddressbyId.myProvince)
+      // setValue('myDistrict', myAddressbyId.myDistrict)
+      // setValue('myWard', myAddressbyId.myWard)
+      getMyAddress(myAddressbyId)
+    } else {
+      setValue('address', { myProvince: '', myDistrict: '', myWard: '', detailAddress: '' }),
+        setSelectedProvince(''),
+        setSelectedDistrict(''),
+        setSelectedWards(''),
+        setValue('phoneNumber', ""),
+        setValue('fullName', "")
+    }
+  }, [myAddress])
   const handleFindVoucher = () => {
     if (codeVoucher && voucherState) {
       const voucherByCode = voucherState?.find((voucher) => voucher.code === codeVoucher)
@@ -229,6 +354,7 @@ const CheckoutsPage = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 });
   }, []);
+
   return (
     <>
       {loading && (
@@ -264,19 +390,15 @@ const CheckoutsPage = () => {
 
                 </div>
                 <div>
+
                   <div className="mb-3">
-
                     <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn địa chỉ giao hàng</label>
-                    <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option selected>Địa chỉ của bạn</option>
+                    <select onChange={(e) => setMyAddress(e.target.value)} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option value={''} selected>Địa chỉ khác ...</option>
                       {InfoUser?.addresses?.map((item, index) =>
-                        <option value="US">{item.address}</option>
+                        <option value={item._id}>{item.fullname},{item.address}</option>
                       )}
-                      {/* <option value="CA">Canada</option>
-                      <option value="FR">France</option>
-                      <option value="DE">Germany</option> */}
                     </select>
-
                   </div>
                   <div className="mb-3">
                     <input
@@ -321,8 +443,32 @@ const CheckoutsPage = () => {
 
                   </div>
                   <div className="mb-3">
+                    <select onChange={handleProvinceChange} value={selectedProvince} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option value="">Chọn tỉnh/thành phố</option>
+                      {provinces.map(province => (
+                        <option key={province.code} value={province.code} > {province.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <select onChange={handleDistrictChange} value={selectedDistrict} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option value="">Chọn quận/huyện</option>
+                      {districts?.districts?.map(district => (
+                        <option key={district.code} value={district.code}>{district.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    <select onChange={handleWardChange} value={selectedWard} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <option value="">Chọn xã phường</option>
+                      {wards?.wards?.map(ward => (
+                        <option key={ward.code} value={ward.code}>{ward.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
                     <input
-                      {...register("address")}
+                      {...register("address.detailAddress")}
 
                       type="text"
                       id="address"

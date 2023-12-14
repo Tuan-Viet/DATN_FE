@@ -14,7 +14,7 @@ export const orderReturnSchema = yup.object({
         yup.object().shape({
             productDetailId: yup.string(),
             orderDetailId: yup.string(),
-            quantity: yup.number().min(0),
+            quantity: yup.number(),
             color: yup.string(),
             size: yup.string(),
             price: yup.number(),
@@ -22,7 +22,12 @@ export const orderReturnSchema = yup.object({
         })
     ),
     orderId: yup.string().required(),
-    address: yup.string().trim("Hãy nhập địa chỉ của bạn").required("Trường địa chỉ bắt buộc nhập"),
+    address: yup.object().shape({
+        myProvince: yup.string().required('trường tỉnh/thành phố bắt buộc nhập'),
+        myDistrict: yup.string().required('trường quận/huyện bắt buộc nhập'),
+        myWard: yup.string().required('trường phường/xã bắt buộc nhập'),
+        detailAddress: yup.string().required('trường địa chỉ bắt buộc nhập')
+    }),
     reason: yup.string().required(),
     // totalMoney: yup.number().required(),
     createdAt: yup.date()

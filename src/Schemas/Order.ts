@@ -16,7 +16,12 @@ export const orderSchema = yup.object({
             totalMoney: yup.number().required("truong totalMoney bat buoc")
         })
     ),
-    address: yup.string().trim("Hãy nhập số điện thoại của bạn").required("Trường địa chỉ bắt buộc nhập"),
+    address: yup.object().shape({
+        myProvince: yup.string().required('trường tỉnh/thành phố bắt buộc nhập'),
+        myDistrict: yup.string().required('trường quận/huyện bắt buộc nhập'),
+        myWard: yup.string().required('trường phường/xã bắt buộc nhập'),
+        detailAddress: yup.string().required('trường địa chỉ bắt buộc nhập')
+    }),
     voucher_code: yup.string(),
     note: yup.string(),
     status: yup.number().required(),
