@@ -18,6 +18,7 @@ const routes = {
     addresses: "/account/addresses",
     orderDetail: "/account/orders/:id",
     searchResult: "/search",
+    outfit: "/outfit",
 
     // Admin 
     admin: "/admin",
@@ -26,6 +27,10 @@ const routes = {
     adminProductAdd: "/admin/product/add",
     adminProductUpdate: "/admin/product/update/:id",
     adminProductById: "/admin/product/:id",
+    adminOutfitPage: "/admin/outfit",
+    adminOutfitAdd: "/admin/outfit/add",
+    adminOutfitUpdate: "/admin/outfit/update/:id",
+    adminOutfitById: "/admin/outfit/:id",
     adminCategorys: "/admin/category",
     adminCategoryAdd: "/admin/category/add",
     adminCategoryUpdate: "/admin/category/update/:id",
@@ -43,7 +48,8 @@ const routes = {
     adminOrderRevanueByWeek: "/admin/statistic/by_week",
     adminOrderRevanueByMonth: "/admin/statistic/by_month",
     adminOrderRevanueByQuarter: "/admin/statistic/by_quarter",
-
+    adminOrderReturnPage: "/admin/orderreturn",
+    adminOrderReturnGetOne: "/admin/orderreturn/:id",
 }
 
 export default routes;

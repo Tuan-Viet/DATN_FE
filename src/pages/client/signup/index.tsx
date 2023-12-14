@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, Spin, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 type FormDataType = {
   fullname: string;
@@ -65,13 +66,24 @@ const signup = () => {
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
-
+  const [loading, setLoading] = useState(false);
   const handSubmitSignup = async (data: FormDataType) => {
     try {
+      setLoading(true);
       await axios.post("http://localhost:8080/api/auth/register", data);
-    //   message.success("Successfully registered");
-      toast.success("Đăng kí thành công")
+      setLoading(false)
+      //   message.success("Successfully registered");
+      Swal.fire({
+        title: "Vui lòng xác thực email của bạn!",
+        icon: "info",
+      })
+      // .then((result) => {
+      //   if (result.isConfirmed) {
+      //     window.location.href = "https://mail.google.com/mail/"; // Replace with your actual link
+      //   }
+      // });
       navigate("/signin");
+
     } catch (error: any) {
       if (error.response) {
         const serverErrorMessage = error.response.data.messages;
@@ -89,7 +101,11 @@ const signup = () => {
     }
   };
   return (
-    <>
+    <div>
+      {loading &&
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
+          <Spin className="z-50" size='large' />
+        </div>}
       <Header></Header>
       <div className="w-[630px] py-[60px] mx-auto flex flex-col items-center mb-[55px]">
         <div className="flex text-[24px] font-semibold tracking-wide text-[#CACACA] mb-[45px]">
@@ -231,7 +247,7 @@ const signup = () => {
             </form> */}
       </div>
       <Footer></Footer>
-    </>
+    </div>
   );
 };
 export default signup;

@@ -141,6 +141,10 @@ const CheckoutsPage = () => {
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/create_payment_url`, data)
             .then(({ data }) => window.location.href = data)
         }
+        else if (data?.pay_method === "MOMO") {
+          axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/momo_payment`, data)
+            .then(({ data }) => window.location.href = data)
+        }
       }
       ).then(() => refetchUser())
     } catch (error) {
@@ -153,6 +157,7 @@ const CheckoutsPage = () => {
       await setIdVoucher(voucherId)
     }
   }
+
   useEffect(() => {
     if (getOneVoucher) {
       setValue("voucher_code", getOneVoucher.code)
@@ -364,9 +369,9 @@ const CheckoutsPage = () => {
         </div>
       )}
       <Header></Header>
-      <div className="container-2">
+      <div className="container-2 px-10">
         <form onSubmit={handleSubmit(onSubmitOrder)} className="flex gap-[28px] mt-10 mb-10">
-          <div className="">
+          <div className="w-1/2">
 
             <div className="flex gap-[28px]">
               <div className="w-[400px]">
@@ -374,18 +379,18 @@ const CheckoutsPage = () => {
                   <h3 className="text-lg mb-5 font-bold">
                     Thông tin giao hàng
                   </h3>
-                  {current?._id ? ""
-                    : (
-                      <p className="text-sm">
-                        Bạn đã có tài khoản?{" "}
-                        <Link
-                          to=""
-                          className="text-primary font-semibold text-blue-500"
-                        >
-                          Đăng nhập
-                        </Link>
-                      </p>
-                    )
+                  {!user?.current?._id
+                    ?
+                    <p className="text-sm">
+                      Bạn đã có tài khoản?{" "}
+                      <Link
+                        to={`/signin`}
+                        className="text-primary font-semibold text-blue-500"
+                      >
+                        Đăng nhập
+                      </Link>
+                    </p>
+                    : <span>Xin chào,{user?.current?.fullname}</span>
                   }
 
                 </div>
@@ -537,6 +542,18 @@ const CheckoutsPage = () => {
                         <label htmlFor="vnbank">Thanh toán bằng ví VN Pay</label>
                       </div>
                     </div>
+                    <div className="flex w-[350px] justify-between mb-3 bg-gray-50 border border-gray-300 text-gray-900 p-3 text-sm rounded-lg focus:ring-primary focus:border-primary">
+                      <div className="flex gap-3 items-center">
+                        <input
+                          id="momo"
+                          {...register("pay_method")}
+                          type="radio"
+                          className="bg-gray-50 border border-gray-300 text-primary text-sm rounded-full focus:ring-primary focus:border-primary block dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary dark:focus:border-primary"
+                          value="MOMO"
+                        />
+                        <label htmlFor="momo">Thanh toán bằng ví MOMO</label>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -637,6 +654,7 @@ const CheckoutsPage = () => {
               </div>}
 
               <h1 className="tracking-wide py-[10px] text-[14px] text-yellow-600 italic text-right">
+
                 {totalCart < 500000 && <span className="">*Bạn
                   cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ </strong>
                   để miễn phí vận chuyển
@@ -674,10 +692,10 @@ const CheckoutsPage = () => {
               </Link>
 
               <div className="flex flex-col">
-                <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
+                {user?.current?._id ? <button className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">
                   Đặt hàng
-                </button>
-                <Link to={"/signin"} className="italic text-red-500 text-[14px] hover:border-b-2 hover:border-red-300 transition-all ease-linear">{errors ? errors?.userId?.message : ""}</Link>
+                </button> : <Link to={"/signin"} className="text-white uppercase font-semibold bg-blue-500 py-4 px-10 rounded-lg min-w-[120px]">Bạn cần phải đăng nhập</Link>}
+
               </div>
             </div>
           </div>

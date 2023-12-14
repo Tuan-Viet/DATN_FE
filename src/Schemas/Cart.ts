@@ -1,7 +1,7 @@
 import * as yup from "yup"
 
 export const CartSchema = yup.object({
-    user_id: yup.string().required(),
+    user_id: yup.string(),
     productDetailId: yup.string().required(),
     color: yup.string().required(),
     size: yup.string().required(),

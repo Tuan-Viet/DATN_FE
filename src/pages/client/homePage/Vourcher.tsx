@@ -62,111 +62,76 @@ const Vourcher = () => {
             >
 
                 {voucherState.map((voucher, index) => {
+                    if (voucher.validTo == null) {
+                        return (
+                            <SwiperSlide key={index}>
+
+                                <div
+                                    className="divide-y divide-gray-200 rounded-2xl border border-gray-200 shadow-sm"
+                                    key={index}
+                                >
+                                    <div className="p-6 sm:px-8">
+                                        <h2 className="text-lg font-medium text-gray-900">
+                                            Giảm {voucher.discount}
+                                            <span className="sr-only">Plan</span>
+                                        </h2>
+
+                                        <p className="mt-2 text-gray-700">{voucher.title}</p>
+                                    </div>
+
+                                    <div className="p-2 sm:px-8 ">
+                                        <ul className="mt-2 space-y-2 flex justify-between">
+                                            <p className="mt-2 text-gray-700">{voucher.code}</p>
+
+                                            <button
+                                                className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
+                                                type="button"
+                                                onClick={() => addVoucher(user.current._id, voucher._id)}
+                                            >
+                                                Lưu mã
+                                            </button>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </SwiperSlide>
+                        );
+                    }
+
                     const currentDate = new Date();
                     const validTo = new Date(voucher.validTo);
-                    if (voucher.status == true) {
-                        if (voucher.validTo == null) {
-                            return (
-                                <SwiperSlide key={index}>
+                    if (validTo > currentDate && voucher.quantity > 0) {
+                        return (
+                            <SwiperSlide key={index}>
 
-                                    <div
-                                        className="divide-y divide-gray-200 rounded-2xl border border-gray-200 shadow-sm"
-                                        key={index}
-                                    >
-                                        <div className="p-6 sm:px-8">
-                                            <h2 className="text-lg font-medium text-gray-900">
-                                                {/* Giảm {voucher.discount}{voucher.type == "percent" ? "%" : "VND"} */}
-                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount / 1000).toLocaleString("vi-VN")}k </>}
-                                                <span className="sr-only">Plan</span>
-                                            </h2>
+                                <div
+                                    className=" divide-y divide-gray-200 rounded-2xl border border-gray-200 shadow-sm"
+                                    key={index}
+                                >
+                                    <div className="p-6 sm:px-8">
+                                        <h2 className="text-lg font-medium text-gray-900">
+                                            Giảm {voucher.discount}
+                                            <span className="sr-only">Plan</span>
+                                        </h2>
 
-                                            <p className="mt-2 text-gray-700">{voucher.title}</p>
-                                        </div>
-
-                                        <div className="p-2 sm:px-8 ">
-                                            <ul className="mt-2 space-y-2 flex justify-between">
-                                                <p className="mt-2 text-gray-700">{voucher.code}</p>
-
-                                                <button
-                                                    className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
-                                                    type="button"
-                                                    onClick={() => addVoucher(user.current._id, voucher._id)}
-                                                >
-                                                    Lưu mã
-                                                </button>
-                                            </ul>
-                                        </div>
+                                        <p className="mt-2 text-gray-700">{voucher.title}</p>
                                     </div>
-                                </SwiperSlide>
-                            );
-                        }
-                        else if (validTo > currentDate && voucher.quantity > 0) {
-                            return (
-                                <SwiperSlide key={index}>
 
-                                    <div
-                                        className=" divide-y divide-gray-200 rounded-2xl border border-gray-200 shadow-sm"
-                                        key={index}
-                                    >
-                                        <div className="p-6 sm:px-8">
-                                            <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount / 1000).toLocaleString("vi-VN")}k </>}
-                                                <span className="sr-only">Plan</span>
-                                            </h2>
+                                    <div className="p-2 sm:px-8 ">
+                                        <ul className="mt-2 space-y-2 flex justify-between">
+                                            <p className="mt-2 text-gray-700">{voucher.code}</p>
 
-                                            <p className="mt-2 text-gray-700">{voucher.title}</p>
-                                        </div>
-
-                                        <div className="p-2 sm:px-8 ">
-                                            <ul className="mt-2 space-y-2 flex justify-between">
-                                                <p className="mt-2 text-gray-700">{voucher.code}</p>
-
-                                                <button
-                                                    className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
-                                                    type="button"
-                                                    onClick={() => addVoucher(user.current._id, voucher._id)}
-                                                >
-                                                    Lưu mã
-                                                </button>
-                                            </ul>
-                                        </div>
+                                            <button
+                                                className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
+                                                type="button"
+                                                onClick={() => addVoucher(user.current._id, voucher._id)}
+                                            >
+                                                Lưu mã
+                                            </button>
+                                        </ul>
                                     </div>
-                                </SwiperSlide>
-                            );
-                        } else if (voucher.quantity == null) {
-                            return (
-                                <SwiperSlide key={index}>
-
-                                    <div
-                                        className=" divide-y divide-gray-200 rounded-2xl border border-gray-200 shadow-sm"
-                                        key={index}
-                                    >
-                                        <div className="p-6 sm:px-8">
-                                            <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount / 1000).toLocaleString("vi-VN")}k </>}
-                                                <span className="sr-only">Plan</span>
-                                            </h2>
-
-                                            <p className="mt-2 text-gray-700">{voucher.title}</p>
-                                        </div>
-
-                                        <div className="p-2 sm:px-8 ">
-                                            <ul className="mt-2 space-y-2 flex justify-between">
-                                                <p className="mt-2 text-gray-700">{voucher.code}</p>
-
-                                                <button
-                                                    className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
-                                                    type="button"
-                                                    onClick={() => addVoucher(user.current._id, voucher._id)}
-                                                >
-                                                    Lưu mã
-                                                </button>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </SwiperSlide>
-                            );
-                        }
+                                </div>
+                            </SwiperSlide>
+                        );
                     }
 
                 })}

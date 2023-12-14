@@ -11,18 +11,23 @@ import {
     Breadcrumb,
     Table,
     Modal,
-    Popconfirm
+    Popconfirm,
+    Image
 } from 'antd';
 import {
     UploadOutlined,
     CreditCardOutlined,
-    CheckCircleOutlined
+    CheckCircleOutlined,
+    FrownOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
+import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../../store/orderReturn/order.service';
+import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../../../store/orderDetail/orderDetail.service';
+import { useListVoucherQuery } from '../../../store/vouchers/voucher.service';
 const { Dragger } = Upload;
 const { TextArea } = Input;
 
@@ -75,16 +80,33 @@ const orderUpdate = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [onUpdate] = useUpdateOrderMutation()
+    const [onUpdateOrderReturn] = useUpdateOrderReturnMutation()
+    const [onUpdateOrderDetail] = useUpdateOrderDetailMutation()
+    const [onRemoveOrderDetail] = useDeleteOrderDetailMutation()
     let orderDetails = []
     const { data: order } = useGetOneOrderQuery(id || '');
-    const ListOrderDeatils = order?.orderDetails;
+    const { data: voucher } = useListVoucherQuery();
+    const voucherByOrder = voucher?.filter(voucher => voucher.code === order?.voucher_code)
 
-    console.log(order);
+    const idOrderReturn = order?.orderReturn?._id
+
+    const { data: orderReturn } = useGetOneOrderReturnQuery(idOrderReturn);
+
+    const ListOrderDeatils = order?.orderDetails;
+    const ListOrderReturnDetail = orderReturn?.orderReturnDetails;
+
     const [openFormUpdateNote, setOpenFormUpdateNote] = useState(false);
     const [openFormUpdateInfo, setOpenFormUpdateInfo] = useState(false);
     const [openFormUpdateStatus, setOpenFormUpdateStatus] = useState(false);
+    const [openFormConfirmOrderReturn, setOpenFormConfirmOrderReturn] = useState(false);
     const [orderDetail, setOrderDetail] = useState<any[]>([]);
+    const [orderReturnDetail, setOrderReturnDetail] = useState<any[]>([]);
+    const [sumTotalMoney, setSumTotalMoney] = useState<number>()
+
     useEffect(() => {
+        if (order) {
+            setSumTotalMoney(order?.totalMoney)
+        }
         if (ListOrderDeatils) {
             const fetchData = async () => {
                 const productDetails = [];
@@ -110,9 +132,35 @@ const orderUpdate = () => {
             };
             fetchData();
         }
-    }, [ListOrderDeatils]);
+        if (ListOrderReturnDetail) {
+            const fetchData = async () => {
+                const productDetails = [];
+                for (const detail of ListOrderReturnDetail) {
+                    try {
+                        const response = await axios.get(`http://localhost:8080/api/productDetails/${detail.productDetailId}`);
+                        const productInfo = response.data;
 
+                        const productResponse = await axios.get(`http://localhost:8080/api/products/${productInfo.product_id}`);
+                        const productData = productResponse.data;
+
+                        productDetails.push({
+                            ...detail,
+                            productInfo,
+                            productName: productData.title,
+                            sku: productData.sku
+
+                        });
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                setOrderReturnDetail(productDetails);
+            };
+            fetchData();
+        }
+    }, [order, ListOrderDeatils, ListOrderReturnDetail]);
     orderDetails = orderDetail
+
 
 
     const date = () => {
@@ -147,6 +195,7 @@ const orderUpdate = () => {
                     </div>
                 </div>
             ),
+            className: 'w-2/5'
         },
         {
             title: 'Giá bán',
@@ -162,11 +211,11 @@ const orderUpdate = () => {
             title: <div className="text-end">Thành tiền</div>,
             key: 'total',
             render: (record: any) => <div className='text-end'>{(record.price * record.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>,
+            className: 'w-1/5'
         },
     ];
     let data: DataType[] = [];
 
-    console.log(orderDetails);
 
     if (orderDetails) {
         data = orderDetails.map((order: any) => ({
@@ -214,6 +263,16 @@ const orderUpdate = () => {
             console.log(error);
         }
     };
+    const updateStatusComplte = async (values: any) => {
+        try {
+            const newValue = { ...order, status: 5 }
+            await onUpdate({ id, ...newValue });
+            setOpenFormUpdateInfo(false)
+            message.success(`Cập nhật thành công`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const updateStatus = async (values: any) => {
         try {
@@ -221,6 +280,69 @@ const orderUpdate = () => {
             await onUpdate({ id, ...newValue });
             setOpenFormUpdateStatus(false)
             message.success(`Cập nhật thành công`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const confirmOrderReturn = async () => {
+        try {
+            const orderDetailsArray = order?.orderDetails;
+            const orderReturnDetailsArray = orderReturn?.orderReturnDetails;
+
+            const updatePromises = orderDetailsArray?.map(async (orderDetail) => {
+                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+                );
+
+                if (matchingOrderReturnDetail) {
+                    if (orderDetail.quantity > matchingOrderReturnDetail?.quantity) {
+                        const valueUpdate = {
+                            ...orderDetail,
+                            totalMoney: orderDetail.price * (orderDetail.quantity - matchingOrderReturnDetail.quantity),
+                            quantity: orderDetail.quantity - matchingOrderReturnDetail.quantity,
+                        };
+
+                        await onUpdateOrderDetail({ _id: orderDetail._id, order: valueUpdate });
+
+                        let totalMoneyUpdate =
+                            sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
+                        setSumTotalMoney(totalMoneyUpdate);
+                        console.log(1);
+                    }
+                    if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
+                        await onRemoveOrderDetail(orderDetail._id)
+                        let totalMoneyUpdate =
+                            sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
+                        setSumTotalMoney(totalMoneyUpdate);
+
+                    }
+                }
+            });
+
+            await Promise.all(updatePromises);
+
+            const updatedTotalMoney = orderDetailsArray?.reduce((total, orderDetail) => {
+                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+                );
+
+                if (matchingOrderReturnDetail) {
+                    total -= matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price;
+                }
+
+                return total;
+            }, sumTotalMoney);
+
+            const updatedOrder = { ...order, status: 5, totalMoney: updatedTotalMoney };
+            await onUpdate({ id, ...updatedOrder });
+
+            const updateStatusOrderReturn = { ...orderReturn, status: 2 };
+            const idOrderReturn = order?.orderReturn?._id;
+            onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
+
+            setOpenFormConfirmOrderReturn(false);
+            message.info(`Xác nhận yêu cầu đổi hàng`);
         } catch (error) {
             console.log(error);
         }
@@ -237,15 +359,24 @@ const orderUpdate = () => {
                 return "Đang giao";
             case 4:
                 return "Đã nhận hàng";
+            case 5:
+                return "Hoàn thành";
+            case 6:
+                return "Y/c đổi hàng";
             default:
                 return "Trạng thái không xác định";
         }
     }
 
+    const totalCart = ListOrderDeatils?.reduce((total, order) => {
+        return total + order.totalMoney;
+    }, 0);
+    console.log(order);
+
+
     return <>
         <Breadcrumb className='pb-3'
             items={[
-
                 {
                     title: <Link to={`/admin/order`}>Đơn hàng</Link>,
                 },
@@ -261,7 +392,13 @@ const orderUpdate = () => {
                 <div className="flex space-x-1 text-gray-400">
                     <span className='block'>{moment(order?.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
                     <span className='border-l border-gray-300'></span>
-                    <span className='block '>Trạng thái: <span className='text-blue-500'>{mapStatusToText(order?.status)}</span></span>
+                    <span className='block'>
+                        Trạng thái: {order && order.status === 5 ? (
+                            <span className='text-green-500'>Hoàn thành</span>
+                        ) : (
+                            <span className='text-blue-500'>{mapStatusToText(Number(order?.status))}</span>
+                        )}
+                    </span>
                 </div>
             </div>
             <div className="flex w-[85%] mx-auto space-x-10">
@@ -287,15 +424,20 @@ const orderUpdate = () => {
                                             <Table.Summary.Row className=''>
                                                 <Table.Summary.Cell index={0} colSpan={3}>
                                                     <span className='block'>Tổng sản phẩm</span>
-                                                    <span className='block'>Giao hàng</span>
+                                                    {order?.voucher_code ? <span className='block'>Khuyến mãi</span> : ""}
+                                                    <span className='block'>Vận chuyển</span>
                                                     <span className='block'>Tổng</span>
                                                 </Table.Summary.Cell>
                                                 <Table.Summary.Cell index={1}>
                                                     <div className='text-end'>
-                                                        {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                        {totalCart?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                     </div>
+                                                    {order?.voucher_code && <div className='text-end'>
+                                                        -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                        {/* {totalCart?} */}
+                                                    </div>}
                                                     <div className='text-end'>
-                                                        Miễn phí
+                                                        {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
                                                     </div>
                                                     <div className='text-end'>
                                                         {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -319,7 +461,7 @@ const orderUpdate = () => {
                                                     ) : (
                                                         <div className="flex items-center space-x-2 ">
                                                             <CreditCardOutlined className='text-[#1677ff] text-lg' />
-                                                            <span className='block text-xs'>{order?.pay_method === "COD" ? "THU HỘ (CODE)" : "CHUUYỂN KHOẢN"}</span>
+                                                            <span className='block text-xs'>{order?.pay_method === "COD" ? "THU HỘ (COD)" : "CHUUYỂN KHOẢN"}</span>
                                                         </div>
                                                     )}
                                                 </Table.Summary.Cell>
@@ -327,9 +469,10 @@ const orderUpdate = () => {
                                                     {(order as any)?.paymentStatus !== 1 && (order as any)?.pay_method === "COD" ? (
                                                         <div className="flex justify-end">
                                                             <Popconfirm
-                                                                title="Title"
-                                                                description="Open Popconfirm with Promise"
+                                                                title="Xác nhận thanh toán"
+                                                                description={`Xác nhận khách hàng đã thanh toán số tiền ${order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ cho phương thức thanh toán cho đơn hàng này`}
                                                                 onConfirm={updatePaymentStatus}
+                                                                okButtonProps={{ className: "text-white bg-blue-500" }}
                                                             // onOpenChange={() => console.log('open change')}
                                                             >
                                                                 <Button type="primary" className='bg-blue-500'>Xác nhận thanh toán</Button>
@@ -339,17 +482,152 @@ const orderUpdate = () => {
                                                     ) : null}
                                                 </Table.Summary.Cell>
                                             </Table.Summary.Row>
+
+                                            {orderReturn?.status === 2 ? (
+                                                <Table.Summary.Row className=''>
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
+                                                        <span className='text-xs font-semibold'>
+                                                            YÊU CẦU ĐỔI HÀNG
+                                                        </span>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1}>
+                                                        <Link to={`/admin/orderreturn/${orderReturn._id}`}><Button className='w-full bg-yellow-500 text-white hover:text-white hover:bg-yellow-400'>Kiểm tra</Button></Link>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row >
+                                            ) : ""}
+
                                             <Table.Summary.Row className=''>
                                                 <Table.Summary.Cell index={0} colSpan={3}>
-                                                    <div className="flex items-center space-x-1">
-                                                        <span className='block '>GIAO HÀNG</span>
-                                                    </div>
+                                                    {order?.status === 6 ? (
+                                                        <div className="flex items-center space-x-1">
+                                                            <span className='block '>YÊU CẦU ĐỔI TRẢ</span>
+                                                        </div>
+                                                    ) : order?.status === 5 ? (
+                                                        <div className="flex items-center space-x-1">
+                                                            <span className='block '>ĐƠN HÀNG</span>
+                                                        </div>
+                                                    ) : order?.status === 4 && order.paymentStatus === 1 ? (
+                                                        <div className="flex items-center space-x-1">
+                                                            <span className='block '>ĐƠN HÀNG</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center space-x-1">
+                                                            <span className='block '>GIAO HÀNG</span>
+                                                        </div>
+                                                    )}
+
                                                 </Table.Summary.Cell>
+
                                                 <Table.Summary.Cell index={1}>
                                                     <div className="">
-                                                        <div className="flex justify-end">
-                                                            <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormUpdateStatus(true)}>Cập nhật trạng thái giao hàng</Button>
-                                                        </div>
+                                                        {order?.status === 0 && (
+                                                            <div className='w-[160px] leading-[30px] rounded-md text-center bg-red-500 text-white outline-none hover:text-white'>Hủy đơn hàng</div>
+                                                        )}
+                                                        {/* {order?.status === 4 && (
+                                                            <div className='w-[160px] leading-[30px] rounded-md text-center font-semibold bg-green-500 text-white outline-none hover:text-white'>Đã nhận hàng</div>
+                                                        )} */}
+                                                        {order?.status === 4 && order?.paymentStatus === 1 ? (
+                                                            <Popconfirm
+                                                                title="Xác nhận"
+                                                                description={`Xác nhận hoàn thành đơn hàng `}
+                                                                onConfirm={updateStatusComplte}
+                                                                okButtonProps={{ className: "text-white bg-blue-500" }}
+                                                            // onOpenChange={() => console.log('open change')}
+                                                            >
+                                                                <Button type="primary" className='bg-blue-500'>Xác nhận hoàn thành đơn hàng</Button>
+                                                            </Popconfirm>
+                                                        ) : order?.status === 4 ? (
+                                                            <div className='w-[160px] leading-[30px] text-center text-green-500 '>Đã nhận hàng</div>
+                                                        ) : ""}
+                                                        {order?.status === 5 && (
+                                                            <div className='w-[160px] leading-[30px] text-center  text-green-500  ' >Hoàn thành</div>
+                                                        )}
+                                                        {order?.status === 3 && (
+                                                            <div className='w-[160px] leading-[30px] rounded-md text-center  bg-blue-500 text-white outline-none hover:text-white' >Đang giao hàng</div>
+                                                        )}
+                                                        {order?.status === 6 && (
+                                                            <div className="flex justify-end">
+                                                                <Button className='bg-yellow-500 text-white hover:text-white hover:bg-yellow-400' onClick={() => setOpenFormConfirmOrderReturn(true)}>Xác nhận đổi hàng</Button>
+                                                            </div>
+                                                        )}
+                                                        {order?.status === 1 || order?.status === 2 ? (
+                                                            <div className="flex justify-end">
+                                                                <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormUpdateStatus(true)}>Cập nhật trạng thái giao hàng</Button>
+                                                            </div>
+                                                        ) : ""}
+
+                                                        <Modal
+                                                            title="Yêu cầu đổi hàng"
+                                                            // centered
+                                                            open={openFormConfirmOrderReturn}
+                                                            onOk={() => setOpenFormConfirmOrderReturn(false)}
+                                                            onCancel={() => setOpenFormConfirmOrderReturn(false)}
+                                                            okButtonProps={{ hidden: true }}
+                                                            cancelButtonProps={{ hidden: true }}
+                                                            width={500}
+                                                        >
+                                                            <div className="space-y-1">
+                                                                <span className='font-medium'>Khách hàng: </span>
+                                                                <span>{orderReturn?.fullName}</span>
+                                                                <span className='block mb-2 font-medium'> Lí do: </span>
+                                                                <div className="">
+                                                                    <FrownOutlined className='text-red-500 px-1' />  {orderReturn?.reason}
+                                                                    {/* <TextArea value={orderReturn?.reason} rows={3} /> */}
+                                                                </div>
+                                                                <Image.PreviewGroup>
+                                                                    <div className='flex space-x-2 py-3'>
+                                                                        {orderReturn?.images.map((url: any) => (
+                                                                            <div
+                                                                                className='w-24 h-24 border flex justify-center items-center rounded-md hover:border-blue-400 shadow-xl '
+                                                                            >
+                                                                                <Image height={80} src={url} />
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </Image.PreviewGroup>
+                                                                <div className="">
+                                                                    <h2 className=' font-medium text-gray-800 my-3'>Sản phẩm đổi trả</h2>
+                                                                    {orderReturnDetail.map((item: any) => (
+                                                                        <div className="flex items-center justify-between space-x-2 mb-3">
+                                                                            <div className="flex items-center space-x-2">
+                                                                                <div className="">
+                                                                                    <img className='h-16 w-16' src={item.productInfo.imageColor} alt="" />
+                                                                                </div>
+                                                                                <div className="space-y-2">
+                                                                                    <span className='block text-gray-800'><Link to={`/admin/product/${item.productInfo.product_id}`}>{item.productName}</Link></span>
+                                                                                    <div className="flex space-x-3">
+                                                                                        <div className="space-x-1 text-xs">
+                                                                                            <span>Phân loại:</span>
+                                                                                            <span className='text-blue-500'>{item.color}</span>
+                                                                                            <span className='border-l text-gray-400'></span>
+                                                                                            <span className='text-blue-500'>{item.size}</span>
+                                                                                        </div>
+                                                                                        <div className="text-xs">
+                                                                                            <span>Mã SP: <Link to={`/admin/product/${item.productInfo.product_id}`}>{item.sku}</Link></span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div className=" space-x-3">
+                                                                                <span className='text-[12px] text-gray-500'>SL: 1</span>
+                                                                                {/* <span className='text-[12px] text-gray-500'>320,000 đ</span> */}
+                                                                            </div>
+                                                                        </div>
+                                                                    ))}
+
+
+                                                                </div>
+                                                                <div className="flex justify-end pt-8">
+                                                                    <Button type="primary"
+                                                                        className='bg-blue-500'
+                                                                        onClick={() => confirmOrderReturn()}>
+                                                                        Xác nhận
+                                                                    </Button>
+                                                                </div>
+                                                            </div>
+                                                        </Modal>
+
                                                         <Modal
                                                             title="Cập nhật trạng thái giao hàng"
                                                             centered
@@ -378,7 +656,7 @@ const orderUpdate = () => {
                                                                             allowClear
                                                                             options={[
                                                                                 { value: 0, label: 'Hủy đơn hành' },
-                                                                                { value: 1, label: 'Đang xử lí' },
+                                                                                { value: 1, label: 'Chờ xử lí' },
                                                                                 { value: 2, label: 'Chờ lấy hàng' },
                                                                                 { value: 3, label: 'Đang giao' },
                                                                                 { value: 4, label: 'Hoàn thành', disabled: true },
@@ -397,7 +675,9 @@ const orderUpdate = () => {
                                                     </div>
 
                                                 </Table.Summary.Cell>
-                                            </Table.Summary.Row>
+                                            </Table.Summary.Row >
+
+
                                         </>
                                     );
                                 }}
@@ -467,7 +747,7 @@ const orderUpdate = () => {
                                     <span className='underline italic'>Sửa</span>
                                 </Button>
                                 <Modal
-                                    title="Sửa ghi chú"
+                                    title="Sửa địa chỉ giao hàng"
                                     centered
                                     open={openFormUpdateInfo}
                                     onOk={() => setOpenFormUpdateInfo(false)}

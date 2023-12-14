@@ -11,7 +11,7 @@ import { Link, useParams } from "react-router-dom";
 import { useFetchOneProductByAdminQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { Dispatch, useEffect, useState } from "react";
 import axios from "axios";
-import { useGetOneProductDetailQuery } from "../../../store/productDetail/productDetail.service";
+import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListReviewsQuery } from "../../../store/reviews/review.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
@@ -35,7 +35,11 @@ const productById = () => {
     const { id } = useParams();
     // const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductQuery(id || '')
     const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id || '')
+
     const { data: productRevanue, isSuccess: isSuccessProductStatistic } = useGetProductRevenueQuery();
+
+    // const { data: listProductDetail } = useListProductDetailQuery()
+
     const productStatistic = productRevanue?.filter(pro => pro.productId === id);
 
     const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
@@ -165,7 +169,6 @@ const productById = () => {
     const handleNextClick = () => {
         setSelectedImage((prev) => (prev < listImages.length - 1 ? prev + 1 : 0));
     };
-
 
     const items: CollapseProps['items'] = [
         {
@@ -327,7 +330,7 @@ const productById = () => {
                         )}
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
-                        <span className="block text-sm text-gray-400">HÀNG CÓ SẴN:</span>
+                        <span className="block text-sm text-gray-400">ĐÃ BÁN:</span>
                         {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
@@ -339,7 +342,7 @@ const productById = () => {
                         )}
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
-                        <span className="block text-sm text-gray-400">TỔNG DOANH THU:</span>
+                        <span className="block text-sm text-gray-400">DOANH THU:</span>
                         {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (

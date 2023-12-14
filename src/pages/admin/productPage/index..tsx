@@ -252,21 +252,20 @@ const productPage = () => {
             break;
         case 3:
             // Giá: Tăng dần
-            // sortedProducts.sort((a, b) => {
-            //     if (a.discount !== 0 && b.discount !== 0) {
-            //         return a.discount - b.discount;
-            //     } else if (a.discount === 0 && b.discount === 0) {
-            //         return a.price - b.price; // 
-            //     } else {
-            //         return a.discount !== 0 ? -1 : 1;
-            //     }
-            // });
-            sortedProducts.sort((a, b) => a.price - b.price);
+            sortedProducts.sort((a, b) => {
+                const discountA = a.discount > 0 ? a.price - a.discount : a.price;
+                const discountB = b.discount > 0 ? b.price - b.discount : b.price;
+                return discountA - discountB;
+            });
 
             break;
         case 4:
             // Giá: Giảm dần
-            sortedProducts.sort((a, b) => b.price - a.price);
+            sortedProducts.sort((a, b) => {
+                const discountA = a.discount > 0 ? a.price - a.discount : a.price;
+                const discountB = b.discount > 0 ? b.price - b.discount : b.price;
+                return discountB - discountA;
+            });
             break;
         case 5:
             // Tên: A - Z

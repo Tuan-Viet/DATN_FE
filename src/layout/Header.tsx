@@ -111,9 +111,7 @@ const Header = () => {
     if (listCart) {
       if (user?.current?._id) {
         dispatch(listCartSlice(listCart))
-        console.log("list cart", listCart)
       } else {
-        console.log("list cartStore")
         dispatch(listCartSlice(cartStore ? cartStore : [])!)
       }
     }
@@ -364,14 +362,14 @@ const Header = () => {
             <div className="h-[73px] flex items-center">
               <Link to="/">
                 <img
-                  src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173"
-                  className="w-[220px] h-[53px]"
+                  src="../../public/images/logo/dec5f33d-20b9-45cc-ab8c-5ce587a75660.jpg"
+                  className="w-[170px] h-[53px]"
                   alt=""
                 />
               </Link>
             </div>
             {/* menu */}
-            <ul className="flex font-medium tracking-wide">
+            {/* <ul className="flex font-medium tracking-wide">
               <li className="mx-[15px] cursor-pointer leading-[73px]">Sale</li>
               <li className="mx-[15px] cursor-pointer flex items-center group leading-[73px] static">
                 <a href="">Áo nam</a>
@@ -587,7 +585,7 @@ const Header = () => {
               <li className="mx-[15px] leading-[73px]">
                 <Link to="">Hệ thống cửa hàng</Link>
               </li>
-            </ul>
+            </ul> */}
             {/* icon */}
             <div className="flex items-center">
               {/* icon search */}

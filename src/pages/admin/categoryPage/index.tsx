@@ -5,7 +5,8 @@ import {
     Popconfirm,
     message,
     Image,
-    Spin
+    Spin,
+    Select
 } from 'antd';
 import {
     EditFilled,
@@ -22,10 +23,14 @@ import { RootState } from '../../../store';
 import { ICategory } from '../../../store/category/category.interface';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import { useForm } from 'react-hook-form';
+import moment from 'moment';
+const { Option } = Select;
 interface DataType {
     _id: React.Key;
     name: string;
     images: any;
+    products: any;
+    createdAt: any;
     ICategory: string;
 }
 
@@ -36,6 +41,8 @@ const categoryPage = () => {
     const { data: listCategory, isLoading, isError, isSuccess } = useFetchListCategoryQuery()
     const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
     const categoryData = categoryState.filter(category => category.name !== 'Chưa phân loại');
+    const [cateOption, setCateOption] = useState<Number>(1);
+
     const { handleSubmit } = useForm()
     const [search, setSearch] = useState<string>("")
     useEffect(() => {
@@ -98,7 +105,6 @@ const categoryPage = () => {
             key: 'name',
             render: (record: ICategory) => (
                 <div className="flex items-center  ">
-
                     <a className='w-full overflow-hidden'>{record.name}</a>
                 </div>
             ),
@@ -107,22 +113,69 @@ const categoryPage = () => {
             showSorterTooltip: false,
         },
         {
+            title: 'SẢN PHẨM',
+            dataIndex: 'products',
+            key: 'products',
+            render: (value) => (
+                <div className="">
+                    <span className='block my-2'>Tổng: {value.length} sản phẩm</span>
+                    <Select
+                        showSearch
+                        style={{ width: 400 }}
+                        placeholder="Tìm kiếm tên sản phẩm, mã sản phẩm "
+                        optionFilterProp="children"
+                        filterOption={(input: any, option: any) => {
+                            const labelIncludesInput = (option?.label ?? '').includes(input);
+                            const skuIncludesInput = (option?.sku ?? '').includes(input);
+                            return labelIncludesInput || skuIncludesInput;
+                        }}
+                        filterSort={(optionA, optionB) =>
+                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                        }
+                        optionLabelProp="customLabel"
+                        dropdownRender={menu => (
+                            <div>
+                                {menu}
+                            </div>
+                        )}
+                    >
+                        {value.map((product: any) => (
+                            <Option key={product._id} value={product._id} label={product.title} sku={product.sku}>
+                                <Link to={`/admin/product/${product._id}`}>
+                                    <div className='flex items-center space-x-2'>
+                                        <img className='h-14' src={product.images[0]} alt="" />
+                                        <span>{product.title} {product.sku}</span>
+                                    </div>
+                                </Link>
+                            </Option>
+                        ))}
+                    </Select>
+                </div>
+            )
+
+        },
+        {
+            title: 'NGÀY KHỞI TẠO',
+            dataIndex: 'createdAt',
+            render: (value) => moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
+        },
+        {
             title: '',
             key: 'action',
             render: (record: ICategory) => (
                 <Space size="middle" className='flex justify-end'>
                     <Popconfirm
-                        title="Delete category"
-                        description="Are you sure to delete this category?"
+                        title="Xóa danh mục"
+                        description="Bạn có chắc muốn xóa danh mục này"
                         onConfirm={() => confirm(record._id!)}
                         okText="Yes"
                         cancelText="No"
-                        okButtonProps={{ className: "text-white bg-blue-400" }}
+                        okButtonProps={{ className: "text-white bg-blue-500" }}
                     >
-                        <DeleteFilled className='text-xl text-red-400' />
+                        <DeleteFilled className='text-xl text-red-500' />
                     </Popconfirm>
                     <Link to={`/admin/category/update/${record._id}`}>
-                        <EditFilled className='text-xl text-yellow-400' />
+                        <EditFilled className='text-xl text-yellow-500' />
                     </Link>
                 </Space>
             ),
@@ -130,13 +183,40 @@ const categoryPage = () => {
 
     ];
 
-    const data: DataType[] = categoryData.map((category: any, index) => ({
+    const sortCate = [...categoryData];
+
+    switch (cateOption) {
+        case 1:
+            // Mới nhất
+            sortCate.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+        case 2:
+            // Cũ nhất
+            sortCate.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            break;
+        case 3:
+            // Tên: A - Z
+            sortCate.sort((a, b) => a.name.localeCompare(b.name));
+            break;
+        case 4:
+            // Tên: Z - A
+            sortCate.sort((a, b) => b.name.localeCompare(a.name));
+            break;
+        default:
+            break;
+    }
+
+    const data: DataType[] = sortCate.map((category: any, index) => ({
         key: index + 1,
         _id: category._id,
         name: category.name,
         images: category.images,
+        createdAt: category.createdAt,
+        products: category.products,
         ICategory: category.ICategory,
     }));
+
+
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
@@ -173,6 +253,7 @@ const categoryPage = () => {
                                 </svg>
                             </div>
                             <input
+                                placeholder='Tìm kiếm theo tên danh mục'
                                 onChange={(e) => setSearch(e.target.value)}
                                 type="text" id="default-search" className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
@@ -180,6 +261,23 @@ const categoryPage = () => {
                     </form>
 
 
+                </div>
+                <div className="flex justify-end items-start mb-6">
+                    <div className="flex items-center">
+                        <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
+                        <Select
+                            defaultValue={1}
+                            style={{ width: 200, height: 36 }}
+                            options={[
+                                { value: 1, label: 'Mới nhất' },
+                                { value: 2, label: 'Cũ nhất' },
+                                { value: 3, label: 'Tên: A - Z' },
+                                { value: 4, label: 'Tên: Z - A' },
+
+                            ]}
+                            onChange={(value: Number) => setCateOption(value)}
+                        />
+                    </div>
                 </div>
                 <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
             </div>

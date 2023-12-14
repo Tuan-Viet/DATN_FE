@@ -5,7 +5,8 @@ import {
     Image,
     Button,
     message,
-    Spin
+    Spin,
+    Select
 } from 'antd';
 import {
     EditFilled,
@@ -24,6 +25,7 @@ import { ColumnsType, TableProps } from 'antd/es/table';
 import { useListOrderQuery } from '../../../store/order/order.service';
 import { listOrderSearchSlice, listOrderSlice } from '../../../store/order/orderSlice';
 import { useForm } from 'react-hook-form';
+import moment from 'moment';
 
 interface DataType {
     key: React.Key;
@@ -42,6 +44,8 @@ const ordersPage = () => {
     const { handleSubmit } = useForm();
     const [search, setSearch] = useState<string>("")
     const orderState = useSelector((state: RootState) => state.orderSlice.orders)
+    const [orderOption, setOrderOption] = useState<Number>(1);
+
     // const [onRemove] = useRemoveProductMutation()
     useEffect(() => {
         if (orders) {
@@ -81,7 +85,7 @@ const ordersPage = () => {
         {
             title: 'MÃ ĐƠN HÀNG',
             key: '_id',
-            render: (record: any) => (<Link to={``} className='uppercase'>#{record?._id.slice(0, 10)}</Link>),
+            render: (record: any) => (<Link to={`/admin/order/${record?._id}`} className='uppercase'>#{record?._id}</Link>),
             className: 'w-1/6',
         },
         {
@@ -113,14 +117,7 @@ const ordersPage = () => {
                     return yearA - yearB;
                 }
             },
-            render: (text, record) => {
-                const date = new Date(record.date);
-                const day = date.getDate();
-                const month = date.getMonth() + 1; // Months are zero-based
-                const year = date.getFullYear();
-
-                return `${day}/${month}/${year}`;
-            },
+            render: (value: any) => <span>{moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>,
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -143,11 +140,11 @@ const ordersPage = () => {
             title: 'THANH TOÁN',
             key: 'paymentStatus',
             render: (value: any) => (value.paymentStatus === 1 ? (
-                <span className='border bg-green-500 rounded-lg text-white px-2 py-1 text-xs'>
+                <span className=' bg-green-300 text-green-700 border rounded-lg px-2 py-1 text-xs'>
                     Đã thanh toán
                 </span>
             ) : (
-                <span className='border bg-gray-200 rounded-lg text-gray-500 px-2 py-1 text-xs'>
+                <span className=' bg-gray-200 text-gray-700  border rounded-lg px-2 py-1 text-xs'>
                     Chưa thanh toán
                 </span>
             )),
@@ -164,23 +161,31 @@ const ordersPage = () => {
                 switch (value.status) {
                     case 0:
                         statusText = 'Hủy đơn hàng';
-                        statusColor = 'bg-red-500 text-white';
+                        statusColor = 'bg-red-300 text-red-700';
                         break;
                     case 1:
-                        statusText = 'Đang xử lí';
-                        statusColor = 'bg-gray-200 text-gray-500';
+                        statusText = 'Chờ xử lí';
+                        statusColor = 'bg-gray-200 text-gray-700';
                         break;
                     case 2:
-                        statusText = 'Chuẩn bị hàng';
-                        statusColor = 'bg-yellow-400 text-white';
+                        statusText = 'Chờ lấy hàng';
+                        statusColor = 'bg-cyan-300 text-cyan-700';
                         break;
                     case 3:
                         statusText = 'Đang giao';
-                        statusColor = 'bg-blue-500 text-white';
+                        statusColor = 'bg-blue-300 text-blue-700';
                         break;
                     case 4:
+                        statusText = 'Đã nhận hàng';
+                        statusColor = 'bg-teal-300 text-teal-700';
+                        break;
+                    case 5:
                         statusText = 'Hoàn thành';
-                        statusColor = 'bg-green-500 text-white';
+                        statusColor = 'bg-green-300 text-green-700 ';
+                        break;
+                    case 6:
+                        statusText = 'Y/c trả hàng';
+                        statusColor = 'bg-yellow-200 text-yellow-700';
                         break;
                     default:
                         statusText = '';
@@ -188,7 +193,8 @@ const ordersPage = () => {
                 }
 
                 return (
-                    <span className={`border rounded-lg px-2 py-1 text-xs ${statusColor}`}>
+
+                    <span className={`border rounded-lg px-2 py-1 text-xs  ${statusColor}`}>
                         {statusText}
                     </span>
                 );
@@ -211,7 +217,7 @@ const ordersPage = () => {
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
                     <Link to={`/admin/order/${record?._id}`}>
-                        <EditFilled className='text-xl text-yellow-400' />
+                        <EyeOutlined className='text-xl text-green-500' />
                     </Link>
                 </Space>
             ),
@@ -219,10 +225,25 @@ const ordersPage = () => {
 
     ];
 
+    const sortOrder = [...orderState];
+
+    switch (orderOption) {
+        case 1:
+            // Mới nhất
+            sortOrder.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+        case 2:
+            // Cũ nhất
+            sortOrder.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            break;
+        default:
+            break;
+    }
+
     let data: DataType[] = [];
 
     if (orderState) {
-        data = orderState?.map((order: any, index) => ({
+        data = sortOrder?.map((order: any, index) => ({
             key: index + 1,
             _id: order._id,
             date: order.createdAt,
@@ -263,6 +284,7 @@ const ordersPage = () => {
                                 </svg>
                             </div>
                             <input
+                                placeholder='Tìm kiếm theo tên khách hàng'
                                 onChange={(e) => setSearch(e.target.value)}
                                 type="text" id="default-search" className="block w-full outline-none p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
@@ -270,6 +292,20 @@ const ordersPage = () => {
                     </form>
 
 
+                </div>
+                <div className="flex justify-end items-start mb-6">
+                    <div className="flex items-center">
+                        <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
+                        <Select
+                            defaultValue={1}
+                            style={{ width: 200, height: 36 }}
+                            options={[
+                                { value: 1, label: 'Mới nhất' },
+                                { value: 2, label: 'Cũ nhất' },
+                            ]}
+                            onChange={(value: Number) => setOrderOption(value)}
+                        />
+                    </div>
                 </div>
                 <Table columns={columns} dataSource={data} pagination={{ pageSize: 10 }} onChange={onChange} />
             </div>

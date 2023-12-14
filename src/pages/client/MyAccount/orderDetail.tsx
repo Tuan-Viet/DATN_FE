@@ -17,7 +17,7 @@ import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
-import { useAddOrderMutation } from "../../../store/orderReturn/order.service";
+import { useAddOrderReturnMutation } from "../../../store/orderReturn/order.service";
 import { current } from "@reduxjs/toolkit";
 import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
@@ -60,6 +60,10 @@ function mapStatusToText(statusCode) {
       return "Đang giao";
     case 4:
       return "Đã nhận hàng";
+    case 5:
+      return "Hoàn thành";
+    case 6:
+      return "Yêu cầu đổi hàng";
     default:
       return "Trạng thái không xác định";
   }
@@ -85,7 +89,6 @@ const OrderDetail = () => {
     resolver: yupResolver(ReviewSchema)
   })
   const [countUpload, setCountUpload] = useState([0]);
-  console.log(countUpload);
 
   const user = useSelector((state: any) => state.user);
   useEffect(() => {
@@ -145,7 +148,6 @@ const OrderDetail = () => {
     const updatedImageList = imageList.filter((url) => url !== file.response[0].url);
     setImageList(updatedImageList);
   };
-  console.log(imageList);
 
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
@@ -243,7 +245,7 @@ const OrderDetail = () => {
     resolver: yupResolver(orderReturnSchema)
   })
 
-  const [addOrderReturn] = useAddOrderMutation()
+  const [addOrderReturn] = useAddOrderReturnMutation()
   const [updatedOrder] = useUpdateOrderMutation()
 
   const onAddOrderReturn = async (data: orderReturnForm) => {
@@ -472,23 +474,20 @@ const OrderDetail = () => {
                         {mapStatusToText(order?.status)}
                       </span>
                     </h1>
-                    {order?.status !== 0 && order?.status !== 1 && order?.status !== 2 && (
-                      <>
-                        <p>
-                          Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
-                          <button
-                            onClick={handleConfirmReceived}
-                            className="text-blue-500 underline"
-                          >
-                            xác thực đơn hàng
-                          </button>
-                        </p>
-
-                      </>
+                    {order?.status === 3 && (
+                      <p>
+                        Nếu bạn đã nhận được hàng, vui lòng ấn vào{" "}
+                        <button
+                          onClick={handleConfirmReceived}
+                          className="text-blue-500 underline"
+                        >
+                          xác thực đơn hàng
+                        </button>
+                      </p>
                     )}
                     {order?.status == 4 && (
                       <Button type="primary" onClick={showOrderModal} className="text-white bg-blue-700"  >
-                        Trả hàng
+                        Đổi hàng
                       </Button>
                     )}
                   </div>
@@ -507,13 +506,13 @@ const OrderDetail = () => {
                       <input type="hidden" value={order?._id} {...registerOrder("orderId")} id="orderId" />
                       <div className="mb-5">
                         <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Họ tên người gửi</label>
-                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-md focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                         <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.fullName?.message : ""}</p>
 
                       </div>
                       <div className="mb-5">
                         <label htmlFor="base-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Số điện thoại người gửi</label>
-                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                         <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.phoneNumber?.message : ""}</p>
 
                       </div>
@@ -572,8 +571,8 @@ const OrderDetail = () => {
                           name="productImages"
                           label="Ảnh Sản phẩm"
                           className="relative"
+                          rules={[{ required: true, message: 'Không được để trống' }]}
                         >
-                          <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">{countProductUpload}/3</span>
                           <Upload name='productImages'
                             {...props}
                             onChange={handleImageChange}
@@ -676,13 +675,6 @@ const OrderDetail = () => {
                                 );
                               })}
                             </tbody>
-                            <tfoot>
-                              <tr className="font-semibold text-gray-900 dark:text-gray">
-                                <th scope="row" className="px-6 py-3 text-base">Total</th>
-                                <td className="px-6 py-3">3</td>
-                                <td className="px-6 py-3">21,000</td>
-                              </tr>
-                            </tfoot>
                           </table>
                         </div>
 
@@ -692,14 +684,22 @@ const OrderDetail = () => {
 
                   </Modal>
                   <div className="text-right">
-                    {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
+                    {/* {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
                       order?.paymentStatus && Number(order?.paymentStatus) !== 1 && <button
                         onClick={() => handleCancelOrder(id!)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                       >
                         Hủy đơn hàng
                       </button>
-                    }
+                    } */}
+                    {order?.status === 1 && Number(order?.paymentStatus) !== 1 ? (
+                      <button
+                        onClick={() => handleCancelOrder(id!)}
+                        className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
+                      >
+                        Hủy đơn hàng
+                      </button>
+                    ) : ""}
                     <Link
                       to="/account"
                       className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
@@ -727,9 +727,9 @@ const OrderDetail = () => {
                         <th scope="col" className="px-6 py-3">
                           Thành tiền
                         </th>
-                        {order && order.status === 4 && <th scope="col" className="px-6 py-3">
+                        {order && order.status === 4 || order?.status === 5 ? <th scope="col" className="px-6 py-3">
                           Đánh giá
-                        </th>}
+                        </th> : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -789,8 +789,8 @@ const OrderDetail = () => {
                                             ₫
                                           </td>
                                           <td>
-                                            {order && order.status === 4 && product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
-                                            {order && order.status === 4 && product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
+                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div> : null}
+                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div> : null}
                                           </td>
                                         </tr>
                                       ))}

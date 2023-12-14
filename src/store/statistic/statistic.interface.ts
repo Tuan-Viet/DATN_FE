@@ -39,6 +39,7 @@ export interface Statistics {
     bestSellingProduct: {
       _id: string;
       title: string ;
+      images: string[];
       totalQuantitySold: number
     }[];
 

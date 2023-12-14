@@ -12,14 +12,11 @@ import { listProductDetailSlice } from "../../../store/productDetail/productDeta
 const Product_Collection = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const { data: listCategory, isSuccess: isSuccessCategory } = useFetchListCategoryQuery()
-
   const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery()
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
-
   const categoryState = useSelector((state: RootState) => state.categorySlice.categories)
   const productFilterState = useSelector((state: RootState) => state.productFilterSlice.products)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
-
   const onHandleFilter = (_id: string) => {
     if (_id && listProduct) {
       dispatch(listProductCategorySlice({ nameTerm: _id, products: listProduct }))
@@ -52,12 +49,12 @@ const Product_Collection = () => {
       <div className="max-w-[1500px] mx-auto">
         <div className="tabs flex justify-center items-center gap-[40px] mb-[50px]">
           {listCate?.map((cate, index) => {
-            return <div onClick={() => onHandleFilter(cate._id!)} key={index} className="tab-item text-[30px] font-medium hover:text-black hover:underline transition-all cursor-pointer">
+            return <div onClick={() => onHandleFilter(cate._id!)} key={index} className="tab-item text-[14px] font-medium hover:text-black hover:underline transition-all cursor-pointer md:text-[16px] lg:text-lg xl:text-[30px]">
               {cate.name}
             </div>
           })}
         </div>
-        <div className="outstanding-product mb-12 grid grid-cols-5 gap-[10px] transition-all ease-linear">
+        <div className="outstanding-product text-[16px] mb-12 grid grid-cols-2 gap-[20px] transition-all ease-linear md:text-[14px] md:grid-cols-3 lg:gap-[15px] lg:grid-cols-4 lg:text-lg xl:grid-cols-5">
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
             return <>
               <div className={`relative group overflow-hidden ${[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
@@ -123,14 +120,14 @@ const Product_Collection = () => {
             </>
           }) : <div className="text-center w-full">Hiện chưa có sản phẩm nào</div>}
         </div>
-        <div className="text-center">
+        {/* <div className="text-center">
           <Link
             to=""
             className="py-[15px] text-center inline-block w-[400px] rounded border border-black uppercase hover:bg-black hover:text-white transition-all"
           >
             Xem tất cả <span className="font-bold"> áo polo</span>
           </Link>
-        </div>
+        </div> */}
       </div>
     </div >
   );
