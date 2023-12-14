@@ -6,7 +6,9 @@ import {
     message,
     Image,
     Spin,
-    Select
+    Select,
+    Dropdown,
+    Tooltip
 } from 'antd';
 import {
     EditFilled,
@@ -108,8 +110,6 @@ const categoryPage = () => {
                     <a className='w-full overflow-hidden'>{record.name}</a>
                 </div>
             ),
-            sorter: (a, b) => a.name.localeCompare(b.name), // Sắp xếp theo bảng chữ cái
-            sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
         {
@@ -155,29 +155,47 @@ const categoryPage = () => {
 
         },
         {
-            title: 'NGÀY KHỞI TẠO',
+            title: 'NGÀY ĐẶT',
             dataIndex: 'createdAt',
-            render: (value) => moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
+            key: 'date',
+            sorter: (a, b) => {
+                const dateA = moment(a.createdAt);
+                const dateB = moment(b.createdAt);
+
+                // So sánh theo thời gian
+                return dateA.isBefore(dateB) ? -1 : dateA.isAfter(dateB) ? 1 : 0;
+            },
+            render: (value: any) => <span>{moment(value as string).format("HH:mm DD/MM/YYYY")}</span>,
+            sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
         },
         {
             title: '',
             key: 'action',
             render: (record: ICategory) => (
-                <Space size="middle" className='flex justify-end'>
-                    <Popconfirm
-                        title="Xóa danh mục"
-                        description="Bạn có chắc muốn xóa danh mục này"
-                        onConfirm={() => confirm(record._id!)}
-                        okText="Yes"
-                        cancelText="No"
-                        okButtonProps={{ className: "text-white bg-blue-500" }}
-                    >
-                        <DeleteFilled className='text-xl text-red-500' />
-                    </Popconfirm>
-                    <Link to={`/admin/category/update/${record._id}`}>
-                        <EditFilled className='text-xl text-yellow-500' />
-                    </Link>
-                </Space>
+                <div className="">
+                    <Space size="middle" className='flex justify-end'>
+                        <Popconfirm
+                            title="Xóa danh mục"
+                            description="Bạn có chắc muốn xóa danh mục này"
+                            onConfirm={() => confirm(record._id!)}
+                            okText="Yes"
+                            cancelText="No"
+                            okButtonProps={{ className: "text-white bg-blue-500" }}
+                        >
+                            <Tooltip title="Xóa" color={'red'} key={'red'}>
+                                <DeleteFilled className='text-xl text-red-500' />
+                            </Tooltip>
+                        </Popconfirm>
+                        <Tooltip title="Chỉnh sửa" color={'yellow'} key={'yellow'}>
+                            <Link to={`/admin/category/update/${record._id}`}>
+                                <EditFilled className='text-xl text-yellow-400' />
+                            </Link>
+                        </Tooltip>
+
+                    </Space>
+                </div>
+
             ),
         },
 

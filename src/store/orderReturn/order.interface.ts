@@ -16,6 +16,7 @@ export interface IOrderReturn {
     createdAt: any
     orderReturnDetails: any
     status: number
+    newOrder: string
 }
 
 export interface IOrderReturnState {

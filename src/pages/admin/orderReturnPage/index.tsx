@@ -6,7 +6,8 @@ import {
     Button,
     message,
     Spin,
-    Select
+    Select,
+    Tooltip
 } from 'antd';
 import {
     EditFilled,
@@ -90,35 +91,17 @@ const ordersReturnPage = () => {
             className: 'w-1/6',
         },
         {
-            title: 'NGÀY',
+            title: 'NGÀY ĐẶT',
             dataIndex: 'date',
             key: 'date',
             sorter: (a, b) => {
-                // Chuyển đổi giá trị date thành kiểu Date
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
+                const dateA = moment(a.date);
+                const dateB = moment(b.date);
 
-                // Lấy ngày, tháng, năm từ đối tượng Date
-                const dayA = dateA.getDate();
-                const monthA = dateA.getMonth() + 1; // Months are zero-based
-                const yearA = dateA.getFullYear();
-
-                const dayB = dateB.getDate();
-                const monthB = dateB.getMonth() + 1;
-                const yearB = dateB.getFullYear();
-
-                // So sánh theo ngày/tháng/năm
-                if (yearA === yearB) {
-                    if (monthA === monthB) {
-                        return dayA - dayB;
-                    } else {
-                        return monthA - monthB;
-                    }
-                } else {
-                    return yearA - yearB;
-                }
+                // So sánh theo thời gian
+                return dateA.isBefore(dateB) ? -1 : dateA.isAfter(dateB) ? 1 : 0;
             },
-            render: (value: any) => <span>{moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>,
+            render: (value: any) => <span>{moment(value as string).format("HH:mm DD/MM/YYYY")}</span>,
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -135,6 +118,14 @@ const ordersReturnPage = () => {
                 let statusText, statusColor;
 
                 switch (value.status) {
+                    case 0:
+                        statusText = 'Từ chối Y/c';
+                        statusColor = 'bg-red-200 text-red-700';
+                        break;
+                    case 1:
+                        statusText = 'Chờ Xác nhận';
+                        statusColor = 'bg-yellow-200 text-yellow-700';
+                        break;
                     case 2:
                         statusText = 'Chờ xử lí';
                         statusColor = 'bg-gray-200 text-gray-700';
@@ -143,7 +134,7 @@ const ordersReturnPage = () => {
                         statusText = 'Đang xử lí';
                         statusColor = 'bg-blue-300 text-blue-700';
                         break;
-                    case 3:
+                    case 4:
                         statusText = 'Hoàn thành';
                         statusColor = 'bg-green-300 text-green-700';
                         break;
@@ -160,7 +151,6 @@ const ordersReturnPage = () => {
             },
             sorter: (a, b) => {
                 const customOrder = [1, 2, 3, 4, 0];
-
                 const orderA = customOrder.indexOf(a.status);
                 const orderB = customOrder.indexOf(b.status);
 
@@ -175,9 +165,14 @@ const ordersReturnPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/orderreturn/${record?._id}`}>
+                    <Tooltip title="Xem" color={'green'} key={'green'}>
+                        <Link to={`/admin/orderreturn/${record?._id}`}>
+                            <EyeOutlined className='text-xl text-green-500' />
+                        </Link>
+                    </Tooltip>
+                    {/* <Link to={`/admin/orderreturn/${record?._id}`}>
                         <EyeOutlined className='text-xl text-green-500' />
-                    </Link>
+                    </Link> */}
                 </Space>
             ),
         },
@@ -203,7 +198,7 @@ const ordersReturnPage = () => {
 
     if (orderState) {
         data = sortOrder
-            .filter(order => order.status !== 1)
+            // .filter(order => order.status !== 1)
             .map((order: any, index) => ({
                 key: index + 1,
                 _id: order._id,

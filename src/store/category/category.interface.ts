@@ -1,7 +1,7 @@
 import IProduct from "../product/product.interface"
 
 export interface ICategory {
-    _id?: string
+    _id: string
     products: IProduct[]
     images: Url
     name: string

@@ -1,8 +1,6 @@
 import {
     Space,
     Table,
-    Popconfirm,
-    Image,
     Button,
     message,
     Spin,
@@ -10,11 +8,9 @@ import {
     MenuProps,
     Dropdown,
     DatePicker,
+    Tooltip,
 } from 'antd';
 import {
-    EditFilled,
-    DeleteFilled,
-    PlusOutlined,
     EyeOutlined,
     DownOutlined
 } from '@ant-design/icons';
@@ -41,7 +37,6 @@ interface DataType {
     totalMoney: number;
     paymentStatus: number;
 }
-
 
 const ordersPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
@@ -71,14 +66,11 @@ const ordersPage = () => {
             dispatch(listOrderSearchSlice({ searchTerm: search, orders: orders }))
         }
     }
-    // useEffect(() => {
-    //     if (orderState?.length === 0 && orders) {
-    //         dispatch(listOrderSearchSlice({ searchTerm: search, orders: orders }))
-    //     }
-    // }, [orderState.length === 0])
+
     if (isError) {
         return <>error</>;
     }
+
     if (isLoading) {
         return <>
             <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
@@ -104,31 +96,13 @@ const ordersPage = () => {
             dataIndex: 'date',
             key: 'date',
             sorter: (a, b) => {
-                // Chuyển đổi giá trị date thành kiểu Date
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
+                const dateA = moment(a.date);
+                const dateB = moment(b.date);
 
-                // Lấy ngày, tháng, năm từ đối tượng Date
-                const dayA = dateA.getDate();
-                const monthA = dateA.getMonth() + 1; // Months are zero-based
-                const yearA = dateA.getFullYear();
-
-                const dayB = dateB.getDate();
-                const monthB = dateB.getMonth() + 1;
-                const yearB = dateB.getFullYear();
-
-                // So sánh theo ngày/tháng/năm
-                if (yearA === yearB) {
-                    if (monthA === monthB) {
-                        return dayA - dayB;
-                    } else {
-                        return monthA - monthB;
-                    }
-                } else {
-                    return yearA - yearB;
-                }
+                // So sánh theo thời gian
+                return dateA.isBefore(dateB) ? -1 : dateA.isAfter(dateB) ? 1 : 0;
             },
-            render: (value: any) => <span>{moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>,
+            render: (value: any) => <span>{moment(value as string).format("HH:mm DD/MM/YYYY")}</span>,
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -227,9 +201,11 @@ const ordersPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/order/${record?._id}`}>
-                        <EyeOutlined className='text-xl text-green-500' />
-                    </Link>
+                    <Tooltip title="Xem" color={'green'} key={'green'}>
+                        <Link to={`/admin/order/${record?._id}`}>
+                            <EyeOutlined className='text-xl text-green-500' />
+                        </Link>
+                    </Tooltip>
                 </Space>
             ),
         },

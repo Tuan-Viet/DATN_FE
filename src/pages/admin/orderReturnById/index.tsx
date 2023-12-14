@@ -9,16 +9,19 @@ import {
     Breadcrumb,
     Table,
     Modal,
+    Image,
 } from 'antd';
 import {
-    FormOutlined
+    FormOutlined,
+    FrownOutlined
 } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../../store/orderReturn/order.service';
-import { useAddOrderByAdminMutation } from '../../../store/order/order.service';
+import { useAddOrderByAdminMutation, useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
+import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../../../store/orderDetail/orderDetail.service';
 const { TextArea } = Input;
 
 interface DataType {
@@ -35,15 +38,26 @@ const orderReturnById = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const { id } = useParams();
-
+    const [onUpdateOrder] = useUpdateOrderMutation()
     const [onAddOrderByAdmin] = useAddOrderByAdminMutation()
     const [onUpdateOrderReturn] = useUpdateOrderReturnMutation()
+    const [onUpdateOrderDetail] = useUpdateOrderDetailMutation()
+    const [onRemoveOrderDetail] = useDeleteOrderDetailMutation()
     const { data: orderReturn } = useGetOneOrderReturnQuery(id!);
+    const idOrder = orderReturn?.orderId
+    const { data: order } = useGetOneOrderQuery(idOrder || '');
 
     const ListOrderReturnDetail = orderReturn?.orderReturnDetails;
 
     const [openFormCreateOrder, setOpenFormCreateOrder] = useState(false);
     const [orderReturnDetail, setOrderReturnDetail] = useState<any[]>([]);
+    const [openFormConfirmOrderReturn, setOpenFormConfirmOrderReturn] = useState(false);
+
+    const [openFormUpdateNote, setOpenFormUpdateNote] = useState(false);
+    const [openFormUpdateInfo, setOpenFormUpdateInfo] = useState(false);
+    const [openFormUpdateStatus, setOpenFormUpdateStatus] = useState(false);
+    const [orderDetail, setOrderDetail] = useState<any[]>([]);
+    const [sumTotalMoney, setSumTotalMoney] = useState<Number>()
 
     useEffect(() => {
         if (ListOrderReturnDetail) {
@@ -140,7 +154,7 @@ const orderReturnById = () => {
         return total + order.totalMoney;
     }, 0);
 
-    const onFinish = async (values: any) => {
+    const createNewOrder = async (values: any) => {
         try {
             const valueCreate = {
                 ...values,
@@ -148,7 +162,9 @@ const orderReturnById = () => {
                 userId: orderReturn?.userId,
                 items: listOrderDetail,
                 totalMoney: totalOrderAmount,
-                paymentStatus: 0
+                paymentStatus: 1,
+                pay_method: "FREE",
+                orderReturnId: orderReturn?._id
             }
             await onAddOrderByAdmin(valueCreate)
             const updateStatus = { ...orderReturn, status: 3 }
@@ -161,17 +177,97 @@ const orderReturnById = () => {
         }
     };
 
+    const confirmOrderReturn = async () => {
+        try {
+            const orderDetailsArray = order?.orderDetails;
+            const orderReturnDetailsArray = orderReturn?.orderReturnDetails;
+
+            const updatePromises: any = orderDetailsArray?.map(async (orderDetail) => {
+                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+                );
+
+                if (matchingOrderReturnDetail) {
+                    if (orderDetail.quantity > matchingOrderReturnDetail?.quantity) {
+                        const valueUpdate = {
+                            ...orderDetail,
+                            totalMoney: orderDetail.price * (orderDetail.quantity - matchingOrderReturnDetail.quantity),
+                            quantity: orderDetail.quantity - matchingOrderReturnDetail.quantity,
+                        };
+
+                        await onUpdateOrderDetail({ _id: orderDetail._id, order: valueUpdate });
+
+                        let totalMoneyUpdate =
+                            sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
+                        setSumTotalMoney(totalMoneyUpdate);
+                        console.log(1);
+                    }
+                    if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
+                        await onRemoveOrderDetail(orderDetail._id)
+                        let totalMoneyUpdate =
+                            sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
+                        setSumTotalMoney(totalMoneyUpdate);
+
+                    }
+                }
+            });
+
+            await Promise.all(updatePromises);
+
+            const updatedTotalMoney = orderDetailsArray?.reduce((total, orderDetail) => {
+                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+                );
+
+                if (matchingOrderReturnDetail) {
+                    total -= matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price;
+                }
+
+                return total;
+            }, sumTotalMoney);
+
+            const valueStatus = order?.paymentStatus === 1 ? 5 : 4
+            const updatedOrder = { ...order, status: valueStatus, totalMoney: updatedTotalMoney };
+            await onUpdateOrder({ id: idOrder, ...updatedOrder });
+
+            const updateStatusOrderReturn = { ...orderReturn, status: 2 };
+            const idOrderReturn = order?.orderReturn?._id;
+            onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
+
+            setOpenFormConfirmOrderReturn(false);
+            message.info(`Xác nhận yêu cầu đổi hàng`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const unConfirmOrderReturn = async () => {
+        try {
+            const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
+            const updatedOrder = { ...order, status: valueStatus };
+            await onUpdateOrder({ id, ...updatedOrder });
+
+            const updateStatusOrderReturn = { ...orderReturn, status: 0 };
+            const idOrderReturn = order?.orderReturn?._id;
+            onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
+
+            setOpenFormConfirmOrderReturn(false);
+            message.info(`Xác nhận yêu cầu đổi hàng`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     function mapStatusToText(statusCode: number) {
         switch (statusCode) {
             case 0:
-                return "Đã hủy";
+                return "Từ chối yêu cầu";
             case 1:
-                return "Chờ xử lý";
+                return "Chờ xác nhận";
             case 2:
                 return "Chờ xử lí";
             case 3:
                 return "Đang xử lí";
-            case 3:
+            case 4:
                 return "Hoàn thành";
             default:
                 return "Trạng thái không xác định";
@@ -216,89 +312,227 @@ const orderReturnById = () => {
                                 columns={columns}
                                 dataSource={data}
                                 pagination={false}
+                                summary={(pageData) => {
+                                    return (
+                                        <>
+                                            <Table.Summary.Row >
+                                                <Table.Summary.Cell index={0} colSpan={3}>
+                                                    <span className='text-[13px] text-gray-600'>Trạng thái</span>
+                                                </Table.Summary.Cell>
+                                                <Table.Summary.Cell index={1} className='text-end'>
+                                                    {orderReturn?.newOrder?.status === 5 ? (
+                                                        <span className='p-2 font-medium text-xs text-green-600'>Hoàn thành</span>
+                                                    ) : (
+                                                        <span className='p-2 font-medium text-xs text-blue-700'>{mapStatusToText(orderReturn?.status)}</span>
+                                                    )}
+                                                </Table.Summary.Cell>
+                                            </Table.Summary.Row>
+                                            {orderReturn?.status === 3 && (
+                                                <Table.Summary.Row >
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
+                                                        {orderReturn.newOrder.status === 5 ? (
+                                                            <span className='text-[13px] text-gray-600'>Hoàn tất đổi hàng</span>
+                                                        ) : (
+                                                            <span className='text-[13px] text-gray-600'>Đang xử lí yêu cầu</span>
+                                                        )}
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1} className='text-end'>
+                                                        <Link to={`/admin/order/${orderReturn?.newOrder && orderReturn?.newOrder._id}`}>
+                                                            <span className="inline-block cursor-pointer border rounded-lg p-2 font-medium text-xs text-yellow-500 border-yellow-500 transition-transform transform hover:scale-105">
+                                                                Kiểm tra
+                                                            </span>
+                                                        </Link>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row>
+                                            )}
+
+                                            {orderReturn?.status === 1 && (
+                                                <Table.Summary.Row >
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
+                                                        <div className="flex items-center space-x-1">
+                                                            <span className='block '>YÊU CẦU ĐỔI TRẢ</span>
+                                                        </div>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1} className='text-end'>
+                                                        <div className="flex justify-end">
+                                                            <span className="inline-block cursor-pointer border rounded-lg p-2 font-medium text-xs text-blue-500 border-blue-500 transition-transform transform hover:scale-105"
+                                                                onClick={() => setOpenFormConfirmOrderReturn(true)}
+                                                            >
+                                                                Chi tiết
+                                                            </span>
+                                                            {/* <Button className='bg-yellow-500 text-white hover:text-white hover:bg-yellow-400' onClick={() => setOpenFormConfirmOrderReturn(true)}>Kiểm tra</Button> */}
+                                                            <Modal
+                                                                title="Yêu cầu đổi hàng"
+                                                                // centered
+                                                                open={openFormConfirmOrderReturn}
+                                                                onOk={() => setOpenFormConfirmOrderReturn(false)}
+                                                                onCancel={() => setOpenFormConfirmOrderReturn(false)}
+                                                                okButtonProps={{ hidden: true }}
+                                                                cancelButtonProps={{ hidden: true }}
+                                                                width={500}
+                                                            >
+                                                                <div className="space-y-1">
+                                                                    <span className='font-medium'>Khách hàng: </span>
+                                                                    <span>{orderReturn?.fullName}</span>
+                                                                    <span className='block mb-2 font-medium'> Lí do: </span>
+                                                                    <div className="">
+                                                                        <FrownOutlined className='text-red-500 px-1' />  {orderReturn?.reason}
+                                                                        {/* <TextArea value={orderReturn?.reason} rows={3} /> */}
+                                                                    </div>
+                                                                    <Image.PreviewGroup>
+                                                                        <div className='flex space-x-2 py-3'>
+                                                                            {orderReturn?.images.map((url: any) => (
+                                                                                <div
+                                                                                    className='w-24 h-24 border flex justify-center items-center rounded-md hover:border-blue-400 shadow-xl '
+                                                                                >
+                                                                                    <Image height={80} src={url} />
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    </Image.PreviewGroup>
+                                                                    <div className="">
+                                                                        <h2 className=' font-medium text-gray-800 my-3'>Sản phẩm đổi trả</h2>
+                                                                        {orderReturnDetail.map((item: any) => (
+                                                                            <div className="flex items-center justify-between space-x-2 mb-3">
+                                                                                <div className="flex items-center space-x-2">
+                                                                                    <div className="">
+                                                                                        <img className='h-16 w-16' src={item.productInfo.imageColor} alt="" />
+                                                                                    </div>
+                                                                                    <div className="space-y-2">
+                                                                                        <span className='block text-gray-800'><Link to={`/admin/product/${item.productInfo.product_id}`}>{item.productName}</Link></span>
+                                                                                        <div className="flex space-x-3">
+                                                                                            <div className="space-x-1 text-xs">
+                                                                                                <span>Phân loại:</span>
+                                                                                                <span className='text-blue-500'>{item.color}</span>
+                                                                                                <span className='border-l text-gray-400'></span>
+                                                                                                <span className='text-blue-500'>{item.size}</span>
+                                                                                            </div>
+                                                                                            <div className="text-xs">
+                                                                                                <span>Mã SP: <Link to={`/admin/product/${item.productInfo.product_id}`}>{item.sku}</Link></span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                                <div className=" space-x-3">
+                                                                                    <span className='text-[12px] text-gray-500'>SL: 1</span>
+                                                                                    {/* <span className='text-[12px] text-gray-500'>320,000 đ</span> */}
+                                                                                </div>
+                                                                            </div>
+                                                                        ))}
+
+
+                                                                    </div>
+                                                                    <div className="flex justify-end pt-8 space-x-3">
+                                                                        <Button
+                                                                            onClick={() => unConfirmOrderReturn()}>
+                                                                            Từ chối yêu cầu
+                                                                        </Button>
+                                                                        <Button type="primary"
+                                                                            className='bg-blue-500'
+                                                                            onClick={() => confirmOrderReturn()}>
+                                                                            Xác nhận
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </Modal>
+                                                        </div>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row >
+                                            )}
+
+                                            {orderReturn?.status === 2 && (
+                                                <Table.Summary.Row>
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1} className='text-end'>
+                                                        <div className="flex justify-end">
+                                                            <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormCreateOrder(true)}>Tạo đơn hàng</Button>
+                                                        </div>
+                                                        <Modal
+                                                            title="Tạo mới đơn hàng"
+                                                            centered
+                                                            open={openFormCreateOrder}
+                                                            onOk={() => setOpenFormCreateOrder(false)}
+                                                            onCancel={() => setOpenFormCreateOrder(false)}
+                                                            okButtonProps={{ hidden: true }}
+                                                            cancelButtonProps={{ hidden: true }}
+                                                            width={700}
+                                                        >
+                                                            <Form
+                                                                form={form}
+                                                                name="validateOnly"
+                                                                layout="vertical"
+                                                                onFinish={createNewOrder}
+                                                                autoComplete="off"
+                                                                className="mx-auto"
+                                                            >
+                                                                <Form.Item
+                                                                    name="fullName"
+                                                                    label="Khách hàng"
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                        }
+                                                                    ]}>
+                                                                    <Input />
+                                                                </Form.Item>
+
+                                                                <Form.Item
+                                                                    name="phoneNumber"
+                                                                    label="Số điện thoại"
+                                                                    rules={[{ required: true }]}
+                                                                >
+                                                                    <Input
+                                                                        style={{ width: '100%' }}
+                                                                    />
+                                                                </Form.Item>
+                                                                <Form.Item
+
+                                                                    name="address"
+                                                                    label="Địa chỉ"
+                                                                    rules={[{ required: true }]}
+                                                                    className='mb-1'
+                                                                >
+                                                                    <Input />
+                                                                </Form.Item>
+                                                                <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
+                                                                    <summary
+                                                                        className="flex w-[250px] cursor-pointer p-2 transition"
+                                                                    >
+                                                                        <span className="text-sm text-blue-500">Ghi chú <FormOutlined /></span>
+                                                                    </summary>
+                                                                    <div className="pt-3">
+                                                                        <Form.Item
+                                                                            name="note"
+                                                                        >
+                                                                            <TextArea />
+                                                                        </Form.Item>
+                                                                    </div>
+                                                                </details>
+
+                                                                <Table
+                                                                    columns={columns}
+                                                                    dataSource={data}
+                                                                    pagination={false}
+                                                                />
+                                                                <Form.Item className=' flex justify-end '>
+                                                                    <Button type="primary" htmlType="submit" className='bg-blue-500 my-3'>
+                                                                        Tạo mới
+                                                                    </Button>
+                                                                </Form.Item>
+                                                            </Form>
+                                                        </Modal>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row>
+                                            )}
+
+                                        </>
+                                    )
+                                }}
                             />
-                        </div>
-                        <div className=' flex justify-end py-3 px-5'>
-                            {orderReturn?.status === 2 && (
-                                <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormCreateOrder(true)}>Tạo đơn hàng</Button>
-                            )}
-                            {orderReturn?.status === 3 && (
-                                <span className='border rounded-lg p-2 font-medium text-xs bg-blue-300 text-blue-700'>Đang xử lí yêu cầu</span>
-                            )}
-                            <Modal
-                                title="Tạo mới đơn hàng"
-                                centered
-                                open={openFormCreateOrder}
-                                onOk={() => setOpenFormCreateOrder(false)}
-                                onCancel={() => setOpenFormCreateOrder(false)}
-                                okButtonProps={{ hidden: true }}
-                                cancelButtonProps={{ hidden: true }}
-                                width={700}
-                            >
-                                <Form
-                                    form={form}
-                                    name="validateOnly"
-                                    layout="vertical"
-                                    onFinish={onFinish}
-                                    autoComplete="off"
-                                    className="mx-auto"
-                                >
-                                    <Form.Item
-                                        name="fullName"
-                                        label="Khách hàng"
-                                        rules={[
-                                            {
-                                                required: true,
-                                            }
-                                        ]}>
-                                        <Input />
-                                    </Form.Item>
 
-                                    <Form.Item
-                                        name="phoneNumber"
-                                        label="Số điện thoại"
-                                        rules={[{ required: true }]}
-                                    >
-                                        <Input
-                                            style={{ width: '100%' }}
-                                        />
-                                    </Form.Item>
-                                    <Form.Item
 
-                                        name="address"
-                                        label="Địa chỉ"
-                                        rules={[{ required: true }]}
-                                        className='mb-1'
-                                    >
-                                        <Input />
-                                    </Form.Item>
-                                    <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
-                                        <summary
-                                            className="flex w-[250px] cursor-pointer p-2 transition"
-                                        >
-                                            <span className="text-sm text-blue-500">Ghi chú <FormOutlined /></span>
-                                        </summary>
-                                        <div className="pt-3">
-                                            <Form.Item
-                                                name="note"
-                                            >
-                                                <TextArea />
-                                            </Form.Item>
-                                        </div>
-                                    </details>
-
-                                    <Table
-                                        columns={columns}
-                                        dataSource={data}
-                                        pagination={false}
-                                    />
-                                    <Form.Item className=' flex justify-end '>
-                                        <Button type="primary" htmlType="submit" className='bg-blue-500 my-3'>
-                                            Tạo mới
-                                        </Button>
-                                    </Form.Item>
-                                </Form>
-                            </Modal>
                         </div>
                     </div>
                 </div>
