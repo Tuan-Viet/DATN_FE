@@ -426,7 +426,7 @@ const myAddress = () => {
                   )
                 })}
                 <Modal title="Basic Modal" open={isModalUpdateOpen} onOk={handleSubmit(updateAddress)} onCancel={handleCancelUpdate} okButtonProps={{ className: "text-white bg-blue-500" }}>
-                  <form className="max-w-sm" onSubmit={handleSubmit(updateAddress)}>
+                  <form className="" onSubmit={handleSubmit(updateAddress)}>
                     <input type="hidden" {...register('_id')} name="_id" />
                     <div className="mb-5">
                       <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
@@ -481,7 +481,7 @@ const myAddress = () => {
                 Thêm địa chỉ
               </Button>
               <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onAddAddress)} onCancel={handleCancel} okButtonProps={{ className: "text-white bg-blue-500" }}>
-                <form className="max-w-sm" onSubmit={handleSubmit(onAddAddress)}>
+                <form className="" onSubmit={handleSubmit(onAddAddress)}>
                   <div className="mb-5">
                     <label htmlFor="fullname" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
                     <input {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />

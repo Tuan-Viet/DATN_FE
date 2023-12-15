@@ -169,7 +169,7 @@ const myAccount = () => {
                     Thay đổi thông tin
                   </Button>
                   <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onUpdateAccount)} onCancel={handleCancel} okButtonProps={{ className: "text-white bg-blue-500" }}>
-                    <form className="max-w-sm" onSubmit={handleSubmit(onUpdateAccount)}>
+                    <form className="" onSubmit={handleSubmit(onUpdateAccount)}>
                       <input type="hidden" {...register('_id')} />
                       <div className="mb-5">
                         <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Tên của bạn</label>
