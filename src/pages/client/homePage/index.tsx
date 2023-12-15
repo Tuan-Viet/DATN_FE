@@ -9,6 +9,7 @@ import Product_Collection from "./Product_Collection";
 import Sale from "./Sale";
 import { useEffect } from "react";
 import Vouchers from "./Vourcher";
+import Outfit from "./Outfit";
 function ScrollToTop() {
     const { pathname } = useLocation();
 
@@ -27,6 +28,7 @@ const homePage = () => {
         <Category></Category>
         <Sale></Sale>
         <Outstanding_Product></Outstanding_Product>
+        <Outfit></Outfit>
         <Product_Collection></Product_Collection>
         <Policy></Policy>
         <Footer></Footer>

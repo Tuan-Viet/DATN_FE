@@ -89,7 +89,6 @@ const OrderDetail = () => {
     resolver: yupResolver(ReviewSchema)
   })
   const [countUpload, setCountUpload] = useState([0]);
-  console.log(countUpload);
 
   const user = useSelector((state: any) => state.user);
   useEffect(() => {
@@ -149,7 +148,6 @@ const OrderDetail = () => {
     const updatedImageList = imageList.filter((url) => url !== file.response[0].url);
     setImageList(updatedImageList);
   };
-  console.log(imageList);
 
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
@@ -322,6 +320,78 @@ const OrderDetail = () => {
     } catch (error) {
     }
   };
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedWard, setSelectedWards] = useState('');
+  const [selectedNameProvince, setSelectedNameProvince] = useState("");
+  const [selectedNameDistrict, setSelectednameDistrict] = useState('');
+  const [selectedNameWard, setSelectednameWard] = useState('');
+  // console.log(myProvince);
+
+  useEffect(() => {
+    // Gọi API để lấy dữ liệu tỉnh/thành phố
+    axios.get('https://provinces.open-api.vn/api/p/')
+      .then(response => setProvinces(response.data))
+      .catch(error => console.error('Error fetching provinces:', error));
+
+  }, []);
+
+  const handleProvinceChange = (e) => {
+    const provinceCode = e.target.value;
+    const nameProvince = provinces.find((item) => item.code == provinceCode)
+    // myProvince = {
+    //   code: nameProvice.code,
+    //   name: nameProvince.name
+    // }
+    setSelectedNameProvince(nameProvince.name);
+
+    setSelectedProvince(provinceCode);
+
+    // Gọi API để lấy dữ liệu quận/huyện dựa trên tỉnh/thành phố được chọn
+    axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+      .then(response => setDistricts(response.data))
+      .catch(error => console.error('Error fetching districts:', error));
+
+
+
+  };
+
+  const handleDistrictChange = (e) => {
+    const districtCode = e.target.value;
+    setSelectedDistrict(districtCode);
+
+    const nameDistrict = districts.districts.find((item) => item.code == districtCode)
+    setSelectednameDistrict(nameDistrict.name);
+
+
+    // Gọi API để lấy dữ liệu xã/phường dựa trên quận/huyện được chọn
+    axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+      .then(response => setWards(response.data))
+      .catch(error => console.error('Error fetching wards:', error));
+  };
+
+  const handleWardChange = (e) => {
+    const wardCode = e.target.value;
+    setSelectedWards(wardCode);
+
+    const nameWard = wards.wards.find((item) => item.code == wardCode)
+    setSelectednameWard(nameWard.name);
+
+  };
+
+  useEffect(() => {
+    setOrderValue('address.myProvince', selectedNameProvince)
+  }, [selectedNameProvince])
+  useEffect(() => {
+    setOrderValue('address.myDistrict', selectedNameDistrict)
+  }, [selectedNameDistrict])
+  useEffect(() => {
+    setOrderValue('address.myWard', selectedNameWard)
+  }, [selectedNameWard])
+
   return (
     <>
       <Header></Header>
@@ -447,9 +517,41 @@ const OrderDetail = () => {
 
                       </div>
                       <div className="mb-5">
+                        <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Tỉnh/Thành phố:</label>
+                        <select onChange={handleProvinceChange} value={selectedProvince} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Chọn tỉnh/thành phố</option>
+                          {provinces.map(province => (
+                            <option key={province.code} value={province.code} > {province.name}</option>
+                          ))}
+                        </select>
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.myProvince?.message : ""}</p>
+
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Quận/Huyện:</label>
+                        <select onChange={handleDistrictChange} value={selectedDistrict} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Chọn quận/huyện</option>
+                          {districts?.districts?.map(district => (
+                            <option key={district.code} value={district.code}>{district.name}</option>
+                          ))}
+                        </select>
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.myDistrict?.message : ""}</p>
+                      </div>
+                      <div className="mb-5">
+                        <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn xã/phường:</label>
+                        <select onChange={handleWardChange} value={selectedWard} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Chọn xã phường</option>
+                          {wards?.wards?.map(ward => (
+                            <option key={ward.code} value={ward.code}>{ward.name}</option>
+                          ))}
+                        </select>
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.myWard?.message : ""}</p>
+
+                      </div>
+                      <div className="mb-5">
                         <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Địa chỉ gửi</label>
-                        <input type="text" {...registerOrder("address")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.message : ""}</p>
+                        <input type="text" {...registerOrder("address.detailAddress")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.detailAddress?.message : ""}</p>
 
                       </div>
                       <div className="mb-5">
@@ -553,9 +655,8 @@ const OrderDetail = () => {
                                                     ₫
                                                   </td>
                                                   <td className="px-6 py-4">
-
                                                     <div className="relative flex items-center max-w-[8rem]">
-                                                      <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} placeholder="0" required min={0} max={product.quantity} />
+                                                      <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
                                                       /{product.quantity}
                                                     </div>
                                                   </td>
@@ -626,9 +727,9 @@ const OrderDetail = () => {
                         <th scope="col" className="px-6 py-3">
                           Thành tiền
                         </th>
-                        {order && order.status === 4 && <th scope="col" className="px-6 py-3">
+                        {order && order.status === 4 || order?.status === 5 ? <th scope="col" className="px-6 py-3">
                           Đánh giá
-                        </th>}
+                        </th> : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -688,8 +789,8 @@ const OrderDetail = () => {
                                             ₫
                                           </td>
                                           <td>
-                                            {order && order.status === 4 && product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div>}
-                                            {order && order.status === 4 && product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div>}
+                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div> : null}
+                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div> : null}
                                           </td>
                                         </tr>
                                       ))}
@@ -762,7 +863,10 @@ const OrderDetail = () => {
                     </p>
                     <p className="mb-2">
                       Địa chỉ:{" "}
-                      <span className="font-bold">{order?.address}</span>
+                      <span className="font-bold">{order?.address.detailAddress},</span>
+                      <span className="font-bold">{order?.address.myWard},</span>
+                      <span className="font-bold">{order?.address.myDistrict},</span>
+                      <span className="font-bold">{order?.address.myProvince}</span>
                     </p>
                     <p className="mb-2">
                       Số điện thoại:{" "}

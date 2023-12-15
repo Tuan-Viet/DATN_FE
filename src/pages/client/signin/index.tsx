@@ -28,7 +28,6 @@ const signin = () => {
   const [onAddCart] = useAddCartMutation()
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!)
   const user = useSelector((state: any) => state?.user);
-  console.log(cartState)
   useEffect(() => {
     const buttonSignin = document.querySelector(".buttonSignin");
     const formSignin = document.querySelector(".formSignin");

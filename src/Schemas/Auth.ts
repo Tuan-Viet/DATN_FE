@@ -20,6 +20,9 @@ export const AddressSchema = yup.object({
     fullname: yup.string().required("Bạn cần phải nhập tên người nhận"),
     phone: yup.string().required("Bạn cần phải nhập số điện thoại người nhận"),
     address: yup.string().required("Bạn cần phải nhập địa chỉ nhận hàng"),
+    myProvince: yup.string().required("Bạn cần phải chọn tỉnh thành"),
+    myDistrict: yup.string().required("Bạn cần phải chọn huyện"),
+    myWard: yup.string().required("Bạn cần phải chọn xã"),
 })
 
 export type AddressForm = yup.InferType<typeof AddressSchema>
