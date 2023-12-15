@@ -29,6 +29,7 @@ export const orderReturnSchema = yup.object({
         detailAddress: yup.string().required('trường địa chỉ bắt buộc nhập')
     }),
     reason: yup.string().required(),
+    note: yup.string(),
     // totalMoney: yup.number().required(),
     createdAt: yup.date()
 })

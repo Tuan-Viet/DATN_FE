@@ -461,18 +461,9 @@ const myAddress = () => {
                     </Link>
                   );
                 })}
-                <Modal
-                  title="Basic Modal"
-                  open={isModalUpdateOpen}
-                  onOk={handleSubmit(updateAddress)}
-                  onCancel={handleCancelUpdate}
-                  okButtonProps={{ className: "text-white bg-blue-500" }}
-                >
-                  <form
-                    className="max-w-sm"
-                    onSubmit={handleSubmit(updateAddress)}
-                  >
-                    <input type="hidden" {...register("_id")} name="_id" />
+                <Modal title="Basic Modal" open={isModalUpdateOpen} onOk={handleSubmit(updateAddress)} onCancel={handleCancelUpdate} okButtonProps={{ className: "text-white bg-blue-500" }}>
+                  <form className="" onSubmit={handleSubmit(updateAddress)}>
+                    <input type="hidden" {...register('_id')} name="_id" />
                     <div className="mb-5">
                       <label
                         htmlFor="email"
@@ -602,17 +593,8 @@ const myAddress = () => {
               >
                 Thêm địa chỉ
               </Button>
-              <Modal
-                title="Basic Modal"
-                open={isModalOpen}
-                onOk={handleSubmit(onAddAddress)}
-                onCancel={handleCancel}
-                okButtonProps={{ className: "text-white bg-blue-500" }}
-              >
-                <form
-                  className="max-w-sm"
-                  onSubmit={handleSubmit(onAddAddress)}
-                >
+              <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onAddAddress)} onCancel={handleCancel} okButtonProps={{ className: "text-white bg-blue-500" }}>
+                <form className="" onSubmit={handleSubmit(onAddAddress)}>
                   <div className="mb-5">
                     <label
                       htmlFor="fullname"

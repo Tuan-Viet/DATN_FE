@@ -1,3 +1,5 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
@@ -286,19 +288,41 @@ const OrderDetail = () => {
     resolver: yupResolver(orderReturnSchema),
   });
 
-  const [addOrderReturn] = useAddOrderReturnMutation();
-  const [updatedOrder] = useUpdateOrderMutation();
+  const [addOrderReturn] = useAddOrderReturnMutation()
+  const [updatedOrder] = useUpdateOrderMutation()
 
+  // const [addReason, setAddReason] = useState(false)
+  // const handleReasonChange = async (e) => {
+  //   setAddReason(true);
+  // };
+  const [showInput, setShowInput] = useState(false);
+
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    if (selectedValue !== "khác") {
+      setOrderValue('reason', selectedValue)
+    }
+    setShowInput(selectedValue === "khác");
+  };
   const onAddOrderReturn = async (data: orderReturnForm) => {
     const image = imageList;
     const value = { ...data, images: image };
     console.log(value);
-
-    await addOrderReturn(value);
-    await updatedOrder({ id: id, status: 6 });
-    toast.success("Trả hàng thành công vui lòng đợi xác nhận");
-    setIsModalOrderOpen(false);
-  };
+    let count = 0;
+    value.orderDetailIds?.forEach((item) => {
+      if (item.quantity == 0) {
+        count += 1
+      }
+    })
+    if (count === data.orderDetailIds.length) {
+      toast.success('Vui lòng chọn số lượng sản phẩm để trả hàng')
+    } else {
+      await addOrderReturn(value)
+      await updatedOrder({ id: id, status: 6 })
+      toast.success('Trả hàng thành công vui lòng đợi xác nhận')
+      setIsModalOrderOpen(false);
+    }
+  }
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -346,9 +370,7 @@ const OrderDetail = () => {
     action: " http://localhost:8080/api/images/upload",
   };
 
-  const handleChange: UploadProps["onChange"] = ({
-    fileList: newFileList,
-  }: any) => {
+  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
     setCountUpload(newFileList.length);
   };
@@ -731,21 +753,31 @@ const OrderDetail = () => {
                         </p>
                       </div>
                       <div className="mb-5">
-                        <label
-                          htmlFor="small-input"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Lý do trả hàng
-                        </label>
-                        <input
-                          type="text"
-                          {...registerOrder("reason")}
-                          id="reason"
-                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors ? OrderErrors.reason?.message : ""}
-                        </p>
+                        <label htmlFor="reason" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do đổi hàng</label>
+                        <select onClick={handleSelectChange} id="reason" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Chọn lý do</option>
+                          <option value="bị lỗi size">Bị lỗi size</option>
+                          <option value="không đúng mẫu">Không đúng mẫu</option>
+                          <option value="khác" >Khác</option>
+                        </select>
+                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
+                      </div>
+                      {showInput && (
+                        <div className="mb-5" id="addreason">
+                          <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do cụ thể</label>
+                          <input
+                            type="text"
+                            {...registerOrder("reason")}
+                            id="reason"
+                            className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                          <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
+                        </div>
+                      )}
+                      <div className="mb-5">
+                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Ghi chú</label>
+                        <input type="text" {...registerOrder("note")} id="note" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        {/* <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p> */}
                       </div>
                       <Form
                         form={form}
@@ -802,120 +834,71 @@ const OrderDetail = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {productsInOrder?.map((product, index) => {
+                              {productsInOrder.map((product, index) => {
                                 return (
                                   <>
-                                    {productDetailState
-                                      ?.filter(
-                                        (proDetail) =>
-                                          proDetail._id ===
-                                          product.productDetailId
-                                      )
-                                      .map((item) => {
-                                        return (
-                                          <>
-                                            {productState
-                                              ?.filter(
-                                                (prod) =>
-                                                  prod._id === item.product_id
-                                              )
-                                              .map((pro) => (
-                                                <tr className="bg-white ">
-                                                  <input
-                                                    type="hidden"
-                                                    {...registerOrder(
-                                                      `orderDetailIds.${index}.productDetailId`
-                                                    )}
-                                                    value={item._id}
-                                                    className=""
-                                                  />
-                                                  <input
-                                                    type="hidden"
-                                                    {...registerOrder(
-                                                      `orderDetailIds.${index}.orderDetailId`
-                                                    )}
-                                                    value={product._id}
-                                                    className=""
-                                                  />
-                                                  <input
-                                                    type="hidden"
-                                                    {...registerOrder(
-                                                      `orderDetailIds.${index}.color`
-                                                    )}
-                                                    value={product.color}
-                                                    className=""
-                                                  />
-                                                  <input
-                                                    type="hidden"
-                                                    {...registerOrder(
-                                                      `orderDetailIds.${index}.size`
-                                                    )}
-                                                    value={product.size}
-                                                    className=""
-                                                  />
-                                                  <input
-                                                    type="hidden"
-                                                    {...registerOrder(
-                                                      `orderDetailIds.${index}.price`
-                                                    )}
-                                                    value={product.price}
-                                                    className=""
-                                                  />
-                                                  <th
-                                                    scope="row"
-                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
-                                                  >
-                                                    <img
-                                                      src={item.imageColor}
-                                                      alt={pro.title}
-                                                      className="w-[58px] h-[78px] object-cover"
-                                                    />
-                                                    <div>
-                                                      <p className="mb-4 max-w-[340px]">
-                                                        {pro.title}
-                                                      </p>
-                                                      <p>
-                                                        {product.color} /{" "}
-                                                        {product.size}
-                                                      </p>
-                                                    </div>
-                                                  </th>
-                                                  <td className="px-6 py-4">
-                                                    {product.price.toLocaleString(
-                                                      "vi-VN"
-                                                    )}
-                                                    ₫
-                                                  </td>
-                                                  <td className="px-6 py-4">
-                                                    <div className="relative flex items-center max-w-[8rem]">
-                                                      <input
-                                                        type="number"
-                                                        {...registerOrder(
-                                                          `orderDetailIds.${index}.quantity`
-                                                        )}
-                                                        className="border-x-0 border-gray-300"
-                                                        onChange={(e) =>
-                                                          e.target.value
-                                                        }
-                                                        defaultValue={0}
-                                                        placeholder="0"
-                                                        min={0}
-                                                        max={product.quantity}
+                                    {
+                                      productDetailState
+                                        ?.filter(
+                                          (proDetail) =>
+                                            proDetail._id === product.productDetailId
+                                        )
+                                        .map((item) => {
+                                          return (
+                                            <>
+                                              {productState
+                                                ?.filter(
+                                                  (prod) => prod._id === item.product_id
+                                                )
+                                                .map((pro) => (
+
+                                                  <tr className="bg-white ">
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
+                                                    <th
+                                                      scope="row"
+                                                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                                    >
+                                                      <img
+                                                        src={item.imageColor}
+                                                        alt={pro.title}
+                                                        className="w-[58px] h-[78px] object-cover"
                                                       />
-                                                      /{product.quantity}
-                                                    </div>
-                                                  </td>
-                                                  <td className="px-6 py-4">
-                                                    {product.totalMoney.toLocaleString(
-                                                      "vi-VN"
-                                                    )}
-                                                    ₫
-                                                  </td>
-                                                </tr>
-                                              ))}
-                                          </>
-                                        );
-                                      })}
+                                                      <div>
+                                                        <p className="mb-4 max-w-[340px]">
+                                                          {pro.title}
+                                                        </p>
+                                                        <p>
+                                                          {product.color} / {product.size}
+                                                        </p>
+                                                      </div>
+                                                    </th>
+                                                    <td className="px-6 py-4">
+                                                      {product.price.toLocaleString(
+                                                        "vi-VN"
+                                                      )}
+                                                      ₫
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                      <div className="relative flex items-center max-w-[8rem]">
+                                                        <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
+                                                        /{product.quantity}
+                                                      </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                      {product.totalMoney.toLocaleString(
+                                                        "vi-VN"
+                                                      )}
+                                                      ₫
+                                                    </td>
+                                                  </tr>
+                                                ))}
+                                            </>
+                                          );
+                                        })}
                                   </>
                                 );
                               })}
