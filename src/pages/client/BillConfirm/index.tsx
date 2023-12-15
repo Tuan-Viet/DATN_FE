@@ -236,7 +236,10 @@ const BillConfirm = () => {
                         <p className="mb-3">{getOneOrder?.phoneNumber}</p>
                         <p className="mb-3">Thanh toán khi nhận hàng (COD)</p>
                         <p className="mb-3">
-                          {getOneOrder?.address}
+                          {getOneOrder?.address.detailAddress},
+                          {getOneOrder?.address.myWard},
+                          {getOneOrder?.address.myDistrict},
+                          {getOneOrder?.address.myProvince},
                         </p>
                         <p className="mb-3">
                           {getOneOrder?.note}
