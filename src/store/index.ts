@@ -26,6 +26,7 @@ import ReviewApi from './reviews/review.service'
 import reviewSlice, { reviewByRatingReducer, reviewByUserReducer } from './reviews/reviewSlice'
 import outfitAPI from './outfit/outfit.service'
 import outfitSlice, { searchOutfitReducer } from './outfit/outfitSlice'
+import statisticSlice from './statistic/statisticSlice'
 
 const commonConfig = {
   key: "user",
@@ -53,6 +54,7 @@ export const store = configureStore({
 
     [ReviewApi.reducerPath]: ReviewApi.reducer,
     [outfitAPI.reducerPath]: outfitAPI.reducer,
+
     // category
     categorySlice: categorySlice,
     // product
@@ -90,7 +92,9 @@ export const store = configureStore({
     reviewByRatingReducer: reviewByRatingReducer,
     // outfit
     searchOutfitReducer: searchOutfitReducer,
-    outfitSlice: outfitSlice
+    outfitSlice: outfitSlice,
+
+    statisticSlice: statisticSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([

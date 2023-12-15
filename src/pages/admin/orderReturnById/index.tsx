@@ -71,7 +71,7 @@ const orderReturnById = () => {
     const [nameDistrict, setNameDistrict] = useState<any>();
     const [nameWard, setNameWard] = useState<any>();
 
-    const provinceUpdate: any = provinces.find((item: any) => item.name == order?.address.myProvince)
+    const provinceUpdate: any = provinces.find((item: any) => item.name == order?.address?.myProvince)
 
     console.log(nameProvince);
     console.log(nameDistrict);
@@ -333,7 +333,7 @@ const orderReturnById = () => {
             await onUpdateOrder({ id: idOrder, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 2 };
-            const idOrderReturn = order?.orderReturn?._id;
+            const idOrderReturn = orderReturn?._id;
             onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
 
             setOpenFormConfirmOrderReturn(false);
@@ -344,12 +344,14 @@ const orderReturnById = () => {
     };
     const unConfirmOrderReturn = async () => {
         try {
+            console.log(1);
+
             const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
             const updatedOrder = { ...order, status: valueStatus };
             await onUpdateOrder({ id: idOrder, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 0 };
-            const idOrderReturn = order?.orderReturn?._id;
+            const idOrderReturn = orderReturn?._id;
             onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
 
             setOpenFormConfirmOrderReturn(false);

@@ -1,6 +1,24 @@
 import {
     Breadcrumb,
-    Button, Collapse, CollapseProps, Empty, Form, Image, List, Modal, Progress, Rate, Skeleton, Space, Spin, Tag, Tooltip, Input, message, Popconfirm
+    Button,
+    Collapse,
+    CollapseProps,
+    Empty,
+    Form,
+    Image,
+    List,
+    Modal,
+    Progress,
+    Rate,
+    Skeleton,
+    Space,
+    Spin,
+    Tag,
+    Tooltip,
+    Input,
+    message,
+    Popconfirm,
+    Typography
 } from "antd";
 import {
     EditFilled,
@@ -23,6 +41,7 @@ import { deleteReviewSlice, listReviewSlice } from "../../../store/reviews/revie
 import moment from 'moment';
 import { useGetProductRevenueQuery } from "../../../store/statistic/statistic.service";
 const { TextArea } = Input;
+const { Paragraph } = Typography;
 
 interface ProductDetail {
     _id: string;
@@ -603,52 +622,8 @@ const productById = () => {
                                                                 <span className="font-medium">{item.reply.nameUser}</span>
                                                                 <span className="block text-end text-xs text-gray-400 pr-1">{moment(item.reply.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
                                                             </div>
-                                                            <span className="block mt-2">{item.reply.comment}</span>
+                                                            <Paragraph editable={{ onChange: (newComment) => editReplyComment(item._id, { commentEdit: newComment }) }}>{item.reply.comment}</Paragraph>
                                                         </div>
-                                                        {/* 
-                                                        <Collapse
-                                                            size="small"
-                                                            ghost
-                                                            className="p-0 w-4/5"
-                                                            style={{ padding: 0 }}
-                                                            expandIcon={({ isActive }) => <CaretRightOutlined style={{ display: 'none', padding: 0 }} rotate={isActive ? 90 : 0} />}
-                                                        >
-                                                            <Collapse.Panel
-                                                                key={index}
-                                                                header={
-                                                                    <span className="block text-[13px] cursor-pointer  text-gray-500 hover:underline"
-                                                                    >
-                                                                        Sửa <EditOutlined className="text-gray-500 text-[13px]" />
-                                                                    </span>
-                                                                } >
-                                                                <Form
-                                                                    form={form}
-                                                                    name="validateOnly"
-                                                                    layout="vertical"
-                                                                    onFinish={(values: any) => editReplyComment(item._id, values)}
-                                                                    autoComplete="off"
-                                                                    className="mx-auto w-full"
-                                                                    style={{ padding: 0 }}
-                                                                >
-                                                                    <div className="flex items-end">
-                                                                        <Form.Item
-                                                                            name="commentEdit"
-                                                                            className="w-full"
-                                                                        >
-                                                                            <TextArea defaultValue={item.reply.comment} rows={2} className="w-full" bordered={false} />
-                                                                        </Form.Item>
-                                                                        <Form.Item >
-                                                                            <Button
-                                                                                type="link"
-                                                                                htmlType="submit"
-                                                                                className='flex items-end justify-center  rounded-full w-8 text-blue-400 '>
-                                                                                Lưu
-                                                                            </Button>
-                                                                        </Form.Item>
-                                                                    </div>
-                                                                </Form>
-                                                            </Collapse.Panel>
-                                                        </Collapse> */}
                                                     </Collapse.Panel>
                                                 </Collapse>
                                             )}
