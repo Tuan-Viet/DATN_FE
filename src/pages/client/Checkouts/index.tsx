@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
-import { useDeleteCartMutation, useListCartQuery } from "../../../store/cart/cart.service";
+import { useDeleteCartMutation, useListCartQuery, useUpdateCartMutation } from "../../../store/cart/cart.service";
 import { Dispatch, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listCartSlice, removeCartSlice } from "../../../store/cart/cartSlice";
@@ -23,6 +23,8 @@ import { toast } from "react-toastify";
 import { useGetInfoUserQuery } from "../../../store/user/user.service";
 import { ICart } from "../../../store/cart/cart.interface";
 import { IOrder } from "../../../store/order/order.interface";
+import { listOutfitSlice } from "../../../store/outfit/outfitSlice";
+import { useFetchListOutfitQuery } from "../../../store/outfit/outfit.service";
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
@@ -43,9 +45,17 @@ const CheckoutsPage = () => {
   const [loading, setLoading] = useState(false);
   const [codeVoucher, setcodeVoucher] = useState<string>("")
   const [idVoucher, setIdVoucher] = useState<string>("")
+  const [onUpdateCart] = useUpdateCartMutation();
+
   const { data: getOneVoucher } = useGetOneVoucherQuery(idVoucher!)
   const { data: InfoUser, refetch: refetchUser } = useGetInfoUserQuery(user?.current?._id)
-
+  const { data: listOutfit, isSuccess: isSuccesslistOutfit } = useFetchListOutfitQuery();
+  const outfitState = useSelector((state: RootState) => state.outfitSlice.outfits)
+  useEffect(() => {
+    if (listOutfit) {
+      dispatch(listOutfitSlice(listOutfit))
+    }
+  }, [isSuccesslistOutfit])
 
   useEffect(() => {
     if (listCart) {
@@ -89,6 +99,19 @@ const CheckoutsPage = () => {
   })
 
   const { current } = useSelector((state: any) => state.user);
+  let count = 0
+  cartState?.map((cart) => {
+    const matchingItems = outfitState?.filter((outfit) =>
+      outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
+    )
+    // console.log(matchingItems)
+    const filteredItems = matchingItems?.[0]?.items?.filter(
+      (product) => cart.productDetailId.product_id === product.product_id
+    );
+    if (filteredItems) {
+      count += 1
+    }
+  });
   useEffect(() => {
     if (current) {
       setValue("status", 1)
@@ -108,7 +131,7 @@ const CheckoutsPage = () => {
             quantity: item.quantity,
             color: item.productDetailId.nameColor,
             size: item.productDetailId.size,
-            totalMoney: item.totalMoney
+            totalMoney: count === 2 ? (item.totalMoney - ((item.totalMoney * 10) / 100)) : item.totalMoney
           };
         }
         return undefined;
@@ -128,8 +151,6 @@ const CheckoutsPage = () => {
       }
       setLoading(true);
       await onAddOrder(data).then(({ data }: any) => {
-        console.log(cartState)
-        console.log(data);
         refetchCart().then(() => dispatch(listCartSlice(listCart!)))
         if (data?.pay_method === "COD") {
           setTimeout(async () => {
@@ -144,6 +165,13 @@ const CheckoutsPage = () => {
         else if (data?.pay_method === "MOMO") {
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/momo_payment`, data)
             .then(({ data }) => window.location.href = data)
+        }
+        if (count === 2) {
+          cartState?.map((cart) => {
+            const { totalMoney } = cart
+            const newTotalMoney = totalMoney - (totalMoney - ((totalMoney * 10) / 100))
+            onUpdateCart({ _id: cart._id, totalMoney: newTotalMoney })
+          })
         }
       }
       ).then(() => refetchUser())
@@ -178,7 +206,11 @@ const CheckoutsPage = () => {
     let total = 0
     if (cartState) {
       cartState.map((cart) => {
-        total += cart.totalMoney
+        if (count && count === 2) {
+          total += cart.totalMoney - ((cart.totalMoney * 10) / 100)
+        } else {
+          total += cart.totalMoney
+        }
       })
     }
     setTotalCart(total);
@@ -187,9 +219,14 @@ const CheckoutsPage = () => {
     let total = 0
     if (cartState) {
       cartState.map((cart) => {
-        total += cart.totalMoney
+        if (count && count === 2) {
+          total += cart.totalMoney - ((cart.totalMoney * 10) / 100)
+        } else {
+          total += cart.totalMoney
+        }
       })
     }
+
     if (getOneVoucher && getOneVoucher?.type === "percent") {
       let totalPer = total - (total * getOneVoucher?.discount) / 100
       if (totalPer) {
@@ -240,7 +277,7 @@ const CheckoutsPage = () => {
     //   code: nameProvice.code,
     //   name: nameProvince.name
     // }
-    setSelectedNameProvince(nameProvince.name);
+    setSelectedNameProvince(nameProvince?.name);
 
     setSelectedProvince(provinceCode);
 
@@ -253,11 +290,11 @@ const CheckoutsPage = () => {
 
   };
 
-  const handleDistrictChange = (e) => {
+  const handleDistrictChange = (e: any) => {
     const districtCode = e.target.value;
     setSelectedDistrict(districtCode);
 
-    const nameDistrict = districts.districts.find((item) => item.code == districtCode)
+    const nameDistrict = districts.districts?.find((item) => item.code == districtCode)
     setSelectednameDistrict(nameDistrict.name);
 
 
@@ -584,7 +621,7 @@ const CheckoutsPage = () => {
                         <p className="font-medium">
                           Giá:{" "}
                           <span className="text-red-500 text-xl font-bold">
-                            {cart.totalMoney.toLocaleString("vi-VN")}₫
+                            {count && count === 2 ? (cart.totalMoney - ((cart.totalMoney * 10) / 100)).toLocaleString("vi-VN") : cart.totalMoney.toLocaleString("vi-VN")}đ
                           </span>
                         </p>
                       </div>
@@ -630,7 +667,7 @@ const CheckoutsPage = () => {
             <div className="pt-7 pb-5 border-b-[1px]">
               <div className="flex justify-between mb-4">
                 <span>Tạm tính:</span>
-                <span className="font-medium text-sm">{(totalCart).toLocaleString("vi-VN")}₫</span>
+                <span className="font-medium text-sm">{totalCart.toLocaleString("vi-VN")}₫</span>
               </div>
 
               {totalVoucher && totalVoucher !== 0 ?
@@ -665,8 +702,6 @@ const CheckoutsPage = () => {
             <div className="flex justify-between mb-4 items-center pt-5">
               <span className="text-lg font-semibold">Tổng cộng: </span>
               {totalVoucher == 0 ? <span className="text-black text-2xl font-bold">{(totalCart >= 500000 ? totalCart : totalCart + 40000).toLocaleString("vi-VN")}₫</span> : <span className="text-black text-2xl font-bold">{(totalVoucher >= 500000 ? totalVoucher : totalVoucher + 40000).toLocaleString("vi-VN")}₫</span>}
-
-
             </div>
             <div className="flex justify-between">
               <Link

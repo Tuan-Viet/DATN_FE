@@ -31,7 +31,7 @@ const cartAPI = createApi({
             }),
             invalidatesTags: ["cart"]
         }),
-        updateCart: builer.mutation<ICart[], ICart>({
+        updateCart: builer.mutation({
             query: ({ _id, ...cart }) => ({
                 method: "PATCH",
                 url: `/carts/${_id}`,

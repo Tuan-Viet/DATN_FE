@@ -48,6 +48,7 @@ const cartSlice = createSlice({
             } else {
                 if (cartExistIndex !== -1) {
                     state.carts[cartExistIndex].quantity += actions.payload.quantity
+                    state.carts[cartExistIndex].totalMoney += actions.payload.totalMoney
                 } else {
                     state.carts = [
                         ...state.carts,
