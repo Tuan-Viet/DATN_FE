@@ -4,7 +4,7 @@ import categoryApi from './category/category.service'
 import productAPI from './product/product.service'
 import categorySlice from './category/categorySlice'
 import { productFilterSliceReducer, productOutstandReducer, productRelatedSliceReducer, productSaleSliceReducer, productSearchReducer, productSliceReducer, productViewedSliceReducer } from './product/productSlice'
-import productDetailSlice, { productDetailFilterSliceReducer, productDetailIdReducer, productDetailRelatedReducer } from './productDetail/productDetailSlice'
+import productDetailSlice, { productDetailByOutfitSizeReducer, productDetailByOutfitSizeSecondReducer, productDetailFilterByOutfitSecondReducer, productDetailFilterByOutfitSliceReducer, productDetailFilterSliceReducer, productDetailIdReducer, productDetailRelatedReducer } from './productDetail/productDetailSlice'
 import productDetailAPI from './productDetail/productDetail.service'
 import cartAPI from './cart/cart.service'
 import cartSlice from './cart/cartSlice'
@@ -25,7 +25,7 @@ import statisticsApi from './statistic/statistic.service'
 import ReviewApi from './reviews/review.service'
 import reviewSlice, { reviewByRatingReducer, reviewByUserReducer } from './reviews/reviewSlice'
 import outfitAPI from './outfit/outfit.service'
-import { searchOutfitReducer } from './outfit/outfitSlice'
+import outfitSlice, { searchOutfitReducer } from './outfit/outfitSlice'
 
 const commonConfig = {
   key: "user",
@@ -68,6 +68,11 @@ export const store = configureStore({
     productDetailFilterSliceReducer: productDetailFilterSliceReducer,
     productDetailIdReducer: productDetailIdReducer,
     productDetailRelatedReducer: productDetailRelatedReducer,
+    // outfit
+    productDetailFilterByOutfitSliceReducer: productDetailFilterByOutfitSliceReducer,
+    productDetailByOutfitSizeReducer: productDetailByOutfitSizeReducer,
+    productDetailByOutfitSizeSecondReducer: productDetailByOutfitSizeSecondReducer,
+    productDetailFilterByOutfitSecondReducer: productDetailFilterByOutfitSecondReducer,
     // cart
     cartSlice: cartSlice,
     // order
@@ -85,6 +90,7 @@ export const store = configureStore({
     reviewByRatingReducer: reviewByRatingReducer,
     // outfit
     searchOutfitReducer: searchOutfitReducer,
+    outfitSlice: outfitSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat([

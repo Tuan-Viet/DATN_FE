@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { getOneIdProductDetailSlice, listProductDetailFilter, listProductDetailFilterSlice, listProductDetailRelatedSlice, listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { useFetchOneCategoryQuery } from "../../../store/category/category.service";
-import { listProductRelated, listProductRelatedSlice } from "../../../store/product/productSlice";
+import { listProductRelated, listProductRelatedSlice, listProductSlice } from "../../../store/product/productSlice";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { CartSchema, cartForm } from "../../../Schemas/Cart";
@@ -35,6 +35,9 @@ import { useFetchListReviewsQuery } from "../../../store/reviews/review.service"
 import { listReviewByRate, listReviewByRateFilterSlice, listReviewByRateSlice, listReviewByUserFilterSlice, listReviewSlice } from "../../../store/reviews/reviewSlice";
 import { IProductDetail } from "../../../store/productDetail/productDetail.interface";
 import moment from "moment";
+import { useFetchListOutfitQuery, useFetchOneOutfitQuery } from "../../../store/outfit/outfit.service";
+import { listOutfitSlice, listSearchOutfitByProductIdSlice } from "../../../store/outfit/outfitSlice";
+import OutfitProductDetail from "./OutfitProductDetail";
 
 const ProductInfo = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -44,6 +47,7 @@ const ProductInfo = () => {
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productDetailFilterState = useSelector((state: RootState) => state.productDetailFilterSliceReducer.productDetails)
   const productDetailGetOneId = useSelector((state: RootState) => state.productDetailIdReducer.productDetails)
+
   const listCartState = useSelector((state: RootState) => state.cartSlice.carts)
   const [onAddCart] = useAddCartMutation()
   const [formProductDetailClicked, setFormProductDetailClicked] = useState(false);
@@ -69,21 +73,30 @@ const ProductInfo = () => {
       resolver: yupResolver(productDetailSchema)
     })
     const [quantity, setQuantity] = useState(1);
-
     const [currentTab, setCurrentTab] = useState(1);
-    const { data: listProduct } = useFetchListProductQuery()
+    const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
     const { data: getOneProduct, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id)
     const { data: listProductDetailApi, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const categoryId = getOneProduct?.categoryId?._id;
     const { data: getCategoryById, isLoading: categoryLoading } = useFetchOneCategoryQuery(categoryId)
     const userStore = useSelector((state: any) => state.user)
     const productDetailRelatedState = useSelector((state: RootState) => state.productDetailRelatedReducer.productDetails)
+    const { data: listOutfit, isSuccess: isSuccessOutfit } = useFetchListOutfitQuery()
+    const listOutfitByProductIdState = useSelector((state: RootState) => state.searchOutfitReducer.outfits)
+    const listOutfitState = useSelector((state: RootState) => state.outfitSlice.outfits)
+    const productState = useSelector((state: RootState) => state.productSlice.products)
+
     const [rateAver, setRateAver] = useState<number>(0)
     useEffect(() => {
       if (getOneProduct) {
         dispatch(listProductDetailSlice(getOneProduct?.variants))
       }
     }, [getOneProduct])
+    useEffect(() => {
+      if (listProduct) {
+        dispatch(listProductSlice(listProduct))
+      }
+    }, [isSuccessListProduct])
     useEffect(() => {
       if (listProductDetailApi) {
         dispatch(listProductDetailRelatedSlice(listProductDetailApi))
@@ -100,7 +113,16 @@ const ProductInfo = () => {
         setRateAver(rateAverage)
       }
     }, [reviewState, rateAver])
-
+    useEffect(() => {
+      if (listOutfit && id) {
+        dispatch(listSearchOutfitByProductIdSlice({ searchTerm: id, outfits: listOutfit }))
+      }
+    }, [isSuccessOutfit, id])
+    useEffect(() => {
+      if (listOutfit) {
+        dispatch(listOutfitSlice(listOutfit))
+      }
+    }, [isSuccessOutfit])
     const data = reviewByRateStateVer.map((item, index) => ({
       color: item.color,
       size: item.size,
@@ -131,7 +153,6 @@ const ProductInfo = () => {
                   <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 2, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">2 sao</div>
                   <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 1, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">1 sao</div>
                   {userStore?.current?._id && <div onClick={() => dispatch(listReviewByUserFilterSlice({ userId: userStore.current._id, reviews: reviewState && reviewState }))} className="border border-1 w-[150px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Đánh giá của tôi</div>}
-
                 </div>
               </div>
             </div>
@@ -536,7 +557,7 @@ const ProductInfo = () => {
     }
 
     const productDetails = filterAndTransformVariants(getOneProduct?.variants)
-    const colorProduct = productDetails.map((product: any) => product.nameColor)
+    const colorProduct = productDetails?.map((product: any) => product.nameColor)
 
 
     let sizeProduct: any = [];
@@ -555,18 +576,17 @@ const ProductInfo = () => {
     const handleImageClick = (index: any) => {
       setSelectedImage(index);
     };
-
     const handlePrevClick = () => {
       setSelectedImage((prev) => (prev > 0 ? prev - 1 : listImages.length - 1));
     };
-
     const handleNextClick = () => {
       setSelectedImage((prev) => (prev < listImages.length - 1 ? prev + 1 : 0));
     };
-
     useEffect(() => {
       window.scrollTo({ top: 0, left: 0 });
     }, [id]);
+
+
     return (
       <div className=" mx-3 mb-[70px] my-10" id="scroller ">
         {/* <ScrollToTop /> */}
@@ -705,7 +725,6 @@ const ProductInfo = () => {
                     <div className="">
                       {[...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
                         <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
-
                         <div className="flex my-6">
                           <div className="w-[13%] text-sm font-bold">Màu sắc</div>
                           <div className="flex">
@@ -812,6 +831,11 @@ const ProductInfo = () => {
               </div>
 
             </form>
+            {/* outfit */}
+            {listOutfitByProductIdState.length > 0 &&
+              <OutfitProductDetail listOutfitByProductIdState={listOutfitByProductIdState} productState={productState} id={id} productDetailRelatedState={productDetailRelatedState} listOutfitState={listOutfitState} listCartState={listCartState}></OutfitProductDetail>
+            }
+
             {isSuccessProduct ? (
               <div className="policy flex justify-between gap-x-[13px]">
                 <div>

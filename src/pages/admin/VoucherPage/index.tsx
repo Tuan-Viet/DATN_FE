@@ -53,11 +53,7 @@ const VoucherPage = () => {
         }
 
     }, [isSuccess, search])
-    // useEffect(() => {
-    //     if (listVochers) {
-    //         dispatch(listVoucherSlice(listVochers))
-    //     }
-    // }, [isSuccess])
+
     const handleSearch = () => {
         if (listVochers && search) {
             console.log(1)

@@ -18,6 +18,7 @@ const routes = {
     addresses: "/account/addresses",
     orderDetail: "/account/orders/:id",
     searchResult: "/search",
+    outfit: "/outfit",
 
     // Admin 
     admin: "/admin",
@@ -26,6 +27,10 @@ const routes = {
     adminProductAdd: "/admin/product/add",
     adminProductUpdate: "/admin/product/update/:id",
     adminProductById: "/admin/product/:id",
+    adminOutfitPage: "/admin/outfit",
+    adminOutfitAdd: "/admin/outfit/add",
+    adminOutfitUpdate: "/admin/outfit/update/:id",
+    adminOutfitById: "/admin/outfit/:id",
     adminCategorys: "/admin/category",
     adminCategoryAdd: "/admin/category/add",
     adminCategoryUpdate: "/admin/category/update/:id",

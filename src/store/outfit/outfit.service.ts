@@ -8,7 +8,7 @@ const outfitAPI = createApi({
     }),
     tagTypes: ["outfit"],
     endpoints: (builer) => ({
-        fetchListOutfit: builer.query<IOutfit, void>({
+        fetchListOutfit: builer.query<IOutfit[], void>({
             query: () => `/outfit`,
             providesTags: ["outfit"]
         }),
@@ -28,7 +28,7 @@ const outfitAPI = createApi({
         }),
         updateOutfit: builer.mutation<IOutfit[], IOutfit>({
             query: ({ _id, ...outfit }) => ({
-                url: "/outfit/" + _id,
+                url: `/outfit/${_id}/edit`,
                 method: "PATCH",
                 body: outfit
             }),

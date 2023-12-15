@@ -63,9 +63,9 @@ const columns = [
   // Thêm các cột khác nếu cần
 ];
 interface OrderRevanueByMonthProps {
-  showTable?: boolean; 
+  showTable?: boolean;
 }
-const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({showTable : true})) => {
+const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({ showTable: true })) => {
   const { data: orderRevanueMonth, isSuccess: isSuccessGetRevanueMonth } = useGetOrderRevenueByMonthQuery()
   console.log(orderRevanueMonth);
   console.log(isSuccessGetRevanueMonth);
@@ -159,37 +159,37 @@ const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({showTable : tru
           }}
         /></div>
       <div>
-      {props.showTable && (
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={{ size: 'small', pageSize: 20 }}
-          summary={() => (
-            <Table.Summary.Row className='h-20 bg-blue-50'>
-              <Table.Summary.Cell index={0} colSpan={1}>
-                <strong>Tổng</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={0} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalOrders, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={2} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={3} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalOrderValue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={4} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={5} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={6} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          )}
-        />)}
+        {props.showTable && (
+          <Table
+            columns={columns}
+            dataSource={data}
+            pagination={{ size: 'small', pageSize: 20 }}
+            summary={() => (
+              <Table.Summary.Row className='h-20 bg-blue-50'>
+                <Table.Summary.Cell index={0} colSpan={1}>
+                  <strong>Tổng</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={0} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalOrders, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={3} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalOrderValue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={4} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={5} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={6} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            )}
+          />)}
       </div></>
   )
 }
