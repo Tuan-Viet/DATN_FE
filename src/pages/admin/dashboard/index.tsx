@@ -120,6 +120,8 @@ const DashboardPage = () => {
                     ;
         }
     };
+    console.log(dashboardStatistic);
+
     return <>
         <h2 className='text-2xl p-4 font-bold pb-2'>KẾT QUẢ KINH DOANH TRONG NGÀY</h2>
         <p className='text-sm italic px-4'>Trong vòng 24 giờ</p>

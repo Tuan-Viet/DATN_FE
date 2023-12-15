@@ -1,23 +1,21 @@
 import {
     Space,
     Table,
-    Popconfirm,
-    Image,
     Button,
     message,
     Spin,
-    Select
+    Select,
+    MenuProps,
+    Dropdown,
+    DatePicker,
+    Tooltip,
 } from 'antd';
 import {
-    EditFilled,
-    DeleteFilled,
-    PlusOutlined,
     EyeOutlined,
-    SearchOutlined
+    DownOutlined
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
@@ -26,6 +24,9 @@ import { useListOrderQuery } from '../../../store/order/order.service';
 import { listOrderSearchSlice, listOrderSlice } from '../../../store/order/orderSlice';
 import { useForm } from 'react-hook-form';
 import moment from 'moment';
+import React from 'react';
+import { } from 'antd';
+const { RangePicker } = DatePicker;
 
 interface DataType {
     key: React.Key;
@@ -37,16 +38,21 @@ interface DataType {
     paymentStatus: number;
 }
 
-
 const ordersPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
     const { data: orders, isLoading, isError, isSuccess } = useListOrderQuery()
     const { handleSubmit } = useForm();
     const [search, setSearch] = useState<string>("")
     const orderState = useSelector((state: RootState) => state.orderSlice.orders)
-    const [orderOption, setOrderOption] = useState<Number>(1);
 
-    // const [onRemove] = useRemoveProductMutation()
+    const [selectedStatus, setSelectedStatus] = useState<any[]>([]);
+    const [dateFrom, setDateFrom] = useState<any>(null);
+    const [dateTo, setDateTo] = useState<any>(null);
+    const [selectedFilterType, setSelectedFilterType] = useState('');
+
+    const [orderOption, setOrderOption] = useState<Number>(1);
+    const [visibleStatus, setVisibleStatus] = useState(false);
+    const [visibleDate, setVisibleDate] = useState(false);
     useEffect(() => {
         if (orders) {
             if (search === "" || !search) {
@@ -60,14 +66,11 @@ const ordersPage = () => {
             dispatch(listOrderSearchSlice({ searchTerm: search, orders: orders }))
         }
     }
-    // useEffect(() => {
-    //     if (orderState?.length === 0 && orders) {
-    //         dispatch(listOrderSearchSlice({ searchTerm: search, orders: orders }))
-    //     }
-    // }, [orderState.length === 0])
+
     if (isError) {
         return <>error</>;
     }
+
     if (isLoading) {
         return <>
             <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
@@ -93,31 +96,13 @@ const ordersPage = () => {
             dataIndex: 'date',
             key: 'date',
             sorter: (a, b) => {
-                // Chuyển đổi giá trị date thành kiểu Date
-                const dateA = new Date(a.date);
-                const dateB = new Date(b.date);
+                const dateA = moment(a.date);
+                const dateB = moment(b.date);
 
-                // Lấy ngày, tháng, năm từ đối tượng Date
-                const dayA = dateA.getDate();
-                const monthA = dateA.getMonth() + 1; // Months are zero-based
-                const yearA = dateA.getFullYear();
-
-                const dayB = dateB.getDate();
-                const monthB = dateB.getMonth() + 1;
-                const yearB = dateB.getFullYear();
-
-                // So sánh theo ngày/tháng/năm
-                if (yearA === yearB) {
-                    if (monthA === monthB) {
-                        return dayA - dayB;
-                    } else {
-                        return monthA - monthB;
-                    }
-                } else {
-                    return yearA - yearB;
-                }
+                // So sánh theo thời gian
+                return dateA.isBefore(dateB) ? -1 : dateA.isAfter(dateB) ? 1 : 0;
             },
-            render: (value: any) => <span>{moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>,
+            render: (value: any) => <span>{moment(value as string).format("HH:mm DD/MM/YYYY")}</span>,
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -200,7 +185,7 @@ const ordersPage = () => {
                 );
             },
             sorter: (a, b) => {
-                const customOrder = [1, 2, 3, 4, 0];
+                const customOrder = [0, 1, 2, 3, 4, 5, 6];
 
                 const orderA = customOrder.indexOf(a.status);
                 const orderB = customOrder.indexOf(b.status);
@@ -216,16 +201,258 @@ const ordersPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/order/${record?._id}`}>
-                        <EyeOutlined className='text-xl text-green-500' />
-                    </Link>
+                    <Tooltip title="Xem" color={'green'} key={'green'}>
+                        <Link to={`/admin/order/${record?._id}`}>
+                            <EyeOutlined className='text-xl text-green-500' />
+                        </Link>
+                    </Tooltip>
                 </Space>
             ),
         },
 
     ];
 
-    const sortOrder = [...orderState];
+    const toggleStatus = (status: any) => {
+        if (selectedStatus.includes(status)) {
+            setSelectedStatus(selectedStatus.filter(item => item !== status));
+        } else {
+            setSelectedStatus([...selectedStatus, status]);
+        }
+    };
+
+    const filteredOrder = orderState?.filter((order: any) => {
+        // Lọc theo danh mục đã chọn
+        if (selectedStatus.length > 0 && !selectedStatus.includes(order.status)) {
+            return false;
+        }
+        // Lọc theo thời gian
+        if (dateFrom && dateTo) {
+            const createdAtMoment = moment(order.createdAt, 'YYYY-MM-DD HH:mm:ss');
+
+            if (!createdAtMoment.isBetween(dateFrom, dateTo)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+    const handleResetClick = () => {
+        setSelectedStatus([]);
+    };
+
+    const handleClickFilterStatus = () => {
+        setVisibleStatus(!visibleStatus);
+    };
+
+    const listStatusByOrder = [0, 1, 2, 3, 4, 5, 6];
+    function orderStatus(satus: number) {
+        switch (satus) {
+            case 0:
+                return "Hủy đơn hàng";
+            case 1:
+                return "Chờ xử lí";
+            case 2:
+                return "Đang chuản bị hàng";
+            case 3:
+                return "Đang giao";
+            case 4:
+                return "Đã nhận hàng"
+            case 5:
+                return "Hoàn Thành"
+            case 6:
+                return "Yêu cầu đổi hàng"
+            default:
+                return "Trạng thái không xác định";
+        }
+    }
+    const filterStatus: MenuProps['items'] = [
+        {
+            label: (
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">{selectedStatus?.length} đã chọn</span>
+
+                    <button
+                        type="button"
+                        className="text-sm text-gray-900 underline underline-offset-4"
+                        onClick={handleResetClick}
+                    >
+                        Reset
+                    </button>
+                </div>
+            ),
+            key: '0',
+        },
+        {
+            type: 'divider',
+        },
+        ...(listStatusByOrder?.map((status: any) => ({
+            label: (
+                <label htmlFor={`FilterStatus-${status}`} className="inline-flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        id={`FilterStatus-${status}`}
+                        className="h-5 w-5 rounded border-gray-300"
+                        checked={selectedStatus?.includes(status)}
+                        onChange={() => toggleStatus(status)}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">{orderStatus(status)}</span>
+                    {/* ({cate.products.length - 1}) */}
+                </label>
+            ),
+            key: status,
+        })) || []),
+    ];
+
+    const handleClickFilterDate = () => {
+        setVisibleDate(!visibleDate);
+    };
+    const handleResetDate = () => {
+        setSelectedFilterType("")
+        setDateFrom(null);
+        setDateTo(null);
+    };
+
+    const handleDateFilter = (filterType: string) => {
+        let fromDate, toDate;
+
+        switch (filterType) {
+            case 'today':
+                fromDate = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+                toDate = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+                break;
+            case 'oneWeekAgo':
+                fromDate = moment().subtract(7, 'days').startOf('day').format('YYYY-MM-DD HH:mm:ss');
+                toDate = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+                break;
+            case 'oneMonthAgo':
+                fromDate = moment().subtract(1, 'months').startOf('day').format('YYYY-MM-DD HH:mm:ss');
+                toDate = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+                break;
+            default:
+                fromDate = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+                toDate = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
+                break;
+        }
+
+        setDateFrom(fromDate);
+        setDateTo(toDate);
+    };
+
+    const handleDateChange = (dates: [moment.Moment, moment.Moment] | null) => {
+        if (dates) {
+            const fromDate = dates[0].startOf('day').format('YYYY-MM-DD HH:mm:ss');
+            const toDate = dates[1].endOf('day').format('YYYY-MM-DD HH:mm:ss');
+            setDateFrom(fromDate);
+            setDateTo(toDate);
+            setSelectedFilterType('');
+        } else {
+            setDateFrom(null);
+            setDateTo(null);
+        }
+    };
+
+    const filterDate: MenuProps['items'] = [
+        {
+            label: (
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">Thời gian</span>
+
+                    <button
+                        type="button"
+                        className="text-sm text-gray-900 underline underline-offset-4"
+                        onClick={handleResetDate}
+                    >
+                        Reset
+                    </button>
+                </div>
+            ),
+            key: '0',
+        },
+        {
+            type: 'divider',
+        },
+        {
+            label: (
+                <label htmlFor="FilterToday" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterToday"
+                        type="radio"
+                        id="FilterToday"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => {
+                            handleDateFilter('today');
+                            setSelectedFilterType('today');
+                        }}
+                        checked={selectedFilterType === 'today'}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        Hôm nay
+                    </span>
+                </label>
+            ),
+            key: 'today',
+        },
+        {
+            label: (
+                <label htmlFor="FilterOneWeekAgo" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterOneWeekAgo"
+                        type="radio"
+                        id="FilterOneWeekAgo"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => {
+                            handleDateFilter('oneWeekAgo');
+                            setSelectedFilterType('oneWeekAgo');
+                        }}
+                        checked={selectedFilterType === 'oneWeekAgo'}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        1 tuần trước
+                    </span>
+                </label>
+            ),
+            key: 'oneWeekAgo',
+        },
+        {
+            label: (
+                <label htmlFor="FilterOneMonthAgo" className="inline-flex items-center gap-2">
+                    <input
+                        name="FilterOneMonthAgo"
+                        type="radio"
+                        id="FilterOneMonthAgo"
+                        className="h-5 w-5 rounded border-gray-300"
+                        onChange={() => {
+                            handleDateFilter('oneMonthAgo');
+                            setSelectedFilterType('oneMonthAgo');
+                        }}
+                        checked={selectedFilterType === 'oneMonthAgo'}
+                    />
+
+                    <span className="text-sm font-medium text-gray-700">
+                        1 tháng trước
+                    </span>
+                </label>
+            ),
+            key: 'oneMonthAgo',
+        },
+
+        {
+            label: (
+                <RangePicker
+                    bordered={false}
+                    onChange={(dates: any) => handleDateChange(dates)}
+                    format={'DD/MM/YYYY'}
+                />
+            ),
+            key: 1,
+        },
+
+    ];
+
+    const sortOrder = [...filteredOrder];
 
     switch (orderOption) {
         case 1:
@@ -293,12 +520,44 @@ const ordersPage = () => {
 
 
                 </div>
-                <div className="flex justify-end items-start mb-6">
+                <div className="flex justify-between items-start mb-6">
+                    <div className="flex items-center space-x-3">
+                        <Dropdown
+                            menu={{ items: filterStatus }}
+                            trigger={['click']}
+                            visible={visibleStatus}
+                            onOpenChange={handleClickFilterStatus}
+                        >
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Button className='w-[250px]'>
+                                    <Space className='flex justify-between' >
+                                        <span>Lọc theo trạng thái đơn hàng</span>
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </a>
+                        </Dropdown>
+                        <Dropdown
+                            menu={{ items: filterDate }}
+                            trigger={['click']}
+                            visible={visibleDate}
+                            onOpenChange={handleClickFilterDate}
+                        >
+                            <a onClick={(e) => e.preventDefault()}>
+                                <Button className='w-[250px]'>
+                                    <Space className='flex justify-between' >
+                                        <span>Lọc theo thời gian</span>
+                                        <DownOutlined />
+                                    </Space>
+                                </Button>
+                            </a>
+                        </Dropdown>
+                    </div>
                     <div className="flex items-center">
                         <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
                         <Select
                             defaultValue={1}
-                            style={{ width: 200, height: 36 }}
+                            style={{ width: 200 }}
                             options={[
                                 { value: 1, label: 'Mới nhất' },
                                 { value: 2, label: 'Cũ nhất' },

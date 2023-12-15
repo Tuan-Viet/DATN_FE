@@ -74,7 +74,16 @@ const outfitUpdate = () => {
     const { data: listProductDeatil, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery()
     const { data: outfitById } = useFetchOneOutfitQuery(id!)
     const outfitSearchState = useSelector((state: RootState) => state.searchOutfitReducer.outfits)
+
     const filterOutfitById = outfitSearchState.find(outfit => outfit._id === id);
+    const filteredProductOne = listProduct?.filter(product => {
+        const titleLowerCase = product.title.toLowerCase();
+        return !product.hide && (titleLowerCase.includes('áo') || titleLowerCase.includes('sơ mi'));
+    }) || [];
+    const filteredProductTwo = listProduct?.filter(product => {
+        const titleLowerCase = product.title.toLowerCase();
+        return !product.hide && (titleLowerCase.includes('quần') || titleLowerCase.includes('short'));
+    }) || [];
     const [newImage, setNewImage] = useState(false);
 
     const filteredProducts = listProduct?.filter(product => !product.hide) || [];
@@ -137,7 +146,7 @@ const outfitUpdate = () => {
         const listProductDetail = listProductDeatil?.filter((productDetail: any) => {
             return productDetail.product_id === selectedProductId;
         });
-        const productById = filteredProducts?.find((product: any) => product._id === selectedProductId);
+        const productById = filteredProductOne?.find((product: any) => product._id === selectedProductId);
 
         setProductOne(productById)
         setProductDetailByOne(listProductDetail);
@@ -147,7 +156,7 @@ const outfitUpdate = () => {
         const listProductDetail = listProductDeatil?.filter((productDetail: any) => {
             return productDetail.product_id === selectedProductId;
         });
-        const productById = filteredProducts?.find((product: any) => product._id === selectedProductId);
+        const productById = filteredProductTwo?.find((product: any) => product._id === selectedProductId);
 
         setProductTwo(productById)
         setProductDetailByTwo(listProductDetail);
@@ -221,8 +230,9 @@ const outfitUpdate = () => {
                 description: description,
                 image: valueImage
             };
+            console.log(valueUpdate);
 
-            await onUpdate({ _id: id, ...valueUpdate })
+            // await onUpdate({ _id: id, ...valueUpdate })
         } else {
             const valueUpdate: any = {
                 title: values.title,
@@ -231,12 +241,13 @@ const outfitUpdate = () => {
                 description: description,
                 image: outfitById?.image
             };
+            console.log(valueUpdate);
 
-            await onUpdate({ _id: id, ...valueUpdate })
+            // await onUpdate({ _id: id, ...valueUpdate })
         }
 
         message.success(`Tạo mới thành công`);
-        navigate("/admin/outfit");
+        // navigate("/admin/outfit");
     };
 
     const props: UploadProps = {
@@ -405,7 +416,7 @@ const outfitUpdate = () => {
                                                 </div>
                                             )}
                                         >
-                                            {filteredProducts?.map((product: any) => (
+                                            {filteredProductOne?.map((product: any) => (
                                                 <Option key={product._id}
                                                     value={product._id}
                                                     label={product.title}
@@ -525,7 +536,7 @@ const outfitUpdate = () => {
                                                 </div>
                                             )}
                                         >
-                                            {filteredProducts?.map((product: any) => (
+                                            {filteredProductTwo?.map((product: any) => (
                                                 <Option key={product._id}
                                                     value={product._id}
                                                     label={product.title}

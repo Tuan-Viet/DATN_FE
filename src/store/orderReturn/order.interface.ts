@@ -8,7 +8,12 @@ export interface IOrderReturn {
     fullName: string
     email: string
     phoneNumber: string
-    address: string
+    address: {
+        myProvince: string,
+        myDistrict: string,
+        myWard: string,
+        detailAddress: string
+    }
     reason: string
     note: string
     totalMoney: number
@@ -16,6 +21,7 @@ export interface IOrderReturn {
     createdAt: any
     orderReturnDetails: any
     status: number
+    newOrder: string
 }
 
 export interface IOrderReturnState {

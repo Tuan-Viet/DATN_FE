@@ -1,17 +1,20 @@
 import IProduct from "../product/product.interface"
 
 export interface IReview {
+    _id: string
     productId: string
     userId: {
         _id: string
         fullname: string
     }
+    fullName: string
     color: string
     size: string
     rating: number
     comment: string
     images: Types[]
     createdAt: string
+    reply: any
 }
 
 

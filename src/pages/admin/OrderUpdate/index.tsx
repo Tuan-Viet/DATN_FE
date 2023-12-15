@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
+import { useDeleteOrderMutation, useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
 import { ColumnsType } from 'antd/es/table';
 import moment from 'moment';
 import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../../store/orderReturn/order.service';
@@ -83,12 +83,14 @@ const orderUpdate = () => {
     const [onUpdateOrderReturn] = useUpdateOrderReturnMutation()
     const [onUpdateOrderDetail] = useUpdateOrderDetailMutation()
     const [onRemoveOrderDetail] = useDeleteOrderDetailMutation()
+    const [onRemoveOrder] = useDeleteOrderMutation()
     let orderDetails = []
     const { data: order } = useGetOneOrderQuery(id || '');
     const { data: voucher } = useListVoucherQuery();
     const voucherByOrder = voucher?.filter(voucher => voucher.code === order?.voucher_code)
 
     const idOrderReturn = order?.orderReturn?._id
+    console.log(order);
 
     const { data: orderReturn } = useGetOneOrderReturnQuery(idOrderReturn);
 
@@ -305,17 +307,13 @@ const orderUpdate = () => {
 
                         await onUpdateOrderDetail({ _id: orderDetail._id, order: valueUpdate });
 
-                        let totalMoneyUpdate =
-                            sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
+                        let totalMoneyUpdate = sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
                         setSumTotalMoney(totalMoneyUpdate);
-                        console.log(1);
                     }
                     if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
                         await onRemoveOrderDetail(orderDetail._id)
-                        let totalMoneyUpdate =
-                            sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
+                        let totalMoneyUpdate = sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
                         setSumTotalMoney(totalMoneyUpdate);
-
                     }
                 }
             });
@@ -334,7 +332,8 @@ const orderUpdate = () => {
                 return total;
             }, sumTotalMoney);
 
-            const updatedOrder = { ...order, status: 5, totalMoney: updatedTotalMoney };
+            const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
+            const updatedOrder = { ...order, status: valueStatus, totalMoney: updatedTotalMoney };
             await onUpdate({ id, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 2 };
@@ -342,7 +341,23 @@ const orderUpdate = () => {
             onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
 
             setOpenFormConfirmOrderReturn(false);
-            message.info(`Xác nhận yêu cầu đổi hàng`);
+            message.success(`Xác nhận yêu cầu đổi hàng`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const unConfirmOrderReturn = async () => {
+        try {
+            const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
+            const updatedOrder = { ...order, status: valueStatus };
+            await onUpdate({ id, ...updatedOrder });
+
+            const updateStatusOrderReturn = { ...orderReturn, status: 0 };
+            const idOrderReturn = order?.orderReturn?._id;
+            onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
+
+            setOpenFormConfirmOrderReturn(false);
+            message.error(`Xác nhận từ chối yêu cầu đổi hàng`);
         } catch (error) {
             console.log(error);
         }
@@ -436,35 +451,61 @@ const orderUpdate = () => {
                                                         -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                         {/* {totalCart?} */}
                                                     </div>}
-                                                    <div className='text-end'>
-                                                        {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
-                                                    </div>
+
+                                                    {order?.pay_method === "FREE" ? (
+                                                        <div className='text-end'>
+                                                            Miễn phí
+                                                        </div>
+                                                    ) : (
+                                                        <div className='text-end'>
+                                                            {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
+                                                        </div>
+                                                    )}
+
                                                     <div className='text-end'>
                                                         {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                     </div>
                                                 </Table.Summary.Cell>
                                             </Table.Summary.Row>
                                             <Table.Summary.Row className=''>
-                                                <Table.Summary.Cell index={0} colSpan={3}>
-                                                    {(order as any)?.paymentStatus === 1 ? (
+                                                {order?.pay_method === "FREE" ? (
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
                                                         <div className="flex items-center space-x-2">
                                                             <CheckCircleOutlined className='text-green-500 text-2xl' />
                                                             <div className="">
-                                                                <span className='text-xs font-semibold'>
+                                                                <span className='text-xs font-semibold block'>
                                                                     ĐƠN HÀNG ĐÃ XÁC NHẬN THANH TOÁN {(order as any).totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
                                                                 </span>
                                                                 <span className='block text-gray-800 text-xs'>
-                                                                    {order?.pay_method === "COD" ? "Thu hộ (COD)" : "Chuyển khoản ngân hàng"}
+                                                                    (Đơn hàng đổi hàng)
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                    ) : (
-                                                        <div className="flex items-center space-x-2 ">
-                                                            <CreditCardOutlined className='text-[#1677ff] text-lg' />
-                                                            <span className='block text-xs'>{order?.pay_method === "COD" ? "THU HỘ (COD)" : "CHUUYỂN KHOẢN"}</span>
-                                                        </div>
-                                                    )}
-                                                </Table.Summary.Cell>
+
+                                                    </Table.Summary.Cell>
+                                                ) : (
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
+                                                        {(order as any)?.paymentStatus === 1 ? (
+                                                            <div className="flex items-center space-x-2">
+                                                                <CheckCircleOutlined className='text-green-500 text-2xl' />
+                                                                <div className="">
+                                                                    <span className='text-xs font-semibold'>
+                                                                        ĐƠN HÀNG ĐÃ XÁC NHẬN THANH TOÁN {(order as any).totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
+                                                                    </span>
+                                                                    <span className='block text-gray-800 text-xs'>
+                                                                        {order?.pay_method === "COD" ? "Thu hộ (COD)" : "Chuyển khoản ngân hàng"}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center space-x-2 ">
+                                                                <CreditCardOutlined className='text-[#1677ff] text-lg' />
+                                                                <span className='block text-xs'>{order?.pay_method === "COD" ? "THU HỘ (COD)" : "CHUUYỂN KHOẢN"}</span>
+                                                            </div>
+                                                        )}
+                                                    </Table.Summary.Cell>
+                                                )}
+
                                                 <Table.Summary.Cell index={1}>
                                                     {(order as any)?.paymentStatus !== 1 && (order as any)?.pay_method === "COD" ? (
                                                         <div className="flex justify-end">
@@ -547,7 +588,12 @@ const orderUpdate = () => {
                                                         )}
                                                         {order?.status === 6 && (
                                                             <div className="flex justify-end">
-                                                                <Button className='bg-yellow-500 text-white hover:text-white hover:bg-yellow-400' onClick={() => setOpenFormConfirmOrderReturn(true)}>Xác nhận đổi hàng</Button>
+                                                                <span className="inline-block cursor-pointer border rounded-lg p-2 font-medium text-xs text-yellow-500 border-yellow-500 transition-transform transform hover:scale-105"
+                                                                    onClick={() => setOpenFormConfirmOrderReturn(true)}
+                                                                >
+                                                                    Kiểm tra
+                                                                </span>
+                                                                {/* <Button className='bg-yellow-500 text-white hover:text-white hover:bg-yellow-400' onClick={() => setOpenFormConfirmOrderReturn(true)}>Kiểm tra</Button> */}
                                                             </div>
                                                         )}
                                                         {order?.status === 1 || order?.status === 2 ? (
@@ -576,7 +622,7 @@ const orderUpdate = () => {
                                                                 </div>
                                                                 <Image.PreviewGroup>
                                                                     <div className='flex space-x-2 py-3'>
-                                                                        {orderReturn?.images.map((url: any) => (
+                                                                        {orderReturn?.images?.map((url: any) => (
                                                                             <div
                                                                                 className='w-24 h-24 border flex justify-center items-center rounded-md hover:border-blue-400 shadow-xl '
                                                                             >
@@ -618,7 +664,11 @@ const orderUpdate = () => {
 
 
                                                                 </div>
-                                                                <div className="flex justify-end pt-8">
+                                                                <div className="flex justify-end pt-8 space-x-3">
+                                                                    <Button
+                                                                        onClick={() => unConfirmOrderReturn()}>
+                                                                        Từ chối yêu cầu
+                                                                    </Button>
                                                                     <Button type="primary"
                                                                         className='bg-blue-500'
                                                                         onClick={() => confirmOrderReturn()}>
@@ -801,7 +851,10 @@ const orderUpdate = () => {
                             </div>
                             <span className='block'>{order?.fullName}</span>
                             <span className='block'>{order?.phoneNumber}</span>
-                            <span className='block'>{order?.address}</span>
+                            <span className='block'>{order?.address?.myProvince}</span>
+                            <span className='block'>{order?.address?.myDistrict}</span>
+                            <span className='block'>{order?.address?.myWard}</span>
+                            <span className='block'>{order?.address?.detailAddress}</span>
                         </div>
                         <div className="border-b p-4">
                             <h2 className='text-sm mb-2 font-medium text-gray-900 '>Phương thức vận chuyển</h2>

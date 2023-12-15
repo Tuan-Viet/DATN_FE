@@ -6,31 +6,24 @@ import {
     Button,
     message,
     Spin,
-    Slider,
-    InputNumber,
-    Select
+    Select,
+    Tooltip
 } from 'antd';
 import {
     EditFilled,
     DeleteFilled,
     PlusOutlined,
-    EyeOutlined,
-    SearchOutlined,
-    DownOutlined
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { useFetchListProductByAdminQuery, useFetchListProductQuery, useRemoveProductMutation } from '../../../store/product/product.service';
 import { useEffect, useState } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
-import { deleteProductSearchSlice, deleteProductSlice, listProductFilterSlice, listProductSearch, listProductSearchBySkuSlice, listProductSearchSlice } from '../../../store/product/productSlice';
 import { useForm } from "react-hook-form";
 import { ColumnsType, TableProps } from 'antd/es/table';
 import moment from 'moment';
 import { useFetchListOutfitQuery, useRemoveOutfitMutation } from '../../../store/outfit/outfit.service';
 import { deleteOutfitSlice, listSearchOutfit, listSearchOutfitBySkuSlice, listSearchOutfitByTitleSlice } from '../../../store/outfit/outfitSlice';
-
 interface DataType {
     _id: React.Key;
     sku: string;
@@ -50,7 +43,6 @@ const outfitPage = () => {
     const [messageApi, contextHolder] = message.useMessage();
     const { data: listOutfit, isLoading, isError, isSuccess } = useFetchListOutfitQuery()
     const outfitSearchState = useSelector((state: RootState) => state.searchOutfitReducer.outfits)
-    console.log(listOutfit);
 
     // const productState = useSelector((state: RootState) => state.productSlice.products)
     const [sortOption, setSortOption] = useState<Number>(1)
@@ -70,6 +62,7 @@ const outfitPage = () => {
             dispatch(listSearchOutfitByTitleSlice({ searchTerm: search, outfits: listOutfit }));
         }
     };
+
     useEffect(() => {
         if (outfitSearchState?.length === 0 && listOutfit) {
             if (search) {
@@ -77,9 +70,11 @@ const outfitPage = () => {
             }
         }
     }, [outfitSearchState.length === 0]);
+
     if (isError) {
         return <>error</>;
     }
+
     if (isLoading) {
         return <>
             <div className="fixed inset-0 flex justify-center items-center bg-gray-50 ">
@@ -101,6 +96,7 @@ const outfitPage = () => {
             console.log(error);
         }
     }
+
     const columns: ColumnsType<DataType> = [
         {
             title: 'STT',
@@ -151,7 +147,7 @@ const outfitPage = () => {
             ),
         },
         {
-            title: 'SẢN PHẨM QUẦM',
+            title: 'SẢN PHẨM QUẦN',
             dataIndex: 'productTwo',
             key: 'productOne',
             render: (value: any) => (
@@ -171,29 +167,41 @@ const outfitPage = () => {
         {
             title: 'NGÀY KHỞI TẠO',
             dataIndex: 'createdAt',
-            render: (value) => moment(value as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
+            key: 'date',
+            sorter: (a, b) => {
+                const dateA = moment(a.createdAt);
+                const dateB = moment(b.createdAt);
+
+                // So sánh theo thời gian
+                return dateA.isBefore(dateB) ? -1 : dateA.isAfter(dateB) ? 1 : 0;
+            },
+            render: (value: any) => <span>{moment(value as string).format("HH:mm DD/MM/YYYY")}</span>,
+            sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
         },
         {
             title: '',
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    {/* <Link to={`/admin/product/${record?._id}`}>
-                        <EyeOutlined className='text-xl text-green-400' />
-                    </Link> */}
                     <Popconfirm
-                        title="Delete category"
-                        description="Are you sure to delete this category?"
+                        title="Xóa outfit"
+                        description="Bạn có chắc muốn xóa Outfit này không"
                         onConfirm={() => confirm(record?._id)}
                         okText="Yes"
                         cancelText="No"
                         okButtonProps={{ className: "text-white bg-blue-400" }}
                     >
-                        <DeleteFilled className='text-xl text-red-400' />
+                        <Tooltip title="Xóa" color={'red'} key={'red'}>
+                            <DeleteFilled className='text-xl text-red-500' />
+                        </Tooltip>
                     </Popconfirm>
-                    <Link to={`/admin/outfit/update/${record?._id}`}>
-                        <EditFilled className='text-xl text-yellow-400' />
-                    </Link>
+                    <Tooltip title="Chỉnh sửa" color={'yellow'} key={'yellow'}>
+                        <Link to={`/admin/outfit/update/${record?._id}`}>
+                            <EditFilled className='text-xl text-yellow-400' />
+                        </Link>
+                    </Tooltip>
+
                 </Space>
             ),
         },
@@ -222,6 +230,7 @@ const outfitPage = () => {
         default:
             break;
     }
+
     const data: DataType[] = sortedProducts?.map((product: any, index) => ({
         key: index + 1,
         _id: product._id!,
@@ -233,13 +242,11 @@ const outfitPage = () => {
         description: product.description,
         createdAt: product.createdAt,
     }));
+
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
 
-    // useEffect(() => {
-    //     window.scrollTo({ top: 0, left: 0 });
-    // }, []);
     return (
         <div className="">
             {contextHolder}
@@ -248,9 +255,6 @@ const outfitPage = () => {
                     <span className="block text-xl text-[#1677ff]">
                         QUẢN LÝ OUTFIT
                     </span>
-                    {/* <span className="block text-base  text-[#1677ff]">
-                        Manage your products
-                    </span> */}
                 </div>
                 <Link to={`add`}>
                     <Button type='primary' className='bg-[#1677ff]'
@@ -278,21 +282,18 @@ const outfitPage = () => {
                             <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-[#1677ff] hover:bg-blue-400 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Tìm kiếm</button>
                         </div>
                     </form>
-
-
                 </div>
                 <div className="flex justify-end items-start">
                     <div className="flex items-center">
                         <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
                         <Select
                             defaultValue={1}
-                            style={{ width: 200, height: 36 }}
+                            style={{ width: 200 }}
                             options={[
                                 { value: 1, label: 'Mới nhất' },
                                 { value: 2, label: 'Cũ nhất' },
                                 { value: 3, label: 'Tên: A - Z' },
                                 { value: 4, label: 'Tên: Z - A' },
-
                             ]}
                             onChange={(value: Number) => setSortOption(value)}
                         />
