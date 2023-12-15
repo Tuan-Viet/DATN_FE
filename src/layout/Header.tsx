@@ -32,6 +32,8 @@ import { ICart } from "../store/cart/cart.interface";
 import { useForm } from "react-hook-form";
 import { ForgotAccountForm, ForgotAccountSchema } from "../Schemas/forgotAccount";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { listOutfitSlice } from "../store/outfit/outfitSlice";
+import { useFetchListOutfitQuery } from "../store/outfit/outfit.service";
 
 type FormDataType = {
   email: string;
@@ -43,8 +45,14 @@ const Header = () => {
   const { data: listCart, isSuccess: isSuccessCart } = useListCartQuery();
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } =
     useListProductDetailQuery();
-  const { data: listProduct, isSuccess: isSuccessListProduct } =
-    useFetchListProductQuery();
+  const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery();
+  const { data: listOutfit, isSuccess: isSuccesslistOutfit } = useFetchListOutfitQuery();
+  const outfitState = useSelector((state: RootState) => state.outfitSlice.outfits)
+  useEffect(() => {
+    if (listOutfit) {
+      dispatch(listOutfitSlice(listOutfit))
+    }
+  }, [isSuccesslistOutfit])
   const cartState = useSelector((state: RootState) => state.cartSlice.carts);
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
@@ -59,7 +67,6 @@ const Header = () => {
   const [onUpdateCart] = useUpdateCartMutation();
   const [onAddCart] = useAddCartMutation();
   const cartStore: ICart[] = JSON.parse(localStorage.getItem("carts")!);
-  // const userStore = JSON.parse(localStorage.getItem("user")!)
   const [totalCart, setTotalCart] = useState<number>(0);
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -168,7 +175,6 @@ const Header = () => {
       console.log(error);
     }
   };
-
   const increaseCart = async (_id: string, discount: number) => {
     try {
       if (_id) {
@@ -319,6 +325,20 @@ const Header = () => {
     );
     message.success("Mã token đã gửi về email của bạn")
   }
+  let count = 0
+  cartState?.map((cart) => {
+    const matchingItems = outfitState?.filter((outfit) =>
+      outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
+    )
+    const filteredItems = matchingItems?.[0]?.items?.filter(
+      (product) => cart.productDetailId.product_id === product.product_id
+    );
+    if (filteredItems) {
+      count += 1
+    }
+  });
+  console.log(count)
+
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -368,224 +388,6 @@ const Header = () => {
                 />
               </Link>
             </div>
-            {/* menu */}
-            {/* <ul className="flex font-medium tracking-wide">
-              <li className="mx-[15px] cursor-pointer leading-[73px]">Sale</li>
-              <li className="mx-[15px] cursor-pointer flex items-center group leading-[73px] static">
-                <a href="">Áo nam</a>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-                <div className="dropdown absolute left-0 border-2 right-0 top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100px] transition-all ease-in-out bg-white w-full pointer-events-none group-hover:pointer-events-auto py-[25px] leading-7 px-[50px] border-t-2 flex">
-                  <div className="w-[65%] tracking-wide">
-                    <div className="grid grid-cols-4">
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Áo polo
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Polo trơn</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Polo họa tiết</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Polo bo kẻ</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Polo can phối</Link>
-                          </li>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Áo thun
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Áo thun in hình</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Áo tank top</Link>
-                          </li>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Sơ mi ngắn tay
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi tay trơn</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi họa tiết</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi tay kẻ</Link>
-                          </li>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Sơ mi dài tay
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi dài tay dạ</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi dài tay họa tiết</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi dài tay kẻ</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Sơ mi dài tay trơn</Link>
-                          </li>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <Link to="" className="w-[35%]">
-                    <img
-                      className="w-full"
-                      src="/images/imgs-menu/mega_menu_3_img.jpg"
-                      alt=""
-                    />
-                  </Link>
-                </div>
-              </li>
-              <li className="mx-[15px] flex items-center group leading-[73px]">
-                <Link to="">Quần nam</Link>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-                <div className="dropdown absolute left-0 border-2 right-0 top-[150px] opacity-0 group-hover:opacity-100 group-hover:top-[100px] transition-all ease-linear bg-white w-full pointer-events-none group-hover:pointer-events-auto py-[25px] leading-7 z-50 px-[50px] border-t-2 flex">
-                  <div className="w-[65%] tracking-wide">
-                    <div className="grid grid-cols-4">
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Quần dài kaki
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Quần dài kaki basic</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Quần kaki phối thun cạp</Link>
-                          </li>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Quần âu
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Quần âu basic</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Quần âu phối thun cạp</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Quần âu LV</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Quần âu carrot</Link>
-                          </li>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Quần jeans
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Quần jeans basic</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Quần jeans rách</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Quần jeans xước</Link>
-                          </li>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Link to="" className="font-bold">
-                          Quần short
-                        </Link>
-                        <div className="flex flex-col font-normal text-[14px] mt-[5px] text-[#666666]">
-                          <li className="hover:text-black">
-                            <Link to="">Short kaki</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Short đũi</Link>
-                          </li>
-                          <li className="hover:text-black">
-                            <Link to="">Short gió</Link>
-                          </li>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <Link to="" className="w-[35%]">
-                    <img
-                      className="w-full"
-                      src="/images/imgs-menu/mega_menu_2_img.jpg"
-                      alt=""
-                    />
-                  </Link>
-                </div>
-              </li>
-              <li className="mx-[15px] group flex items-center leading-[73px] relative">
-                <Link to="">Hàng đông</Link>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4 mx-[4px] group-hover:rotate-180 transition-all ease-linear"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  />
-                </svg>
-                <div className="dropdown absolute  top-[150px] border-2 opacity-0 group-hover:opacity-100 group-hover:top-[100%] transition-all ease-linear bg-white w-[200px] pointer-events-none group-hover:pointer-events-auto py-4 leading-7 z-50 px-[20px] border-t-2 flex">
-                  <p className="font-normal cursor-pointer">Áo khoác gió</p>
-                </div>
-              </li>
-              <li className="mx-[15px] leading-[73px]">
-                <Link to="">Hệ thống cửa hàng</Link>
-              </li>
-            </ul> */}
             {/* icon */}
             <div className="flex items-center">
               {/* icon search */}
@@ -979,9 +781,7 @@ const Header = () => {
                             <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                               <div className="flex items-center">
                                 <p className="font-bold tracking-wide text-[15px]">
-                                  {cart?.totalMoney?.toLocaleString(
-                                    "vi-VN"
-                                  )}
+                                  {count === 2 ? (cart.totalMoney - ((cart.totalMoney) * 10 / 100)).toLocaleString("vi-VN") : (cart.totalMoney).toLocaleString("vi-VN")}
                                   đ
                                 </p>
                               </div>
@@ -1074,17 +874,17 @@ const Header = () => {
             </div>
           </div>
           {/* pay */}
-          <div className="mt-6 w-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-full">
+          <div className=" w-full rounded-lg border bg-white px-6 pt-6 pb-6 shadow-md md:mt-0 md:w-full">
             <div className="flex justify-between">
               <p className="text-lg font-bold">Tổng tiền:</p>
               <div className="">
-                <p className="mb-1 text-[20px] font-bold text-red-500 tracking-wide">
-                  {totalCart?.toLocaleString("vi-VN")}đ
+                <p className="text-[20px] font-bold text-red-500 tracking-wide">
+                  {count === 2 ? (totalCart - ((totalCart * 10) / 100)).toLocaleString("vi-VN") : totalCart.toLocaleString("vi-VN")}đ
                 </p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-[10px]">
-              <Link to="/checkout">
+              <Link to={"/checkout"}>
                 <button className="mt-6 w-full uppercase rounded-md bg-red-500 py-1.5 font-medium text-red-50 hover:bg-red-600">
                   Thanh toán
                 </button>

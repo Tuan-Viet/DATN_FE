@@ -93,7 +93,7 @@ const productDetailFilterByOutfitSlice = createSlice({
             const nameColor = actions.payload.nameColor.trim().toLowerCase()
             const sizeTerm = actions.payload.sizeTerm.trim().toLowerCase()
             if (nameColor) {
-                const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase().includes(nameColor) && product.product_id.includes(product_id) && product.size.toLowerCase() === sizeTerm)
+                const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase() === nameColor && product.product_id.includes(product_id) && product.size.toLowerCase() === sizeTerm)
                 state.productDetails = newListProductDetail
             } else {
                 state.productDetails = actions.payload.productDetails
@@ -113,7 +113,7 @@ const productDetailFilterByOutfitSecondSlice = createSlice({
             const nameColor = actions.payload.nameColor.trim().toLowerCase()
             const sizeTerm = actions.payload.sizeTerm.trim().toLowerCase()
             if (nameColor) {
-                const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase().includes(nameColor) && product.product_id.includes(product_id) && product.size.toLowerCase() === sizeTerm)
+                const newListProductDetail = actions.payload.productDetails.filter((product) => product && product.nameColor.toLowerCase() === nameColor && product.product_id.includes(product_id) && product.size.toLowerCase() === sizeTerm)
                 state.productDetails = newListProductDetail
             } else {
                 state.productDetails = actions.payload.productDetails
@@ -121,7 +121,6 @@ const productDetailFilterByOutfitSecondSlice = createSlice({
         },
     })
 })
-
 
 const productDetailByOutfitSizeSlice = createSlice({
     name: "productDetails",
