@@ -143,7 +143,7 @@ const ProductInfo = () => {
                   <div className="flex items-center text-yellow-500">
                     <p className="text-[24px]"> {rateAver ? rateAver.toFixed(1) : 0}</p><span className="ml-2">trên 5 sao</span>
                   </div>
-                  <Rate value={rateAver} disabled className="text-2xl " />
+                  <Rate value={rateAver} allowHalf disabled className="text-2xl " />
                 </div>
                 <div className="flex ml-10">
                   <div onClick={() => dispatch(listReviewByRateFilterSlice({ rating: 0, reviews: reviewState && reviewState }))} className="border border-1 w-[80px] flex items-center justify-center h-[42px] bg-white ml-3 cursor-pointer">Tất cả</div>
