@@ -127,12 +127,12 @@ const OutfitProductDetail = (props: any) => {
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: (pro?.price - pro?.discount) * 1
+                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
                             }).then(() => dispatch(addCartSlice({
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: (pro?.price - pro?.discount) * 1
+                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
                             }))).then(() => {
                                 const overlayCart = document.querySelector(".overlay-cart")
                                 const overlay = document.querySelector(".overlay")
@@ -148,7 +148,7 @@ const OutfitProductDetail = (props: any) => {
                             dispatch(addCartSlice({
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: (pro.price - pro.discount) * 1
+                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
                             }))
                             const overlayCart = document.querySelector(".overlay-cart")
                             const overlay = document.querySelector(".overlay")
@@ -183,12 +183,12 @@ const OutfitProductDetail = (props: any) => {
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: (pro?.price - pro?.discount) * 1
+                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
                             }).then(() => dispatch(addCartSlice({
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: (pro?.price - pro?.discount) * 1
+                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
                             }))).then(() => {
                                 const overlayCart = document.querySelector(".overlay-cart")
                                 const overlay = document.querySelector(".overlay")
@@ -204,7 +204,7 @@ const OutfitProductDetail = (props: any) => {
                             dispatch(addCartSlice({
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: (pro.price - pro.discount) * 1
+                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
                             }))
                             const overlayCart = document.querySelector(".overlay-cart")
                             const overlay = document.querySelector(".overlay")
