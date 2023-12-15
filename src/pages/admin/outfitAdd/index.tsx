@@ -11,7 +11,8 @@ import {
     Spin,
     Typography,
     Breadcrumb,
-    Tooltip
+    Tooltip,
+    InputNumber
 } from 'antd';
 import {
     PlusOutlined,
@@ -138,6 +139,7 @@ const outfitAdd = () => {
 
         const valueAdd: any = {
             title: values.title,
+            discount: values.discount,
             sku: values.sku,
             items: [productDeatilOne, productDetailTwo],
             description: description,
@@ -190,11 +192,38 @@ const outfitAdd = () => {
                         <div className="bg-white border space-y-3 rounded-sm">
                             <h1 className='border-b p-5 font-medium text-lg'>Thông tin chung</h1>
                             <div className="px-5">
+                                <div className="space-x-5">
+                                    <div className="flex w-full space-x-5">
+                                        <Form.Item
+                                            name="title"
+                                            label="Tên sản phẩm"
+                                            rules={[
+                                                {
+                                                    required: true,
+                                                    message: 'Không được để trống!'
+                                                }
+                                            ]}
+                                            className='w-1/2'
 
-                                <div className="flex space-x-5">
+                                        >
+                                            <Input
+                                                placeholder='Nhập tên sản phẩm'
+                                                className='py-2' />
+                                        </Form.Item>
+                                        <Form.Item
+                                            name="sku"
+                                            label="Mã sản phẩm/SKU"
+                                            rules={[{ required: true, message: 'Không được để trống!' }, { validator: handleCheckSku },]}
+                                            normalize={(value) => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}
+                                            className='w-1/2'>
+                                            <Input className='py-2' />
+                                        </Form.Item>
+                                    </div>
+                                </div>
+                                <div className="flex w-full space-x-5 pr-5">
                                     <Form.Item
-                                        name="title"
-                                        label="Tên sản phẩm"
+                                        name="discount"
+                                        label="Giảm giá(%)"
                                         rules={[
                                             {
                                                 required: true,
@@ -202,19 +231,13 @@ const outfitAdd = () => {
                                             }
                                         ]}
                                         className='w-1/2'
-
                                     >
-                                        <Input
-                                            placeholder='Nhập tên sản phẩm'
-                                            className='py-2' />
-                                    </Form.Item>
-                                    <Form.Item
-                                        name="sku"
-                                        label="Mã sản phẩm/SKU"
-                                        rules={[{ required: true, message: 'Không được để trống!' }, { validator: handleCheckSku },]}
-                                        normalize={(value) => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}
-                                        className='w-1/2'>
-                                        <Input className='py-2' />
+                                        <InputNumber
+                                            placeholder='Nhập giảm giá'
+                                            className='py-1'
+                                            max={100}
+                                            style={{ width: '100%' }}
+                                        />
                                     </Form.Item>
                                 </div>
                                 <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">

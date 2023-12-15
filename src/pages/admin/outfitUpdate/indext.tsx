@@ -11,7 +11,8 @@ import {
     Spin,
     Typography,
     Breadcrumb,
-    Tooltip
+    Tooltip,
+    InputNumber
 } from 'antd';
 import {
     PlusOutlined,
@@ -121,6 +122,7 @@ const outfitUpdate = () => {
                 _id: outfitById?._id,
                 title: outfitById?.title,
                 sku: outfitById?.sku,
+                discount: outfitById?.discount,
                 image: outfitById?.image,
                 productOne: outfitById?.items?.[0].product_id,
                 productTwo: outfitById?.items?.[1].product_id,
@@ -225,29 +227,29 @@ const outfitUpdate = () => {
             }
             const valueUpdate: any = {
                 title: values.title,
+                discount: values.discount,
                 sku: values.sku,
                 items: [productDeatilOne, productDetailTwo],
                 description: description,
                 image: valueImage
             };
-            console.log(valueUpdate);
 
-            // await onUpdate({ _id: id, ...valueUpdate })
+            await onUpdate({ _id: id, ...valueUpdate })
         } else {
             const valueUpdate: any = {
                 title: values.title,
+                discount: values.discount,
                 sku: values.sku,
                 items: [productDeatilOne, productDetailTwo],
                 description: description,
                 image: outfitById?.image
             };
-            console.log(valueUpdate);
 
-            // await onUpdate({ _id: id, ...valueUpdate })
+            await onUpdate({ _id: id, ...valueUpdate })
         }
 
         message.success(`Tạo mới thành công`);
-        // navigate("/admin/outfit");
+        navigate("/admin/outfit");
     };
 
     const props: UploadProps = {
@@ -291,7 +293,6 @@ const outfitUpdate = () => {
                         <div className="bg-white border space-y-3 rounded-sm">
                             <h1 className='border-b p-5 font-medium text-lg'>Thông tin chung</h1>
                             <div className="px-5">
-
                                 <div className="flex space-x-5">
                                     <Form.Item
                                         name="title"
@@ -316,6 +317,26 @@ const outfitUpdate = () => {
                                         normalize={(value) => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}
                                         className='w-1/2'>
                                         <Input className='py-2' />
+                                    </Form.Item>
+                                </div>
+                                <div className="flex w-full space-x-5 pr-5">
+                                    <Form.Item
+                                        name="discount"
+                                        label="Giảm giá(%)"
+                                        rules={[
+                                            {
+                                                required: true,
+                                                message: 'Không được để trống!'
+                                            }
+                                        ]}
+                                        className='w-1/2'
+                                    >
+                                        <InputNumber
+                                            placeholder='Nhập giảm giá'
+                                            className='py-1'
+                                            max={100}
+                                            style={{ width: '100%' }}
+                                        />
                                     </Form.Item>
                                 </div>
                                 <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
