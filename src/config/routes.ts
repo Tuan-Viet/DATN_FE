@@ -14,6 +14,8 @@ const routes = {
     signup: "/signup",
     myAccount: "/account",
     orders: "/account/orders",
+    ordersReturn: "/account/ordersReturn",
+    ordersReturnDetail: "/account/orderReturn/:id",
     changePassword: "/account/password",
     addresses: "/account/addresses",
     orderDetail: "/account/orders/:id",

@@ -8,10 +8,10 @@ import {
   useUpdateOrderMutation,
 } from "../../../store/order/order.service";
 import { Result, Spin } from "antd";
-import { listOrderSlice } from "../../../store/order/orderSlice";
+import { listOrderSlice } from "../../../store/orderReturn/orderSlice";
 import { Dispatch } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
 import { RootState } from "../../../store";
+import { useListOrderReturnQuery } from "../../../store/orderReturn/order.service";
 
 function formatDateStringToDisplayDate(dateString: any) {
   const date = new Date(dateString);
@@ -33,28 +33,24 @@ function mapStatusPaymentToText(statusCode: number) {
       return "Trạng thái không xác định";
   }
 }
-function orderStatus(satus: number) {
+function orderReturnStatus(satus: number) {
   switch (satus) {
     case 0:
-      return "Hủy đơn hàng";
+      return "Từ chối yêu cầu";
     case 1:
-      return "Chờ xử lí";
+      return "Chờ xác nhận";
     case 2:
-      return "Đang chuản bị hàng";
+      return "Chờ xử lý";
     case 3:
-      return "Đang giao";
+      return "Đang xử lý";
     case 4:
-      return "Đã nhận hàng";
-    case 5:
-      return "Hoàn Thành";
-    case 6:
-      return "Yêu cầu đổi hàng";
+      return "Hoàn thành";
     default:
       return "Trạng thái không xác định";
   }
 }
 
-const myOrders = () => {
+const ordersReturn = () => {
   const dispatch: Dispatch<any> = useDispatch();
   const user = useSelector((state: any) => state.user);
   const isLoggedIn = user?.isLoggedIn;
@@ -65,12 +61,11 @@ const myOrders = () => {
     }
   }, [navigate]);
 
-  const [cancelOrder] = useUpdateOrderMutation();
-  const { data: orders, isLoading, isError } = useListOrderQuery();
+  const { data: orders, isLoading, isError } = useListOrderReturnQuery();
 
   dispatch(listOrderSlice(orders!));
   const ordersState = useSelector(
-    (state: RootState) => state.orderSlice.orders
+    (state: RootState) => state.orderReturnSlice.orderReturns
   );
 
   if (isLoading) {
@@ -93,6 +88,7 @@ const myOrders = () => {
   const userOrders = ordersState.filter(
     (order: any) => order?.userId === user?.current?._id
   );
+  console.log("ordersReturn ~ userOrders:", userOrders);
 
   return (
     <>
@@ -138,9 +134,7 @@ const myOrders = () => {
                     d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                   />
                 </svg>
-                <Link to="/account/orders" className="font-bold">
-                  Đơn hàng đã đặt
-                </Link>
+                <Link to="/account/orders">Đơn hàng đã đặt</Link>
               </div>
               <div className="flex items-center gap-x-2 mb-3">
                 <svg
@@ -157,7 +151,7 @@ const myOrders = () => {
                     d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                   />
                 </svg>
-                <Link to="/account/ordersReturn">
+                <Link to="/account/ordersReturn" className="font-bold">
                   Yêu cầu đổi trả
                 </Link>
               </div>
@@ -214,12 +208,9 @@ const myOrders = () => {
                           <th scope="col" className="px-6 py-3">
                             Ngày đặt
                           </th>
-                          <th scope="col" className="px-6 py-3">
+                          {/* <th scope="col" className="px-6 py-3">
                             Thành tiền
-                          </th>
-                          <th scope="col" className="px-6 py-3">
-                            Trạng thái thanh toán
-                          </th>
+                          </th> */}
                           <th scope="col" className="px-6 py-3">
                             Trạng thái
                           </th>
@@ -236,7 +227,7 @@ const myOrders = () => {
                               className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap max-w-[130px] truncate hover:truncate"
                             >
                               <Link
-                                to={`/account/orders/${order._id}`}
+                                to={`/account/orderReturn/${order._id}`}
                                 className=""
                               >
                                 #{order._id}
@@ -245,20 +236,17 @@ const myOrders = () => {
                             <td className="px-6 py-4">
                               {formatDateStringToDisplayDate(order.createdAt)}
                             </td>
-                            <td className="px-6 py-4">
+                            {/* <td className="px-6 py-4">
                               {order.totalMoney.toLocaleString("vi-VN")}₫
-                            </td>
+                            </td> */}
                             <td className="px-6 py-4">
-                              {mapStatusPaymentToText(order.paymentStatus)}
-                            </td>
-                            <td className="px-6 py-4">
-                              {orderStatus(order.status)}
+                              {orderReturnStatus(order?.status)}
                             </td>
                             <td className="px-6 py-4 text-blue-500">
                               {order.status == 0 ? (
                                 "Bạn đã hủy đơn hàng này"
                               ) : (
-                                <Link to={`/account/orders/${order._id}`}>
+                                <Link to={`/account/orderReturn/${order._id}`}>
                                   Xem chi tiết
                                 </Link>
                               )}
@@ -279,4 +267,4 @@ const myOrders = () => {
   );
 };
 
-export default myOrders;
+export default ordersReturn;

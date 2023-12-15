@@ -15,6 +15,8 @@ import { useFetchListProductQuery } from "../../../store/product/product.service
 import { listProductSlice } from "../../../store/product/productSlice";
 import { useListCartQuery } from "../../../store/cart/cart.service";
 import { listCartSlice } from "../../../store/cart/cartSlice";
+import { listOutfitSlice } from "../../../store/outfit/outfitSlice";
+import { useFetchListOutfitQuery } from "../../../store/outfit/outfit.service";
 
 const BillConfirm = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -32,14 +34,13 @@ const BillConfirm = () => {
   const productState = useSelector((state: RootState) => state.productSlice.products)
   const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const [totalCart, setTotalCart] = useState<number>(0)
-
-  // useEffect(() => {
-  //   if (getOneOrder) {
-  //     getOneOrder.orderDetails.map((cart) => {
-  //       console.log(cart.quantity)
-  //     })
-  //   }
-  // }, [getOneOrder])
+  const { data: listOutfit, isSuccess: isSuccesslistOutfit } = useFetchListOutfitQuery();
+  const outfitState = useSelector((state: RootState) => state.outfitSlice.outfits)
+  useEffect(() => {
+    if (listOutfit) {
+      dispatch(listOutfitSlice(listOutfit))
+    }
+  }, [isSuccesslistOutfit])
   useEffect(() => {
     if (listOrder) {
       dispatch(listOrderSlice(listOrder))
@@ -74,7 +75,19 @@ const BillConfirm = () => {
     }
     setTotalCart(total)
   }, [getOneOrder])
-
+  let count = 0
+  cartState?.map((cart) => {
+    const matchingItems = outfitState?.filter((outfit) =>
+      outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
+    )
+    // console.log(matchingItems)
+    const filteredItems = matchingItems?.[0]?.items?.filter(
+      (product) => cart.productDetailId.product_id === product.product_id
+    );
+    if (filteredItems) {
+      count += 1
+    }
+  });
   return (
     <>
       <Header></Header>
@@ -220,7 +233,7 @@ const BillConfirm = () => {
                   <h1 className="text-[30px] text-center font-semibold mb-5">
                     Thông tin nhận hàng
                   </h1>
-                  <div className="bg-[#f1f1f1] rounded-xl p-7 text-sm font-semibold">
+                  <div className="bg-[#f1f1f1] rounded-xl text-left p-7 text-sm font-semibold">
                     <div className="flex">
                       <div className="w-[20%]">
                         <p className="mb-3">Tên người nhận:</p>
@@ -236,10 +249,10 @@ const BillConfirm = () => {
                         <p className="mb-3">{getOneOrder?.phoneNumber}</p>
                         <p className="mb-3">Thanh toán khi nhận hàng (COD)</p>
                         <p className="mb-3">
-                          {getOneOrder?.address.detailAddress},
+                          {/* {getOneOrder?.address.detailAddress}, */}
                           {getOneOrder?.address.myWard},
                           {getOneOrder?.address.myDistrict},
-                          {getOneOrder?.address.myProvince},
+                          {getOneOrder?.address.myProvince}
                         </p>
                         <p className="mb-3">
                           {getOneOrder?.note}
