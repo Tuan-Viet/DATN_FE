@@ -10,6 +10,7 @@ import {
     Table,
     Modal,
     Image,
+    Popconfirm,
 } from 'antd';
 import {
     FormOutlined,
@@ -244,7 +245,7 @@ const orderReturnById = () => {
         try {
             const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
             const updatedOrder = { ...order, status: valueStatus };
-            await onUpdateOrder({ id, ...updatedOrder });
+            await onUpdateOrder({ id: idOrder, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 0 };
             const idOrderReturn = order?.orderReturn?._id;
@@ -252,6 +253,17 @@ const orderReturnById = () => {
 
             setOpenFormConfirmOrderReturn(false);
             message.info(`Xác nhận yêu cầu đổi hàng`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const confirmStatusComplte = async (values: any) => {
+        try {
+            const newValue = { ...orderReturn, status: 4 }
+            await onUpdateOrderReturn({ id, ...newValue });
+            setOpenFormUpdateInfo(false)
+            message.success(`Cập nhật thành công`);
         } catch (error) {
             console.log(error);
         }
@@ -330,14 +342,14 @@ const orderReturnById = () => {
                                             {orderReturn?.status === 3 && (
                                                 <Table.Summary.Row >
                                                     <Table.Summary.Cell index={0} colSpan={3}>
-                                                        {orderReturn.newOrder.status === 5 ? (
+                                                        {orderReturn?.newOrder?.status === 5 ? (
                                                             <span className='text-[13px] text-gray-600'>Hoàn tất đổi hàng</span>
                                                         ) : (
                                                             <span className='text-[13px] text-gray-600'>Đang xử lí yêu cầu</span>
                                                         )}
                                                     </Table.Summary.Cell>
                                                     <Table.Summary.Cell index={1} className='text-end'>
-                                                        <Link to={`/admin/order/${orderReturn?.newOrder && orderReturn?.newOrder._id}`}>
+                                                        <Link to={`/admin/order/${orderReturn?.newOrder?._id}`}>
                                                             <span className="inline-block cursor-pointer border rounded-lg p-2 font-medium text-xs text-yellow-500 border-yellow-500 transition-transform transform hover:scale-105">
                                                                 Kiểm tra
                                                             </span>
@@ -523,6 +535,24 @@ const orderReturnById = () => {
                                                                 </Form.Item>
                                                             </Form>
                                                         </Modal>
+                                                    </Table.Summary.Cell>
+                                                </Table.Summary.Row>
+                                            )}
+
+                                            {orderReturn?.newOrder?.status === 5 && orderReturn?.status !== 4 && (
+                                                <Table.Summary.Row>
+                                                    <Table.Summary.Cell index={0} colSpan={3}>
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell index={1} className='text-end'>
+                                                        <Popconfirm
+                                                            title="Xác nhận"
+                                                            description={`Xác nhận hoàn thành đơn hàng `}
+                                                            onConfirm={confirmStatusComplte}
+                                                            okButtonProps={{ className: "text-white bg-blue-500" }}
+                                                        // onOpenChange={() => console.log('open change')}
+                                                        >
+                                                            <Button type="primary" className='bg-blue-500'>Xác nhận hoàn thành đơn hàng</Button>
+                                                        </Popconfirm>
                                                     </Table.Summary.Cell>
                                                 </Table.Summary.Row>
                                             )}

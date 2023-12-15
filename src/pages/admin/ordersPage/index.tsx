@@ -243,8 +243,6 @@ const ordersPage = () => {
     const handleClickFilterStatus = () => {
         setVisibleStatus(!visibleStatus);
     };
-    console.log(dateFrom);
-    console.log(dateTo);
 
     const listStatusByOrder = [0, 1, 2, 3, 4, 5, 6];
     function orderStatus(satus: number) {
