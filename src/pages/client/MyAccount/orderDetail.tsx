@@ -1,3 +1,5 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
@@ -248,15 +250,37 @@ const OrderDetail = () => {
   const [addOrderReturn] = useAddOrderReturnMutation()
   const [updatedOrder] = useUpdateOrderMutation()
 
+  // const [addReason, setAddReason] = useState(false)
+  // const handleReasonChange = async (e) => {
+  //   setAddReason(true);
+  // };
+  const [showInput, setShowInput] = useState(false);
+
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    if (selectedValue !== "khác") {
+      setOrderValue('reason', selectedValue)
+    }
+    setShowInput(selectedValue === "khác");
+  };
   const onAddOrderReturn = async (data: orderReturnForm) => {
     const image = imageList
     const value = { ...data, images: image }
     console.log(value);
-
-    await addOrderReturn(value)
-    await updatedOrder({ id: id, status: 6 })
-    toast.success('Trả hàng thành công vui lòng đợi xác nhận')
-    setIsModalOrderOpen(false);
+    let count = 0;
+    value.orderDetailIds?.forEach((item) => {
+      if (item.quantity == 0) {
+        count += 1
+      }
+    })
+    if (count === data.orderDetailIds.length) {
+      toast.success('Vui lòng chọn số lượng sản phẩm để trả hàng')
+    } else {
+      await addOrderReturn(value)
+      await updatedOrder({ id: id, status: 6 })
+      toast.success('Trả hàng thành công vui lòng đợi xác nhận')
+      setIsModalOrderOpen(false);
+    }
   }
 
   const handleOk = () => {
@@ -296,13 +320,6 @@ const OrderDetail = () => {
     multiple: true,
     action: " http://localhost:8080/api/images/upload",
   };
-
-
-
-
-
-
-
 
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
     setFileList(newFileList);
@@ -456,6 +473,23 @@ const OrderDetail = () => {
                 </svg>
                 <Link to="/account/addresses">Danh sách địa chỉ</Link>
               </div>
+              <div className="flex items-center gap-x-2 mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                  />
+                </svg>
+                <Link to="/account/password">Thay đổi mật khẩu</Link>
+              </div>
             </div>
             <div className="w-[1130px]">
               <div className="mb-[140px]">
@@ -555,10 +589,31 @@ const OrderDetail = () => {
 
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do trả hàng</label>
-                        <input type="text" {...registerOrder("reason")} id="reason" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        <label htmlFor="reason" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do đổi hàng</label>
+                        <select onClick={handleSelectChange} id="reason" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                          <option value="">Chọn lý do</option>
+                          <option value="bị lỗi size">Bị lỗi size</option>
+                          <option value="không đúng mẫu">Không đúng mẫu</option>
+                          <option value="khác" >Khác</option>
+                        </select>
                         <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
-
+                      </div>
+                      {showInput && (
+                        <div className="mb-5" id="addreason">
+                          <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do cụ thể</label>
+                          <input
+                            type="text"
+                            {...registerOrder("reason")}
+                            id="reason"
+                            className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          />
+                          <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
+                        </div>
+                      )}
+                      <div className="mb-5">
+                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Ghi chú</label>
+                        <input type="text" {...registerOrder("note")} id="note" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                        {/* <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p> */}
                       </div>
                       <Form
                         form={form}
@@ -607,70 +662,71 @@ const OrderDetail = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {productsInOrder?.map((product, index) => {
+                              {productsInOrder.map((product, index) => {
                                 return (
                                   <>
-                                    {productDetailState
-                                      ?.filter(
-                                        (proDetail) =>
-                                          proDetail._id === product.productDetailId
-                                      )
-                                      .map((item) => {
-                                        return (
-                                          <>
-                                            {productState
-                                              ?.filter(
-                                                (prod) => prod._id === item.product_id
-                                              )
-                                              .map((pro) => (
+                                    {
+                                      productDetailState
+                                        ?.filter(
+                                          (proDetail) =>
+                                            proDetail._id === product.productDetailId
+                                        )
+                                        .map((item) => {
+                                          return (
+                                            <>
+                                              {productState
+                                                ?.filter(
+                                                  (prod) => prod._id === item.product_id
+                                                )
+                                                .map((pro) => (
 
-                                                <tr className="bg-white ">
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
-                                                  <th
-                                                    scope="row"
-                                                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
-                                                  >
-                                                    <img
-                                                      src={item.imageColor}
-                                                      alt={pro.title}
-                                                      className="w-[58px] h-[78px] object-cover"
-                                                    />
-                                                    <div>
-                                                      <p className="mb-4 max-w-[340px]">
-                                                        {pro.title}
-                                                      </p>
-                                                      <p>
-                                                        {product.color} / {product.size}
-                                                      </p>
-                                                    </div>
-                                                  </th>
-                                                  <td className="px-6 py-4">
-                                                    {product.price.toLocaleString(
-                                                      "vi-VN"
-                                                    )}
-                                                    ₫
-                                                  </td>
-                                                  <td className="px-6 py-4">
-                                                    <div className="relative flex items-center max-w-[8rem]">
-                                                      <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
-                                                      /{product.quantity}
-                                                    </div>
-                                                  </td>
-                                                  <td className="px-6 py-4">
-                                                    {product.totalMoney.toLocaleString(
-                                                      "vi-VN"
-                                                    )}
-                                                    ₫
-                                                  </td>
-                                                </tr>
-                                              ))}
-                                          </>
-                                        );
-                                      })}
+                                                  <tr className="bg-white ">
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
+                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
+                                                    <th
+                                                      scope="row"
+                                                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                                    >
+                                                      <img
+                                                        src={item.imageColor}
+                                                        alt={pro.title}
+                                                        className="w-[58px] h-[78px] object-cover"
+                                                      />
+                                                      <div>
+                                                        <p className="mb-4 max-w-[340px]">
+                                                          {pro.title}
+                                                        </p>
+                                                        <p>
+                                                          {product.color} / {product.size}
+                                                        </p>
+                                                      </div>
+                                                    </th>
+                                                    <td className="px-6 py-4">
+                                                      {product.price.toLocaleString(
+                                                        "vi-VN"
+                                                      )}
+                                                      ₫
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                      <div className="relative flex items-center max-w-[8rem]">
+                                                        <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
+                                                        /{product.quantity}
+                                                      </div>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                      {product.totalMoney.toLocaleString(
+                                                        "vi-VN"
+                                                      )}
+                                                      ₫
+                                                    </td>
+                                                  </tr>
+                                                ))}
+                                            </>
+                                          );
+                                        })}
                                   </>
                                 );
                               })}
