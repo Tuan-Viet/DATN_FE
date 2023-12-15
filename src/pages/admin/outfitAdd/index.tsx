@@ -64,7 +64,14 @@ const outfitAdd = () => {
     const { data: listProductDeatil, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery()
 
     const filteredProducts = listProduct?.filter(product => !product.hide) || [];
-
+    const filteredProductOne = listProduct?.filter(product => {
+        const titleLowerCase = product.title.toLowerCase();
+        return !product.hide && (titleLowerCase.includes('áo') || titleLowerCase.includes('sơ mi'));
+    }) || [];
+    const filteredProductTwo = listProduct?.filter(product => {
+        const titleLowerCase = product.title.toLowerCase();
+        return !product.hide && (titleLowerCase.includes('quần') || titleLowerCase.includes('short'));
+    }) || [];
 
     const listSku = listOutfit?.map((outfit: any) => outfit.sku);
     const handleCheckSku = async (rule: any, value: any) => {
@@ -86,7 +93,7 @@ const outfitAdd = () => {
         const listProductDetail = listProductDeatil?.filter((productDetail: any) => {
             return productDetail.product_id === selectedProductId;
         });
-        const productById = filteredProducts?.find((product: any) => product._id === selectedProductId);
+        const productById = filteredProductOne?.find((product: any) => product._id === selectedProductId);
 
         setProductOne(productById)
         setProductDetailByOne(listProductDetail);
@@ -96,7 +103,7 @@ const outfitAdd = () => {
         const listProductDetail = listProductDeatil?.filter((productDetail: any) => {
             return productDetail.product_id === selectedProductId;
         });
-        const productById = filteredProducts?.find((product: any) => product._id === selectedProductId);
+        const productById = filteredProductTwo?.find((product: any) => product._id === selectedProductId);
 
         setProductTwo(productById)
         setProductDetailByTwo(listProductDetail);
@@ -304,7 +311,7 @@ const outfitAdd = () => {
                                                 </div>
                                             )}
                                         >
-                                            {filteredProducts?.map((product: any) => (
+                                            {filteredProductOne?.map((product: any) => (
                                                 <Option key={product._id}
                                                     value={product._id}
                                                     label={product.title}
@@ -422,7 +429,7 @@ const outfitAdd = () => {
                                                 </div>
                                             )}
                                         >
-                                            {filteredProducts?.map((product: any) => (
+                                            {filteredProductTwo?.map((product: any) => (
                                                 <Option key={product._id}
                                                     value={product._id}
                                                     label={product.title}

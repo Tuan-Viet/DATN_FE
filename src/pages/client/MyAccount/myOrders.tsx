@@ -37,7 +37,7 @@ function orderStatus(satus: number) {
     case 0:
       return "Hủy đơn hàng";
     case 1:
-      return "Đang xử lí";
+      return "Chờ xử lí";
     case 2:
       return "Đang chuản bị hàng";
     case 3:

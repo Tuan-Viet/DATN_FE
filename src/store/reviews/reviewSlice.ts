@@ -27,6 +27,9 @@ const reviewSlice = createSlice({
             //     state.reviews = reviewByRate
             // }
         },
+        deleteReviewSlice: (state: IReviewState, actions: PayloadAction<string>) => {
+            state.reviews = state.reviews.filter((review) => review._id !== actions.payload)
+        }
     })
 })
 const reviewByRate = createSlice({
@@ -68,7 +71,7 @@ const reviewByUserId = createSlice({
     })
 })
 
-export const { listReviewSlice, listReviewByRate } = reviewSlice.actions
+export const { listReviewSlice, listReviewByRate, deleteReviewSlice } = reviewSlice.actions
 export const { listReviewByRateSlice, listReviewByRateFilterSlice, listReviewByUserFilterSlice } = reviewByRate.actions
 // export const { listReviewByUserSlice, listReviewByUserFilterSlice } = reviewByUserId.actions
 export default reviewSlice.reducer

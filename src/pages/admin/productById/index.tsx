@@ -1,23 +1,28 @@
 import {
     Breadcrumb,
-    Button, Collapse, CollapseProps, Empty, Image, List, Progress, Rate, Skeleton, Space, Spin, Tag, Tooltip
+    Button, Collapse, CollapseProps, Empty, Form, Image, List, Modal, Progress, Rate, Skeleton, Space, Spin, Tag, Tooltip, Input, message, Popconfirm
 } from "antd";
 import {
     EditFilled,
     StarFilled,
-    LoadingOutlined
+    LoadingOutlined,
+    CaretRightOutlined,
+    EditOutlined,
+    DeleteOutlined,
+    SendOutlined
 } from '@ant-design/icons';
 import { Link, useParams } from "react-router-dom";
 import { useFetchOneProductByAdminQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
 import { Dispatch, useEffect, useState } from "react";
 import axios from "axios";
 import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
-import { useFetchListReviewsQuery } from "../../../store/reviews/review.service";
+import { useFetchListReviewsQuery, useRemoveReviewMutation, useReplyCommentMutation, useUpdateReviewMutation } from "../../../store/reviews/review.service";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { listReviewSlice } from "../../../store/reviews/reviewSlice";
+import { deleteReviewSlice, listReviewSlice } from "../../../store/reviews/reviewSlice";
 import moment from 'moment';
 import { useGetProductRevenueQuery } from "../../../store/statistic/statistic.service";
+const { TextArea } = Input;
 
 interface ProductDetail {
     _id: string;
@@ -31,8 +36,11 @@ interface ProductDetail {
 }
 
 const productById = () => {
+    const [form] = Form.useForm();
     const dispatch: Dispatch<any> = useDispatch()
     const { id } = useParams();
+    const [onReplyComment] = useReplyCommentMutation()
+    const [onRemoveComment] = useRemoveReviewMutation()
     // const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductQuery(id || '')
     const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id || '')
 
@@ -44,19 +52,24 @@ const productById = () => {
 
     const { data: listReview, isSuccess: isSuccessReview } = useFetchListReviewsQuery()
     const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
+    const filterReviewByProduct = listReview?.filter((review) => review?.productId && review?.productId?.includes(id))
+
+    const sortedReviews = filterReviewByProduct?.slice().sort((a: any, b: any) => {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
     const reviewStateVer = reviewState?.slice().reverse()
+    const [openFormUpdateReply, setOpenFormUpdateReply] = useState(false);
 
     useEffect(() => {
         if (listReview && id) {
-            const listReviewByProductId = listReview?.filter((review) => review?.productId && review?.productId?.includes(id))
-            dispatch(listReviewSlice(listReviewByProductId))
+            dispatch(listReviewSlice(listReview))
         }
     }, [isSuccessReview, id])
     const [rateAver, setRateAver] = useState<number>(0)
     useEffect(() => {
-        if (reviewState) {
-            const rates = reviewState?.map((review) => review.rating)
+        if (filterReviewByProduct) {
+            const rates = filterReviewByProduct?.map((review) => review.rating)
             let totalRating = 0
             rates.forEach(rating => {
                 totalRating += rating
@@ -65,36 +78,37 @@ const productById = () => {
             setRateAver(rateAverage)
         }
     }, [reviewState, rateAver])
-    console.log(reviewState);
     let oneStarCount = 0;
     let twoStarCount = 0;
     let threeStarCount = 0;
     let fourStarCount = 0;
     let fiveStarCount = 0;
 
-    for (const review of reviewState) {
-        switch (review.rating) {
-            case 1:
-                oneStarCount++;
-                break;
-            case 2:
-                twoStarCount++;
-                break;
-            case 3:
-                threeStarCount++;
-                break;
-            case 4:
-                fourStarCount++;
-                break;
-            case 5:
-                fiveStarCount++;
-                break;
-            default:
-                break;
+    if (filterReviewByProduct) {
+        for (const review of filterReviewByProduct) {
+            switch (review.rating) {
+                case 1:
+                    oneStarCount++;
+                    break;
+                case 2:
+                    twoStarCount++;
+                    break;
+                case 3:
+                    threeStarCount++;
+                    break;
+                case 4:
+                    fourStarCount++;
+                    break;
+                case 5:
+                    fiveStarCount++;
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
-    const totalReviews = reviewState.length;
+    const totalReviews = filterReviewByProduct?.length;
 
     // Tính phần trăm cho mỗi số sao
     const percentOneStar = Math.round((oneStarCount / totalReviews) * 100);
@@ -137,7 +151,6 @@ const productById = () => {
         for (const colorKey in colorMap) {
             resultVariants.push(colorMap[colorKey]);
         }
-        console.log(resultVariants);
         return resultVariants;
     }
 
@@ -178,17 +191,44 @@ const productById = () => {
         }
     ];
 
-    const data = reviewState.map((item, index) => ({
-        color: item.color,
-        size: item.size,
-        date: moment(item.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
-        images: item.images,
-        rate: item.rating,
-        fullname: item.userId ? item.userId?.fullname : null,
-        comment: item.comment,
-        useId: item.userId ? item.userId._id : null
-    }));
+    const replyComment = async (id: any, values: any) => {
+        try {
+            const value = {
+                comment: values.comment,
+            }
 
+            await onReplyComment({ id: id, ...value });
+            message.success(`Thành công`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const editReplyComment = async (id: any, values: any) => {
+        try {
+            const value = {
+                comment: values.commentEdit,
+            };
+
+            await onReplyComment({ id: id, ...value });
+
+            message.success(`Thành công`);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    const removeComment = async (id: string) => {
+        try {
+            if (id) {
+                await onRemoveComment(id).then(() => dispatch(deleteReviewSlice(id)))
+                message.success("Xóa thành công")
+            }
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
     useEffect(() => {
         window.scrollTo({ top: 0, left: 0 });
     }, []);
@@ -281,7 +321,7 @@ const productById = () => {
                             <span className="text-xs text-gray-400">
                                 {product?.createdAt && (
                                     <>
-                                        Ngày khởi tạo: {new Date(product.createdAt).toLocaleDateString()}
+                                        Ngày khởi tạo: {moment(product.createdAt, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}
                                     </>
                                 )}
                             </span>
@@ -399,7 +439,7 @@ const productById = () => {
                         ) : (
                             <div className="">
                                 <span className="text-2xl  text-blue-500">
-                                    {reviewState.length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                    {filterReviewByProduct?.length.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                 </span>
                                 <span className="text-blue-500">
                                     (đánh giá)
@@ -464,34 +504,168 @@ const productById = () => {
                                 },
                                 pageSize: 10,
                             }}
-                            dataSource={data}
-                            renderItem={(item) => (
-                                <List.Item
-                                    extra={
-                                        <Image.PreviewGroup
-                                            preview={{
-                                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                                            }}
-                                        >
-                                            {item.images.map((image) => (
-                                                <Image height={70} src={image.url} alt="" className="pr-1" />
+                            dataSource={sortedReviews}
+                            renderItem={(item, index) => (
+                                <List.Item>
+                                    <div className="flex justify-between items-start">
+                                        <div className="w-3/5">
+                                            <div >
+                                                <div className="flex items-center space-x-2">
+                                                    <span className="font-medium"><Link to={``}>{item.userId.fullname}</Link></span>
+                                                    <span className="block"><Rate value={item.rating} disabled className="text-xs mb-0"></Rate></span>
+                                                </div>
+                                                <div className="flex mt-0 items-center ">
+                                                    <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{moment(item.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
+                                                    <div className="px-1">
+                                                        <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
+                                                    </div>
+                                                </div>
+                                                <span className="block mt-2">{item.comment}</span>
+                                                <div className="flex space-x-3 mx-2">
 
-                                            ))}
-                                        </Image.PreviewGroup>
-                                    }
-                                >
-                                    <div className="">
-                                        <div className="flex items-center space-x-2">
-                                            <span className=""><Link to={``}>{item.fullname}</Link></span>
-                                            <span className="block"><Rate value={item.rate} disabled className="text-xs mb-0"></Rate></span>
-                                        </div>
-                                        <div className="flex mt-0 items-center ">
-                                            <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{item.date}</span>
-                                            <div className="px-1">
-                                                <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
+
+                                                </div>
+                                                <div className="flex items-start ">
+                                                    <Popconfirm
+                                                        title="Xóa đánh giá"
+                                                        description="Bạn có chắc muốn xóa đánh giá này"
+                                                        onConfirm={() => removeComment(item._id)}
+                                                        okText="Yes"
+                                                        cancelText="No"
+                                                        okButtonProps={{ className: "text-white bg-blue-500" }}
+                                                    >
+                                                        <div className="leading-9 text-[13px] cursor-pointer hover:underline text-blue-500 w-11">
+                                                            Xóa <DeleteOutlined style={{ fontSize: '13px' }} />
+                                                        </div>
+                                                    </Popconfirm>
+
+                                                    {!item.reply.comment && (
+                                                        <Collapse
+                                                            size="small"
+                                                            // defaultActiveKey={[0]}
+                                                            ghost
+                                                            className="p-0 w-full"
+                                                            style={{ padding: 0 }}
+                                                            expandIcon={({ isActive }) => <CaretRightOutlined style={{ display: 'none', padding: 0 }} rotate={isActive ? 90 : 0} />}
+                                                        >
+                                                            <Collapse.Panel key={index}
+                                                                header={
+                                                                    <div className="flex items-center space-x-1 hover:underline">
+                                                                        <span className="block text-[13px] cursor-pointer  text-gray-500">
+                                                                            Trả lời
+                                                                        </span>
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-3 h-3 text-gray-500">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                                                                        </svg>
+                                                                    </div>
+                                                                } >
+                                                                <Form
+                                                                    form={form}
+                                                                    name="validateOnly"
+                                                                    layout="vertical"
+                                                                    onFinish={(values: any) => replyComment(item._id, values)}
+                                                                    autoComplete="off"
+                                                                    className="mx-auto w-full "
+                                                                    style={{ padding: 0 }}
+                                                                >
+                                                                    <div className="flex items-end">
+                                                                        <Form.Item
+                                                                            name="comment"
+                                                                            className="w-full"
+                                                                        >
+                                                                            <Input.TextArea autoSize={{ minRows: 2, maxRows: 6 }} />
+                                                                        </Form.Item>
+                                                                        <Form.Item >
+                                                                            <Button type="link" htmlType="submit" className='flex items-center justify-center hover:bg-blue-500 rounded-full w-8'>
+                                                                                <SendOutlined />
+                                                                            </Button>
+                                                                        </Form.Item>
+                                                                    </div>
+                                                                </Form>
+                                                            </Collapse.Panel>
+                                                        </Collapse>
+                                                    )}
+
+                                                </div>
                                             </div>
+                                            {item.reply.comment && (
+                                                <Collapse
+                                                    size="small"
+                                                    // defaultActiveKey={['1']}
+                                                    ghost
+                                                    className="p-0"
+                                                    style={{ padding: 0 }}
+                                                    expandIcon={({ isActive }) => <CaretRightOutlined className={`text-blue-500`} rotate={isActive ? 90 : 0} />}
+                                                >
+                                                    <Collapse.Panel key={index} header={<span className="text-gray-400">Replie</span>} className="m-0">
+                                                        <div className="ml-5">
+                                                            <div className="flex items-center space-x-2">
+                                                                <span className="font-medium">{item.reply.nameUser}</span>
+                                                                <span className="block text-end text-xs text-gray-400 pr-1">{moment(item.reply.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
+                                                            </div>
+                                                            <span className="block mt-2">{item.reply.comment}</span>
+                                                        </div>
+                                                        {/* 
+                                                        <Collapse
+                                                            size="small"
+                                                            ghost
+                                                            className="p-0 w-4/5"
+                                                            style={{ padding: 0 }}
+                                                            expandIcon={({ isActive }) => <CaretRightOutlined style={{ display: 'none', padding: 0 }} rotate={isActive ? 90 : 0} />}
+                                                        >
+                                                            <Collapse.Panel
+                                                                key={index}
+                                                                header={
+                                                                    <span className="block text-[13px] cursor-pointer  text-gray-500 hover:underline"
+                                                                    >
+                                                                        Sửa <EditOutlined className="text-gray-500 text-[13px]" />
+                                                                    </span>
+                                                                } >
+                                                                <Form
+                                                                    form={form}
+                                                                    name="validateOnly"
+                                                                    layout="vertical"
+                                                                    onFinish={(values: any) => editReplyComment(item._id, values)}
+                                                                    autoComplete="off"
+                                                                    className="mx-auto w-full"
+                                                                    style={{ padding: 0 }}
+                                                                >
+                                                                    <div className="flex items-end">
+                                                                        <Form.Item
+                                                                            name="commentEdit"
+                                                                            className="w-full"
+                                                                        >
+                                                                            <TextArea defaultValue={item.reply.comment} rows={2} className="w-full" bordered={false} />
+                                                                        </Form.Item>
+                                                                        <Form.Item >
+                                                                            <Button
+                                                                                type="link"
+                                                                                htmlType="submit"
+                                                                                className='flex items-end justify-center  rounded-full w-8 text-blue-400 '>
+                                                                                Lưu
+                                                                            </Button>
+                                                                        </Form.Item>
+                                                                    </div>
+                                                                </Form>
+                                                            </Collapse.Panel>
+                                                        </Collapse> */}
+                                                    </Collapse.Panel>
+                                                </Collapse>
+                                            )}
                                         </div>
-                                        <span className="block my-2">{item.comment}</span>
+                                        <div className="flex">
+                                            <Image.PreviewGroup
+                                                preview={{
+                                                    onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                                                }}
+                                            >
+                                                {item.images.map((image) => (
+                                                    <Image height={70} src={image.url} alt="" className="pr-1" />
+
+                                                ))}
+                                            </Image.PreviewGroup>
+                                        </div>
+
                                     </div>
                                 </List.Item>
                             )}

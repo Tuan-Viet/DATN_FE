@@ -68,7 +68,6 @@ const Outfit = () => {
           }
           if (productDetail && productDetail._id) {
             if (userStore?.current?._id) {
-              console.log(1)
               await onAddCart({
                 userId: userStore?.current?._id,
                 productDetailId: productDetail,

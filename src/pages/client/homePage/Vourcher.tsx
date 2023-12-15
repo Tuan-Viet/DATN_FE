@@ -49,10 +49,6 @@ const Vourcher = () => {
             <h1 className="text-[37px] font-semibold uppercase mb-8">
                 Voucher dành cho bạn
             </h1>
-            {/* <div
-                className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:items-stretch md:grid-cols-4 md:gap-8"
-            > */}
-            {/* <Slider {...settings} className=" gap-4 sm:items-stretch md:gap-8"> */}
             <Swiper
                 // grabCursor={"true"}
                 spaceBetween={30}
@@ -75,7 +71,7 @@ const Vourcher = () => {
                                     >
                                         <div className="p-6 sm:px-8">
                                             <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher.discount}
+                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>}
                                                 <span className="sr-only">Plan</span>
                                             </h2>
 
@@ -108,7 +104,7 @@ const Vourcher = () => {
                                     >
                                         <div className="p-6 sm:px-8">
                                             <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher.discount}
+                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>}
                                                 <span className="sr-only">Plan</span>
                                             </h2>
 
@@ -142,7 +138,7 @@ const Vourcher = () => {
                                     >
                                         <div className="p-6 sm:px-8">
                                             <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher.discount}
+                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>}
                                                 <span className="sr-only">Plan</span>
                                             </h2>
 
@@ -156,7 +152,7 @@ const Vourcher = () => {
                                                 <button
                                                     className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
                                                     type="button"
-                                                    onClick={() => addVoucher(user.current._id, voucher._id)}
+                                                    onClick={() => addVoucher(user.current._id, voucher._id!)}
                                                 >
                                                     Lưu mã
                                                 </button>

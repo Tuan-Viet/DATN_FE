@@ -5,7 +5,12 @@ export interface IOrder {
     fullName: string
     email: string
     phoneNumber: string
-    address: string
+    address: {
+        myProvince: string,
+        myDistrict: string,
+        myWard: string,
+        detailAddress: string
+    }
     voucher_code: string
     note: string
     status: number

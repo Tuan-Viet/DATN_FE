@@ -78,10 +78,10 @@ const categoryAdd = () => {
                 },
             ]}
         />
-        <div className="border p-10 rounded-lg  bg-white">
-            <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff] pb-5">
+        <div className="border p-10 rounded-lg  bg-white w-1/2 mx-auto">
+            {/* <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff] pb-5">
                 Tạo mới danh mục
-            </h3>
+            </h3> */}
             <Form
                 form={form}
                 name="validateOnly"
