@@ -7,23 +7,49 @@ import {
 } from "../../../store/order/order.service";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, useEffect, useState } from "react";
-import { useListOrderDetailQuery, useUpdateOrderDetailMutation } from "../../../store/orderDetail/orderDetail.service";
+import {
+  useListOrderDetailQuery,
+  useUpdateOrderDetailMutation,
+} from "../../../store/orderDetail/orderDetail.service";
 import { listOrderDetailSlice } from "../../../store/orderDetail/orderDetailSlice";
 import { RootState } from "@reduxjs/toolkit/query";
-import { useGetOneProductDetailQuery, useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
-import { useFetchListProductQuery, useFetchOneProductQuery } from "../../../store/product/product.service";
+import {
+  useGetOneProductDetailQuery,
+  useListProductDetailQuery,
+} from "../../../store/productDetail/productDetail.service";
+import {
+  useFetchListProductQuery,
+  useFetchOneProductQuery,
+} from "../../../store/product/product.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { listProductSlice } from "../../../store/product/productSlice";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import { orderReturnForm, orderReturnSchema } from "../../../Schemas/OrderReturn";
+import {
+  orderReturnForm,
+  orderReturnSchema,
+} from "../../../Schemas/OrderReturn";
 import { useAddOrderReturnMutation } from "../../../store/orderReturn/order.service";
 import { current } from "@reduxjs/toolkit";
 import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Button, Form, Modal, Rate, Upload, UploadFile, UploadProps, message, notification } from "antd";
-import { LoadingOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Form,
+  Modal,
+  Rate,
+  Upload,
+  UploadFile,
+  UploadProps,
+  message,
+  notification,
+} from "antd";
+import {
+  LoadingOutlined,
+  UploadOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import { useAddReviewMutation } from "../../../store/reviews/review.service";
@@ -42,9 +68,11 @@ function formatDateStringToDisplayDate(dateString) {
     amPm = "CH";
   }
 
-  const formattedDate = `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
-    }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? "0" : ""
-    }${minutes}${amPm}`;
+  const formattedDate = `${day < 10 ? "0" : ""}${day}/${
+    month < 10 ? "0" : ""
+  }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${
+    minutes < 10 ? "0" : ""
+  }${minutes}${amPm}`;
   return formattedDate;
 }
 
@@ -85,17 +113,22 @@ const OrderDetail = () => {
   const [form] = Form.useForm();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const { handleSubmit, register, setValue, formState: { errors } } = useForm<ReviewForm>({
-    resolver: yupResolver(ReviewSchema)
-  })
+  const {
+    handleSubmit,
+    register,
+    setValue,
+    formState: { errors },
+  } = useForm<ReviewForm>({
+    resolver: yupResolver(ReviewSchema),
+  });
   const [countUpload, setCountUpload] = useState([0]);
 
   const user = useSelector((state: any) => state.user);
   useEffect(() => {
     if (user) {
-      setValue("user_id", user?.current?._id)
+      setValue("user_id", user?.current?._id);
     }
-  }, [user])
+  }, [user]);
   const isLoggedIn = user?.isLoggedIn;
   const navigate = useNavigate();
   useEffect(() => {
@@ -106,35 +139,35 @@ const OrderDetail = () => {
 
   const { id } = useParams();
   const { data: order } = useGetOneOrderQuery(id!);
-  const { data: listOrderDetail, isSuccess: isSuccessListOrder } = useListOrderDetailQuery();
-  const { data: listProductDetail, isSuccess: isSuccessListProductDetail } = useListProductDetailQuery();
-  const { data: listProduct, isSuccess: isSuccessProduct } = useFetchListProductQuery();
-  const [onaddReviews] = useAddReviewMutation()
+  const { data: listOrderDetail, isSuccess: isSuccessListOrder } =
+    useListOrderDetailQuery();
+  const { data: listProductDetail, isSuccess: isSuccessListProductDetail } =
+    useListProductDetailQuery();
+  const { data: listProduct, isSuccess: isSuccessProduct } =
+    useFetchListProductQuery();
+  const [onaddReviews] = useAddReviewMutation();
   useEffect(() => {
     if (listOrderDetail) {
       dispatch(listOrderDetailSlice(listOrderDetail));
     }
-  }, [isSuccessListOrder, isModalOpen])
+  }, [isSuccessListOrder, isModalOpen]);
   useEffect(() => {
     if (listProductDetail) {
       dispatch(listProductDetailSlice(listProductDetail));
     }
-  }, [isSuccessListProductDetail])
+  }, [isSuccessListProductDetail]);
   useEffect(() => {
     if (listProduct) {
       dispatch(listProductSlice(listProduct));
     }
-  }, [isSuccessProduct])
+  }, [isSuccessProduct]);
 
   const [updateOrder] = useUpdateOrderMutation();
 
-
   const [imageList, setImageList] = useState<any[]>([]);
 
-
-
   const handleImageChange = (info) => {
-    if (info.file.status === 'done') {
+    if (info.file.status === "done") {
       const imageUrl = info.file.response[0].url;
       setImageList([...imageList, imageUrl]);
     }
@@ -145,7 +178,9 @@ const OrderDetail = () => {
 
     console.log(file.response[0].url);
 
-    const updatedImageList = imageList.filter((url) => url !== file.response[0].url);
+    const updatedImageList = imageList.filter(
+      (url) => url !== file.response[0].url
+    );
     setImageList(updatedImageList);
   };
 
@@ -208,19 +243,25 @@ const OrderDetail = () => {
       }
     });
   };
-  const [idProduct, setIdProduct] = useState<string>("")
-  const [idProductDetail, setIdProductDetail] = useState<string>("")
-  const { data: getOneProduct } = useFetchOneProductQuery(idProduct!)
-  const { data: getOneProductDetail } = useGetOneProductDetailQuery(idProductDetail!)
-  const [orderDetailId, setOrderDetailId] = useState<string>("")
-  const showModal = (id: string, idProDetail: string, orderDetailId: string) => {
+  const [idProduct, setIdProduct] = useState<string>("");
+  const [idProductDetail, setIdProductDetail] = useState<string>("");
+  const { data: getOneProduct } = useFetchOneProductQuery(idProduct!);
+  const { data: getOneProductDetail } = useGetOneProductDetailQuery(
+    idProductDetail!
+  );
+  const [orderDetailId, setOrderDetailId] = useState<string>("");
+  const showModal = (
+    id: string,
+    idProDetail: string,
+    orderDetailId: string
+  ) => {
     if (id) {
-      setIdProduct(id)
+      setIdProduct(id);
       if (orderDetailId) {
-        setOrderDetailId(orderDetailId)
+        setOrderDetailId(orderDetailId);
       }
-      setIdProductDetail(idProDetail)
-      setValue("product_id", id)
+      setIdProductDetail(idProDetail);
+      setValue("product_id", id);
     }
     setIsModalOpen(true);
   };
@@ -240,24 +281,24 @@ const OrderDetail = () => {
     register: registerOrder,
     setValue: setOrderValue,
     handleSubmit: handleOrderSubmit,
-    formState: { errors: OrderErrors }
+    formState: { errors: OrderErrors },
   } = useForm<orderReturnForm>({
-    resolver: yupResolver(orderReturnSchema)
-  })
+    resolver: yupResolver(orderReturnSchema),
+  });
 
-  const [addOrderReturn] = useAddOrderReturnMutation()
-  const [updatedOrder] = useUpdateOrderMutation()
+  const [addOrderReturn] = useAddOrderReturnMutation();
+  const [updatedOrder] = useUpdateOrderMutation();
 
   const onAddOrderReturn = async (data: orderReturnForm) => {
-    const image = imageList
-    const value = { ...data, images: image }
+    const image = imageList;
+    const value = { ...data, images: image };
     console.log(value);
 
-    await addOrderReturn(value)
-    await updatedOrder({ id: id, status: 6 })
-    toast.success('Trả hàng thành công vui lòng đợi xác nhận')
+    await addOrderReturn(value);
+    await updatedOrder({ id: id, status: 6 });
+    toast.success("Trả hàng thành công vui lòng đợi xác nhận");
     setIsModalOrderOpen(false);
-  }
+  };
 
   const handleOk = () => {
     setIsModalOpen(false);
@@ -266,29 +307,37 @@ const OrderDetail = () => {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const [onupdateOrderDetail] = useUpdateOrderDetailMutation()
+  const [onupdateOrderDetail] = useUpdateOrderDetailMutation();
 
   const onFinish = async (values: any) => {
-    const imageObjects = fileList.map(file => ({
+    const imageObjects = fileList.map((file) => ({
       url: file.response[0].url,
-      publicId: file.response[0].publicId
+      publicId: file.response[0].publicId,
     }));
     values.images = imageObjects;
     if (idProduct && user?.current?._id && getOneProductDetail) {
-      const valuesData = { ...values, color: getOneProductDetail.nameColor, size: getOneProductDetail.size, userId: user.current._id, productId: idProduct }
-      await onaddReviews(valuesData)
+      const valuesData = {
+        ...values,
+        color: getOneProductDetail.nameColor,
+        size: getOneProductDetail.size,
+        userId: user.current._id,
+        productId: idProduct,
+      };
+      await onaddReviews(valuesData);
       if (orderDetailId) {
-        await onupdateOrderDetail({ _id: orderDetailId, order: { isReviewed: true } })
+        await onupdateOrderDetail({
+          _id: orderDetailId,
+          order: { isReviewed: true },
+        });
       }
-      navigate(`/products/${idProduct}`)
+      navigate(`/products/${idProduct}`);
       Swal.fire({
         title: "Cảm ơn bạn đã đánh giá !",
         icon: "success",
-      })
+      });
       setIsModalOpen(false);
     }
   };
-
 
   const props: UploadProps = {
     listType: "picture-card",
@@ -297,51 +346,47 @@ const OrderDetail = () => {
     action: " http://localhost:8080/api/images/upload",
   };
 
-
-
-
-
-
-
-
-  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
+  const handleChange: UploadProps["onChange"] = ({
+    fileList: newFileList,
+  }: any) => {
     setFileList(newFileList);
     setCountUpload(newFileList.length);
-  }
+  };
   const handleRemoveImage = async (file: UploadFile) => {
     console.log(file);
     try {
-      await axios.delete(`http://localhost:8080/api/images/remove/${file.response[0].publicId}`);
+      await axios.delete(
+        `http://localhost:8080/api/images/remove/${file.response[0].publicId}`
+      );
       notification.success({
         message: "Xóa ảnh thành công",
         duration: 5,
-        closeIcon: true
+        closeIcon: true,
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   };
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [selectedWard, setSelectedWards] = useState('');
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWard, setSelectedWards] = useState("");
   const [selectedNameProvince, setSelectedNameProvince] = useState("");
-  const [selectedNameDistrict, setSelectednameDistrict] = useState('');
-  const [selectedNameWard, setSelectednameWard] = useState('');
+  const [selectedNameDistrict, setSelectednameDistrict] = useState("");
+  const [selectedNameWard, setSelectednameWard] = useState("");
   // console.log(myProvince);
 
   useEffect(() => {
     // Gọi API để lấy dữ liệu tỉnh/thành phố
-    axios.get('https://provinces.open-api.vn/api/p/')
-      .then(response => setProvinces(response.data))
-      .catch(error => console.error('Error fetching provinces:', error));
-
+    axios
+      .get("https://provinces.open-api.vn/api/p/")
+      .then((response) => setProvinces(response.data))
+      .catch((error) => console.error("Error fetching provinces:", error));
   }, []);
 
   const handleProvinceChange = (e) => {
     const provinceCode = e.target.value;
-    const nameProvince = provinces.find((item) => item.code == provinceCode)
+    const nameProvince = provinces.find((item) => item.code == provinceCode);
     // myProvince = {
     //   code: nameProvice.code,
     //   name: nameProvince.name
@@ -351,46 +396,45 @@ const OrderDetail = () => {
     setSelectedProvince(provinceCode);
 
     // Gọi API để lấy dữ liệu quận/huyện dựa trên tỉnh/thành phố được chọn
-    axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
-      .then(response => setDistricts(response.data))
-      .catch(error => console.error('Error fetching districts:', error));
-
-
-
+    axios
+      .get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+      .then((response) => setDistricts(response.data))
+      .catch((error) => console.error("Error fetching districts:", error));
   };
 
   const handleDistrictChange = (e) => {
     const districtCode = e.target.value;
     setSelectedDistrict(districtCode);
 
-    const nameDistrict = districts.districts.find((item) => item.code == districtCode)
+    const nameDistrict = districts.districts.find(
+      (item) => item.code == districtCode
+    );
     setSelectednameDistrict(nameDistrict.name);
 
-
     // Gọi API để lấy dữ liệu xã/phường dựa trên quận/huyện được chọn
-    axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
-      .then(response => setWards(response.data))
-      .catch(error => console.error('Error fetching wards:', error));
+    axios
+      .get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+      .then((response) => setWards(response.data))
+      .catch((error) => console.error("Error fetching wards:", error));
   };
 
   const handleWardChange = (e) => {
     const wardCode = e.target.value;
     setSelectedWards(wardCode);
 
-    const nameWard = wards.wards.find((item) => item.code == wardCode)
+    const nameWard = wards.wards.find((item) => item.code == wardCode);
     setSelectednameWard(nameWard.name);
-
   };
 
   useEffect(() => {
-    setOrderValue('address.myProvince', selectedNameProvince)
-  }, [selectedNameProvince])
+    setOrderValue("address.myProvince", selectedNameProvince);
+  }, [selectedNameProvince]);
   useEffect(() => {
-    setOrderValue('address.myDistrict', selectedNameDistrict)
-  }, [selectedNameDistrict])
+    setOrderValue("address.myDistrict", selectedNameDistrict);
+  }, [selectedNameDistrict]);
   useEffect(() => {
-    setOrderValue('address.myWard', selectedNameWard)
-  }, [selectedNameWard])
+    setOrderValue("address.myWard", selectedNameWard);
+  }, [selectedNameWard]);
 
   return (
     <>
@@ -454,7 +498,41 @@ const OrderDetail = () => {
                     d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                   />
                 </svg>
+                <Link to="/account/ordersReturn">Yêu cầu đổi trả</Link>
+              </div>
+              <div className="flex items-center gap-x-2 mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                  />
+                </svg>
                 <Link to="/account/addresses">Danh sách địa chỉ</Link>
+              </div>
+              <div className="flex items-center gap-x-2 mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                  />
+                </svg>
+                <Link to="/account/password">Thay đổi mật khẩu</Link>
               </div>
             </div>
             <div className="w-[1130px]">
@@ -486,7 +564,11 @@ const OrderDetail = () => {
                       </p>
                     )}
                     {order?.status == 4 && (
-                      <Button type="primary" onClick={showOrderModal} className="text-white bg-blue-700"  >
+                      <Button
+                        type="primary"
+                        onClick={showOrderModal}
+                        className="text-white bg-blue-700"
+                      >
                         Đổi hàng
                       </Button>
                     )}
@@ -497,83 +579,191 @@ const OrderDetail = () => {
                     open={isModalOrderOpen}
                     onOk={handleOrderSubmit(onAddOrderReturn)}
                     okButtonProps={{ className: "text-white bg-blue-500" }}
-                    onCancel={(handleOrderCancel)}
+                    onCancel={handleOrderCancel}
                     width={1000}
                   >
-
-                    <form className=" mx-auto" onSubmit={handleOrderSubmit(onAddOrderReturn)}>
-                      <input type="hidden" value={user.current._id} {...registerOrder("userId")} id="userId" />
-                      <input type="hidden" value={order?._id} {...registerOrder("orderId")} id="orderId" />
+                    <form
+                      className=" mx-auto"
+                      onSubmit={handleOrderSubmit(onAddOrderReturn)}
+                    >
+                      <input
+                        type="hidden"
+                        value={user.current._id}
+                        {...registerOrder("userId")}
+                        id="userId"
+                      />
+                      <input
+                        type="hidden"
+                        value={order?._id}
+                        {...registerOrder("orderId")}
+                        id="orderId"
+                      />
                       <div className="mb-5">
-                        <label htmlFor="large-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Họ tên người gửi</label>
-                        <input {...registerOrder("fullName")} type="text" id="fullName" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.fullName?.message : ""}</p>
-
+                        <label
+                          htmlFor="large-input"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Họ tên người gửi
+                        </label>
+                        <input
+                          {...registerOrder("fullName")}
+                          type="text"
+                          id="fullName"
+                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors ? OrderErrors.fullName?.message : ""}
+                        </p>
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="base-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Số điện thoại người gửi</label>
-                        <input type="text" {...registerOrder("phoneNumber")} id="phoneNumber" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.phoneNumber?.message : ""}</p>
-
+                        <label
+                          htmlFor="base-input"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Số điện thoại người gửi
+                        </label>
+                        <input
+                          type="text"
+                          {...registerOrder("phoneNumber")}
+                          id="phoneNumber"
+                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors ? OrderErrors.phoneNumber?.message : ""}
+                        </p>
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Tỉnh/Thành phố:</label>
-                        <select onChange={handleProvinceChange} value={selectedProvince} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <label
+                          htmlFor="countries"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Tỉnh/Thành phố:
+                        </label>
+                        <select
+                          onChange={handleProvinceChange}
+                          value={selectedProvince}
+                          id="countries"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
                           <option value="">Chọn tỉnh/thành phố</option>
-                          {provinces.map(province => (
-                            <option key={province.code} value={province.code} > {province.name}</option>
+                          {provinces.map((province) => (
+                            <option key={province.code} value={province.code}>
+                              {" "}
+                              {province.name}
+                            </option>
                           ))}
                         </select>
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.myProvince?.message : ""}</p>
-
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors
+                            ? OrderErrors.address?.myProvince?.message
+                            : ""}
+                        </p>
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Quận/Huyện:</label>
-                        <select onChange={handleDistrictChange} value={selectedDistrict} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <label
+                          htmlFor="countries"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Quận/Huyện:
+                        </label>
+                        <select
+                          onChange={handleDistrictChange}
+                          value={selectedDistrict}
+                          id="countries"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
                           <option value="">Chọn quận/huyện</option>
-                          {districts?.districts?.map(district => (
-                            <option key={district.code} value={district.code}>{district.name}</option>
+                          {districts?.districts?.map((district) => (
+                            <option key={district.code} value={district.code}>
+                              {district.name}
+                            </option>
                           ))}
                         </select>
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.myDistrict?.message : ""}</p>
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors
+                            ? OrderErrors.address?.myDistrict?.message
+                            : ""}
+                        </p>
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn xã/phường:</label>
-                        <select onChange={handleWardChange} value={selectedWard} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                        <label
+                          htmlFor="countries"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Chọn xã/phường:
+                        </label>
+                        <select
+                          onChange={handleWardChange}
+                          value={selectedWard}
+                          id="countries"
+                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
                           <option value="">Chọn xã phường</option>
-                          {wards?.wards?.map(ward => (
-                            <option key={ward.code} value={ward.code}>{ward.name}</option>
+                          {wards?.wards?.map((ward) => (
+                            <option key={ward.code} value={ward.code}>
+                              {ward.name}
+                            </option>
                           ))}
                         </select>
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.myWard?.message : ""}</p>
-
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors
+                            ? OrderErrors.address?.myWard?.message
+                            : ""}
+                        </p>
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Địa chỉ gửi</label>
-                        <input type="text" {...registerOrder("address.detailAddress")} id="address" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.address?.detailAddress?.message : ""}</p>
-
+                        <label
+                          htmlFor="small-input"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Địa chỉ gửi
+                        </label>
+                        <input
+                          type="text"
+                          {...registerOrder("address.detailAddress")}
+                          id="address"
+                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors
+                            ? OrderErrors.address?.detailAddress?.message
+                            : ""}
+                        </p>
                       </div>
                       <div className="mb-5">
-                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do trả hàng</label>
-                        <input type="text" {...registerOrder("reason")} id="reason" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
-
+                        <label
+                          htmlFor="small-input"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Lý do trả hàng
+                        </label>
+                        <input
+                          type="text"
+                          {...registerOrder("reason")}
+                          id="reason"
+                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                        <p className="text-red-500 italic text-sm">
+                          {OrderErrors ? OrderErrors.reason?.message : ""}
+                        </p>
                       </div>
                       <Form
                         form={form}
                         name="validateOnly"
                         layout="vertical"
                         autoComplete="off"
-                      // onFinish={uploadFile}
+                        // onFinish={uploadFile}
                       >
                         <Form.Item
                           name="productImages"
                           label="Ảnh Sản phẩm"
                           className="relative"
-                          rules={[{ required: true, message: 'Không được để trống' }]}
+                          rules={[
+                            { required: true, message: "Không được để trống" },
+                          ]}
                         >
-                          <Upload name='productImages'
+                          <Upload
+                            name="productImages"
                             {...props}
                             onChange={handleImageChange}
                             onRemove={handleImageProductRemove}
@@ -587,7 +777,12 @@ const OrderDetail = () => {
                         </Form.Item>
                       </Form>
                       <div className="mb-5">
-                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Sản phẩm trả hàng</label>
+                        <label
+                          htmlFor="small-input"
+                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                        >
+                          Sản phẩm trả hàng
+                        </label>
                         <div className="relative overflow-x-auto">
                           <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead className="text-sm uppercase border-b-2 border-black bg-gray-50">
@@ -613,23 +808,59 @@ const OrderDetail = () => {
                                     {productDetailState
                                       ?.filter(
                                         (proDetail) =>
-                                          proDetail._id === product.productDetailId
+                                          proDetail._id ===
+                                          product.productDetailId
                                       )
                                       .map((item) => {
                                         return (
                                           <>
                                             {productState
                                               ?.filter(
-                                                (prod) => prod._id === item.product_id
+                                                (prod) =>
+                                                  prod._id === item.product_id
                                               )
                                               .map((pro) => (
-
                                                 <tr className="bg-white ">
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
-                                                  <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
+                                                  <input
+                                                    type="hidden"
+                                                    {...registerOrder(
+                                                      `orderDetailIds.${index}.productDetailId`
+                                                    )}
+                                                    value={item._id}
+                                                    className=""
+                                                  />
+                                                  <input
+                                                    type="hidden"
+                                                    {...registerOrder(
+                                                      `orderDetailIds.${index}.orderDetailId`
+                                                    )}
+                                                    value={product._id}
+                                                    className=""
+                                                  />
+                                                  <input
+                                                    type="hidden"
+                                                    {...registerOrder(
+                                                      `orderDetailIds.${index}.color`
+                                                    )}
+                                                    value={product.color}
+                                                    className=""
+                                                  />
+                                                  <input
+                                                    type="hidden"
+                                                    {...registerOrder(
+                                                      `orderDetailIds.${index}.size`
+                                                    )}
+                                                    value={product.size}
+                                                    className=""
+                                                  />
+                                                  <input
+                                                    type="hidden"
+                                                    {...registerOrder(
+                                                      `orderDetailIds.${index}.price`
+                                                    )}
+                                                    value={product.price}
+                                                    className=""
+                                                  />
                                                   <th
                                                     scope="row"
                                                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
@@ -644,7 +875,8 @@ const OrderDetail = () => {
                                                         {pro.title}
                                                       </p>
                                                       <p>
-                                                        {product.color} / {product.size}
+                                                        {product.color} /{" "}
+                                                        {product.size}
                                                       </p>
                                                     </div>
                                                   </th>
@@ -656,7 +888,20 @@ const OrderDetail = () => {
                                                   </td>
                                                   <td className="px-6 py-4">
                                                     <div className="relative flex items-center max-w-[8rem]">
-                                                      <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
+                                                      <input
+                                                        type="number"
+                                                        {...registerOrder(
+                                                          `orderDetailIds.${index}.quantity`
+                                                        )}
+                                                        className="border-x-0 border-gray-300"
+                                                        onChange={(e) =>
+                                                          e.target.value
+                                                        }
+                                                        defaultValue={0}
+                                                        placeholder="0"
+                                                        min={0}
+                                                        max={product.quantity}
+                                                      />
                                                       /{product.quantity}
                                                     </div>
                                                   </td>
@@ -677,11 +922,8 @@ const OrderDetail = () => {
                             </tbody>
                           </table>
                         </div>
-
                       </div>
                     </form>
-
-
                   </Modal>
                   <div className="text-right">
                     {/* {order?.status !== 4 && order?.status !== 3 && order?.status !== 0 &&
@@ -692,14 +934,17 @@ const OrderDetail = () => {
                         Hủy đơn hàng
                       </button>
                     } */}
-                    {order?.status === 1 && Number(order?.paymentStatus) !== 1 ? (
+                    {order?.status === 1 &&
+                    Number(order?.paymentStatus) !== 1 ? (
                       <button
                         onClick={() => handleCancelOrder(id!)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
                       >
                         Hủy đơn hàng
                       </button>
-                    ) : ""}
+                    ) : (
+                      ""
+                    )}
                     <Link
                       to="/account"
                       className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
@@ -727,9 +972,12 @@ const OrderDetail = () => {
                         <th scope="col" className="px-6 py-3">
                           Thành tiền
                         </th>
-                        {order && order.status === 4 || order?.status === 5 ? <th scope="col" className="px-6 py-3">
-                          Đánh giá
-                        </th> : null}
+                        {(order && order.status === 4) ||
+                        order?.status === 5 ? (
+                          <th scope="col" className="px-6 py-3">
+                            Đánh giá
+                          </th>
+                        ) : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -746,7 +994,8 @@ const OrderDetail = () => {
                                   <>
                                     {productState
                                       ?.filter(
-                                        (prod: any) => prod._id === item.product_id
+                                        (prod: any) =>
+                                          prod._id === item.product_id
                                       )
                                       .map((pro: any) => (
                                         <tr className="bg-white">
@@ -754,7 +1003,10 @@ const OrderDetail = () => {
                                             scope="row"
                                             className="font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
                                           >
-                                            <Link to={`/products/${pro._id!}`} className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5">
+                                            <Link
+                                              to={`/products/${pro._id!}`}
+                                              className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
+                                            >
                                               <img
                                                 src={item.imageColor}
                                                 alt={pro.title}
@@ -765,13 +1017,14 @@ const OrderDetail = () => {
                                                   {pro.title}
                                                 </p>
                                                 <p>
-                                                  {product.color} / {product.size}
+                                                  {product.color} /{" "}
+                                                  {product.size}
                                                 </p>
                                               </div>
                                             </Link>
                                           </th>
                                           <td className="px-6 py-4">
-                                            ESTP03872PE00SB_BL-XXL
+                                            {pro?.sku}
                                           </td>
                                           <td className="px-6 py-4">
                                             {product.price.toLocaleString(
@@ -789,8 +1042,32 @@ const OrderDetail = () => {
                                             ₫
                                           </td>
                                           <td>
-                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === false && <div onClick={() => showModal(pro._id!, product.productDetailId!, product._id!)} className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đánh giá</div> : null}
-                                            {order && order.status === 4 || order?.status === 5 ? product.isReviewed === true && <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">Đã đánh giá</div> : null}
+                                            {(order && order.status === 4) ||
+                                            order?.status === 5
+                                              ? product.isReviewed ===
+                                                  false && (
+                                                  <div
+                                                    onClick={() =>
+                                                      showModal(
+                                                        pro._id!,
+                                                        product.productDetailId!,
+                                                        product._id!
+                                                      )
+                                                    }
+                                                    className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
+                                                  >
+                                                    Đánh giá
+                                                  </div>
+                                                )
+                                              : null}
+                                            {(order && order.status === 4) ||
+                                            order?.status === 5
+                                              ? product.isReviewed === true && (
+                                                  <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">
+                                                    Đã đánh giá
+                                                  </div>
+                                                )
+                                              : null}
                                           </td>
                                         </tr>
                                       ))}
@@ -826,7 +1103,13 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
-                        <td className="px-6 py-4 font-bold">{totalProductPrice >= 500000 ? <p>Miễn phí</p> : <p>40.000đ</p>}</td>
+                        <td className="px-6 py-4 font-bold">
+                          {totalProductPrice >= 500000 ? (
+                            <p>Miễn phí</p>
+                          ) : (
+                            <p>40.000đ</p>
+                          )}
+                        </td>
                       </tr>
                       <tr className="bg-white">
                         <th
@@ -839,7 +1122,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {(Number(order?.totalMoney)).toLocaleString("vi-VN")}₫
+                          {Number(order?.totalMoney).toLocaleString("vi-VN")}₫
                         </td>
                       </tr>
                     </tbody>
@@ -863,10 +1146,18 @@ const OrderDetail = () => {
                     </p>
                     <p className="mb-2">
                       Địa chỉ:{" "}
-                      <span className="font-bold">{order?.address.detailAddress},</span>
-                      <span className="font-bold">{order?.address.myWard},</span>
-                      <span className="font-bold">{order?.address.myDistrict},</span>
-                      <span className="font-bold">{order?.address.myProvince}</span>
+                      <span className="font-bold">
+                        {order?.address.detailAddress},
+                      </span>
+                      <span className="font-bold">
+                        {order?.address.myWard},
+                      </span>
+                      <span className="font-bold">
+                        {order?.address.myDistrict},
+                      </span>
+                      <span className="font-bold">
+                        {order?.address.myProvince}
+                      </span>
                     </p>
                     <p className="mb-2">
                       Số điện thoại:{" "}
@@ -877,29 +1168,54 @@ const OrderDetail = () => {
               </div>
             </div>
           </div>
-          {order && order.status === 4 &&
+          {order && order.status === 4 && (
             <>
               <Modal
-                cancelButtonProps={{ style: { display: 'none' } }}
-                title="Đánh giá của bạn" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+                cancelButtonProps={{ style: { display: "none" } }}
+                title="Đánh giá của bạn"
+                open={isModalOpen}
+                onOk={handleOk}
+                onCancel={handleCancel}
+              >
                 <Form
                   name="basic"
                   layout="vertical"
                   style={{ maxWidth: 600 }}
                   onFinish={onFinish}
                 >
-                  {getOneProduct && getOneProductDetail &&
+                  {getOneProduct && getOneProductDetail && (
                     <div className="">
                       <div className="flex pb-3">
-                        <img className="h-20" src={getOneProduct.images?.[0]} alt="" />
+                        <img
+                          className="h-20"
+                          src={getOneProduct.images?.[0]}
+                          alt=""
+                        />
                         <div className="flex flex-col p-2">
                           <p>{getOneProduct?.title}</p>
                           <div className="">
-                            <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{getOneProductDetail.size}</span> - <span className="text-xs text-blue-500"> {getOneProductDetail.nameColor}</span>
+                            <span className="text-xs text-gray-400 ">
+                              Phân loại:{" "}
+                            </span>
+                            <span className="text-xs text-blue-500">
+                              {getOneProductDetail.size}
+                            </span>{" "}
+                            -{" "}
+                            <span className="text-xs text-blue-500">
+                              {" "}
+                              {getOneProductDetail.nameColor}
+                            </span>
                           </div>
                           <div className="flex ">
-                            <del className="text-gray-400">{getOneProduct?.price?.toLocaleString("vi-VN")}đ</del>
-                            <p className="ml-2">{(getOneProduct?.price - getOneProduct?.discount).toLocaleString("vi-VN")}đ</p>
+                            <del className="text-gray-400">
+                              {getOneProduct?.price?.toLocaleString("vi-VN")}đ
+                            </del>
+                            <p className="ml-2">
+                              {(
+                                getOneProduct?.price - getOneProduct?.discount
+                              ).toLocaleString("vi-VN")}
+                              đ
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -907,28 +1223,39 @@ const OrderDetail = () => {
                         label="Đánh giá"
                         name="rating"
                         className="text-base"
-                        rules={[{ required: true, message: 'Hãy đánh giá sao' }]}
+                        rules={[
+                          { required: true, message: "Hãy đánh giá sao" },
+                        ]}
                       >
                         <Rate className="text-2xl" />
                       </Form.Item>
                     </div>
-                  }
+                  )}
 
                   <Form.Item
                     label="Bình luận"
                     name="comment"
-                    rules={[{ required: true, message: 'Hãy nhập tối thiểu 10 kí tự bạn nhé!' }]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Hãy nhập tối thiểu 10 kí tự bạn nhé!",
+                      },
+                    ]}
                   >
                     <TextArea />
                   </Form.Item>
-                  <Form.Item name="images"
+                  <Form.Item
+                    name="images"
                     label="Ảnh đánh giá"
                     className="relative"
                   >
-                    <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">{countUpload}/3</span>
-                    <Upload name='images'
+                    <span className="absolute right-0 top-[-22px] text-gray-500 text-sm">
+                      {countUpload}/3
+                    </span>
+                    <Upload
+                      name="images"
                       multiple
-                      action={'http://localhost:8080/api/images/upload'}
+                      action={"http://localhost:8080/api/images/upload"}
                       fileList={fileList}
                       onChange={handleChange}
                       listType="picture-card"
@@ -943,16 +1270,21 @@ const OrderDetail = () => {
                     </Upload>
                   </Form.Item>
 
-                  <Form.Item >
-                    <Button type="primary" className="bg-blue-500 w-full py-3 flex items-center justify-center " htmlType="submit">
+                  <Form.Item>
+                    <Button
+                      type="primary"
+                      className="bg-blue-500 w-full py-3 flex items-center justify-center "
+                      htmlType="submit"
+                    >
                       Viết đánh giá
                     </Button>
                   </Form.Item>
                 </Form>
               </Modal>
-            </>}
+            </>
+          )}
         </div>
-      </div >
+      </div>
       <Footer></Footer>
     </>
   );

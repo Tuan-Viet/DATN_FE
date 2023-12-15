@@ -37,7 +37,7 @@ const Sale = () => {
           <div className="w-3 h-3 rounded-full animate-ping bg-red-500"></div>
           <h1 className="text-[37px] font-semibold uppercase">Sale vô cực</h1>
         </div>
-        <div className="product-sale mb-12 grid">
+        <div className="product-sale mb-12">
           <Swiper
             grabCursor={"true"}
             spaceBetween={25}

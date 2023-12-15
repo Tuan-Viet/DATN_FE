@@ -137,7 +137,7 @@ const ProductInfo = () => {
       switch (currentTab && currentTab) {
         case 1:
           return <>
-            <div className="bg-[#fffbf8] px-[24px] py-4 ">
+            <div className="bg-[#fffbf8] py-4">
               <div className="flex w-[80%] mx-auto">
                 <div className="">
                   <div className="flex items-center text-yellow-500">
@@ -588,409 +588,411 @@ const ProductInfo = () => {
 
 
     return (
-      <div className=" mx-3 mb-[70px] my-10" id="scroller ">
-        {/* <ScrollToTop /> */}
-        <div className="flex justify-between gap-x-7 mb-10 mx-10">
-          {!isSuccessProduct ? (
-            <div className="space-y-3">
-              <Skeleton.Image active={true} style={{ width: '380px', height: '400px' }} />
-              <Skeleton.Image active={true} style={{ width: '80px', height: '80px' }} />
-            </div>
-          ) : (
-            <div className="">
-              <div className="w-[400px] h-[500px] relative">
-                <img
-                  src={listImages[selectedImage]}
-                  alt=""
-                  className="w-[400px] h-[500px] object-cover border"
-                />
-                <button
-                  onClick={handlePrevClick}
-                  className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
-                >
-                  &lt;
-                </button>
-                <button
-                  onClick={handleNextClick}
-                  className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
-                >
-                  &gt;
-                </button>
-              </div>
-              <div className=" mt-5">
-                <Swiper
-                  modules={[Navigation]}
-                  spaceBetween={4}
-                  slidesPerView={"auto"}
-                  navigation={true}
-                  className="w-[400px] mx-auto"
-                >
-                  {listImages.map((imageUrl, index) => {
-                    return <SwiperSlide key={index} className="w-20 h-24 cursor-pointer">
-                      <div
-                        onClick={() => handleImageClick(index)}
-                        className={`h-20 w-16 overflow-hidden mb-3 relative group transform transition-transform hover:scale-110 
-                      }`}
-                      >
-                        <div className="h-20 flex items-center justify-center">
-                          <img
-                            src={imageUrl}
-                            alt=""
-                            className="h-full w-full object-cover "
-                          />
-                        </div>
-
-                      </div>
-                    </SwiperSlide>
-                  })}
-                </Swiper>
-
-              </div>
-            </div>
-          )}
-
-          <div className="product-info w-2/3">
+      <div className="container">
+        <div className="mb-[70px] my-10" id="scroller ">
+          {/* <ScrollToTop /> */}
+          <div className="flex justify-between gap-x-7 mb-10">
             {!isSuccessProduct ? (
-              <div className="">
-                <div className="">
-                  <Skeleton.Input active={true} style={{ width: '380px', height: '39px' }} />
-                </div>
-                <div className="mt-3">
-                  <Skeleton.Input active={true} style={{ width: '450px', height: '20px' }} />
-                </div>
+              <div className="space-y-3">
+                <Skeleton.Image active={true} style={{ width: '380px', height: '400px' }} />
+                <Skeleton.Image active={true} style={{ width: '80px', height: '80px' }} />
               </div>
             ) : (
-              <div className="mb-10">
-                <h1 className="text-[26px] font-bold mb-2">
-                  {getOneProduct?.title}
-                </h1>
-                <div className="flex gap-x-5 text-sm">
-                  <span>
-                    Mã sản phẩm: <b>{getOneProduct?.sku}</b>
-                  </span>
-                  <span>
-                    Tình trạng: <b>Còn hàng</b>
-                  </span>
-                  <span>
-                    Thương hiệu: <b className="uppercase">HUSTLE</b>
-                  </span>
+              <div className="">
+                <div className="w-[400px] h-[500px] relative">
+                  <img
+                    src={listImages[selectedImage]}
+                    alt=""
+                    className="w-[400px] h-[500px] object-cover border"
+                  />
+                  <button
+                    onClick={handlePrevClick}
+                    className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
+                  >
+                    &lt;
+                  </button>
+                  <button
+                    onClick={handleNextClick}
+                    className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
+                  >
+                    &gt;
+                  </button>
+                </div>
+                <div className=" mt-5">
+                  <Swiper
+                    modules={[Navigation]}
+                    spaceBetween={4}
+                    slidesPerView={"auto"}
+                    navigation={true}
+                    className="w-[400px] mx-auto"
+                  >
+                    {listImages.map((imageUrl, index) => {
+                      return <SwiperSlide key={index} className="w-20 h-24 cursor-pointer">
+                        <div
+                          onClick={() => handleImageClick(index)}
+                          className={`h-20 w-16 overflow-hidden mb-3 relative group transform transition-transform hover:scale-110 
+                        }`}
+                        >
+                          <div className="h-20 flex items-center justify-center">
+                            <img
+                              src={imageUrl}
+                              alt=""
+                              className="h-full w-full object-cover "
+                            />
+                          </div>
+  
+                        </div>
+                      </SwiperSlide>
+                    })}
+                  </Swiper>
+  
                 </div>
               </div>
             )}
-
-            {/* form */}
-            <form onSubmit={handleSubmit(handleFormProductDetail)}>
-              <div className="px-4">
-                {!isSuccessProduct ? (
-                  <div className="mb-8 mt-10 ">
-                    <Skeleton.Input active={true} style={{ width: '220px', height: '40px' }} />
+  
+            <div className="product-info w-2/3">
+              {!isSuccessProduct ? (
+                <div className="">
+                  <div className="">
+                    <Skeleton.Input active={true} style={{ width: '380px', height: '39px' }} />
                   </div>
-                ) : (
-                  <div className="flex items-center gap-x-[109px] py-3 mb-5">
-                    <span className="text-sm font-bold">Giá:</span>
-
-                    <div className="font-bold text-xl text-[#FF2C26]">
-                      {(getOneProduct?.price - getOneProduct.discount).toLocaleString("vi-VN")}đ
-                      <del className="font-bold text-sm text-[#ccc] ml-2">
-                        {getOneProduct.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
-                          <del>{getOneProduct.price?.toLocaleString("vi-VN")}đ</del>
-                        </span>}
-                      </del>
-                    </div>
-                    {getOneProduct && getOneProduct.discount !== 0 && <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
-                      -{`${((getOneProduct?.price - (getOneProduct.price - getOneProduct.discount)) / getOneProduct?.price * 100).toFixed(0)}`}%
-                    </span>}
+                  <div className="mt-3">
+                    <Skeleton.Input active={true} style={{ width: '450px', height: '20px' }} />
                   </div>
-                )}
-
-                {/* bien the */}
-                <div>
-                  {!isSuccessProduct ? (
-                    <div className="mt-3">
-                      <div className="">
-                        <Skeleton.Input active={true} style={{ width: '300px', height: '36px' }} />
-                      </div>
-                      <div className="mt-1">
-                        <Skeleton.Input active={true} style={{ width: '300px', height: '36px' }} />
-                      </div>
-                      <div className="mt-8">
-                        <Skeleton.Button active={true} style={{ width: '200px', height: '40px' }} />
-                      </div>
-                      <div className="mt-5 flex space-x-5 mb-3">
-                        <Skeleton.Button active={true} style={{ width: '300px', height: '50px' }} />
-                        <Skeleton.Button active={true} style={{ width: '300px', height: '50px' }} />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="">
-                      {[...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
-                        <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
-                        <div className="flex my-6">
-                          <div className="w-[13%] text-sm font-bold">Màu sắc</div>
-                          <div className="flex">
-                            {colorProduct.map((color, index) => (
-                              <div className="mx-1">
-                                <input
-                                  type="radio"
-                                  value={color}
-                                  onClick={() => {
-                                    handleColorProductDetail(color);
-                                    handleImageClick(index + getOneProduct.images.length);
-                                  }}
-                                  id={color}
-                                  name="color"
-                                  className="hidden peer"
-                                />
-                                <label htmlFor={color}
-                                  className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                                >
-                                  {color}
-                                </label>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="flex my-6">
-                          {/* size */}
-                          <div className="w-[13%] text-sm font-bold">Kích thước</div>
-                          <div className="flex">
-                            {productDetailFilterState
-                              ?.slice()
-                              .sort((a: any, b: any) => new Date(a?.createdAt).getTime() - new Date(b?.createdAt).getTime())
-                              .map((item) => {
-                                return <>
-                                  {item.quantity > 0 ? <div className="mx-1" key={item._id}>
-                                    <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
-                                    <label htmlFor={item.size}
-                                      className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
-                                    >
-                                      {item.size}
-                                    </label>
-                                  </div> :
-                                    <div className="mx-1">
-                                      <label
-                                        className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
-                                      >
-                                        {item.size}
-                                      </label>
-                                    </div>
-                                  }
-                                </>
-                              })}
-                          </div>
-                        </div >
-                        <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
-                          <span className="text-sm font-bold">Số lượng:</span>
-                          <div>
-                            <label htmlFor="Quantity" className="sr-only">
-                              {" "}
-                              Quantity{" "}
-                            </label>
-
-                            <div className="flex items-center border border-gray-300 rounded">
-                              <button
-                                onClick={decreaseQuantity}
-                                type="button"
-                                className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                              >
-                                &minus;
-                              </button>
-
-                              <input
-                                type="number"
-                                id="Quantity"
-                                value={quantity}
-                                className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
-                              />
-
-                              <button
-                                onClick={increaseQuantity}
-                                type="button"
-                                className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mb-7">
-                          <div className="flex gap-x-[15px] mb-5">
-                            <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
-                              Thêm vào giỏ
-                            </button>
-                            <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
-                              Mua ngay
-                            </button>
-                          </div>
-                        </div>
-                      </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
-                    </div>
-                  )}
-
                 </div>
-              </div>
-
-            </form>
-            {/* outfit */}
-            {listOutfitByProductIdState.length > 0 &&
-              <OutfitProductDetail listOutfitByProductIdState={listOutfitByProductIdState} productState={productState} id={id} productDetailRelatedState={productDetailRelatedState} listOutfitState={listOutfitState} listCartState={listCartState}></OutfitProductDetail>
-            }
-
-            {isSuccessProduct ? (
-              <div className="policy flex justify-between gap-x-[13px]">
-                <div>
-                  <div className="flex items-center gap-x-[10px] mb-4">
-                    <img
-                      src="/images/icon/product_info2_desc3_img.png"
-                      className="w-[30px] h-[30px]"
-                      alt=""
-                    />
-                    <span className="text-sm">
-                      Kiểm tra, thanh toán khi nhận hàng COD
+              ) : (
+                <div className="mb-10">
+                  <h1 className="text-[26px] font-bold mb-2">
+                    {getOneProduct?.title}
+                  </h1>
+                  <div className="flex gap-x-5 text-sm">
+                    <span>
+                      Mã sản phẩm: <b>{getOneProduct?.sku}</b>
+                    </span>
+                    <span>
+                      Tình trạng: <b>Còn hàng</b>
+                    </span>
+                    <span>
+                      Thương hiệu: <b className="uppercase">HUSTLE</b>
                     </span>
                   </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-x-[10px] mb-4">
-                    <img
-                      src="/images/icon/product_info1_desc2_img.png"
-                      className="w-[30px] h-[30px]"
-                      alt=""
-                    />
-                    <span className="text-sm">Hàng phân phối chính hãng 100%</span>
-                  </div>
-                </div>
-                <div>
-                  <div className="flex items-center gap-x-[10px] mb-4">
-                    <img
-                      src="/images/icon/product_info1_desc3_img.png"
-                      className="w-[30px] h-[30px]"
-                      alt=""
-                    />
-                    <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
-                  </div>
-
-                </div>
-              </div>
-            ) : ""}
-          </div >
-        </div >
-        <div className="px-10">
-          <div className="product-tabs flex gap-x-[60px]">
-            <div>
-              <button
-                className={`${currentTab === 1
-                  ? "border-b-2 border-black text-black"
-                  : "text-[#b3b3b3]"
-                  } text-lg font-semibold pb-2`}
-                onClick={() => setCurrentTab(1)}
-              >
-                Đánh giá - Nhận xét từ khách hàng
-              </button>
-            </div>
-            <div>
-              <button
-                className={`${currentTab === 2
-                  ? "border-b-2 border-black text-black"
-                  : "text-[#b3b3b3]"
-                  } text-lg font-semibold pb-2`}
-                onClick={() => setCurrentTab(2)}
-              >
-                Mô tả sản phẩm
-              </button>
-            </div>
-            <div>
-              <button
-                className={`${currentTab === 3
-                  ? "border-b-2 border-black text-black"
-                  : "text-[#b3b3b3]"
-                  } text-lg font-semibold pb-2`}
-                onClick={() => setCurrentTab(3)}
-              >
-                Chính sách đổi trả
-              </button>
-            </div>
-            <div>
-              <button
-                className={`${currentTab === 4
-                  ? "border-b-2 border-black text-black"
-                  : "text-[#b3b3b3]"
-                  } text-lg font-semibold pb-2`}
-                onClick={() => setCurrentTab(4)}
-              >
-                Chính sách bảo mật
-              </button>
-            </div>
-          </div>
-          <div className="mt-[40px]">{renderContent()}</div>
-        </div>
-        {/* san pham lien quan */}
-        <div>
-          <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase mt-10">
-            Sản phẩm liên quan
-          </h1>
-          <div className="product-related mb-12">
-            <Swiper
-              modules={[Navigation]}
-              // grabCursor={"true"}
-              spaceBetween={25}
-              slidesPerView={"auto"}
-              navigation={true}
-            >
-              {productRelated?.map((product, index) => {
-                return <SwiperSlide key={index}>
-                  <div className={`relative group ${[...new Set(productDetailRelatedState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
-                    {[...new Set(productDetailRelatedState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 overflow-hidden bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>}
-                    <Link to={`/products/${product._id}`}>
-                      <div className="min-h-[375px] max-h-[395px] overflow-hidden">
-                        <img
-                          src={product.images?.[0]}
-                          className="mx-auto max-h-[395px] min-h-[375px] w-full group-hover:opacity-0 group-hover:scale-100 absolute transition-all ease-linear duration-200"
-                          alt=""
-                        />
-
-                        <img
-                          src={product.images?.[1] ? product.images?.[1] : productDetailRelatedState.find((proDetail) => proDetail.product_id && proDetail.product_id.includes(product._id!))?.imageColor
-                          }
-                          className="mx-auto max-h-[375px] min-h-[375px] w-full duration-999 absolute opacity-0 group-hover:opacity-100 transition-all ease-linear"
-                          alt=""
-                        />
+              )}
+  
+              {/* form */}
+              <form onSubmit={handleSubmit(handleFormProductDetail)}>
+                <div className="">
+                  {!isSuccessProduct ? (
+                    <div className="mb-8 mt-10 ">
+                      <Skeleton.Input active={true} style={{ width: '220px', height: '40px' }} />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-x-[109px] py-3 mb-5">
+                      <span className="text-sm font-bold">Giá:</span>
+  
+                      <div className="font-bold text-xl text-[#FF2C26]">
+                        {(getOneProduct?.price - getOneProduct.discount).toLocaleString("vi-VN")}đ
+                        <del className="font-bold text-sm text-[#ccc] ml-2">
+                          {getOneProduct.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
+                            <del>{getOneProduct.price?.toLocaleString("vi-VN")}đ</del>
+                          </span>}
+                        </del>
                       </div>
-                    </Link>
-                    <div className="product-info p-[8px] bg-white">
-                      <div className="text-sm flex justify-between mb-3">
-                        <span>+{productDetailRelatedState ? [...new Set(productDetailRelatedState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
-                        <div className="flex">+{productDetailRelatedState ? [...new Set(productDetailRelatedState?.filter((item) => item.product_id === product._id).map((pro) => pro.size))].length : 0}
-                          <p className="ml-1">Kích thước</p>
+                      {getOneProduct && getOneProduct.discount !== 0 && <span className="width-[52px]  top-3 left-3 height-[22px] rounded-full px-3 py-[5px] text-xs font-semibold text-white bg-[#FF0000]">
+                        -{`${((getOneProduct?.price - (getOneProduct.price - getOneProduct.discount)) / getOneProduct?.price * 100).toFixed(0)}`}%
+                      </span>}
+                    </div>
+                  )}
+  
+                  {/* bien the */}
+                  <div>
+                    {!isSuccessProduct ? (
+                      <div className="mt-3">
+                        <div className="">
+                          <Skeleton.Input active={true} style={{ width: '300px', height: '36px' }} />
+                        </div>
+                        <div className="mt-1">
+                          <Skeleton.Input active={true} style={{ width: '300px', height: '36px' }} />
+                        </div>
+                        <div className="mt-8">
+                          <Skeleton.Button active={true} style={{ width: '200px', height: '40px' }} />
+                        </div>
+                        <div className="mt-5 flex space-x-5 mb-3">
+                          <Skeleton.Button active={true} style={{ width: '300px', height: '50px' }} />
+                          <Skeleton.Button active={true} style={{ width: '300px', height: '50px' }} />
                         </div>
                       </div>
-                      <Link to="" className="block font-medium h-12">
-                        {product.title}
+                    ) : (
+                      <div className="">
+                        {[...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? <>
+                          <p className="text-red-400 italic font-semibold">{errors ? errors.nameColor?.message : ""}</p>
+                          <div className="flex my-6">
+                            <div className="w-[13%] text-sm font-bold">Màu sắc</div>
+                            <div className="flex">
+                              {colorProduct.map((color, index) => (
+                                <div className="mx-1">
+                                  <input
+                                    type="radio"
+                                    value={color}
+                                    onClick={() => {
+                                      handleColorProductDetail(color);
+                                      handleImageClick(index + getOneProduct.images.length);
+                                    }}
+                                    id={color}
+                                    name="color"
+                                    className="hidden peer"
+                                  />
+                                  <label htmlFor={color}
+                                    className="py-2 px-6 items-center text-gray-500 bg-white border border-gray-200 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                                  >
+                                    {color}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex my-6">
+                            {/* size */}
+                            <div className="w-[13%] text-sm font-bold">Kích thước</div>
+                            <div className="flex">
+                              {productDetailFilterState
+                                ?.slice()
+                                .sort((a: any, b: any) => new Date(a?.createdAt).getTime() - new Date(b?.createdAt).getTime())
+                                .map((item) => {
+                                  return <>
+                                    {item.quantity > 0 ? <div className="mx-1" key={item._id}>
+                                      <input {...register("size")} type="radio" id={item.size} name="size" value={item.size} className="hidden peer" />
+                                      <label htmlFor={item.size}
+                                        className="py-2 px-6 items-center text-gray-600 bg-white border border-gray-400 rounded-md cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700"
+                                      >
+                                        {item.size}
+                                      </label>
+                                    </div> :
+                                      <div className="mx-1">
+                                        <label
+                                          className="py-2 px-6 items-center text-gray-300 bg-white border border-gray-200 rounded-md cursor-default dark:hover:text-gray-300 dark:border-gray-700 dark:peer-checked:text-blue-500 peer-checked:border-blue-600 pointer-events-none peer-checked:text-blue-600 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:bg-gray-800  dark:hover:bg-gray-700"
+                                        >
+                                          {item.size}
+                                        </label>
+                                      </div>
+                                    }
+                                  </>
+                                })}
+                            </div>
+                          </div >
+                          <div className="flex items-center gap-x-[71.75px] py-4 mb-2">
+                            <span className="text-sm font-bold">Số lượng:</span>
+                            <div>
+                              <label htmlFor="Quantity" className="sr-only">
+                                {" "}
+                                Quantity{" "}
+                              </label>
+  
+                              <div className="flex items-center border border-gray-300 rounded">
+                                <button
+                                  onClick={decreaseQuantity}
+                                  type="button"
+                                  className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                                >
+                                  &minus;
+                                </button>
+  
+                                <input
+                                  type="number"
+                                  id="Quantity"
+                                  value={quantity}
+                                  className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
+                                />
+  
+                                <button
+                                  onClick={increaseQuantity}
+                                  type="button"
+                                  className="w-10 h-10 leading-10 text-gray-700 transition hover:opacity-75"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="mb-7">
+                            <div className="flex gap-x-[15px] mb-5">
+                              <button className="addtoCart w-[336px] text-[#E70505] border uppercase h-[50px] rounded font-semibold hover:text-white hover:bg-[#E70505] transition-all border-[#E70505]">
+                                Thêm vào giỏ
+                              </button>
+                              <button className="w-[336px] border h-[50px] flex items-center justify-center rounded font-semibold uppercase text-white bg-[#E70505] border-[#E70505] transition-all buy-now">
+                                Mua ngay
+                              </button>
+                            </div>
+                          </div>
+                        </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
+                      </div>
+                    )}
+  
+                  </div>
+                </div>
+  
+              </form>
+              {/* outfit */}
+              {listOutfitByProductIdState.length > 0 &&
+                <OutfitProductDetail listOutfitByProductIdState={listOutfitByProductIdState} productState={productState} id={id} productDetailRelatedState={productDetailRelatedState} listOutfitState={listOutfitState} listCartState={listCartState}></OutfitProductDetail>
+              }
+  
+              {isSuccessProduct ? (
+                <div className="policy flex justify-between gap-x-[13px]">
+                  <div>
+                    <div className="flex items-center gap-x-[10px] mb-4">
+                      <img
+                        src="/images/icon/product_info2_desc3_img.png"
+                        className="w-[30px] h-[30px]"
+                        alt=""
+                      />
+                      <span className="text-sm">
+                        Kiểm tra, thanh toán khi nhận hàng COD
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-x-[10px] mb-4">
+                      <img
+                        src="/images/icon/product_info1_desc2_img.png"
+                        className="w-[30px] h-[30px]"
+                        alt=""
+                      />
+                      <span className="text-sm">Hàng phân phối chính hãng 100%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-x-[10px] mb-4">
+                      <img
+                        src="/images/icon/product_info1_desc3_img.png"
+                        className="w-[30px] h-[30px]"
+                        alt=""
+                      />
+                      <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
+                    </div>
+  
+                  </div>
+                </div>
+              ) : ""}
+            </div >
+          </div >
+          <div className="">
+            <div className="product-tabs flex gap-x-[60px]">
+              <div>
+                <button
+                  className={`${currentTab === 1
+                    ? "border-b-2 border-black text-black"
+                    : "text-[#b3b3b3]"
+                    } text-lg font-semibold pb-2`}
+                  onClick={() => setCurrentTab(1)}
+                >
+                  Đánh giá - Nhận xét từ khách hàng
+                </button>
+              </div>
+              <div>
+                <button
+                  className={`${currentTab === 2
+                    ? "border-b-2 border-black text-black"
+                    : "text-[#b3b3b3]"
+                    } text-lg font-semibold pb-2`}
+                  onClick={() => setCurrentTab(2)}
+                >
+                  Mô tả sản phẩm
+                </button>
+              </div>
+              <div>
+                <button
+                  className={`${currentTab === 3
+                    ? "border-b-2 border-black text-black"
+                    : "text-[#b3b3b3]"
+                    } text-lg font-semibold pb-2`}
+                  onClick={() => setCurrentTab(3)}
+                >
+                  Chính sách đổi trả
+                </button>
+              </div>
+              <div>
+                <button
+                  className={`${currentTab === 4
+                    ? "border-b-2 border-black text-black"
+                    : "text-[#b3b3b3]"
+                    } text-lg font-semibold pb-2`}
+                  onClick={() => setCurrentTab(4)}
+                >
+                  Chính sách bảo mật
+                </button>
+              </div>
+            </div>
+            <div className="mt-[40px]">{renderContent()}</div>
+          </div>
+          {/* san pham lien quan */}
+          <div>
+            <h1 className="text-[37px] font-semibold mb-[30px] text-center uppercase mt-10">
+              Sản phẩm liên quan
+            </h1>
+            <div className="product-related mb-12">
+              <Swiper
+                modules={[Navigation]}
+                // grabCursor={"true"}
+                spaceBetween={25}
+                slidesPerView={"auto"}
+                navigation={true}
+              >
+                {productRelated?.map((product, index) => {
+                  return <SwiperSlide key={index}>
+                    <div className={`relative group ${[...new Set(productDetailRelatedState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
+                      {[...new Set(productDetailRelatedState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 overflow-hidden bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>}
+                      <Link to={`/products/${product._id}`}>
+                        <div className="min-h-[375px] max-h-[395px] overflow-hidden">
+                          <img
+                            src={product.images?.[0]}
+                            className="mx-auto max-h-[395px] min-h-[375px] w-full group-hover:opacity-0 group-hover:scale-100 absolute transition-all ease-linear duration-200"
+                            alt=""
+                          />
+  
+                          <img
+                            src={product.images?.[1] ? product.images?.[1] : productDetailRelatedState.find((proDetail) => proDetail.product_id && proDetail.product_id.includes(product._id!))?.imageColor
+                            }
+                            className="mx-auto max-h-[375px] min-h-[375px] w-full duration-999 absolute opacity-0 group-hover:opacity-100 transition-all ease-linear"
+                            alt=""
+                          />
+                        </div>
                       </Link>
-                      <div className="price flex gap-x-[8px] items-baseline">
-                        <span className="text-sm text-[#FF2C26] font-semibold">
-                          {(product?.price - product.discount).toLocaleString("vi-VN")}đ
-                        </span>
-                        {product.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
-                          <del>{product.price?.toLocaleString("vi-VN")}đ</del>
+                      <div className="product-info p-[8px] bg-white">
+                        <div className="text-sm flex justify-between mb-3">
+                          <span>+{productDetailRelatedState ? [...new Set(productDetailRelatedState?.filter((item) => item.product_id === product._id).map((pro) => pro.nameColor))].length : 0} màu sắc</span>
+                          <div className="flex">+{productDetailRelatedState ? [...new Set(productDetailRelatedState?.filter((item) => item.product_id === product._id).map((pro) => pro.size))].length : 0}
+                            <p className="ml-1">Kích thước</p>
+                          </div>
+                        </div>
+                        <Link to="" className="block font-medium h-12">
+                          {product.title}
+                        </Link>
+                        <div className="price flex gap-x-[8px] items-baseline">
+                          <span className="text-sm text-[#FF2C26] font-semibold">
+                            {(product?.price - product.discount).toLocaleString("vi-VN")}đ
+                          </span>
+                          {product.discount !== 0 && <span className="text-[13px] text-[#878C8F]">
+                            <del>{product.price?.toLocaleString("vi-VN")}đ</del>
+                          </span>}
+                        </div>
+                      </div>
+                      <div>
+                        {product.discount > 0 && <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
+                          -{`${((product?.price - (product?.price - product?.discount)) / product?.price * 100).toFixed(0)}`}%
                         </span>}
                       </div>
                     </div>
-                    <div>
-                      {product.discount > 0 && <span className="width-[52px] absolute top-3 left-3 height-[22px] rounded-full px-3 py-[3px] text-xs font-semibold text-white bg-[#FF0000]">
-                        -{`${((product?.price - (product?.price - product?.discount)) / product?.price * 100).toFixed(0)}`}%
-                      </span>}
-                    </div>
-                  </div>
-                </SwiperSlide>
-              })}
-
-            </Swiper>
+                  </SwiperSlide>
+                })}
+  
+              </Swiper>
+            </div>
           </div>
-        </div>
-        {/* Sản phẩm đã xem */}
-        <ProductViewed idProduct={id} listProductDetail={productDetailState}></ProductViewed>
-      </div >
+          {/* Sản phẩm đã xem */}
+          <ProductViewed idProduct={id} listProductDetail={productDetailState}></ProductViewed>
+        </div >
+      </div>
     );
 
   }

@@ -390,7 +390,7 @@ const CheckoutsPage = () => {
                         Đăng nhập
                       </Link>
                     </p>
-                    : <span>Xin chào,{user?.current?.fullname}</span>
+                    : ""
                   }
 
                 </div>
