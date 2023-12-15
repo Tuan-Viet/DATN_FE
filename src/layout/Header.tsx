@@ -325,19 +325,25 @@ const Header = () => {
     );
     message.success("Mã token đã gửi về email của bạn")
   }
-  let count = 0
-  cartState?.map((cart) => {
-    const matchingItems = outfitState?.filter((outfit) =>
-      outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
-    )
-    const filteredItems = matchingItems?.[0]?.items?.filter(
-      (product) => cart.productDetailId.product_id === product.product_id
-    );
-    if (filteredItems) {
-      count += 1
-    }
-  });
-  console.log(count)
+
+  // cartState?.map((cart) => {
+  //   const matchingItems = outfitState?.filter((outfit) =>
+  //     outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
+  //   )
+  //   const filteredItems = matchingItems?.[0]?.items?.filter(
+  //     (product) => cart.productDetailId.product_id === product.product_id
+  //   );
+  //   if (filteredItems) {
+  //     count += 1
+  //   }
+  // });
+  // outfitState.map((outfit) => {
+  //   const filteredArray = cartState.filter(item => outfit.items.includes(item));
+  //   console.log(filteredArray);
+
+  // })
+  // const filteredArray =
+  //   console.log(itemsOutfit)
 
   return (
     <>
@@ -730,6 +736,7 @@ const Header = () => {
                                 {cart.productDetailId?.nameColor} / {cart.productDetailId?.size}
                               </p>
                               {/* price product */}
+
                               <p className="mt-1 text-[14px] text-[#8f9bb3] font-semibold tracking-wide">
                                 {(pro.price - pro.discount).toLocaleString("vi-VN")}
                                 đ
@@ -781,8 +788,8 @@ const Header = () => {
                             <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                               <div className="flex items-center">
                                 <p className="font-bold tracking-wide text-[15px]">
-                                  {count === 2 ? (cart.totalMoney - ((cart.totalMoney) * 10 / 100)).toLocaleString("vi-VN") : (cart.totalMoney).toLocaleString("vi-VN")}
-                                  đ
+                                  {(cart.totalMoney).toLocaleString("vi-VN")}đ
+
                                 </p>
                               </div>
                               <div className="flex items-center w-[100px] border border-gray-300 rounded">
@@ -879,7 +886,7 @@ const Header = () => {
               <p className="text-lg font-bold">Tổng tiền:</p>
               <div className="">
                 <p className="text-[20px] font-bold text-red-500 tracking-wide">
-                  {count === 2 ? (totalCart - ((totalCart * 10) / 100)).toLocaleString("vi-VN") : totalCart.toLocaleString("vi-VN")}đ
+                  {totalCart.toLocaleString("vi-VN")}đ
                 </p>
               </div>
             </div>

@@ -131,7 +131,7 @@ const CheckoutsPage = () => {
             quantity: item.quantity,
             color: item.productDetailId.nameColor,
             size: item.productDetailId.size,
-            totalMoney: count === 2 ? (item.totalMoney - ((item.totalMoney * 10) / 100)) : item.totalMoney
+            totalMoney: item.totalMoney
           };
         }
         return undefined;
@@ -166,13 +166,13 @@ const CheckoutsPage = () => {
           axios.post(`https://datn-be-gy1y.onrender.com/api/paymentMethod/momo_payment`, data)
             .then(({ data }) => window.location.href = data)
         }
-        if (count === 2) {
-          cartState?.map((cart) => {
-            const { totalMoney } = cart
-            const newTotalMoney = totalMoney - (totalMoney - ((totalMoney * 10) / 100))
-            onUpdateCart({ _id: cart._id, totalMoney: newTotalMoney })
-          })
-        }
+        // if (count === 2) {
+        //   cartState?.map((cart) => {
+        //     const { totalMoney } = cart
+        //     const newTotalMoney = totalMoney - (totalMoney - ((totalMoney * 10) / 100))
+        //     onUpdateCart({ _id: cart._id, totalMoney: newTotalMoney })
+        //   })
+        // }
       }
       ).then(() => refetchUser())
     } catch (error) {
@@ -206,11 +206,12 @@ const CheckoutsPage = () => {
     let total = 0
     if (cartState) {
       cartState.map((cart) => {
-        if (count && count === 2) {
-          total += cart.totalMoney - ((cart.totalMoney * 10) / 100)
-        } else {
-          total += cart.totalMoney
-        }
+        // if (count && count === 2) {
+        //   total += cart.totalMoney - ((cart.totalMoney * 10) / 100)
+        // } else
+        // if {
+        // }
+        total += cart.totalMoney
       })
     }
     setTotalCart(total);
@@ -219,11 +220,11 @@ const CheckoutsPage = () => {
     let total = 0
     if (cartState) {
       cartState.map((cart) => {
-        if (count && count === 2) {
-          total += cart.totalMoney - ((cart.totalMoney * 10) / 100)
-        } else {
-          total += cart.totalMoney
-        }
+        // if (count && count === 2) {
+        //   total += cart.totalMoney - ((cart.totalMoney * 10) / 100)
+        // } else {
+        // }
+        total += cart.totalMoney
       })
     }
 
@@ -621,7 +622,8 @@ const CheckoutsPage = () => {
                         <p className="font-medium">
                           Giá:{" "}
                           <span className="text-red-500 text-xl font-bold">
-                            {count && count === 2 ? (cart.totalMoney - ((cart.totalMoney * 10) / 100)).toLocaleString("vi-VN") : cart.totalMoney.toLocaleString("vi-VN")}đ
+                            {/* {count && count === 2 ? (cart.totalMoney - ((cart.totalMoney * 10) / 100)).toLocaleString("vi-VN") : cart.totalMoney.toLocaleString("vi-VN")}đ */}
+                            {cart.totalMoney.toLocaleString("vi-VN")}đ
                           </span>
                         </p>
                       </div>
