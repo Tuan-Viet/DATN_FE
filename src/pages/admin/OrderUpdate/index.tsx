@@ -90,6 +90,7 @@ const orderUpdate = () => {
     const voucherByOrder = voucher?.filter(voucher => voucher.code === order?.voucher_code)
 
     const idOrderReturn = order?.orderReturn?._id
+    console.log(order);
 
     const { data: orderReturn } = useGetOneOrderReturnQuery(idOrderReturn);
 
@@ -621,7 +622,7 @@ const orderUpdate = () => {
                                                                 </div>
                                                                 <Image.PreviewGroup>
                                                                     <div className='flex space-x-2 py-3'>
-                                                                        {orderReturn?.images.map((url: any) => (
+                                                                        {orderReturn?.images?.map((url: any) => (
                                                                             <div
                                                                                 className='w-24 h-24 border flex justify-center items-center rounded-md hover:border-blue-400 shadow-xl '
                                                                             >
@@ -850,7 +851,10 @@ const orderUpdate = () => {
                             </div>
                             <span className='block'>{order?.fullName}</span>
                             <span className='block'>{order?.phoneNumber}</span>
-                            <span className='block'>{order?.address}</span>
+                            <span className='block'>{order?.address?.myProvince}</span>
+                            <span className='block'>{order?.address?.myDistrict}</span>
+                            <span className='block'>{order?.address?.myWard}</span>
+                            <span className='block'>{order?.address?.detailAddress}</span>
                         </div>
                         <div className="border-b p-4">
                             <h2 className='text-sm mb-2 font-medium text-gray-900 '>Phương thức vận chuyển</h2>

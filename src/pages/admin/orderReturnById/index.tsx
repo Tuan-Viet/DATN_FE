@@ -594,7 +594,10 @@ const orderReturnById = () => {
                             </div>
                             <span className='block'>{orderReturn?.fullName}</span>
                             <span className='block'>{orderReturn?.phoneNumber}</span>
-                            <span className='block'>{orderReturn?.address}</span>
+                            <span className='block'>{orderReturn?.address?.myProvince}</span>
+                            <span className='block'>{orderReturn?.address?.myDistrict}</span>
+                            <span className='block'>{orderReturn?.address?.myWard}</span>
+                            <span className='block'>{orderReturn?.address?.detailAddress}</span>
                         </div>
 
                     </div>
