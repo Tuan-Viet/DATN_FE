@@ -12,7 +12,8 @@ import {
     Table,
     Modal,
     Popconfirm,
-    Image
+    Image,
+    Badge
 } from 'antd';
 import {
     UploadOutlined,
@@ -30,6 +31,7 @@ import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../.
 import { useListVoucherQuery } from '../../../store/vouchers/voucher.service';
 const { Dragger } = Upload;
 const { TextArea } = Input;
+const { Option } = Select;
 
 interface DataType {
     key: string;
@@ -88,10 +90,7 @@ const orderUpdate = () => {
     const { data: order } = useGetOneOrderQuery(id || '');
     const { data: voucher } = useListVoucherQuery();
     const voucherByOrder = voucher?.filter(voucher => voucher.code === order?.voucher_code)
-
     const idOrderReturn = order?.orderReturn?._id
-    console.log(order);
-
     const { data: orderReturn } = useGetOneOrderReturnQuery(idOrderReturn);
 
     const ListOrderDeatils = order?.orderDetails;
@@ -104,6 +103,107 @@ const orderUpdate = () => {
     const [orderDetail, setOrderDetail] = useState<any[]>([]);
     const [orderReturnDetail, setOrderReturnDetail] = useState<any[]>([]);
     const [sumTotalMoney, setSumTotalMoney] = useState<number>()
+
+    const [provinces, setProvinces] = useState<any>([]);
+    const [districts, setDistricts] = useState<any>([]);
+    const [wards, setWards] = useState<any>([]);
+    const [codeProvince, setCodeProvince] = useState<any>();
+    const [codeDistrict, setCodeDistrict] = useState<any>();
+    const [codeWard, setCodeWard] = useState<any>();
+    const [nameProvince, setNameProvince] = useState<any>();
+    const [nameDistrict, setNameDistrict] = useState<any>();
+    const [nameWard, setNameWard] = useState<any>();
+
+    const provinceUpdate: any = provinces.find((item: any) => item.name == order?.address.myProvince)
+
+    useEffect(() => {
+        // Gọi API để lấy dữ liệu tỉnh/thành phố
+        axios.get('https://provinces.open-api.vn/api/p/')
+            .then(response => setProvinces(response.data))
+            .catch(error => console.error('Error fetching provinces:', error));
+
+        if (order) {
+            setNameProvince(order?.address.myProvince)
+            setNameDistrict(order?.address.myDistrict)
+            setNameWard(order?.address.myWard)
+        }
+        form.setFieldsValue({
+            _id: order?._id,
+            fullName: order?.fullName,
+            address: order?.address,
+            phoneNumber: order?.phoneNumber,
+            myProvince: order?.address.myProvince,
+            myDistrict: order?.address.myDistrict,
+            myWard: order?.address.myWard,
+            detailAddress: order?.address.detailAddress,
+            // date: date(),
+            paymentStatus: order?.paymentStatus && order?.paymentStatus,
+            status: order?.status && order?.status,
+            note: order?.note
+        });
+    }, [order]);
+
+    useEffect(() => {
+        if (provinceUpdate) {
+            // Gọi API để lấy dữ liệu quận/huyện
+            axios.get(`https://provinces.open-api.vn/api/p/${provinceUpdate.code}?depth=2`)
+                .then(response => {
+                    setDistricts(response.data);
+                    const districtCode = response.data.districts.find((item: any) => item.name === order?.address?.myDistrict)?.code;
+                    setCodeDistrict(districtCode);
+                })
+                .catch(error => console.error('Error fetching districts:', error));
+        }
+    }, [provinceUpdate, order?.address?.myDistrict]);
+
+    useEffect(() => {
+        // Gọi API để lấy dữ liệu phường/xã
+        if (codeDistrict) {
+            axios.get(`https://provinces.open-api.vn/api/d/${codeDistrict}?depth=2`)
+                .then(response => {
+                    setWards(response.data);
+                    const wardCode = response.data.wards.find((item: any) => item.name === order?.address?.myWard)?.code;
+                    setCodeWard(wardCode);
+                })
+                .catch(error => console.error('Error fetching wards:', error));
+        }
+    }, [codeDistrict, order?.address?.myWard]);
+
+    const handleProvinceChange = (code: any) => {
+        const province: any = provinces.find((item: any) => item.code == code)
+
+        setNameProvince(province.name);
+        setCodeProvince(code);
+        form.setFieldsValue({
+            myDistrict: '',
+            myWard: '',
+        });
+        // Gọi API để lấy dữ liệu quận/huyện dựa trên tỉnh/thành phố được chọn
+        axios.get(`https://provinces.open-api.vn/api/p/${code}?depth=2`)
+            .then(response => setDistricts(response.data))
+            .catch(error => console.error('Error fetching districts:', error));
+    };
+
+    const handleDistrictChange = (code: any) => {
+        setCodeDistrict(code);
+
+        const district = districts?.districts.find((item: any) => item.code == code)
+        setNameDistrict(district.name);
+        form.setFieldsValue({
+            myWard: '',
+        });
+        // Gọi API để lấy dữ liệu xã/phường dựa trên quận/huyện được chọn
+        axios.get(`https://provinces.open-api.vn/api/d/${code}?depth=2`)
+            .then(response => setWards(response.data))
+            .catch(error => console.error('Error fetching wards:', error));
+    };
+
+    const handleWardChange = (code: any) => {
+        setCodeWard(code);
+
+        const ward = wards.wards.find((item: any) => item.code == code)
+        setNameWard(ward.name);
+    };
 
     useEffect(() => {
         if (order) {
@@ -163,26 +263,6 @@ const orderUpdate = () => {
     }, [order, ListOrderDeatils, ListOrderReturnDetail]);
     orderDetails = orderDetail
 
-
-
-    const date = () => {
-        const date = new Date(order?.createdAt);
-        const day = date.getDate();
-        const month = date.getMonth() + 1;
-        const year = date.getFullYear();
-
-        return `${day}/${month}/${year}`;
-    }
-    form.setFieldsValue({
-        _id: order?._id,
-        fullName: order?.fullName,
-        address: order?.address,
-        phoneNumber: order?.phoneNumber,
-        date: date(),
-        paymentStatus: order?.paymentStatus && order?.paymentStatus,
-        status: order?.status && order?.status,
-        note: order?.note
-    });
     const columns: ColumnsType<DataType> = [
         {
             title: 'Sản phẩm',
@@ -218,7 +298,6 @@ const orderUpdate = () => {
     ];
     let data: DataType[] = [];
 
-
     if (orderDetails) {
         data = orderDetails.map((order: any) => ({
             key: order._id,
@@ -231,7 +310,9 @@ const orderUpdate = () => {
         }));
     }
 
+
     // const [onUpdate] = useUpdateProductMutation()
+
     const updateNote = async (values: any) => {
         try {
             console.log("value:", values);
@@ -246,7 +327,17 @@ const orderUpdate = () => {
 
     const updateInfo = async (values: any) => {
         try {
-            const newValue = { ...order, fullName: values.fullName, phoneNumber: values.phoneNumber, address: values.address }
+            const newValue = {
+                ...order,
+                fullName: values.fullName,
+                phoneNumber: values.phoneNumber,
+                address: {
+                    myProvince: nameProvince,
+                    myDistrict: nameDistrict,
+                    myWard: nameWard,
+                    detailAddress: values.detailAddress
+                }
+            }
             await onUpdate({ id, ...newValue });
             setOpenFormUpdateInfo(false)
             message.success(`Cập nhật thành công`);
@@ -265,6 +356,7 @@ const orderUpdate = () => {
             console.log(error);
         }
     };
+
     const updateStatusComplte = async (values: any) => {
         try {
             const newValue = { ...order, status: 5 }
@@ -346,6 +438,7 @@ const orderUpdate = () => {
             console.log(error);
         }
     };
+
     const unConfirmOrderReturn = async () => {
         try {
             const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
@@ -362,6 +455,7 @@ const orderUpdate = () => {
             console.log(error);
         }
     };
+
     function mapStatusToText(statusCode: number) {
         switch (statusCode) {
             case 0:
@@ -383,11 +477,11 @@ const orderUpdate = () => {
         }
     }
 
+
+
     const totalCart = ListOrderDeatils?.reduce((total, order) => {
         return total + order.totalMoney;
     }, 0);
-    console.log(order);
-
 
     return <>
         <Breadcrumb className='pb-3'
@@ -434,8 +528,50 @@ const orderUpdate = () => {
                                     pageData.forEach((record) => {
                                         total += record.price * record.quantity;
                                     });
+
                                     return (
                                         <>
+                                            {order?.orderReturn?.status !== 0 && order?.orderReturn?.status !== 1 ? (
+                                                <>
+                                                    {orderReturnDetail?.map((item: any, index) => (
+
+                                                        <Table.Summary.Row className='opacity-80 bg-slate-100'>
+                                                            <Table.Summary.Cell
+                                                                className=''
+                                                                key={item.key}
+                                                                colSpan={1}
+                                                                index={0}
+                                                            >
+                                                                <div className='flex'>
+                                                                    <div className='mr-2'>
+                                                                        <img src={item?.productInfo.imageColor} alt="" className='w-14 h-20 object-cover' />
+                                                                    </div>
+                                                                    <div className="space-y-3 py-2 font-light">
+                                                                        <span className='block'>{item?.productName}</span>
+                                                                        <span className='block text'>{item?.productInfo.nameColor} / {item.size}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                            </Table.Summary.Cell>
+                                                            <Table.Summary.Cell key={item.key} colSpan={1} index={index}>
+                                                                {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                            </Table.Summary.Cell>
+                                                            <Table.Summary.Cell key={item.key} colSpan={1} index={index}>
+                                                                {item.quantity}
+                                                            </Table.Summary.Cell>
+
+                                                            <Table.Summary.Cell key={item.key} colSpan={1} index={index}>
+
+                                                                <div className='text-end'>{(item.price * item.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                                                            </Table.Summary.Cell>
+                                                            <Badge.Ribbon text="Đổi hàng" className='opacity-100'>
+                                                            </Badge.Ribbon>
+                                                        </Table.Summary.Row>
+                                                    ))}
+                                                </>
+                                            ) : null}
+
+
                                             <Table.Summary.Row className=''>
                                                 <Table.Summary.Cell index={0} colSpan={3}>
                                                     <span className='block'>Tổng sản phẩm</span>
@@ -457,9 +593,15 @@ const orderUpdate = () => {
                                                             Miễn phí
                                                         </div>
                                                     ) : (
-                                                        <div className='text-end'>
-                                                            {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
-                                                        </div>
+                                                        order?.orderReturn?.status !== 0 && order?.orderReturn?.status !== 1 && totalCart && totalCart < 500000 ? (
+                                                            <div className='text-end'>
+                                                                Miễn phí
+                                                            </div>
+                                                        ) : (
+                                                            <div className='text-end'>
+                                                                {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
+                                                            </div>
+                                                        )
                                                     )}
 
                                                     <div className='text-end'>
@@ -474,7 +616,8 @@ const orderUpdate = () => {
                                                             <CheckCircleOutlined className='text-green-500 text-2xl' />
                                                             <div className="">
                                                                 <span className='text-xs font-semibold block'>
-                                                                    ĐƠN HÀNG ĐÃ XÁC NHẬN THANH TOÁN {(order as any).totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
+                                                                    ĐƠN HÀNG ĐÃ XÁC NHẬN THANH TOÁN
+                                                                    {/* {(order as any).totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ */}
                                                                 </span>
                                                                 <span className='block text-gray-800 text-xs'>
                                                                     (Đơn hàng đổi hàng)
@@ -490,7 +633,8 @@ const orderUpdate = () => {
                                                                 <CheckCircleOutlined className='text-green-500 text-2xl' />
                                                                 <div className="">
                                                                     <span className='text-xs font-semibold'>
-                                                                        ĐƠN HÀNG ĐÃ XÁC NHẬN THANH TOÁN {(order as any).totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ
+                                                                        ĐƠN HÀNG ĐÃ XÁC NHẬN THANH TOÁN
+                                                                        {/* {(order as any).totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}đ */}
                                                                     </span>
                                                                     <span className='block text-gray-800 text-xs'>
                                                                         {order?.pay_method === "COD" ? "Thu hộ (COD)" : "Chuyển khoản ngân hàng"}
@@ -524,18 +668,20 @@ const orderUpdate = () => {
                                                 </Table.Summary.Cell>
                                             </Table.Summary.Row>
 
-                                            {orderReturn?.status === 2 ? (
-                                                <Table.Summary.Row className=''>
-                                                    <Table.Summary.Cell index={0} colSpan={3}>
-                                                        <span className='text-xs font-semibold'>
-                                                            YÊU CẦU ĐỔI HÀNG
-                                                        </span>
-                                                    </Table.Summary.Cell>
-                                                    <Table.Summary.Cell index={1}>
-                                                        <Link to={`/admin/orderreturn/${orderReturn._id}`}><Button className='w-full bg-yellow-500 text-white hover:text-white hover:bg-yellow-400'>Kiểm tra</Button></Link>
-                                                    </Table.Summary.Cell>
-                                                </Table.Summary.Row >
-                                            ) : ""}
+                                            {
+                                                orderReturn?.status === 2 ? (
+                                                    <Table.Summary.Row className=''>
+                                                        <Table.Summary.Cell index={0} colSpan={3}>
+                                                            <span className='text-xs font-semibold'>
+                                                                YÊU CẦU ĐỔI HÀNG
+                                                            </span>
+                                                        </Table.Summary.Cell>
+                                                        <Table.Summary.Cell index={1}>
+                                                            <Link to={`/admin/orderreturn/${orderReturn._id}`}><Button className='w-full bg-yellow-500 text-white hover:text-white hover:bg-yellow-400'>Kiểm tra</Button></Link>
+                                                        </Table.Summary.Cell>
+                                                    </Table.Summary.Row >
+                                                ) : ""
+                                            }
 
                                             <Table.Summary.Row className=''>
                                                 <Table.Summary.Cell index={0} colSpan={3}>
@@ -796,6 +942,7 @@ const orderUpdate = () => {
                                 <Button type="link" onClick={() => setOpenFormUpdateInfo(true)}>
                                     <span className='underline italic'>Sửa</span>
                                 </Button>
+
                                 <Modal
                                     title="Sửa địa chỉ giao hàng"
                                     centered
@@ -835,7 +982,112 @@ const orderUpdate = () => {
                                             />
                                         </Form.Item>
                                         <Form.Item
-                                            name="address"
+                                            name="myProvince"
+                                            label="Tỉnh/thành phố"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Select
+                                                defaultValue={provinceUpdate?.code}
+                                                onChange={handleProvinceChange}
+                                                showSearch
+                                                style={{ width: '100%' }}
+                                                placeholder="Chọn tỉnh, thành phố"
+                                                optionFilterProp="children"
+                                                filterOption={(input: any, option: any) =>
+                                                    (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                }
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                }
+                                                optionLabelProp="customLabel"
+                                                dropdownRender={menu => (
+                                                    <div>
+                                                        {menu}
+                                                    </div>
+                                                )}
+                                            >
+                                                {provinces.map((item: any) => (
+                                                    <Option key={item.code} value={item.code} label={item.name}
+                                                        customLabel={
+                                                            <span>{item.name}</span>
+                                                        }>
+                                                        <span>{item.name}</span>
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item
+                                            name="myDistrict"
+                                            label="Quận/huyện"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Select
+                                                defaultValue={codeDistrict}
+                                                onChange={handleDistrictChange}
+                                                showSearch
+                                                style={{ width: '100%' }}
+                                                placeholder="Chọn quận, huyện"
+                                                optionFilterProp="children"
+                                                filterOption={(input: any, option: any) =>
+                                                    (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                }
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                }
+                                                optionLabelProp="customLabel"
+                                                dropdownRender={menu => (
+                                                    <div>
+                                                        {menu}
+                                                    </div>
+                                                )}
+                                            >
+                                                {districts?.districts?.map((item: any) => (
+                                                    <Option key={item.code} value={item.code} label={item.name}
+                                                        customLabel={
+                                                            <span>{item.name}</span>
+                                                        }>
+                                                        <span>{item.name}</span>
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item
+                                            name="myWard"
+                                            label="Xã/phường"
+                                            rules={[{ required: true }]}
+                                        >
+                                            <Select
+                                                defaultValue={codeWard}
+                                                onChange={handleWardChange}
+                                                showSearch
+                                                style={{ width: '100%' }}
+                                                placeholder="Chọn xã, phường"
+                                                optionFilterProp="children"
+                                                filterOption={(input: any, option: any) =>
+                                                    (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                }
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                }
+                                                optionLabelProp="customLabel"
+                                                dropdownRender={menu => (
+                                                    <div>
+                                                        {menu}
+                                                    </div>
+                                                )}
+                                            >
+                                                {wards?.wards?.map((item: any) => (
+                                                    <Option key={item.code} value={item.code} label={item.name}
+                                                        customLabel={
+                                                            <span>{item.name}</span>
+                                                        }>
+                                                        <span>{item.name}</span>
+                                                    </Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                        <Form.Item
+                                            name="detailAddress"
                                             label="Địa chỉ"
                                             rules={[{ required: true }]}
                                         >

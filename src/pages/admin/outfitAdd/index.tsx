@@ -320,8 +320,9 @@ const outfitAdd = () => {
                                             placeholder="Tìm kiếm theo tên sản phẩm, mã sản phẩm"
                                             optionFilterProp="children"
                                             filterOption={(input: any, option: any) => {
-                                                const labelIncludesInput = (option?.label ?? '').includes(input);
-                                                const skuIncludesInput = (option?.sku ?? '').includes(input);
+                                                const lowerCaseInput = input.toLowerCase();
+                                                const labelIncludesInput = (option?.label?.toLowerCase() ?? '').includes(lowerCaseInput);
+                                                const skuIncludesInput = (option?.sku?.toLowerCase() ?? '').includes(lowerCaseInput);
                                                 return labelIncludesInput || skuIncludesInput;
                                             }}
                                             filterSort={(optionA, optionB) =>
@@ -369,8 +370,9 @@ const outfitAdd = () => {
                                                 placeholder="Tìm kiếm theo kích thước, màu sắc"
                                                 optionFilterProp="children"
                                                 filterOption={(input: any, option: any) => {
-                                                    const sizeIncludesInput = (option?.size ?? '').includes(input);
-                                                    const colorIncludesInput = (option?.color ?? '').includes(input);
+                                                    const lowerCaseInput = input.toLowerCase();
+                                                    const sizeIncludesInput = (option?.size?.toLowerCase() ?? '').includes(lowerCaseInput);
+                                                    const colorIncludesInput = (option?.color?.toLowerCase() ?? '').includes(lowerCaseInput);
                                                     return colorIncludesInput || sizeIncludesInput;
                                                 }}
                                                 filterSort={(optionA, optionB) =>
@@ -438,8 +440,9 @@ const outfitAdd = () => {
                                             placeholder="Tìm kiếm theo tên sản phẩm, mã sản phẩm"
                                             optionFilterProp="children"
                                             filterOption={(input: any, option: any) => {
-                                                const labelIncludesInput = (option?.label ?? '').includes(input);
-                                                const skuIncludesInput = (option?.sku ?? '').includes(input);
+                                                const lowerCaseInput = input.toLowerCase();
+                                                const labelIncludesInput = (option?.label?.toLowerCase() ?? '').includes(lowerCaseInput);
+                                                const skuIncludesInput = (option?.sku?.toLowerCase() ?? '').includes(lowerCaseInput);
                                                 return labelIncludesInput || skuIncludesInput;
                                             }}
                                             filterSort={(optionA, optionB) =>
@@ -487,8 +490,9 @@ const outfitAdd = () => {
                                                 placeholder="Tìm kiếm theo kích thước, màu sẵc"
                                                 optionFilterProp="children"
                                                 filterOption={(input: any, option: any) => {
-                                                    const sizeIncludesInput = (option?.size ?? '').includes(input);
-                                                    const colorIncludesInput = (option?.color ?? '').includes(input);
+                                                    const lowerCaseInput = input.toLowerCase();
+                                                    const sizeIncludesInput = (option?.size?.toLowerCase() ?? '').includes(lowerCaseInput);
+                                                    const colorIncludesInput = (option?.color?.toLowerCase() ?? '').includes(lowerCaseInput);
                                                     return colorIncludesInput || sizeIncludesInput;
                                                 }}
                                                 filterSort={(optionA, optionB) =>
