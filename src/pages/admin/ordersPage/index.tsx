@@ -9,6 +9,8 @@ import {
     Dropdown,
     DatePicker,
     Tooltip,
+    Badge,
+    Typography
 } from 'antd';
 import {
     EyeOutlined,
@@ -27,7 +29,7 @@ import moment from 'moment';
 import React from 'react';
 import { } from 'antd';
 const { RangePicker } = DatePicker;
-
+const { Text } = Typography;
 interface DataType {
     key: React.Key;
     date: string;
@@ -125,13 +127,9 @@ const ordersPage = () => {
             title: 'THANH TOÁN',
             key: 'paymentStatus',
             render: (value: any) => (value.paymentStatus === 1 ? (
-                <span className=' bg-green-300 text-green-700 border rounded-lg px-2 py-1 text-xs'>
-                    Đã thanh toán
-                </span>
+                <Badge status="success" text={<Text type="success" className=''>Đã thanh toán</Text>} />
             ) : (
-                <span className=' bg-gray-200 text-gray-700  border rounded-lg px-2 py-1 text-xs'>
-                    Chưa thanh toán
-                </span>
+                <Badge status="default" text={<Text className=''>Chưa thanh toán</Text>} />
             )),
             sorter: (a, b) => a.paymentStatus - b.paymentStatus, // Sắp xếp theo số
             sortDirections: ['ascend', 'descend'],
@@ -141,48 +139,47 @@ const ordersPage = () => {
             title: 'TRẠNG THÁI',
             key: 'status',
             render: (value: any) => {
-                let statusText, statusColor;
 
                 switch (value.status) {
                     case 0:
-                        statusText = 'Hủy đơn hàng';
-                        statusColor = 'bg-red-300 text-red-700';
-                        break;
+                        return (
+                            <Badge status={"error"} text={<Text type="danger" >Hủy đơn hàng</Text>} />
+                        )
                     case 1:
-                        statusText = 'Chờ xử lí';
-                        statusColor = 'bg-gray-200 text-gray-700';
-                        break;
+                        return (
+                            <Badge status="default" text={<Text >Chờ xử lí</Text>} />
+                        )
                     case 2:
-                        statusText = 'Chờ lấy hàng';
-                        statusColor = 'bg-cyan-300 text-cyan-700';
-                        break;
+                        return (
+                            <Badge color={"cyan"} text={<Text className='text-cyan-500'>Chờ lấy hàng</Text>} />
+                        )
                     case 3:
-                        statusText = 'Đang giao';
-                        statusColor = 'bg-blue-300 text-blue-700';
-                        break;
+                        return (
+                            <Badge status="processing" text={<Text className='text-blue-400'>Đang giao</Text>} />
+                        )
                     case 4:
-                        statusText = 'Đã nhận hàng';
-                        statusColor = 'bg-teal-300 text-teal-700';
-                        break;
+                        return (
+                            <Badge color={"lime"} text={<Text type="success" className='text-lime-300'>Đã nhận hàng</Text>} />
+                        )
                     case 5:
-                        statusText = 'Hoàn thành';
-                        statusColor = 'bg-green-300 text-green-700 ';
-                        break;
+                        return (
+                            <Badge status={"success"} text={<Text type="success" className=''>Hoàn thành</Text>} />
+                        )
                     case 6:
-                        statusText = 'Y/c trả hàng';
-                        statusColor = 'bg-yellow-200 text-yellow-700';
-                        break;
+                        return (
+                            <Badge status={"warning"} text={<Text type="warning" >Y/C đổi hàng</Text>} />
+                        )
                     default:
-                        statusText = '';
-                        statusColor = '';
+                        return "Không xác định"
                 }
 
-                return (
+                // return (
 
-                    <span className={`border rounded-lg px-2 py-1 text-xs  ${statusColor}`}>
-                        {statusText}
-                    </span>
-                );
+                //     <Badge key={statusColor} status={"success"} text={<Text type="success" className=''>{statusText}</Text>} />
+                //     // <span className={`border rounded-lg px-2 py-1 text-xs  ${statusColor}`}>
+                //     //     {statusText}
+                //     // </span>
+                // );
             },
             sorter: (a, b) => {
                 const customOrder = [0, 1, 2, 3, 4, 5, 6];

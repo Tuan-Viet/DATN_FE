@@ -5,7 +5,8 @@ import {
     Popconfirm,
     message,
     Image,
-    Spin
+    Spin,
+    Tooltip
 } from 'antd';
 import {
     EditFilled,
@@ -73,47 +74,26 @@ const userPage = () => {
             className: 'w-[100px]'
         },
         {
-            title: 'MÃ',
+            title: 'MÃ KHÁCH HÀNG',
             dataIndex: '_id',
             render: (value: any) => <Link to={``} className='uppercase'>#{value.slice(0, 10)}</Link>,
             className: 'w-1/5'
         },
         {
-            title: 'Họ tên',
+            title: 'HỌ TÊN',
             key: 'fullname',
             render: (record: any) => (
                 <div className="flex items-center  ">
-                    {/* <Image
-                        width={70}
-                        src={record.image}
-                        alt="Category Image"
-                        className=""
-                    /> */}
                     <a className='w-full '>{record.fullname}</a>
                 </div>
             ),
         },
-        // {
-        //     title: 'Số điện thoai',
-        //     dataIndex: 'phone',
-        //     key: 'phone',
-
-        // },
         {
-            title: 'Email',
+            title: 'EMAIL',
             dataIndex: 'email',
             key: 'email',
 
         },
-        // {
-        //     title: 'Address',
-        //     key: 'address',
-        //     render: (record: any) => (
-        //         <p className='w-[300px] truncate'>{record.address}</p>
-        //     ),
-        //     className: '',
-
-        // },
         {
             title: 'Vai trò',
             key: 'role',
@@ -121,13 +101,10 @@ const userPage = () => {
 
         },
         {
-            title: 'Action',
+            title: '',
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Link to={`/admin/product/${record?._id}`}>
-                        <EyeOutlined className='text-xl text-green-400' />
-                    </Link>
                     <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
@@ -141,6 +118,11 @@ const userPage = () => {
                     <Link to={`/admin/category/update/${record._id}`}>
                         <EditFilled className='text-xl text-yellow-400' />
                     </Link>
+                    <Tooltip title="Xem" color={'green'} key={'green'}>
+                        <Link to={`/admin/product/${record?._id}`}>
+                            <EyeOutlined className='text-xl text-green-500' />
+                        </Link>
+                    </Tooltip>
                 </Space>
             ),
         },

@@ -233,16 +233,30 @@ const OutfitProductDetail = (props: any) => {
     return (
         <div className="w-[650px] min-h-[250px] my-4 border-2 border-dashed border-red-500 p-5">
             {props && <>
-                <h1 className="font-semibold">{props.listOutfitByProductIdState?.[0]?.title}: {props.listOutfitByProductIdState?.[0]?.sku}</h1>
-                <div className="flex justify-between p-5 gap-x-[20px]">
+                <div className="flex justify-between items-center">
+                    <h1 className="font-semibold">
+                        Gợi ý cho bạn
+                        {/* {props.listOutfitByProductIdState?.[0]?.title} */}
+                    </h1>
+                    <span>Mã: {props.listOutfitByProductIdState?.[0]?.sku}</span>
+                </div>
+                <div className="flex justify-between p-5 gap-x-[30px]">
                     {/* productDetailRelatedState */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col justify-between w-1/2">
                         <input type="text" className='hidden' value={props?.listOutfitByProductIdState?.[0]?.items?.[0]?._id} />
                         <Link to={`/products/${props.listOutfitByProductIdState?.[0]?.items?.[0]?.product_id}`}>
-                            <img className="w-[130px]" src={props?.listOutfitByProductIdState?.[0]?.items?.[0]?.imageColor} alt="" />
+                            <img className="h-[250px]" src={props?.listOutfitByProductIdState?.[0]?.items?.[0]?.imageColor} alt="" />
                         </Link>
-                        <div className="py-5">
-                            <p className="text-sm">{props.listOutfitByProductIdState?.[0]?.items?.[0]?.product_id === props.id && props.id ? <span className="font-bold text-sm">Bạn đang xem:</span> : ""}<span className="ml-2">x1 {OutFitItemFirstLengh?.title}</span></p>
+                        <div className="py-5 px-3">
+                            <p className="text-sm">
+                                {props.listOutfitByProductIdState?.[0]?.items?.[0]?.product_id === props.id && props.id ?
+                                    <span className="block font-bold text-sm">
+                                        Bạn đang xem:
+                                    </span> : ""}
+                                <span className="ml-2">
+                                    x1 {OutFitItemFirstLengh?.title}
+                                </span>
+                            </p>
                             {[...new Set(productDetailState?.filter((item) => item.product_id === props.listOutfitByProductIdState?.[0]?.items?.[0]?.product_id).filter((pro) => pro.quantity !== 0))].length != 0 ?
                                 <>
                                     <p className="opacity-70 text-[14px] my-3">Vui lòng chọn:</p>
@@ -271,18 +285,16 @@ const OutfitProductDetail = (props: any) => {
                                         ((OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount) * getOneOutfit.discount) / 100).toLocaleString("vi-VN")}</strong><del className='ml-2'>{(OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount).toLocaleString("vi-VN")}₫</del></p>
                                 </>
                                 : <div className="bg-red-400 text-white w-[150px] text-[10px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
-
-
                         </div>
                     </div>
                     {/* item second */}
-                    <div className="flex flex-col">
+                    <div className="flex flex-col justify-between w-1/2">
                         <input type="text" className='hidden' value={props?.listOutfitByProductIdState?.[0]?.items?.[1]?._id} />
                         <Link to={`/products/${props.listOutfitByProductIdState?.[0]?.items?.[1]?.product_id}`}>
-                            <img className="w-[130px]" src={props?.listOutfitByProductIdState?.[0]?.items?.[1]?.imageColor} alt="" />
+                            <img className="h-[250px]" src={props?.listOutfitByProductIdState?.[0]?.items?.[1]?.imageColor} alt="" />
                         </Link>
-                        <div className="py-5">
-                            <p className="text-sm">{props.listOutfitByProductIdState?.[0]?.items?.[1]?.product_id === props.id && props.id ? <span className="font-bold text-sm">Bạn đang xem:</span> : ""}<span className="ml-2">x1 {OutFitItemSecondLengh?.title}</span></p>
+                        <div className="py-5 px-3">
+                            <p className="text-sm">{props.listOutfitByProductIdState?.[0]?.items?.[1]?.product_id === props.id && props.id ? <span className="block font-bold text-sm">Bạn đang xem:</span> : ""}<span className="ml-2">x1 {OutFitItemSecondLengh?.title}</span></p>
                             <p className="opacity-70 text-[14px] my-3">Vui lòng chọn:</p>
                             <div className="text-[14px]">
                                 {/* color */}

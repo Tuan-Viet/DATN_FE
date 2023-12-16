@@ -42,6 +42,8 @@ import OutfitPage from "../pages/client/Outfit";
 import outfitPage from "../pages/admin/outfitPage";
 import outfitAdd from "../pages/admin/outfitAdd";
 import outfitUpdate from "../pages/admin/outfitUpdate/indext";
+import ordersReturn from "../pages/client/MyAccount/orderReturn";
+import OrderReturnDetail from "../pages/client/MyAccount/orderReturnDetail";
 
 
 export const publicRoutes = [
@@ -58,6 +60,8 @@ export const publicRoutes = [
   { path: routes.signup, Component: signup },
   { path: routes.myAccount, Component: myAccount },
   { path: routes.orders, Component: myOrders },
+  { path: routes.ordersReturn, Component: ordersReturn },
+  { path: routes.ordersReturnDetail, Component: OrderReturnDetail },
   { path: routes.changePassword, Component: ChangePassword },
   { path: routes.addresses, Component: myAddress },
   { path: routes.orderDetail, Component: OrderDetail },
