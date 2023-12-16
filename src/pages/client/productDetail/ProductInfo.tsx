@@ -1,5 +1,10 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { LikeOutlined, MessageOutlined, StarOutlined } from '@ant-design/icons';
+import {
+  LikeOutlined,
+  MessageOutlined,
+  StarOutlined,
+  CaretRightOutlined
+} from '@ant-design/icons';
 import { Navigation, Autoplay } from "swiper/modules";
 import React, { Dispatch, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -21,6 +26,7 @@ import {
   Avatar,
   Breadcrumb,
   Button,
+  Collapse,
   Form,
   Image,
   Input,
@@ -129,6 +135,7 @@ const ProductInfo = () => {
       date: moment(item.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY"),
       images: item.images,
       rate: item.rating,
+      reply: item.reply,
       fullname: item.userId ? item.userId?.fullname : null,
       comment: item.comment,
       useId: item.userId ? item.userId._id : null
@@ -174,33 +181,61 @@ const ProductInfo = () => {
                       pageSize: 10,
                     }}
                     dataSource={data}
-                    renderItem={(item) => (
-                      <List.Item
-                        extra={
-                          <Image.PreviewGroup
-                            preview={{
-                              onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                            }}
-                          >
-                            {item.images.map((image) => (
-                              <Image height={70} src={image.url} alt="" className="pr-1" />
-
-                            ))}
-                          </Image.PreviewGroup>
-                        }
-                      >
-                        <div className="">
-                          <div className="flex items-center space-x-2">
-                            <span className=""><Link to={``}>{item.fullname}</Link></span>
-                            <span className="block"><Rate value={item.rate} disabled className="text-xs mb-0"></Rate></span>
-                          </div>
-                          <div className="flex mt-0 items-center ">
-                            <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{item.date}</span>
-                            <div className="px-1">
-                              <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
+                    renderItem={(item, index) => (
+                      <List.Item>
+                        <div className="flex justify-between items-start">
+                          <div className="w-3/5">
+                            <div >
+                              <div className="flex items-center space-x-2">
+                                <span className="font-medium"><Link to={``}>{item.fullname}</Link></span>
+                                <span className="block"><Rate value={item.rate} disabled className="text-xs mb-0"></Rate></span>
+                              </div>
+                              <div className="flex mt-0 items-center ">
+                                <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{item.date}</span>
+                                <div className="px-1">
+                                  <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
+                                </div>
+                              </div>
+                              <span className="block mt-2">{item.comment}</span>
+                              <div className="flex space-x-3 mx-2">
+                              </div>
+                              <div className="flex items-start ">
+                              </div>
                             </div>
+                            {item?.reply?.comment && (
+                              <Collapse
+                                size="small"
+                                // defaultActiveKey={['1']}
+                                ghost
+                                className="p-0"
+                                style={{ padding: 0 }}
+                                expandIcon={({ isActive }) => <CaretRightOutlined className={`text-blue-500`} rotate={isActive ? 90 : 0} />}
+                              >
+                                <Collapse.Panel key={index} header={<span className="text-gray-400">Replie</span>} className="m-0">
+                                  <div className="ml-5">
+                                    <div className="flex items-center space-x-2">
+                                      <span className="font-medium">{item.reply.nameUser}</span>
+                                      <span className="block text-end text-xs text-gray-400 pr-1">{moment(item.reply.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
+                                    </div>
+                                    <span>{item.reply.comment}</span>
+                                  </div>
+                                </Collapse.Panel>
+                              </Collapse>
+                            )}
                           </div>
-                          <span className="block my-2">{item.comment}</span>
+                          <div className="flex">
+                            <Image.PreviewGroup
+                              preview={{
+                                onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
+                              }}
+                            >
+                              {item.images.map((image) => (
+                                <Image height={70} src={image.url} alt="" className="pr-1" />
+
+                              ))}
+                            </Image.PreviewGroup>
+                          </div>
+
                         </div>
                       </List.Item>
                     )}
@@ -586,70 +621,95 @@ const ProductInfo = () => {
       window.scrollTo({ top: 0, left: 0 });
     }, [id]);
 
+    const [isFixed, setIsFixed] = useState(true);
+
+    // Hàm xử lý sự kiện khi cuộn chuột
+    const handleScroll = () => {
+      // Kiểm tra vị trí của phần tử và cập nhật trạng thái
+      const element = document.getElementById('tabsMenu');
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        setIsFixed(rect.top > 0); // Cập nhật trạng thái dựa trên vị trí của phần tử
+      }
+    };
+
+    // Thêm lắng nghe sự kiện cuộn chuột
+    useEffect(() => {
+      window.addEventListener('scroll', handleScroll);
+      return () => {
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }, []);
 
     return (
       <div className="container">
-        <div className="mb-[70px] my-10" id="scroller ">
+        <div className="mb-[70px] mt-5" id="scroller ">
           {/* <ScrollToTop /> */}
           <div className="flex justify-between gap-x-7 mb-10">
             {!isSuccessProduct ? (
-              <div className="space-y-3">
-                <Skeleton.Image active={true} style={{ width: '380px', height: '400px' }} />
-                <Skeleton.Image active={true} style={{ width: '80px', height: '80px' }} />
+              <div className="space-y-3 ">
+                <div className="block">
+                  <Skeleton.Image active={true} style={{ width: '380px', height: '400px' }} />
+                </div>
+                <div className="block">
+                  <Skeleton.Image active={true} style={{ width: '80px', height: '80px' }} />
+                </div>
               </div>
             ) : (
-              <div className="">
-                <div className="w-[400px] h-[500px] relative">
-                  <img
-                    src={listImages[selectedImage]}
-                    alt=""
-                    className="w-[400px] h-[500px] object-cover border"
-                  />
-                  <button
-                    onClick={handlePrevClick}
-                    className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
-                  >
-                    &lt;
-                  </button>
-                  <button
-                    onClick={handleNextClick}
-                    className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
-                  >
-                    &gt;
-                  </button>
-                </div>
-                <div className=" mt-5">
-                  <Swiper
-                    modules={[Navigation]}
-                    spaceBetween={4}
-                    slidesPerView={"auto"}
-                    navigation={true}
-                    className="w-[400px] mx-auto"
-                  >
-                    {listImages.map((imageUrl, index) => {
-                      return <SwiperSlide key={index} className="w-20 h-24 cursor-pointer">
-                        <div
-                          onClick={() => handleImageClick(index)}
-                          className={`h-20 w-16 overflow-hidden mb-3 relative group transform transition-transform hover:scale-110 
+              <div className="relative">
+                <div className={isFixed ? 'fixed' : 'absolute bottom-0'}>
+                  <div className="w-[400px] h-[500px] relative">
+                    <img
+                      src={listImages[selectedImage]}
+                      alt=""
+                      className="w-[400px] h-[500px] object-cover border"
+                    />
+                    <button
+                      onClick={handlePrevClick}
+                      className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
+                    >
+                      &lt;
+                    </button>
+                    <button
+                      onClick={handleNextClick}
+                      className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 text-gray-700"
+                    >
+                      &gt;
+                    </button>
+                  </div>
+                  <div className=" mt-5">
+                    <Swiper
+                      modules={[Navigation]}
+                      spaceBetween={4}
+                      slidesPerView={"auto"}
+                      navigation={true}
+                      className="w-[400px] mx-auto"
+                    >
+                      {listImages.map((imageUrl, index) => {
+                        return <SwiperSlide key={index} className="w-20 h-24 cursor-pointer">
+                          <div
+                            onClick={() => handleImageClick(index)}
+                            className={`h-20 w-16 overflow-hidden mb-3 relative group transform transition-transform hover:scale-110 
                         }`}
-                        >
-                          <div className="h-20 flex items-center justify-center">
-                            <img
-                              src={imageUrl}
-                              alt=""
-                              className="h-full w-full object-cover "
-                            />
+                          >
+                            <div className="h-20 flex items-center justify-center">
+                              <img
+                                src={imageUrl}
+                                alt=""
+                                className="h-full w-full object-cover "
+                              />
+                            </div>
+
                           </div>
-  
-                        </div>
-                      </SwiperSlide>
-                    })}
-                  </Swiper>
-  
+                        </SwiperSlide>
+                      })}
+                    </Swiper>
+
+                  </div>
                 </div>
               </div>
             )}
-  
+
             <div className="product-info w-2/3">
               {!isSuccessProduct ? (
                 <div className="">
@@ -678,7 +738,7 @@ const ProductInfo = () => {
                   </div>
                 </div>
               )}
-  
+
               {/* form */}
               <form onSubmit={handleSubmit(handleFormProductDetail)}>
                 <div className="">
@@ -689,7 +749,7 @@ const ProductInfo = () => {
                   ) : (
                     <div className="flex items-center gap-x-[109px] py-3 mb-5">
                       <span className="text-sm font-bold">Giá:</span>
-  
+
                       <div className="font-bold text-xl text-[#FF2C26]">
                         {(getOneProduct?.price - getOneProduct.discount).toLocaleString("vi-VN")}đ
                         <del className="font-bold text-sm text-[#ccc] ml-2">
@@ -703,7 +763,7 @@ const ProductInfo = () => {
                       </span>}
                     </div>
                   )}
-  
+
                   {/* bien the */}
                   <div>
                     {!isSuccessProduct ? (
@@ -787,7 +847,7 @@ const ProductInfo = () => {
                                 {" "}
                                 Quantity{" "}
                               </label>
-  
+
                               <div className="flex items-center border border-gray-300 rounded">
                                 <button
                                   onClick={decreaseQuantity}
@@ -796,14 +856,14 @@ const ProductInfo = () => {
                                 >
                                   &minus;
                                 </button>
-  
+
                                 <input
                                   type="number"
                                   id="Quantity"
                                   value={quantity}
                                   className="outline-none font-semibold h-10 w-16 border-transparent text-center [-moz-appearance:_textfield] sm:text-sm [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none"
                                 />
-  
+
                                 <button
                                   onClick={increaseQuantity}
                                   type="button"
@@ -827,16 +887,19 @@ const ProductInfo = () => {
                         </> : <div className="bg-[#E70505] text-white w-[250px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
                       </div>
                     )}
-  
+
                   </div>
                 </div>
-  
+
               </form>
               {/* outfit */}
-              {listOutfitByProductIdState.length > 0 &&
-                <OutfitProductDetail listOutfitByProductIdState={listOutfitByProductIdState} productState={productState} id={id} productDetailRelatedState={productDetailRelatedState} listOutfitState={listOutfitState} listCartState={listCartState}></OutfitProductDetail>
-              }
-  
+              <div className="" id="tabsMenu">
+                {listOutfitByProductIdState.length > 0 &&
+                  <OutfitProductDetail listOutfitByProductIdState={listOutfitByProductIdState} productState={productState} id={id} productDetailRelatedState={productDetailRelatedState} listOutfitState={listOutfitState} listCartState={listCartState}></OutfitProductDetail>
+                }
+              </div>
+
+
               {isSuccessProduct ? (
                 <div className="policy flex justify-between gap-x-[13px]">
                   <div>
@@ -870,13 +933,14 @@ const ProductInfo = () => {
                       />
                       <span className="text-sm">TỔNG ĐÀI 24/7 : 0964942121</span>
                     </div>
-  
+
                   </div>
                 </div>
               ) : ""}
             </div >
           </div >
-          <div className="">
+          {/* tới đây  */}
+          <div className="" >
             <div className="product-tabs flex gap-x-[60px]">
               <div>
                 <button
@@ -949,7 +1013,7 @@ const ProductInfo = () => {
                             className="mx-auto max-h-[395px] min-h-[375px] w-full group-hover:opacity-0 group-hover:scale-100 absolute transition-all ease-linear duration-200"
                             alt=""
                           />
-  
+
                           <img
                             src={product.images?.[1] ? product.images?.[1] : productDetailRelatedState.find((proDetail) => proDetail.product_id && proDetail.product_id.includes(product._id!))?.imageColor
                             }
@@ -985,7 +1049,7 @@ const ProductInfo = () => {
                     </div>
                   </SwiperSlide>
                 })}
-  
+
               </Swiper>
             </div>
           </div>
