@@ -657,7 +657,7 @@ const ProductInfo = () => {
               </div>
             ) : (
               <div className="relative">
-                <div className={isFixed ? 'fixed' : 'absolute bottom-0'}>
+                <div className={listOutfitByProductIdState.length > 0 && isFixed ? 'fixed' : 'absolute bottom-0'}>
                   <div className="w-[400px] h-[500px] relative">
                     <img
                       src={listImages[selectedImage]}
@@ -898,7 +898,6 @@ const ProductInfo = () => {
                   <OutfitProductDetail listOutfitByProductIdState={listOutfitByProductIdState} productState={productState} id={id} productDetailRelatedState={productDetailRelatedState} listOutfitState={listOutfitState} listCartState={listCartState}></OutfitProductDetail>
                 }
               </div>
-
 
               {isSuccessProduct ? (
                 <div className="policy flex justify-between gap-x-[13px]">

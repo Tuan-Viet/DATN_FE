@@ -84,9 +84,9 @@ const orderReturnById = () => {
             .catch(error => console.error('Error fetching provinces:', error));
 
         if (order) {
-            setNameProvince(order?.address.myProvince)
-            setNameDistrict(order?.address.myDistrict)
-            setNameWard(order?.address.myWard)
+            setNameProvince(order?.address?.myProvince)
+            setNameDistrict(order?.address?.myDistrict)
+            setNameWard(order?.address?.myWard)
         }
 
         form.setFieldsValue({

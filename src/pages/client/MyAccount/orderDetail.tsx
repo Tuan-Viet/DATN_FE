@@ -41,6 +41,7 @@ import {
   Form,
   Modal,
   Rate,
+  Tooltip,
   Upload,
   UploadFile,
   UploadProps,
@@ -51,6 +52,8 @@ import {
   LoadingOutlined,
   UploadOutlined,
   PlusOutlined,
+  FormOutlined,
+  InfoCircleOutlined
 } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
@@ -70,11 +73,9 @@ function formatDateStringToDisplayDate(dateString) {
     amPm = "CH";
   }
 
-  const formattedDate = `${day < 10 ? "0" : ""}${day}/${
-    month < 10 ? "0" : ""
-  }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${
-    minutes < 10 ? "0" : ""
-  }${minutes}${amPm}`;
+  const formattedDate = `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
+    }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? "0" : ""
+    }${minutes}${amPm}`;
   return formattedDate;
 }
 
@@ -385,7 +386,7 @@ const OrderDetail = () => {
         duration: 5,
         closeIcon: true,
       });
-    } catch (error) {}
+    } catch (error) { }
   };
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
@@ -596,13 +597,19 @@ const OrderDetail = () => {
                     )}
                   </div>
                   <Modal
-                    title="Trả hàng"
+                    title={
+                      <h1 className="text-lg border-b py-3 text-blue-500">
+                        YÊU CẦU ĐỔI HÀNG
+                      </h1>
+                    }
                     centered
                     open={isModalOrderOpen}
                     onOk={handleOrderSubmit(onAddOrderReturn)}
                     okButtonProps={{ className: "text-white bg-blue-500" }}
                     onCancel={handleOrderCancel}
                     width={1000}
+                    okText="Gửi yêu cầu"
+                    cancelText="Hủy"
                   >
                     <form
                       className=" mx-auto"
@@ -613,6 +620,7 @@ const OrderDetail = () => {
                         value={user.current._id}
                         {...registerOrder("userId")}
                         id="userId"
+                        className=""
                       />
                       <input
                         type="hidden"
@@ -620,292 +628,352 @@ const OrderDetail = () => {
                         {...registerOrder("orderId")}
                         id="orderId"
                       />
-                      <div className="mb-5">
-                        <label
-                          htmlFor="large-input"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Họ tên người gửi
-                        </label>
-                        <input
-                          {...registerOrder("fullName")}
-                          type="text"
-                          id="fullName"
-                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors ? OrderErrors.fullName?.message : ""}
-                        </p>
-                      </div>
-                      <div className="mb-5">
-                        <label
-                          htmlFor="base-input"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Số điện thoại người gửi
-                        </label>
-                        <input
-                          type="text"
-                          {...registerOrder("phoneNumber")}
-                          id="phoneNumber"
-                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors ? OrderErrors.phoneNumber?.message : ""}
-                        </p>
-                      </div>
-                      <div className="mb-5">
-                        <label
-                          htmlFor="countries"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Tỉnh/Thành phố:
-                        </label>
-                        <select
-                          onChange={handleProvinceChange}
-                          value={selectedProvince}
-                          id="countries"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        >
-                          <option value="">Chọn tỉnh/thành phố</option>
-                          {provinces.map((province) => (
-                            <option key={province.code} value={province.code}>
-                              {" "}
-                              {province.name}
-                            </option>
-                          ))}
-                        </select>
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors
-                            ? OrderErrors.address?.myProvince?.message
-                            : ""}
-                        </p>
-                      </div>
-                      <div className="mb-5">
-                        <label
-                          htmlFor="countries"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Quận/Huyện:
-                        </label>
-                        <select
-                          onChange={handleDistrictChange}
-                          value={selectedDistrict}
-                          id="countries"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        >
-                          <option value="">Chọn quận/huyện</option>
-                          {districts?.districts?.map((district) => (
-                            <option key={district.code} value={district.code}>
-                              {district.name}
-                            </option>
-                          ))}
-                        </select>
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors
-                            ? OrderErrors.address?.myDistrict?.message
-                            : ""}
-                        </p>
-                      </div>
-                      <div className="mb-5">
-                        <label
-                          htmlFor="countries"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Chọn xã/phường:
-                        </label>
-                        <select
-                          onChange={handleWardChange}
-                          value={selectedWard}
-                          id="countries"
-                          className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        >
-                          <option value="">Chọn xã phường</option>
-                          {wards?.wards?.map((ward) => (
-                            <option key={ward.code} value={ward.code}>
-                              {ward.name}
-                            </option>
-                          ))}
-                        </select>
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors
-                            ? OrderErrors.address?.myWard?.message
-                            : ""}
-                        </p>
-                      </div>
-                      <div className="mb-5">
-                        <label
-                          htmlFor="small-input"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Địa chỉ gửi
-                        </label>
-                        <input
-                          type="text"
-                          {...registerOrder("address.detailAddress")}
-                          id="address"
-                          className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        />
-                        <p className="text-red-500 italic text-sm">
-                          {OrderErrors
-                            ? OrderErrors.address?.detailAddress?.message
-                            : ""}
-                        </p>
-                      </div>
-                      <div className="mb-5">
-                        <label htmlFor="reason" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do đổi hàng</label>
-                        <select onClick={handleSelectChange} id="reason" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                          <option value="">Chọn lý do</option>
-                          <option value="bị lỗi size">Bị lỗi size</option>
-                          <option value="không đúng mẫu">Không đúng mẫu</option>
-                          <option value="khác" >Khác</option>
-                        </select>
-                        <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
-                      </div>
-                      {showInput && (
-                        <div className="mb-5" id="addreason">
-                          <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Lý do cụ thể</label>
-                          <input
-                            type="text"
-                            {...registerOrder("reason")}
-                            id="reason"
-                            className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                          />
-                          <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
-                        </div>
-                      )}
-                      <div className="mb-5">
-                        <label htmlFor="small-input" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Ghi chú</label>
-                        <input type="text" {...registerOrder("note")} id="note" className="block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                        {/* <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p> */}
-                      </div>
-                      <Form
-                        form={form}
-                        name="validateOnly"
-                        layout="vertical"
-                        autoComplete="off"
-                        // onFinish={uploadFile}
-                      >
-                        <Form.Item
-                          name="productImages"
-                          label="Ảnh Sản phẩm"
-                          className="relative"
-                          rules={[
-                            { required: true, message: "Không được để trống" },
-                          ]}
-                        >
-                          <Upload
-                            name="productImages"
-                            {...props}
-                            onChange={handleImageChange}
-                            onRemove={handleImageProductRemove}
-                            maxCount={3}
-                          >
-                            <div>
-                              <PlusOutlined />
-                              <div>Upload </div>
+                      <div className="flex justify-between space-x-5 my-5">
+                        <div className="w-3/5">
+                          <div className="mb-3">
+                            <label htmlFor="reason" className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray">
+                              <span className="text-sm text-red-500 mr-1">*</span>Lý do đổi hàng
+                            </label>
+                            <select onClick={handleSelectChange} id="reason" className="bg-gray-50 p-[6px] border border-gray-300 outline-none text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                              <option value="">Chọn lý do</option>
+                              <option value="Không đúng kích, màu sắc">Không đúng kích thước, màu sắc</option>
+                              <option value="Không đúng mẫu">Không đúng mẫu</option>
+                              <option value="khác" >Khác..</option>
+                            </select>
+                            <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
+                          </div>
+                          {showInput && (
+                            <div className="mb-5" id="addreason">
+                              <label htmlFor="small-input" className="block mb-2 text-sm font-medium  text-gray-900 dark:text-gray">Lý do cụ thể</label>
+                              <input
+                                type="text"
+                                {...registerOrder("reason")}
+                                id="reason"
+                                className="block w-full p-2 text-gray-900 border outline-none border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                              />
+                              <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p>
                             </div>
-                          </Upload>
-                        </Form.Item>
-                      </Form>
-                      <div className="mb-5">
-                        <label
-                          htmlFor="small-input"
-                          className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
-                        >
-                          Sản phẩm trả hàng
-                        </label>
-                        <div className="relative overflow-x-auto">
-                          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <thead className="text-sm uppercase border-b-2 border-black bg-gray-50">
-                              <tr>
-                                <th scope="col" className="px-6 py-3">
-                                  Sản phẩm
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                  Đơn giá
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                  Số lượng
-                                </th>
-                                <th scope="col" className="px-6 py-3">
-                                  Thành tiền
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {productsInOrder.map((product, index) => {
-                                return (
-                                  <>
-                                    {
-                                      productDetailState
-                                        ?.filter(
-                                          (proDetail) =>
-                                            proDetail._id === product.productDetailId
-                                        )
-                                        .map((item) => {
-                                          return (
-                                            <>
-                                              {productState
-                                                ?.filter(
-                                                  (prod) => prod._id === item.product_id
-                                                )
-                                                .map((pro) => (
+                          )}
+                          <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
+                            <summary
+                              className="flex w-[250px] cursor-pointer p-2 transition"
+                            >
+                              <span className="text-sm text-blue-500">Ghi chú <FormOutlined /></span>
+                            </summary>
+                            <div className="pt-3">
+                              <div className="mb-5">
+                                <textarea rows={3} {...registerOrder("note")} id="note" className="block w-full p-2 outline-none text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                                {/* <p className="text-red-500 italic text-sm">{OrderErrors ? OrderErrors.reason?.message : ""}</p> */}
+                              </div>
+                            </div>
+                          </details>
 
-                                                  <tr className="bg-white ">
-                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
-                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
-                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
-                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
-                                                    <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
-                                                    <th
-                                                      scope="row"
-                                                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
-                                                    >
-                                                      <img
-                                                        src={item.imageColor}
-                                                        alt={pro.title}
-                                                        className="w-[58px] h-[78px] object-cover"
-                                                      />
-                                                      <div>
-                                                        <p className="mb-4 max-w-[340px]">
-                                                          {pro.title}
-                                                        </p>
-                                                        <p>
-                                                          {product.color} / {product.size}
-                                                        </p>
-                                                      </div>
-                                                    </th>
-                                                    <td className="px-6 py-4">
-                                                      {product.price.toLocaleString(
-                                                        "vi-VN"
-                                                      )}
-                                                      ₫
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                      <div className="relative flex items-center max-w-[8rem]">
-                                                        <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)} className="border-x-0 border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
-                                                        /{product.quantity}
-                                                      </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                      {product.totalMoney.toLocaleString(
-                                                        "vi-VN"
-                                                      )}
-                                                      ₫
-                                                    </td>
-                                                  </tr>
-                                                ))}
-                                            </>
-                                          );
-                                        })}
-                                  </>
-                                );
-                              })}
-                            </tbody>
-                          </table>
+                          <div className="border rounded-sm">
+                            <div className="flex items-center space-x-1 border-b py-3 px-3">
+                              <h3 className="font-medium">Mô tả</h3>
+                              <Tooltip
+                                style={{ width: 500 }}
+                                title={
+                                  <span className="tooltip-content">
+                                    <h1 className="mb-4 text-lg font-bold">Một số lưu ý:</h1>
+                                    <div className="container">
+                                      <ul className="list-disc pl-6">
+                                        <li className="mb-2">Hình ảnh/video rõ nét, không mờ, nhòe</li>
+                                        <li className="mb-2">Chụp cận cảnh lỗi của sản phẩm</li>
+                                        <li className="mb-2">Cung cấp hình ảnh hóa đơn</li>
+                                      </ul>
+                                    </div>
+                                  </span>
+                                }
+                                color="blue"
+                                key={'blue'}
+                              >
+                                <InfoCircleOutlined className='text-blue-500' />
+                              </Tooltip>
+                            </div>
+                            <Form
+                              form={form}
+                              name="validateOnly"
+                              layout="vertical"
+                              autoComplete="off"
+                              // onFinish={uploadFile}
+                              className="py-3 pb-1 "
+                            >
+                              <Form.Item
+                                name="productImages"
+                                // label="Ảnh Sản phẩm"
+                                className="relative mb-0 pl-1"
+                                rules={[
+                                  { required: true, message: "Không được để trống" },
+
+                                ]}
+                              >
+                                <Upload
+                                  className=""
+                                  name="productImages"
+                                  {...props}
+                                  onChange={handleImageChange}
+                                  onRemove={handleImageProductRemove}
+                                  maxCount={4}
+                                >
+                                  <div>
+                                    <PlusOutlined />
+                                    <div>Upload </div>
+                                  </div>
+                                </Upload>
+                              </Form.Item>
+                            </Form>
+                          </div>
+                          <div className="mb-5">
+                            {/* <label
+                              htmlFor="small-input"
+                              className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                            >
+                              Sản phẩm trả hàng
+                            </label> */}
+                            <div className="relative overflow-x-auto my-3 border rounded-sm">
+                              <h3 className="font-medium p-3 py-5">SẢN PHẨM YÊU CẦU ĐỔI TRẢ</h3>
+                              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                                <thead className="text-sm uppercase border-b-2 border-black bg-gray-50">
+                                  <tr>
+                                    <th scope="col" className="font-medium py-3 px-2 text-[13px]">
+                                      Sản phẩm
+                                    </th>
+                                    <th scope="col" className="font-medium py-3 px-2 text-[13px]">
+                                      Đơn giá
+                                    </th>
+                                    <th scope="col" className="font-medium py-3 px-2 text-[13px] text-center">
+                                      SL
+                                    </th>
+                                    <th scope="col" className="font-medium py-3 px-2 text-[13px]">
+                                      Thành tiền
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {productsInOrder.map((product: any, index: any) => {
+                                    return (
+                                      <>
+                                        {
+                                          productDetailState
+                                            ?.filter(
+                                              (proDetail: any) =>
+                                                proDetail._id === product.productDetailId
+                                            )
+                                            .map((item: any) => {
+                                              return (
+                                                <>
+                                                  {productState
+                                                    ?.filter(
+                                                      (prod: any) => prod._id === item.product_id
+                                                    )
+                                                    .map((pro: any) => (
+
+                                                      <tr className="bg-white ">
+                                                        <input type="hidden" {...registerOrder(`orderDetailIds.${index}.productDetailId`)} value={item._id} className="" />
+                                                        <input type="hidden" {...registerOrder(`orderDetailIds.${index}.orderDetailId`)} value={product._id} className="" />
+                                                        <input type="hidden" {...registerOrder(`orderDetailIds.${index}.color`)} value={product.color} className="" />
+                                                        <input type="hidden" {...registerOrder(`orderDetailIds.${index}.size`)} value={product.size} className="" />
+                                                        <input type="hidden" {...registerOrder(`orderDetailIds.${index}.price`)} value={product.price} className="" />
+                                                        <th
+                                                          scope="row"
+                                                          className="py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5 px-2 pr-3"
+                                                        >
+                                                          <img
+                                                            src={item.imageColor}
+                                                            alt={pro.title}
+                                                            className="w-[58px] h-[78px] object-cover"
+                                                          />
+                                                          <div className="overflow-hidden">
+                                                            <p className="mb-2 text-[13px] overflow-hidden text-ellipsis">
+                                                              {pro.title}
+                                                            </p>
+                                                            <p className="text-xs font-normal text-blue-500">
+                                                              {product.color} / {product.size}
+                                                            </p>
+                                                          </div>
+                                                        </th>
+                                                        <td className="px-2 py-4 text-[13px]">
+                                                          {product.price.toLocaleString(
+                                                            "vi-VN"
+                                                          )}
+                                                          ₫
+                                                        </td>
+                                                        <td className="px-3 py-4 text-xs">
+                                                          <div className="relative flex items-center max-w-[8rem] space-x-1">
+                                                            <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)}
+                                                              className="border p-1 outline-none rounded-md border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
+                                                            <span> /{product.quantity}</span>
+                                                          </div>
+                                                        </td>
+                                                        <td className="px-2 py-4 text-[13px] text-end">
+                                                          {product.totalMoney.toLocaleString(
+                                                            "vi-VN"
+                                                          )}
+                                                          ₫
+                                                        </td>
+                                                      </tr>
+                                                    ))}
+                                                </>
+                                              );
+                                            })}
+                                      </>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="w-2/5 ">
+                          <div className="border rounded-sm">
+                            <div className="border-b">
+                              <h3 className=" p-3 font-medium">
+                                Thộng tin giao hàng
+                              </h3>
+                            </div>
+                            <div className="p-3">
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="large-input"
+                                  className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray"
+                                >
+                                  <span className="text-sm text-red-500">*</span> Họ tên người
+                                </label>
+                                <input
+                                  {...registerOrder("fullName")}
+                                  placeholder="Nhập họ tên"
+                                  type="text"
+                                  id="fullName"
+                                  className="block w-full p-2 text-gray-900 border outline-none border-gray-300 rounded-md bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                />
+                                <p className="text-red-500 italic text-[13px]">
+                                  {OrderErrors ? OrderErrors.fullName?.message : ""}
+                                </p>
+                              </div>
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="base-input"
+                                  className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray"
+                                >
+                                  <span className="text-sm text-red-500">*</span> Số điện thoại
+                                </label>
+                                <input
+                                  type="text"
+                                  {...registerOrder("phoneNumber")}
+                                  placeholder="Nhập số điện thoại"
+                                  id="phoneNumber"
+                                  className="block w-full p-2 text-gray-900 outline-none border border-gray-300 rounded-md bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                />
+                                <p className="text-red-500 italic text-[13px]">
+                                  {OrderErrors ? OrderErrors.phoneNumber?.message : ""}
+                                </p>
+                              </div>
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="countries"
+                                  className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray"
+                                >
+                                  <span className="text-sm text-red-500">*</span>  Tỉnh/Thành phố:
+                                </label>
+                                <select
+                                  onChange={handleProvinceChange}
+                                  value={selectedProvince}
+                                  id="countries"
+                                  className="bg-gray-50 border border-gray-300 outline-none text-gray-900 text-[13px] rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-[6px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                >
+                                  <option value="">Chọn tỉnh/thành phố</option>
+                                  {provinces.map((province: any) => (
+                                    <option key={province.code} value={province.code}>
+                                      {" "}
+                                      {province.name}
+                                    </option>
+                                  ))}
+                                </select>
+                                <p className="text-red-500 italic text-[13px]">
+                                  {OrderErrors
+                                    ? OrderErrors.address?.myProvince?.message
+                                    : ""}
+                                </p>
+                              </div>
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="countries"
+                                  className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray"
+                                >
+                                  <span className="text-sm text-red-500">*</span> Quận/Huyện:
+                                </label>
+                                <select
+                                  onChange={handleDistrictChange}
+                                  value={selectedDistrict}
+                                  id="countries"
+                                  className="bg-gray-50 border border-gray-300 text-gray-900 outline-none text-[13px] rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-[6px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                >
+                                  <option value="">Chọn quận/huyện</option>
+                                  {districts?.districts?.map((district: any) => (
+                                    <option key={district.code} value={district.code}>
+                                      {district.name}
+                                    </option>
+                                  ))}
+                                </select>
+                                <p className="text-red-500 italic text-[13px]">
+                                  {OrderErrors
+                                    ? OrderErrors.address?.myDistrict?.message
+                                    : ""}
+                                </p>
+                              </div>
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="countries"
+                                  className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray"
+                                >
+                                  <span className="text-sm text-red-500">*</span>  Xã/phường:
+                                </label>
+                                <select
+                                  onChange={handleWardChange}
+                                  value={selectedWard}
+                                  id="countries"
+                                  className="bg-gray-50 border border-gray-300 text-gray-900 outline-none text-[13px] rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-[6px] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                >
+                                  <option value="">Chọn xã phường</option>
+                                  {wards?.wards?.map((ward: any) => (
+                                    <option key={ward.code} value={ward.code}>
+                                      {ward.name}
+                                    </option>
+                                  ))}
+                                </select>
+                                <p className="text-red-500 italic text-[13px]">
+                                  {OrderErrors
+                                    ? OrderErrors.address?.myWard?.message
+                                    : ""}
+                                </p>
+                              </div>
+                              <div className="mb-3">
+                                <label
+                                  htmlFor="small-input"
+                                  className="block mb-2 text-[13px] font-medium text-gray-900 dark:text-gray"
+                                >
+                                  <span className="text-sm text-red-500">*</span>  Địa chỉ gửi
+                                </label>
+                                <input
+                                  type="text"
+                                  {...registerOrder("address.detailAddress")}
+                                  id="address"
+                                  className="block w-full p-2 text-gray-900 outline-none border border-gray-300 rounded-md bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:placeholder-gray-400 dark:text-gray dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                />
+                                <p className="text-red-500 italic text-[13px]">
+                                  {OrderErrors
+                                    ? OrderErrors.address?.detailAddress?.message
+                                    : ""}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
+
+
+
                     </form>
                   </Modal>
                   <div className="text-right">
@@ -918,7 +986,7 @@ const OrderDetail = () => {
                       </button>
                     } */}
                     {order?.status === 1 &&
-                    Number(order?.paymentStatus) !== 1 ? (
+                      Number(order?.paymentStatus) !== 1 ? (
                       <button
                         onClick={() => handleCancelOrder(id!)}
                         className="text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
@@ -956,7 +1024,7 @@ const OrderDetail = () => {
                           Thành tiền
                         </th>
                         {(order && order.status === 4) ||
-                        order?.status === 5 ? (
+                          order?.status === 5 ? (
                           <th scope="col" className="px-6 py-3">
                             Đánh giá
                           </th>
@@ -1026,30 +1094,30 @@ const OrderDetail = () => {
                                           </td>
                                           <td>
                                             {(order && order.status === 4) ||
-                                            order?.status === 5
+                                              order?.status === 5
                                               ? product.isReviewed ===
-                                                  false && (
-                                                  <div
-                                                    onClick={() =>
-                                                      showModal(
-                                                        pro._id!,
-                                                        product.productDetailId!,
-                                                        product._id!
-                                                      )
-                                                    }
-                                                    className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
-                                                  >
-                                                    Đánh giá
-                                                  </div>
-                                                )
+                                              false && (
+                                                <div
+                                                  onClick={() =>
+                                                    showModal(
+                                                      pro._id!,
+                                                      product.productDetailId!,
+                                                      product._id!
+                                                    )
+                                                  }
+                                                  className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
+                                                >
+                                                  Đánh giá
+                                                </div>
+                                              )
                                               : null}
                                             {(order && order.status === 4) ||
-                                            order?.status === 5
+                                              order?.status === 5
                                               ? product.isReviewed === true && (
-                                                  <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">
-                                                    Đã đánh giá
-                                                  </div>
-                                                )
+                                                <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">
+                                                  Đã đánh giá
+                                                </div>
+                                              )
                                               : null}
                                           </td>
                                         </tr>
