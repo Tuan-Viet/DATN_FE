@@ -38,6 +38,7 @@ import moment from "moment";
 import { useFetchListOutfitQuery, useFetchOneOutfitQuery } from "../../../store/outfit/outfit.service";
 import { listOutfitSlice, listSearchOutfitByProductIdSlice } from "../../../store/outfit/outfitSlice";
 import OutfitProductDetail from "./OutfitProductDetail";
+import CaculatorSize from "./caculatorSize";
 
 const ProductInfo = () => {
   const dispatch: Dispatch<any> = useDispatch()
@@ -644,8 +645,8 @@ const ProductInfo = () => {
                     </SwiperSlide>
                   })}
                 </Swiper>
-
               </div>
+              <CaculatorSize></CaculatorSize>
             </div>
           )}
 
