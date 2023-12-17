@@ -178,9 +178,9 @@ const OrderRevanueByWeek = (props: OrderRevanueByMonthProps = ({showTable : true
           }}
         /></div>
       <div>
-      <Button danger onClick={handleClick}>Export</Button>
       {props.showTable && (
-        <Table
+        <>      <Button danger onClick={handleClick}>Export</Button>
+<Table
           columns={columns}
           dataSource={data}
           pagination={{ size: 'small', pageSize: 5 }}
@@ -209,7 +209,7 @@ const OrderRevanueByWeek = (props: OrderRevanueByMonthProps = ({showTable : true
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />)}
+        />        </>)}
       </div></>
   )
 }

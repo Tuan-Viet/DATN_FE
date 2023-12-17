@@ -102,9 +102,10 @@ const OrderStatistic = (props: OrderRevanueByMonthProps = ({ showTable: true }))
         .saveAs("Thongkedonhang.xlsx");
     };
   return (
-    <div>      <Button danger onClick={handleClick}>Export</Button>
-
+    
+    <div>      
       {props.showTable && (
+        <><Button danger onClick={handleClick}>Export</Button>
         <Table
           sticky
           showHeader={true}
@@ -130,7 +131,7 @@ const OrderStatistic = (props: OrderRevanueByMonthProps = ({ showTable: true }))
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />)}
+        /></>)}
 
     </div>
   );
