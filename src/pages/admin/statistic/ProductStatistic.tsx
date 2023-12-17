@@ -109,9 +109,9 @@ const ProductStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})
     };
   return (
     <div>
-      <Button danger onClick={handleClick}>Export</Button>
 
       {props.showTable && (
+      <><Button danger onClick={handleClick}>Export</Button>
       <Table
         sticky
         showHeader={true}
@@ -137,7 +137,7 @@ const ProductStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})
             </Table.Summary.Cell>
           </Table.Summary.Row>
         )}
-      />)}
+      /></>)}
 
     </div>
   );

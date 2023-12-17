@@ -166,7 +166,6 @@ const OrderRevanueByQuarter = (props: OrderRevanueByMonthProps = ({showTable : t
   return (
     <>
       <div>
-      <Button danger onClick={handleClick}>Export</Button>
         <HighchartsReact
           highcharts={Highcharts}
           options={{
@@ -198,7 +197,8 @@ const OrderRevanueByQuarter = (props: OrderRevanueByMonthProps = ({showTable : t
       </div>
       <div>
       {props.showTable && (
-        <Table
+        <>      <Button danger onClick={handleClick}>Export</Button>
+<Table
           columns={columns}
           dataSource={data}
           pagination={{ size: 'small', pageSize: 20 }}
@@ -227,7 +227,7 @@ const OrderRevanueByQuarter = (props: OrderRevanueByMonthProps = ({showTable : t
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />)}
+        />        </>)}
       </div>
     </>
   );
