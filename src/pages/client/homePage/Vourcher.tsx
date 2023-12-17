@@ -82,13 +82,19 @@ const Vourcher = () => {
                                             <ul className="mt-2 space-y-2 flex justify-between">
                                                 <p className="mt-2 text-gray-700">{voucher.code}</p>
 
-                                                <button
+                                                {InfoUser?.voucherwallet.find(id => id == voucher._id) ? (<button
+                                                    className="text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                                    type="button"
+                                                    disabled
+                                                >
+                                                    Đã lưu
+                                                </button>) : (<button
                                                     className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
                                                     type="button"
                                                     onClick={() => addVoucher(user.current._id, voucher._id!)}
                                                 >
                                                     Lưu mã
-                                                </button>
+                                                </button>)}
                                             </ul>
                                         </div>
                                     </div>
@@ -115,13 +121,26 @@ const Vourcher = () => {
                                             <ul className="mt-2 space-y-2 flex justify-between">
                                                 <p className="mt-2 text-gray-700">{voucher.code}</p>
 
-                                                <button
+                                                {InfoUser?.voucherwallet.find(id => id == voucher._id) ? (<button
+                                                    className="text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                                    type="button"
+                                                    disabled
+                                                >
+                                                    Đã lưu
+                                                </button>) : <button
                                                     className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
                                                     type="button"
                                                     onClick={() => addVoucher(user.current._id, voucher._id!)}
                                                 >
                                                     Lưu mã
-                                                </button>
+                                                </button>}
+                                                {/* <button
+                                                    className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
+                                                    type="button"
+                                                    onClick={() => addVoucher(user.current._id, voucher._id!)}
+                                                >
+                                                    Lưu mã
+                                                </button> */}
                                             </ul>
                                         </div>
                                     </div>
@@ -149,13 +168,19 @@ const Vourcher = () => {
                                             <ul className="mt-2 space-y-2 flex justify-between">
                                                 <p className="mt-2 text-gray-700">{voucher.code}</p>
 
-                                                <button
+                                                {InfoUser?.voucherwallet.find(id => id == voucher._id) ? (<button
+                                                    className="text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                                                    type="button"
+                                                    disabled
+                                                >
+                                                    Đã lưu
+                                                </button>) : <button
                                                     className="block rounded-lg bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
                                                     type="button"
                                                     onClick={() => addVoucher(user.current._id, voucher._id!)}
                                                 >
                                                     Lưu mã
-                                                </button>
+                                                </button>}
                                             </ul>
                                         </div>
                                     </div>

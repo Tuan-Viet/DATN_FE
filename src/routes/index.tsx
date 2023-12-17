@@ -42,6 +42,8 @@ import OutfitPage from "../pages/client/Outfit";
 import outfitPage from "../pages/admin/outfitPage";
 import outfitAdd from "../pages/admin/outfitAdd";
 import outfitUpdate from "../pages/admin/outfitUpdate/indext";
+import { Component } from "react";
+import PageNotFound from "../pages/PageNotFound";
 import ordersReturn from "../pages/client/MyAccount/orderReturn";
 import OrderReturnDetail from "../pages/client/MyAccount/orderReturnDetail";
 
@@ -68,7 +70,7 @@ export const publicRoutes = [
   { path: routes.products, Component: ProductPage },
   { path: routes.searchResult, Component: SearchResult },
   { path: routes.outfit, Component: OutfitPage },
-
+  { path: routes.pageNotFound, Component: PageNotFound }
 ]
 
 export const privateRoutes = [
@@ -98,7 +100,5 @@ export const privateRoutes = [
   { path: routes.adminOrderRevanueByMonth, Component: OrderRevanueByMonth },
   { path: routes.adminOrderReturnPage, Component: orderReturnPage },
   { path: routes.adminOrderReturnGetOne, Component: orderReturnById },
-
-
-
+  { path: routes.pageNotFound, Component: PageNotFound }
 ]
