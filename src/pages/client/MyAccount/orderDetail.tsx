@@ -1099,27 +1099,24 @@ const OrderDetail = () => {
 
                                           <td>
 
-                                            {(order && order.status === 4) ||
-                                              order?.status === 5
-                                              ? product.isReviewed ===
-                                              false && (
-                                                <div
-                                                  onClick={() =>
-                                                    showModal(
-                                                      pro._id!,
-                                                      product.productDetailId!,
-                                                      product._id!
-                                                    )
-                                                  }
-                                                  className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
-                                                >
-                                                  Đánh giá
-                                                </div>
-                                              )
+                                            {(order && order.status === 4 || (order && order.status === 5)) && product.isReviewed === false ? (
+                                              <div
+                                                onClick={() =>
+                                                  showModal(
+                                                    pro._id!,
+                                                    product.productDetailId!,
+                                                    product._id!
+                                                  )
+                                                }
+                                                className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
+                                              >
+                                                Đánh giá
+                                              </div>
+                                            )
                                               : null}
 
                                             {(order && order.status === 4) ||
-                                              order?.status === 5
+                                              (order && order.status === 5)
                                               ? product.isReviewed === true && (
                                                 <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">
                                                   Đã đánh giá

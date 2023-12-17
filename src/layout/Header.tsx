@@ -341,7 +341,7 @@ const Header = () => {
               (9:00-21:00, Tất cả hàng tuần){" "}
               <span className="mx-[10px]">|</span> <Link to="">Liên hệ</Link>
             </p>
-            <div className="flex">
+            {/* <div className="flex">
               <div className="relative mr-[5px]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -362,7 +362,7 @@ const Header = () => {
                 </p>
               </div>
               <p>Thông báo của tôi</p>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="border-b-2">
