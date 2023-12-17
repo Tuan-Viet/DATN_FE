@@ -4,8 +4,9 @@ import LayoutStatistic from './LayoutStatistic'
 import { useGetOrderRevenueByMonthQuery, useGetOrderRevenueByWeekQuery } from '../../../store/statistic/statistic.service';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { Spin, Table } from 'antd';
-
+import { Button, Spin, Table } from 'antd';
+import { Excel } from "antd-table-saveas-excel";
+import { IExcelColumn } from 'antd-table-saveas-excel/app';
 interface DataType {
   key: string;
   day: string;
@@ -122,8 +123,31 @@ const OrderRevanueByWeek = (props: OrderRevanueByMonthProps = ({showTable : true
 
     }))
     : [];
+    const excelColumns: IExcelColumn[] = columns.map(column => {
+      // Lọc ra các thuộc tính quan trọng từ cột
+      const { title, dataIndex } = column;
+      
+      return {
+        title,
+        dataIndex: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+        key: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+        
+      };
+    });
+    const handleClick = () => {
+      console.log(excelColumns);
+      const excel = new Excel();
+      excel
+        .addSheet("test")
+        .addColumns(excelColumns)
+        .addDataSource(data, {
+          str2Percent: true,
+        })
+        .saveAs("Thongketheotuan.xlsx");
+    };
   return (
-    <>
+    <>      
+
       <div>
         <HighchartsReact
           highcharts={Highcharts}
@@ -155,7 +179,8 @@ const OrderRevanueByWeek = (props: OrderRevanueByMonthProps = ({showTable : true
         /></div>
       <div>
       {props.showTable && (
-        <Table
+        <>      <Button danger onClick={handleClick}>Export</Button>
+<Table
           columns={columns}
           dataSource={data}
           pagination={{ size: 'small', pageSize: 5 }}
@@ -184,7 +209,7 @@ const OrderRevanueByWeek = (props: OrderRevanueByMonthProps = ({showTable : true
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />)}
+        />        </>)}
       </div></>
   )
 }

@@ -4,7 +4,8 @@ import { MonthlyStatistics } from '../../../store/statistic/statistic.interface'
 import { useGetOrderRevenueByMonthQuery } from '../../../store/statistic/statistic.service';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { Spin, Table } from 'antd';
+import { Button, Spin, Table } from 'antd';
+import { Excel } from "antd-table-saveas-excel";
 
 interface DataType {
   key: string;
@@ -126,7 +127,16 @@ const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({ showTable: tru
         return dateA - dateB;
       })
     : [];
-
+    const handleClick = () => {
+      const excel = new Excel();
+      excel
+        .addSheet("test")
+        .addColumns(columns)
+        .addDataSource(data, {
+          str2Percent: true
+        })
+        .saveAs("Excel.xlsx");
+    };
   return (
     <>
       <div>
@@ -159,8 +169,9 @@ const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({ showTable: tru
           }}
         /></div>
       <div>
+      
         {props.showTable && (
-          <Table
+          <><Button danger onClick={handleClick}>Export</Button><Table
             columns={columns}
             dataSource={data}
             pagination={{ size: 'small', pageSize: 20 }}
@@ -189,7 +200,8 @@ const OrderRevanueByMonth = (props: OrderRevanueByMonthProps = ({ showTable: tru
                 </Table.Summary.Cell>
               </Table.Summary.Row>
             )}
-          />)}
+          /></>
+          )}
       </div></>
   )
 }

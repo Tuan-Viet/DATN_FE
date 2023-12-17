@@ -326,33 +326,8 @@ const Header = () => {
     message.success("Mã token đã gửi về email của bạn")
   }
 
-  // cartState?.map((cart) => {
-  //   const matchingItems = outfitState?.filter((outfit) =>
-  //     outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
-  //   )
-  //   const filteredItems = matchingItems?.[0]?.items?.filter(
-  //     (product) => cart.productDetailId.product_id === product.product_id
-  //   );
-  //   if (filteredItems) {
-  //     count += 1
-  //   }
-  // });
 
-  let listProductCart = []
-  let cartOutfitArr = []
-  cartState.forEach((item) => {
-    const productIdCart = { ...item, productId: item.productDetailId.product_id }
-    listProductCart.push(productIdCart)
-  })
-  outfitState.forEach((outfit) => {
-    const filteredArray = outfit.items.filter(item =>
-      listProductCart?.some(cartItem => cartItem.productId == item.product_id.toString())
-    );
-    if (filteredArray.length == 2) {
-      filteredArray.map((outfit) => cartOutfitArr.push(outfit))
-    }
-  })
-  console.log(cartOutfitArr?.map((outfit) => outfit.product_id))
+
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -796,9 +771,7 @@ const Header = () => {
                             <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                               <div className="flex items-center">
                                 <p className="font-bold tracking-wide text-[15px]">
-                                  {cartOutfitArr?.find((outfit) => outfit.product_id === cart.productDetailId.product_id && cart.quantity % 2 !== 0) ?
-                                    (cart.totalMoney - ((cart.totalMoney * 10) / 100)).toLocaleString("vi-VN") :
-                                    cart.totalMoney.toLocaleString("vi-VN")}đ
+                                  {cart.totalMoney.toLocaleString("vi-VN")}
                                 </p>
                               </div>
                               <div className="flex items-center w-[100px] border border-gray-300 rounded">
