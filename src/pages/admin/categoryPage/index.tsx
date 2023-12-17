@@ -125,8 +125,9 @@ const categoryPage = () => {
                         placeholder="Tìm kiếm tên sản phẩm, mã sản phẩm "
                         optionFilterProp="children"
                         filterOption={(input: any, option: any) => {
-                            const labelIncludesInput = (option?.label ?? '').includes(input);
-                            const skuIncludesInput = (option?.sku ?? '').includes(input);
+                            const lowerCaseInput = input.toLowerCase();
+                            const labelIncludesInput = (option?.label?.toLowerCase() ?? '').includes(lowerCaseInput);
+                            const skuIncludesInput = (option?.sku?.toLowerCase() ?? '').includes(lowerCaseInput);
                             return labelIncludesInput || skuIncludesInput;
                         }}
                         filterSort={(optionA, optionB) =>

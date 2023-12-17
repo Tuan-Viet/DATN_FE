@@ -6,7 +6,10 @@ import {
     message,
     Spin,
     Steps,
-    Select
+    Select,
+    Typography,
+    Badge
+
 } from 'antd';
 import {
     EditFilled,
@@ -14,7 +17,7 @@ import {
     PlusOutlined,
     EyeOutlined,
     SearchOutlined,
-    DownOutlined
+    DownOutlined,
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { Dispatch, useEffect, useState } from 'react';
@@ -24,7 +27,7 @@ import { ColumnsType, TableProps } from 'antd/es/table';
 import { useDeleteVoucherMutation, useListVoucherQuery } from '../../../store/vouchers/voucher.service';
 import { deleteVoucherSlice, listVoucherSearchByCodeSlice, listVoucherSearchSlice, listVoucherSlice } from '../../../store/vouchers/voucherSlice';
 import { useForm } from 'react-hook-form';
-
+const { Text } = Typography;
 interface DataType {
     _id: React.Key;
     code: string;
@@ -151,9 +154,9 @@ const VoucherPage = () => {
         {
             title: 'TRẠNG THÁI',
             render: (value: any) => value.status ? (
-                <span className='bg-green-500 text-white rounded-lg px-3 py-1 text-xs'>Đang chạy</span>
+                <Badge status={"success"} text={<Text type="success" className=''>Đang chạy</Text>} />
             ) : (
-                <span className='bg-gray-200 text-gray-500 rounded-lg px-3 py-1 text-xs'>Tạm ngừng</span>
+                <Badge status="default" text={<Text >Tạm ngừng</Text>} />
             )
         },
         {

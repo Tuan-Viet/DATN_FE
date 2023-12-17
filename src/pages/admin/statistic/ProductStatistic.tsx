@@ -2,9 +2,11 @@ import React from 'react'
 import LayoutStatistic from './LayoutStatistic'
 import { MonthlyStatistics } from '../../../store/statistic/statistic.interface';
 import { useGetOrderRevenueByMonthQuery, useGetProductRevenueQuery } from '../../../store/statistic/statistic.service';
-import { Space, Spin, Table, Tag } from 'antd';
+import { Button, Space, Spin, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { Link } from 'react-router-dom';
+import { Excel } from "antd-table-saveas-excel";
+import { IExcelColumn } from 'antd-table-saveas-excel/app';
 
 interface DataType {
   key: string;
@@ -16,7 +18,7 @@ interface DataType {
   profit: number;
 
 }
-const columns: ColumnsType<DataType> = [
+const columns = [
   {
     title: 'Mã sản phẩm',
     dataIndex: 'productId',
@@ -24,12 +26,14 @@ const columns: ColumnsType<DataType> = [
     ellipsis: {
       showTitle: true
     },
-    render: (text) => <Link to={`#`}>#{text}</Link>,
+    render: (text: string) => <Link to={`#`}>#{text}</Link>,
   },
   {
     title: 'Tên sản phẩm',
     dataIndex: 'productName',
     key: 'productName',
+    render: (text: string) => <span >#{text}</span>,
+
   },
   {
     title: 'Số lượng bán',
@@ -81,10 +85,33 @@ const ProductStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})
       profit: item.profit,
     }))
     : [];
-
+    const excelColumns: IExcelColumn[] = columns.map(column => {
+      // Lọc ra các thuộc tính quan trọng từ cột
+      const { title, dataIndex } = column;
+      
+      return {
+        title,
+        dataIndex: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+        key: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+        
+      };
+    });
+    const handleClick = () => {
+      console.log(excelColumns);
+      const excel = new Excel();
+      excel
+        .addSheet("test")
+        .addColumns(excelColumns)
+        .addDataSource(data, {
+          str2Percent: true,
+        })
+        .saveAs("Thongkesanpham.xlsx");
+    };
   return (
     <div>
+
       {props.showTable && (
+      <><Button danger onClick={handleClick}>Export</Button>
       <Table
         sticky
         showHeader={true}
@@ -110,7 +137,7 @@ const ProductStatistic = (props: OrderRevanueByMonthProps = ({showTable : true})
             </Table.Summary.Cell>
           </Table.Summary.Row>
         )}
-      />)}
+      /></>)}
 
     </div>
   );

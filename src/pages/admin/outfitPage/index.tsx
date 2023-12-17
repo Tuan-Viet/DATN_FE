@@ -28,6 +28,7 @@ interface DataType {
     _id: React.Key;
     sku: string;
     title: string;
+    discount: number;
     image: any[];
     productOne: string;
     productTwo: string;
@@ -165,6 +166,15 @@ const outfitPage = () => {
             ),
         },
         {
+            title: 'GIẢM GIÁ',
+            dataIndex: 'discount',
+            key: 'discount',
+            render: (value: number) => value > 0 ? (`${value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}%`) : "",
+            sorter: (a, b) => a.discount - b.discount, // Sắp xếp theo số
+            sortDirections: ['ascend', 'descend'],
+            showSorterTooltip: false,
+        },
+        {
             title: 'NGÀY KHỞI TẠO',
             dataIndex: 'createdAt',
             key: 'date',
@@ -235,6 +245,7 @@ const outfitPage = () => {
         key: index + 1,
         _id: product._id!,
         sku: product.sku,
+        discount: product.discount,
         title: product.title,
         image: product.image,
         productOne: product.items && product.items[0],

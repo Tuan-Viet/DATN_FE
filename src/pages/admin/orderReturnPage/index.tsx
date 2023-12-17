@@ -10,7 +10,9 @@ import {
     Tooltip,
     DatePicker,
     MenuProps,
-    Dropdown
+    Dropdown,
+    Badge,
+    Typography
 } from 'antd';
 import {
     EditFilled,
@@ -32,7 +34,7 @@ import { useForm } from 'react-hook-form';
 import moment from 'moment';
 import { useListOrderReturnQuery } from '../../../store/orderReturn/order.service';
 const { RangePicker } = DatePicker;
-
+const { Text } = Typography;
 interface DataType {
     key: React.Key;
     date: string;
@@ -127,39 +129,32 @@ const ordersReturnPage = () => {
             title: 'TRẠNG THÁI',
             key: 'status',
             render: (value: any) => {
-                let statusText, statusColor;
 
                 switch (value.status) {
                     case 0:
-                        statusText = 'Từ chối Y/c';
-                        statusColor = 'bg-red-200 text-red-700';
-                        break;
+                        return (
+                            <Badge status={"error"} text={<Text type="danger" >Từ chối yêu cầu</Text>} />
+                        )
                     case 1:
-                        statusText = 'Chờ Xác nhận';
-                        statusColor = 'bg-yellow-200 text-yellow-700';
-                        break;
+                        return (
+                            <Badge status={"warning"} text={<Text type="warning" >Chờ xác nhận</Text>} />
+                        )
                     case 2:
-                        statusText = 'Chờ xử lí';
-                        statusColor = 'bg-gray-200 text-gray-700';
-                        break;
+                        return (
+                            <Badge color={"cyan"} text={<Text className='text-cyan-500'>Chờ xử lí</Text>} />
+                        )
                     case 3:
-                        statusText = 'Đang xử lí';
-                        statusColor = 'bg-blue-300 text-blue-700';
-                        break;
+                        return (
+                            <Badge status="processing" text={<Text className='text-blue-400'>Đang xử lí</Text>} />
+                        )
                     case 4:
-                        statusText = 'Hoàn thành';
-                        statusColor = 'bg-green-300 text-green-700';
-                        break;
+                        return (
+                            <Badge status={"success"} text={<Text type="success" className=''>Hoàn thành</Text>} />
+                        )
                     default:
-                        statusText = '';
-                        statusColor = '';
-                }
-                return (
+                        return "Không xác định"
 
-                    <span className={`border rounded-lg px-2 py-1 text-xs  ${statusColor}`}>
-                        {statusText}
-                    </span>
-                );
+                }
             },
             sorter: (a, b) => {
                 const customOrder = [1, 2, 3, 4, 0];
