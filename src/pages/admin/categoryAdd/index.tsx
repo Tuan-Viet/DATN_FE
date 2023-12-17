@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { FormInstance, UploadFile, UploadProps } from 'antd';
+import type { FormInstance, UploadProps } from 'antd';
 import {
     Breadcrumb,
     Button,
@@ -9,9 +9,8 @@ import {
     Upload,
     message,
 } from 'antd';
-import { UploadOutlined, PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from 'react-router-dom';
-import Dragger from 'antd/es/upload/Dragger';
 import { useAddCategoryMutation } from '../../../store/category/category.service';
 
 const SubmitButton = ({ form }: { form: FormInstance }) => {
@@ -40,7 +39,6 @@ const categoryAdd = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [onAdd] = useAddCategoryMutation()
-
 
     const onFinish = async (values: any) => {
         let newImages;
@@ -79,9 +77,6 @@ const categoryAdd = () => {
             ]}
         />
         <div className="border p-10 rounded-lg  bg-white w-1/2 mx-auto">
-            {/* <h3 className="text-center text-2xl font-bold uppercase text-[#1677ff] pb-5">
-                Tạo mới danh mục
-            </h3> */}
             <Form
                 form={form}
                 name="validateOnly"

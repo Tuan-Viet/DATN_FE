@@ -3,10 +3,6 @@ import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import {
-  useListOrderQuery,
-  useUpdateOrderMutation,
-} from "../../../store/order/order.service";
 import { Result, Spin } from "antd";
 import { listOrderSlice } from "../../../store/orderReturn/orderSlice";
 import { Dispatch } from "@reduxjs/toolkit";
@@ -18,9 +14,8 @@ function formatDateStringToDisplayDate(dateString: any) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  return `${day < 10 ? "0" : ""}${day}/${
-    month < 10 ? "0" : ""
-  }${month}/${year}`;
+  return `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
+    }${month}/${year}`;
 }
 
 function mapStatusPaymentToText(statusCode: number) {
@@ -243,13 +238,9 @@ const ordersReturn = () => {
                               {orderReturnStatus(order?.status)}
                             </td>
                             <td className="px-6 py-4 text-blue-500">
-                              {order.status == 0 ? (
-                                "Bạn đã hủy đơn hàng này"
-                              ) : (
-                                <Link to={`/account/orderReturn/${order._id}`}>
-                                  Xem chi tiết
-                                </Link>
-                              )}
+                              <Link to={`/account/orderReturn/${order._id}`}>
+                                Xem chi tiết
+                              </Link>
                             </td>
                           </tr>
                         ))}

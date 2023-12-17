@@ -14,7 +14,6 @@ import { MonthlyStatistics, DashboardStatistic } from '../../../store/statistic/
 import HighchartsReact from 'highcharts-react-official';
 import {
     Button,
-    Card,
     Collapse,
     Empty,
     Form,
@@ -23,7 +22,6 @@ import {
     List,
     Popconfirm,
     Rate,
-    Skeleton,
     Spin,
     TreeSelect,
     message,
@@ -415,47 +413,6 @@ const DashboardPage = () => {
                                 </List.Item>
                             )}
                         />
-                        // <List
-                        //     itemLayout="vertical"
-                        //     size="large"
-                        //     pagination={{
-                        //         onChange: (page) => {
-                        //             console.log(page);
-                        //         },
-                        //         pageSize: 10,
-                        //     }}
-                        //     dataSource={dashboardStatistic.newReviews}
-                        //     renderItem={(item) => (
-                        //         <List.Item
-                        //             extra={
-                        //                 <Image.PreviewGroup
-                        //                     preview={{
-                        //                         onChange: (current, prev) => console.log(`current index: ${current}, prev index: ${prev}`),
-                        //                     }}
-                        //                 >
-                        //                     {item.images.map((image) => (
-                        //                         <Image height={70} src={image.url} alt="" className="pr-1" />
-
-                        //                     ))}
-                        //                 </Image.PreviewGroup>
-                        //             }
-                        //         >
-                        //             <div className="">
-                        //                 <div className="flex items-center space-x-2">
-                        //                     <span className=""><Link to={``}>{item.productId.title}</Link></span>
-                        //                     <span className="block"><Rate value={item.rating} disabled className="text-xs mb-0"></Rate></span>
-                        //                 </div>
-                        //                 <div className="flex mt-0 items-center ">
-                        //                     <span className="block text-end text-xs text-gray-400  border-r border-gray-300 pr-1">{item.createdAt}</span>
-                        //                     <div className="px-1">
-                        //                         <span className="text-xs text-gray-400 ">Phân loại: </span><span className="text-xs text-blue-500">{item.size}</span> - <span className="text-xs text-blue-500"> {item.color}</span>
-                        //                     </div>
-                        //                 </div>
-                        //                 <span className="block my-2">{item.comment}</span>
-                        //             </div>
-                        //         </List.Item>
-                        //     )}
-                        // />
                     ) : (
                         <div className="py-14">
                             <Empty description={

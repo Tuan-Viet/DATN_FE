@@ -63,6 +63,7 @@ function mapStatusPaymentToText(statusCode) {
   }
 }
 
+
 const OrderReturnDetail = () => {
   const dispatch: Dispatch<any> = useDispatch();
   const { setValue } = useForm();
@@ -116,7 +117,8 @@ const OrderReturnDetail = () => {
   productsInOrder?.forEach((product: any) => {
     totalProductPrice += product.price;
   });
-  console.log(orderReturn?.newOrder)
+
+
 
   return (
     <>
@@ -236,7 +238,7 @@ const OrderReturnDetail = () => {
                     </h1>
                     {(orderReturn?.status === 3 ||
                       orderReturn?.status === 4) && (
-                        <Link to={`/account/orders/${orderReturn?.newOrder?._id}`} className="text-white bg-blue-700 py-3 px-3 rounded-md inline-block mt-1">
+                        <Link to={`/account/orders/${orderReturn?.newOrder?._id}`} className="text-blue-500 italic underline rounded-md inline-block mt-1">
                           Kiểm tra đơn hàng đã được tạo mới cho bạn
                         </Link>
                       )}
@@ -367,7 +369,7 @@ const OrderReturnDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {totalProductPrice >= 500000 || order?.pay_method === "FREE" ? (
+                          {totalProductPrice >= 500000 || (orderReturn?.newOrder && orderReturn?.newOrder?.pay_method === "FREE") ? (
                             <p>Miễn phí</p>
                           ) : (
                             <p>40.000đ</p>

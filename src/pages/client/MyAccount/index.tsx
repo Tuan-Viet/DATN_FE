@@ -54,14 +54,6 @@ const myAccount = () => {
     }
   }, [isModalOpen]);
 
-  // useEffect(() => {
-  //   if (user) {
-  //     setValue("fullname", ''),
-  //       setValue("email", ''),
-  //       setValue("_id", '')
-  //   }
-  // }, [isModalOpen != true])
-
   const { data: InfoUser, refetch } = useGetInfoUserQuery(user?.current?._id);
 
   const onUpdateAccount = async (data: AccountForm) => {
