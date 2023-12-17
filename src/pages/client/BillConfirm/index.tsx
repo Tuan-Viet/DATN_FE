@@ -233,7 +233,7 @@ const BillConfirm = () => {
                   <h1 className="text-[30px] text-center font-semibold mb-5">
                     Thông tin nhận hàng
                   </h1>
-                  <div className="bg-[#f1f1f1] rounded-xl p-7 text-sm font-semibold">
+                  <div className="bg-[#f1f1f1] rounded-xl text-left p-7 text-sm font-semibold">
                     <div className="flex">
                       <div className="w-[20%]">
                         <p className="mb-3">Tên người nhận:</p>
@@ -249,10 +249,10 @@ const BillConfirm = () => {
                         <p className="mb-3">{getOneOrder?.phoneNumber}</p>
                         <p className="mb-3">Thanh toán khi nhận hàng (COD)</p>
                         <p className="mb-3">
-                          {getOneOrder?.address.detailAddress},
+                          {/* {getOneOrder?.address.detailAddress}, */}
                           {getOneOrder?.address.myWard},
                           {getOneOrder?.address.myDistrict},
-                          {getOneOrder?.address.myProvince},
+                          {getOneOrder?.address.myProvince}
                         </p>
                         <p className="mb-3">
                           {getOneOrder?.note}

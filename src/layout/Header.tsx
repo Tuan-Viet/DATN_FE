@@ -337,14 +337,22 @@ const Header = () => {
   //     count += 1
   //   }
   // });
-  // outfitState.map((outfit) => {
-  //   const filteredArray = cartState.filter(item => outfit.items.includes(item));
-  //   console.log(filteredArray);
 
-  // })
-  // const filteredArray =
-  //   console.log(itemsOutfit)
-
+  let listProductCart = []
+  let cartOutfitArr = []
+  cartState.forEach((item) => {
+    const productIdCart = { ...item, productId: item.productDetailId.product_id }
+    listProductCart.push(productIdCart)
+  })
+  outfitState.forEach((outfit) => {
+    const filteredArray = outfit.items.filter(item =>
+      listProductCart?.some(cartItem => cartItem.productId == item.product_id.toString())
+    );
+    if (filteredArray.length == 2) {
+      filteredArray.map((outfit) => cartOutfitArr.push(outfit))
+    }
+  })
+  console.log(cartOutfitArr?.map((outfit) => outfit.product_id))
   return (
     <>
       <div className="sticky top-0 bg-white z-[99]">
@@ -788,8 +796,9 @@ const Header = () => {
                             <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                               <div className="flex items-center">
                                 <p className="font-bold tracking-wide text-[15px]">
-                                  {(cart.totalMoney).toLocaleString("vi-VN")}đ
-
+                                  {cartOutfitArr?.find((outfit) => outfit.product_id === cart.productDetailId.product_id && cart.quantity % 2 !== 0) ?
+                                    (cart.totalMoney - ((cart.totalMoney * 10) / 100)).toLocaleString("vi-VN") :
+                                    cart.totalMoney.toLocaleString("vi-VN")}đ
                                 </p>
                               </div>
                               <div className="flex items-center w-[100px] border border-gray-300 rounded">

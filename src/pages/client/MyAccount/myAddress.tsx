@@ -3,7 +3,12 @@ import Footer from "../../../layout/Footer";
 import Header from "../../../layout/Header";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch, useEffect, useState } from "react";
-import { useAddAddressMutation, useDeleteAddressMutation, useGetInfoUserQuery, useUpdateAddressMutation } from "../../../store/user/user.service";
+import {
+  useAddAddressMutation,
+  useDeleteAddressMutation,
+  useGetInfoUserQuery,
+  useUpdateAddressMutation,
+} from "../../../store/user/user.service";
 import { useForm } from "react-hook-form";
 import { AddressForm, AddressSchema } from "../../../Schemas/Auth";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,25 +17,25 @@ import { Button, Modal } from "antd";
 import axios from "axios";
 
 const myAddress = () => {
-  const [addAddress] = useAddAddressMutation()
-  const [deleteAddress] = useDeleteAddressMutation()
+  const [addAddress] = useAddAddressMutation();
+  const [deleteAddress] = useDeleteAddressMutation();
 
-  const dispatch: Dispatch<any> = useDispatch()
+  const dispatch: Dispatch<any> = useDispatch();
 
   const {
     register,
     setValue,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<AddressForm>({
-    resolver: yupResolver(AddressSchema)
-  })
+    resolver: yupResolver(AddressSchema),
+  });
   const user = useSelector((state: any) => state.user);
   const isLoggedIn = user?.isLoggedIn;
   const navigate = useNavigate();
-  const [show, setShow] = useState(false)
-  const [upadteForm, setUpdateForm] = useState(false)
-  const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id)
+  const [show, setShow] = useState(false);
+  const [upadteForm, setUpdateForm] = useState(false);
+  const { data: InfoUser } = useGetInfoUserQuery(user?.current?._id);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -40,26 +45,25 @@ const myAddress = () => {
 
   const onAddAddress = async (data: AddressForm) => {
     try {
-      await addAddress(data),
-        console.log(data);
+      await addAddress(data), console.log(data);
 
-      toast.success('Them dia chi thanh cong')
+      toast.success("Them dia chi thanh cong");
       setIsModalOpen(false);
-      await useGetInfoUserQuery(user.current.id)
+      await useGetInfoUserQuery(user.current.id);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const removeAddress = async (id: string) => {
     try {
-      await deleteAddress(id)
-      toast.success('Xóa địa chỉ thành công')
-      await useGetInfoUserQuery(user.current.id)
+      await deleteAddress(id);
+      toast.success("Xóa địa chỉ thành công");
+      await useGetInfoUserQuery(user.current.id);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalUpdateOpen, setIsModalUpdateOpen] = useState(false);
@@ -70,9 +74,9 @@ const myAddress = () => {
 
   const showModalUpdate = () => {
     {
-      setIsModalUpdateOpen(true)
+      setIsModalUpdateOpen(true);
     }
-  }
+  };
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -92,25 +96,25 @@ const myAddress = () => {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [selectedWard, setSelectedWards] = useState('');
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedWard, setSelectedWards] = useState("");
   const [selectedNameProvince, setSelectedNameProvince] = useState("");
-  const [selectedNameDistrict, setSelectednameDistrict] = useState('');
-  const [selectedNameWard, setSelectednameWard] = useState('');
+  const [selectedNameDistrict, setSelectednameDistrict] = useState("");
+  const [selectedNameWard, setSelectednameWard] = useState("");
   // console.log(myProvince);
 
   useEffect(() => {
     // Gọi API để lấy dữ liệu tỉnh/thành phố
-    axios.get('https://provinces.open-api.vn/api/p/')
-      .then(response => setProvinces(response.data))
-      .catch(error => console.error('Error fetching provinces:', error));
-
+    axios
+      .get("https://provinces.open-api.vn/api/p/")
+      .then((response) => setProvinces(response.data))
+      .catch((error) => console.error("Error fetching provinces:", error));
   }, []);
 
   const handleProvinceChange = (e) => {
     const provinceCode = e.target.value;
-    const nameProvince = provinces.find((item) => item.code == provinceCode)
+    const nameProvince = provinces.find((item) => item.code == provinceCode);
     // myProvince = {
     //   code: nameProvice.code,
     //   name: nameProvince.name
@@ -120,69 +124,76 @@ const myAddress = () => {
     setSelectedProvince(provinceCode);
 
     // Gọi API để lấy dữ liệu quận/huyện dựa trên tỉnh/thành phố được chọn
-    axios.get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
-      .then(response => setDistricts(response.data))
-      .catch(error => console.error('Error fetching districts:', error));
-
-
-
+    axios
+      .get(`https://provinces.open-api.vn/api/p/${provinceCode}?depth=2`)
+      .then((response) => setDistricts(response.data))
+      .catch((error) => console.error("Error fetching districts:", error));
   };
 
   const handleDistrictChange = (e) => {
     const districtCode = e.target.value;
     setSelectedDistrict(districtCode);
 
-    const nameDistrict = districts.districts.find((item) => item.code == districtCode)
+    const nameDistrict = districts.districts.find(
+      (item) => item.code == districtCode
+    );
     setSelectednameDistrict(nameDistrict.name);
 
-
     // Gọi API để lấy dữ liệu xã/phường dựa trên quận/huyện được chọn
-    axios.get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
-      .then(response => setWards(response.data))
-      .catch(error => console.error('Error fetching wards:', error));
+    axios
+      .get(`https://provinces.open-api.vn/api/d/${districtCode}?depth=2`)
+      .then((response) => setWards(response.data))
+      .catch((error) => console.error("Error fetching wards:", error));
   };
 
   const handleWardChange = (e) => {
     const wardCode = e.target.value;
     setSelectedWards(wardCode);
 
-    const nameWard = wards.wards.find((item) => item.code == wardCode)
+    const nameWard = wards.wards.find((item) => item.code == wardCode);
     setSelectednameWard(nameWard.name);
-
   };
 
   useEffect(() => {
-    setValue('myProvince', selectedNameProvince)
-  }, [selectedNameProvince])
+    setValue("myProvince", selectedNameProvince);
+  }, [selectedNameProvince]);
   useEffect(() => {
-    setValue('myDistrict', selectedNameDistrict)
-  }, [selectedNameDistrict])
+    setValue("myDistrict", selectedNameDistrict);
+  }, [selectedNameDistrict]);
   useEffect(() => {
-    setValue('myWard', selectedNameWard)
-  }, [selectedNameWard])
+    setValue("myWard", selectedNameWard);
+  }, [selectedNameWard]);
 
   const getAddress = async (id: string) => {
-    showModalUpdate()
-    const addressUpdate = await InfoUser?.addresses?.find((address: any) => address._id == id)
-    setValue('address', addressUpdate.address),
-      setValue('_id', addressUpdate._id),
-      setValue('fullname', addressUpdate.fullname),
-      setValue('phone', addressUpdate.phone);
-    setValue('myProvince', addressUpdate.myProvince)
-    setValue('myDistrict', addressUpdate.myDistrict)
-    setValue('myWard', addressUpdate.myWard)
-    const provinceCode = provinces.find((item) => item.name == addressUpdate.myProvince)
-    setSelectedProvince(provinceCode.code)
+    showModalUpdate();
+    const addressUpdate = await InfoUser?.addresses?.find(
+      (address: any) => address._id == id
+    );
+    setValue("address", addressUpdate.address),
+      setValue("_id", addressUpdate._id),
+      setValue("fullname", addressUpdate.fullname),
+      setValue("phone", addressUpdate.phone);
+    setValue("myProvince", addressUpdate.myProvince);
+    setValue("myDistrict", addressUpdate.myDistrict);
+    setValue("myWard", addressUpdate.myWard);
+    const provinceCode = provinces.find(
+      (item) => item.name == addressUpdate.myProvince
+    );
+    setSelectedProvince(provinceCode.code);
 
     // Lấy districts dựa trên provinceCode
-    const response1 = await axios.get(`https://provinces.open-api.vn/api/p/${provinceCode.code}?depth=2`);
+    const response1 = await axios.get(
+      `https://provinces.open-api.vn/api/p/${provinceCode.code}?depth=2`
+    );
     console.log(response1.data);
 
     // Lưu districts vào state
     setDistricts(response1.data);
 
     // Tìm districtCode dựa trên tên quận/huyện (addressUpdate.myDistrict)
-    const districtCode = response1.data.districts.find((item) => item.name == addressUpdate.myDistrict);
+    const districtCode = response1.data.districts.find(
+      (item) => item.name == addressUpdate.myDistrict
+    );
     console.log(districtCode.code);
     console.log(districtCode);
 
@@ -191,7 +202,9 @@ const myAddress = () => {
 
     // Kiểm tra xem selectedDistrictCode đã được xác định chưa
     // Sử dụng districtCode để lấy thông tin wards
-    const response2 = await axios.get(`https://provinces.open-api.vn/api/d/${districtCode.code}?depth=2`);
+    const response2 = await axios.get(
+      `https://provinces.open-api.vn/api/d/${districtCode.code}?depth=2`
+    );
 
     console.log(response2.data);
 
@@ -199,7 +212,9 @@ const myAddress = () => {
     setWards(response2.data);
 
     // Tìm wardCode dựa trên tên phường/xã (addressUpdate.myWard)
-    const wardCode = response2.data.wards.find((item) => item.name == addressUpdate.myWard).code;
+    const wardCode = response2.data.wards.find(
+      (item) => item.name == addressUpdate.myWard
+    ).code;
 
     // Lưu wardCode vào state hoặc biến khác để sử dụng sau này
     setSelectedWards(wardCode);
@@ -238,26 +253,22 @@ const myAddress = () => {
     //     })
     //     .catch(error => console.error('Error fetching districts:', error));
     // }
+  };
 
-  }
-
-  const [updateUserAddress] = useUpdateAddressMutation()
+  const [updateUserAddress] = useUpdateAddressMutation();
 
   const updateAddress = async (data: AddressForm) => {
-    await updateUserAddress(data)
+    await updateUserAddress(data);
     // console.log(data);
 
-    toast.success('Sửa đổi địa chỉ thành công')
+    toast.success("Sửa đổi địa chỉ thành công");
     setIsModalUpdateOpen(false);
-    await useGetInfoUserQuery(user.current.id)
-  }
+    await useGetInfoUserQuery(user.current.id);
+  };
 
   useEffect(() => {
-    setValue('address', ""),
-      setValue('fullname', ""),
-      setValue('phone', "")
-  }, [isModalUpdateOpen, isModalOpen])
-
+    setValue("address", ""), setValue("fullname", ""), setValue("phone", "");
+  }, [isModalUpdateOpen, isModalOpen]);
 
   return (
     <>
@@ -320,6 +331,25 @@ const myAddress = () => {
                     d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
                   />
                 </svg>
+                <Link to="/account/ordersReturn">
+                  Yêu cầu đổi trả
+                </Link>
+              </div>
+              <div className="flex items-center gap-x-2 mb-3">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-4 h-4"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                  />
+                </svg>
                 <Link to="/account/addresses" className="font-bold">
                   Danh sách địa chỉ
                 </Link>
@@ -347,12 +377,10 @@ const myAddress = () => {
                 {InfoUser?.addresses?.map((item: any, index) => {
                   return (
                     <Link
-                      to={''}
+                      to={""}
                       className="relative block overflow-hidden rounded-lg border border-gray-100 p-4 sm:p-6 lg:p-8 mb-[16px]"
                     >
-                      <span
-                        className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"
-                      ></span>
+                      <span className="absolute inset-x-0 bottom-0 h-2 bg-gradient-to-r from-green-300 via-blue-500 to-purple-600"></span>
 
                       <div className="sm:flex sm:justify-between sm:gap-4">
                         <div>
@@ -363,13 +391,17 @@ const myAddress = () => {
                       </div>
 
                       <div className="mt-4">
-                        <p className="max-w-[40ch] text-sm text-gray-500 font-bold">Người nhận:</p>
+                        <p className="max-w-[40ch] text-sm text-gray-500 font-bold">
+                          Người nhận:
+                        </p>
                         <p className="max-w-[40ch] text-sm text-gray-500">
                           {item.fullname}
                         </p>
                       </div>
                       <div className="mt-4">
-                        <p className="max-w-[40ch] text-sm text-gray-500 font-bold">Địa chỉ nhận hàng:</p>
+                        <p className="max-w-[40ch] text-sm text-gray-500 font-bold">
+                          Địa chỉ nhận hàng:
+                        </p>
                         <p className="max-w-[40ch] text-sm text-gray-500">
                           {item.address}, <br />
                           {item.myWard},<br />
@@ -378,13 +410,19 @@ const myAddress = () => {
                         </p>
                       </div>
                       <div className="mt-4">
-                        <p className="max-w-[40ch] text-sm text-gray-500 font-bold">Số điện thoại:</p>
+                        <p className="max-w-[40ch] text-sm text-gray-500 font-bold">
+                          Số điện thoại:
+                        </p>
                         <p className="max-w-[40ch] text-sm text-gray-500">
                           {item.phone}
                         </p>
                       </div>
-                      <Button type="primary" onClick={(id) => getAddress(item._id)} className="inline-block border-e p-3 text-gray-700 hover:bg-gray-50 focus:relative"
-                        title="Edit Product">
+                      <Button
+                        type="primary"
+                        onClick={(id) => getAddress(item._id)}
+                        className="inline-block border-e p-3 text-gray-700 hover:bg-gray-50 focus:relative"
+                        title="Edit Product"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
@@ -419,120 +457,268 @@ const myAddress = () => {
                             d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
                           />
                         </svg>
-
                       </button>
                     </Link>
-
-                  )
+                  );
                 })}
                 <Modal title="Basic Modal" open={isModalUpdateOpen} onOk={handleSubmit(updateAddress)} onCancel={handleCancelUpdate} okButtonProps={{ className: "text-white bg-blue-500" }}>
-                  <form className="max-w-sm" onSubmit={handleSubmit(updateAddress)}>
+                  <form className="" onSubmit={handleSubmit(updateAddress)}>
                     <input type="hidden" {...register('_id')} name="_id" />
                     <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
-                      <input {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                      <p className="text-red-500 italic text-sm">{errors ? errors.fullname?.message : ""}</p>
+                      <label
+                        htmlFor="email"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                      >
+                        Người nhận hàng
+                      </label>
+                      <input
+                        {...register("fullname")}
+                        type="text"
+                        id="fullname"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        required
+                      />
+                      <p className="text-red-500 italic text-sm">
+                        {errors ? errors.fullname?.message : ""}
+                      </p>
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Số điện thoại</label>
-                      <input {...register('phone')} type="text" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                      <p className="text-red-500 italic text-sm">{errors ? errors.phone?.message : ""}</p>
+                      <label
+                        htmlFor="email"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                      >
+                        Số điện thoại
+                      </label>
+                      <input
+                        {...register("phone")}
+                        type="text"
+                        id="phone"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        required
+                      />
+                      <p className="text-red-500 italic text-sm">
+                        {errors ? errors.phone?.message : ""}
+                      </p>
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Tỉnh/Thành phố:</label>
-                      <select onChange={handleProvinceChange} value={selectedProvince} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <label
+                        htmlFor="countries"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                      >
+                        Tỉnh/Thành phố:
+                      </label>
+                      <select
+                        onChange={handleProvinceChange}
+                        value={selectedProvince}
+                        id="countries"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      >
                         <option value="">Chọn tỉnh/thành phố</option>
-                        {provinces.map(province => (
-                          <option key={province.code} value={province.code} > {province.name}</option>
+                        {provinces.map((province) => (
+                          <option key={province.code} value={province.code}>
+                            {" "}
+                            {province.name}
+                          </option>
                         ))}
                       </select>
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Quận/Huyện:</label>
-                      <select onChange={handleDistrictChange} value={selectedDistrict} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <label
+                        htmlFor="countries"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                      >
+                        Quận/Huyện:
+                      </label>
+                      <select
+                        onChange={handleDistrictChange}
+                        value={selectedDistrict}
+                        id="countries"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      >
                         <option value="">Chọn quận/huyện</option>
-                        {districts?.districts?.map(district => (
-                          <option key={district.code} value={district.code}>{district.name}</option>
+                        {districts?.districts?.map((district) => (
+                          <option key={district.code} value={district.code}>
+                            {district.name}
+                          </option>
                         ))}
                       </select>
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn xã/phường:</label>
-                      <select onChange={handleWardChange} value={selectedWard} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                      <label
+                        htmlFor="countries"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                      >
+                        Chọn xã/phường:
+                      </label>
+                      <select
+                        onChange={handleWardChange}
+                        value={selectedWard}
+                        id="countries"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      >
                         <option value="">Chọn xã phường</option>
-                        {wards?.wards?.map(ward => (
-                          <option key={ward.code} value={ward.code}>{ward.name}</option>
+                        {wards?.wards?.map((ward) => (
+                          <option key={ward.code} value={ward.code}>
+                            {ward.name}
+                          </option>
                         ))}
                       </select>
                     </div>
                     <div className="mb-5">
-                      <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Địa chỉ nhận hàng</label>
-                      <input {...register('address')} type="text" id="address" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                      <p className="text-red-500 italic text-sm">{errors ? errors.address?.message : ""}</p>
+                      <label
+                        htmlFor="email"
+                        className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                      >
+                        Địa chỉ nhận hàng
+                      </label>
+                      <input
+                        {...register("address")}
+                        type="text"
+                        id="address"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        required
+                      />
+                      <p className="text-red-500 italic text-sm">
+                        {errors ? errors.address?.message : ""}
+                      </p>
                     </div>
                     {/* <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button> */}
                   </form>
                 </Modal>
-
-
-
               </div>
-              <Button type="primary" onClick={showModal} className="bg-blue-500 mb-[100px]">
+              <Button
+                type="primary"
+                onClick={showModal}
+                className="bg-blue-500 mb-[100px]"
+              >
                 Thêm địa chỉ
               </Button>
               <Modal title="Basic Modal" open={isModalOpen} onOk={handleSubmit(onAddAddress)} onCancel={handleCancel} okButtonProps={{ className: "text-white bg-blue-500" }}>
-                <form className="max-w-sm" onSubmit={handleSubmit(onAddAddress)}>
+                <form className="" onSubmit={handleSubmit(onAddAddress)}>
                   <div className="mb-5">
-                    <label htmlFor="fullname" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Người nhận hàng</label>
-                    <input {...register('fullname')} type="text" id="fullname" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                    <p className="text-red-500 italic text-sm">{errors ? errors.fullname?.message : ""}</p>
+                    <label
+                      htmlFor="fullname"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                    >
+                      Người nhận hàng
+                    </label>
+                    <input
+                      {...register("fullname")}
+                      type="text"
+                      id="fullname"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    />
+                    <p className="text-red-500 italic text-sm">
+                      {errors ? errors.fullname?.message : ""}
+                    </p>
                   </div>
                   <div className="mb-5">
-                    <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Số điện thoại</label>
-                    <input {...register('phone')} type="text" id="phone" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                    <p className="text-red-500 italic text-sm">{errors ? errors.phone?.message : ""}</p>
+                    <label
+                      htmlFor="phone"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                    >
+                      Số điện thoại
+                    </label>
+                    <input
+                      {...register("phone")}
+                      type="text"
+                      id="phone"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    />
+                    <p className="text-red-500 italic text-sm">
+                      {errors ? errors.phone?.message : ""}
+                    </p>
                   </div>
                   <div className="mb-5">
-                    <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Tỉnh/Thành phố:</label>
-                    <select onChange={handleProvinceChange} value={selectedProvince} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <label
+                      htmlFor="countries"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                    >
+                      Tỉnh/Thành phố:
+                    </label>
+                    <select
+                      onChange={handleProvinceChange}
+                      value={selectedProvince}
+                      id="countries"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
                       <option value="">Chọn tỉnh/thành phố</option>
-                      {provinces.map(province => (
-                        <option key={province.code} value={province.code} > {province.name}</option>
+                      {provinces.map((province) => (
+                        <option key={province.code} value={province.code}>
+                          {" "}
+                          {province.name}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className="mb-5">
-                    <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Quận/Huyện:</label>
-                    <select onChange={handleDistrictChange} value={selectedDistrict} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <label
+                      htmlFor="countries"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                    >
+                      Quận/Huyện:
+                    </label>
+                    <select
+                      onChange={handleDistrictChange}
+                      value={selectedDistrict}
+                      id="countries"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
                       <option value="">Chọn quận/huyện</option>
-                      {districts?.districts?.map(district => (
-                        <option key={district.code} value={district.code}>{district.name}</option>
+                      {districts?.districts?.map((district) => (
+                        <option key={district.code} value={district.code}>
+                          {district.name}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className="mb-5">
-                    <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray">Chọn xã/phường:</label>
-                    <select onChange={handleWardChange} value={selectedWard} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <label
+                      htmlFor="countries"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray"
+                    >
+                      Chọn xã/phường:
+                    </label>
+                    <select
+                      onChange={handleWardChange}
+                      value={selectedWard}
+                      id="countries"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
                       <option value="">Chọn xã phường</option>
-                      {wards?.wards?.map(ward => (
-                        <option key={ward.code} value={ward.code}>{ward.name}</option>
+                      {wards?.wards?.map((ward) => (
+                        <option key={ward.code} value={ward.code}>
+                          {ward.name}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div className="mb-5">
-                    <label htmlFor="address" className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900">Địa chỉ nhận hàng</label>
-                    <input {...register('address')} type="text" id="address" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-                    <p className="text-red-500 italic text-sm">{errors ? errors.address?.message : ""}</p>
-
+                    <label
+                      htmlFor="address"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-900"
+                    >
+                      Địa chỉ nhận hàng
+                    </label>
+                    <input
+                      {...register("address")}
+                      type="text"
+                      id="address"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      required
+                    />
+                    <p className="text-red-500 italic text-sm">
+                      {errors ? errors.address?.message : ""}
+                    </p>
                   </div>
-
-
                 </form>
               </Modal>
             </div>
           </div>
         </div>
-      </div >
+      </div>
       <Footer></Footer>
     </>
   );

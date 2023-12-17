@@ -71,7 +71,7 @@ const Vourcher = () => {
                                     >
                                         <div className="p-6 sm:px-8">
                                             <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher.discount}
+                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>}
                                                 <span className="sr-only">Plan</span>
                                             </h2>
 
@@ -104,7 +104,7 @@ const Vourcher = () => {
                                     >
                                         <div className="p-6 sm:px-8">
                                             <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher.discount}
+                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>}
                                                 <span className="sr-only">Plan</span>
                                             </h2>
 
@@ -138,7 +138,7 @@ const Vourcher = () => {
                                     >
                                         <div className="p-6 sm:px-8">
                                             <h2 className="text-lg font-medium text-gray-900">
-                                                Giảm {voucher.discount}
+                                                Giảm {voucher && voucher.type == "percent" ? <>{(voucher.discount)}%</> : <>{(voucher.discount).toLocaleString("vi-VN")}k </>}
                                                 <span className="sr-only">Plan</span>
                                             </h2>
 

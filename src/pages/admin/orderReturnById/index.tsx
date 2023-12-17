@@ -11,6 +11,7 @@ import {
     Modal,
     Image,
     Popconfirm,
+    Select,
 } from 'antd';
 import {
     FormOutlined,
@@ -24,7 +25,7 @@ import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../.
 import { useAddOrderByAdminMutation, useGetOneOrderQuery, useUpdateOrderMutation } from '../../../store/order/order.service';
 import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../../../store/orderDetail/orderDetail.service';
 const { TextArea } = Input;
-
+const { Option } = Select;
 interface DataType {
     key: string;
     image: string;
@@ -60,6 +61,108 @@ const orderReturnById = () => {
     const [orderDetail, setOrderDetail] = useState<any[]>([]);
     const [sumTotalMoney, setSumTotalMoney] = useState<Number>()
 
+    const [provinces, setProvinces] = useState<any>([]);
+    const [districts, setDistricts] = useState<any>([]);
+    const [wards, setWards] = useState<any>([]);
+    const [codeProvince, setCodeProvince] = useState<any>();
+    const [codeDistrict, setCodeDistrict] = useState<any>();
+    const [codeWard, setCodeWard] = useState<any>();
+    const [nameProvince, setNameProvince] = useState<any>();
+    const [nameDistrict, setNameDistrict] = useState<any>();
+    const [nameWard, setNameWard] = useState<any>();
+
+    const provinceUpdate: any = provinces.find((item: any) => item.name == order?.address?.myProvince)
+
+    console.log(nameProvince);
+    console.log(nameDistrict);
+    console.log(nameWard);
+
+    useEffect(() => {
+        // Gọi API để lấy dữ liệu tỉnh/thành phố
+        axios.get('https://provinces.open-api.vn/api/p/')
+            .then(response => setProvinces(response.data))
+            .catch(error => console.error('Error fetching provinces:', error));
+
+        if (order) {
+            setNameProvince(order?.address?.myProvince)
+            setNameDistrict(order?.address?.myDistrict)
+            setNameWard(order?.address?.myWard)
+        }
+
+        form.setFieldsValue({
+            _id: orderReturn?._id,
+            fullName: orderReturn?.fullName,
+            myProvince: orderReturn?.address.myProvince,
+            myDistrict: orderReturn?.address.myDistrict,
+            myWard: orderReturn?.address.myWard,
+            detailAddress: orderReturn?.address.detailAddress,
+            phoneNumber: orderReturn?.phoneNumber,
+            note: orderReturn?.note
+        });
+    }, [order]);
+
+    useEffect(() => {
+        if (provinceUpdate) {
+            // Gọi API để lấy dữ liệu quận/huyện
+            axios.get(`https://provinces.open-api.vn/api/p/${provinceUpdate.code}?depth=2`)
+                .then(response => {
+                    setDistricts(response.data);
+                    const districtCode = response.data.districts.find((item: any) => item.name === order?.address?.myDistrict)?.code;
+                    setCodeDistrict(districtCode);
+                })
+                .catch(error => console.error('Error fetching districts:', error));
+        }
+    }, [provinceUpdate, order?.address?.myDistrict]);
+
+    useEffect(() => {
+        // Gọi API để lấy dữ liệu phường/xã
+        if (codeDistrict) {
+            axios.get(`https://provinces.open-api.vn/api/d/${codeDistrict}?depth=2`)
+                .then(response => {
+                    setWards(response.data);
+                    const wardCode = response.data.wards.find((item: any) => item.name === order?.address?.myWard)?.code;
+                    setCodeWard(wardCode);
+                })
+                .catch(error => console.error('Error fetching wards:', error));
+        }
+    }, [codeDistrict, order?.address?.myWard]);
+
+    const handleProvinceChange = (code: any) => {
+        const province: any = provinces.find((item: any) => item.code == code)
+
+        setNameProvince(province.name);
+        setCodeProvince(code);
+        form.setFieldsValue({
+            myDistrict: '',
+            myWard: '',
+        });
+        // Gọi API để lấy dữ liệu quận/huyện dựa trên tỉnh/thành phố được chọn
+        axios.get(`https://provinces.open-api.vn/api/p/${code}?depth=2`)
+            .then(response => setDistricts(response.data))
+            .catch(error => console.error('Error fetching districts:', error));
+    };
+
+    const handleDistrictChange = (code: any) => {
+        setCodeDistrict(code);
+
+        const district = districts?.districts.find((item: any) => item.code == code)
+        setNameDistrict(district.name);
+        form.setFieldsValue({
+            myWard: '',
+        });
+        // Gọi API để lấy dữ liệu xã/phường dựa trên quận/huyện được chọn
+        axios.get(`https://provinces.open-api.vn/api/d/${code}?depth=2`)
+            .then(response => setWards(response.data))
+            .catch(error => console.error('Error fetching wards:', error));
+    };
+
+    const handleWardChange = (code: any) => {
+        setCodeWard(code);
+
+        const ward = wards.wards.find((item: any) => item.code == code)
+        setNameWard(ward.name);
+    };
+
     useEffect(() => {
         if (ListOrderReturnDetail) {
             const fetchData = async () => {
@@ -89,14 +192,6 @@ const orderReturnById = () => {
         }
     }, [ListOrderReturnDetail]);
 
-
-    form.setFieldsValue({
-        _id: orderReturn?._id,
-        fullName: orderReturn?.fullName,
-        address: orderReturn?.address,
-        phoneNumber: orderReturn?.phoneNumber,
-        note: orderReturn?.note
-    });
     const columns: ColumnsType<DataType> = [
         {
             title: 'Sản phẩm',
@@ -159,6 +254,12 @@ const orderReturnById = () => {
         try {
             const valueCreate = {
                 ...values,
+                address: {
+                    myProvince: nameProvince,
+                    myDistrict: nameDistrict,
+                    myWard: nameWard,
+                    detailAddress: values.detailAddress
+                },
                 note: values.note === undefined ? "" : values.note,
                 userId: orderReturn?.userId,
                 items: listOrderDetail,
@@ -232,7 +333,7 @@ const orderReturnById = () => {
             await onUpdateOrder({ id: idOrder, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 2 };
-            const idOrderReturn = order?.orderReturn?._id;
+            const idOrderReturn = orderReturn?._id;
             onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
 
             setOpenFormConfirmOrderReturn(false);
@@ -243,12 +344,14 @@ const orderReturnById = () => {
     };
     const unConfirmOrderReturn = async () => {
         try {
+            console.log(1);
+
             const valueStatus = order?.paymentStatus === 1 ? 5 : 4;
             const updatedOrder = { ...order, status: valueStatus };
             await onUpdateOrder({ id: idOrder, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 0 };
-            const idOrderReturn = order?.orderReturn?._id;
+            const idOrderReturn = orderReturn?._id;
             onUpdateOrderReturn({ id: idOrderReturn, ...updateStatusOrderReturn });
 
             setOpenFormConfirmOrderReturn(false);
@@ -499,12 +602,116 @@ const orderReturnById = () => {
                                                                         style={{ width: '100%' }}
                                                                     />
                                                                 </Form.Item>
-                                                                <Form.Item
 
-                                                                    name="address"
+                                                                <Form.Item
+                                                                    name="myProvince"
+                                                                    label="Tỉnh/thành phố"
+                                                                    rules={[{ required: true }]}
+                                                                >
+                                                                    <Select
+                                                                        defaultValue={provinceUpdate?.code}
+                                                                        onChange={handleProvinceChange}
+                                                                        showSearch
+                                                                        style={{ width: '100%' }}
+                                                                        placeholder="Chọn tỉnh, thành phố"
+                                                                        optionFilterProp="children"
+                                                                        filterOption={(input: any, option: any) =>
+                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                                        }
+                                                                        filterSort={(optionA, optionB) =>
+                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                                        }
+                                                                        optionLabelProp="customLabel"
+                                                                        dropdownRender={menu => (
+                                                                            <div>
+                                                                                {menu}
+                                                                            </div>
+                                                                        )}
+                                                                    >
+                                                                        {provinces.map((item: any) => (
+                                                                            <Option key={item.code} value={item.code} label={item.name}
+                                                                                customLabel={
+                                                                                    <span>{item.name}</span>
+                                                                                }>
+                                                                                <span>{item.name}</span>
+                                                                            </Option>
+                                                                        ))}
+                                                                    </Select>
+                                                                </Form.Item>
+                                                                <Form.Item
+                                                                    name="myDistrict"
+                                                                    label="Quận/huyện"
+                                                                    rules={[{ required: true }]}
+                                                                >
+                                                                    <Select
+                                                                        defaultValue={codeDistrict}
+                                                                        onChange={handleDistrictChange}
+                                                                        showSearch
+                                                                        style={{ width: '100%' }}
+                                                                        placeholder="Chọn quận, huyện"
+                                                                        optionFilterProp="children"
+                                                                        filterOption={(input: any, option: any) =>
+                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                                        }
+                                                                        filterSort={(optionA, optionB) =>
+                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                                        }
+                                                                        optionLabelProp="customLabel"
+                                                                        dropdownRender={menu => (
+                                                                            <div>
+                                                                                {menu}
+                                                                            </div>
+                                                                        )}
+                                                                    >
+                                                                        {districts?.districts?.map((item: any) => (
+                                                                            <Option key={item.code} value={item.code} label={item.name}
+                                                                                customLabel={
+                                                                                    <span>{item.name}</span>
+                                                                                }>
+                                                                                <span>{item.name}</span>
+                                                                            </Option>
+                                                                        ))}
+                                                                    </Select>
+                                                                </Form.Item>
+                                                                <Form.Item
+                                                                    name="myWard"
+                                                                    label="Xã/phường"
+                                                                    rules={[{ required: true }]}
+                                                                >
+                                                                    <Select
+                                                                        defaultValue={codeWard}
+                                                                        onChange={handleWardChange}
+                                                                        showSearch
+                                                                        style={{ width: '100%' }}
+                                                                        placeholder="Chọn xã, phường"
+                                                                        optionFilterProp="children"
+                                                                        filterOption={(input: any, option: any) =>
+                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                                        }
+                                                                        filterSort={(optionA, optionB) =>
+                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                                        }
+                                                                        optionLabelProp="customLabel"
+                                                                        dropdownRender={menu => (
+                                                                            <div>
+                                                                                {menu}
+                                                                            </div>
+                                                                        )}
+                                                                    >
+                                                                        {wards?.wards?.map((item: any) => (
+                                                                            <Option key={item.code} value={item.code} label={item.name}
+                                                                                customLabel={
+                                                                                    <span>{item.name}</span>
+                                                                                }>
+                                                                                <span>{item.name}</span>
+                                                                            </Option>
+                                                                        ))}
+                                                                    </Select>
+                                                                </Form.Item>
+                                                                <Form.Item
+                                                                    name="detailAddress"
                                                                     label="Địa chỉ"
                                                                     rules={[{ required: true }]}
-                                                                    className='mb-1'
                                                                 >
                                                                     <Input />
                                                                 </Form.Item>
@@ -536,7 +743,7 @@ const orderReturnById = () => {
                                                             </Form>
                                                         </Modal>
                                                     </Table.Summary.Cell>
-                                                </Table.Summary.Row>
+                                                </Table.Summary.Row >
                                             )}
 
                                             {orderReturn?.newOrder?.status === 5 && orderReturn?.status !== 4 && (

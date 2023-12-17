@@ -6,6 +6,7 @@ export interface IOutfit {
     description: string
     image: { url: string, publicId: string }
     sku: string
+    discount: number
     items: IProductDetail[]
     hidden: boolean
     createdAt: string
