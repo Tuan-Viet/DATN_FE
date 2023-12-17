@@ -10,15 +10,18 @@ import {
     DatePicker,
     Tooltip,
     Badge,
-    Typography
+    Typography,
+    Modal
 } from 'antd';
 import {
     EyeOutlined,
-    DownOutlined
+    DownOutlined,
+    FileExcelFilled,
+    PrinterFilled
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../../store';
 import { ColumnsType, TableProps } from 'antd/es/table';
@@ -28,11 +31,16 @@ import { useForm } from 'react-hook-form';
 import moment from 'moment';
 import React from 'react';
 import { } from 'antd';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import { useReactToPrint } from 'react-to-print';
+import 'jspdf-autotable';
 const { RangePicker } = DatePicker;
 const { Text } = Typography;
 interface DataType {
     key: React.Key;
-    date: string;
+    _id: string;
+    date: any;
     fullName: string;
     status: number;
     pay_method: number;
@@ -46,6 +54,7 @@ const ordersPage = () => {
     const { handleSubmit } = useForm();
     const [search, setSearch] = useState<string>("")
     const orderState = useSelector((state: RootState) => state.orderSlice.orders)
+    const componentRef = useRef();
 
     const [selectedStatus, setSelectedStatus] = useState<any[]>([]);
     const [dateFrom, setDateFrom] = useState<any>(null);
@@ -55,6 +64,11 @@ const ordersPage = () => {
     const [orderOption, setOrderOption] = useState<Number>(1);
     const [visibleStatus, setVisibleStatus] = useState(false);
     const [visibleDate, setVisibleDate] = useState(false);
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
+
     useEffect(() => {
         if (orders) {
             if (search === "" || !search) {
@@ -104,7 +118,7 @@ const ordersPage = () => {
                 // So sánh theo thời gian
                 return dateA.isBefore(dateB) ? -1 : dateA.isAfter(dateB) ? 1 : 0;
             },
-            render: (value: any) => <span>{moment(value as string).format("HH:mm DD/MM/YYYY")}</span>,
+            render: (value: any) => <span>{value}</span>,
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -141,31 +155,31 @@ const ordersPage = () => {
             render: (value: any) => {
 
                 switch (value.status) {
-                    case 0:
+                    case 'Đơn hàng bị hủy':
                         return (
                             <Badge status={"error"} text={<Text type="danger" >Hủy đơn hàng</Text>} />
                         )
-                    case 1:
+                    case 'Chờ xử lí':
                         return (
                             <Badge status="default" text={<Text >Chờ xử lí</Text>} />
                         )
-                    case 2:
+                    case 'Chờ lấy hàng':
                         return (
                             <Badge color={"cyan"} text={<Text className='text-cyan-500'>Chờ lấy hàng</Text>} />
                         )
-                    case 3:
+                    case 'Đang giao':
                         return (
                             <Badge status="processing" text={<Text className='text-blue-400'>Đang giao</Text>} />
                         )
-                    case 4:
+                    case 'Đã nhận hàng':
                         return (
                             <Badge color={"lime"} text={<Text type="success" className='text-lime-300'>Đã nhận hàng</Text>} />
                         )
-                    case 5:
+                    case 'Hoàn thành':
                         return (
                             <Badge status={"success"} text={<Text type="success" className=''>Hoàn thành</Text>} />
                         )
-                    case 6:
+                    case 'Y/C đổi hàng':
                         return (
                             <Badge status={"warning"} text={<Text type="warning" >Y/C đổi hàng</Text>} />
                         )
@@ -245,19 +259,19 @@ const ordersPage = () => {
     function orderStatus(satus: number) {
         switch (satus) {
             case 0:
-                return "Hủy đơn hàng";
+                return "Đơn hàng bị hủy";
             case 1:
                 return "Chờ xử lí";
             case 2:
-                return "Đang chuản bị hàng";
+                return "Chờ lấy hàng";
             case 3:
                 return "Đang giao";
             case 4:
                 return "Đã nhận hàng"
             case 5:
-                return "Hoàn Thành"
+                return "Hoàn thành"
             case 6:
-                return "Yêu cầu đổi hàng"
+                return "Y/C đổi hàng"
             default:
                 return "Trạng thái không xác định";
         }
@@ -470,15 +484,52 @@ const ordersPage = () => {
         data = sortOrder?.map((order: any, index) => ({
             key: index + 1,
             _id: order._id,
-            date: order.createdAt,
+            date: moment(order.createdAt as string).format("HH:mm DD/MM/YYYY"),
             fullName: order.fullName,
-            status: order.status,
-            pay_method: order.pay_method,
-            paymentStatus: order.paymentStatus,
             totalMoney: order.totalMoney,
-
+            pay_method: order.pay_method,
+            paymentStatus: order.paymentStatus === 1 ? 'Đã thanh toán' : 'Chưa thanh toán',
+            status: orderStatus(order.status),
         }));
     }
+    const exportExcel = () => {
+        if (data.length === 0) {
+            return;
+        }
+
+        // Tên cột tùy chỉnh
+        const columnHeaders = [
+            'STT',
+            'MÃ ĐƠN HÀNG',
+            'NGÀY ĐẶT',
+            'KHÁCH HÀNG',
+            'TỔNG TIỀN',
+            'PHƯƠNG THỨC THANH TOÁN',
+            'TRẠNG THÁI THANH TOÁN',
+            'TRẠNG THÁI',
+        ];
+
+        // Map data to match the column order
+        const mappedData = data.map((item, index) => ({
+            'STT': index + 1,
+            'MÃ ĐƠN HÀNG': item._id,
+            'NGÀY ĐẶT': item.date,
+            'KHÁCH HÀNG': item.fullName,
+            'TỔNG TIỀN': item.totalMoney,
+            'PHƯƠNG THỨC THANH TOÁN': item.pay_method,
+            'TRẠNG THÁI THANH TOÁN': item.paymentStatus,
+            'TRẠNG THÁI': item.status,
+        }));
+
+        const ws = XLSX.utils.json_to_sheet(mappedData, { header: columnHeaders });
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+        const fileName = 'exported_data.xlsx';
+        XLSX.writeFile(wb, fileName);
+    };
+
+
 
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
@@ -490,13 +541,11 @@ const ordersPage = () => {
                     <span className="block text-xl text-[#1677ff]">
                         QUẢN LÝ ĐƠN HÀNG
                     </span>
-                    {/* <span className="block text-base  text-[#1677ff]">
-                        Manage your orders
-                    </span> */}
                 </div>
             </Space>
+
             <div className="border p-3 rounded-lg min-h-screen bg-white">
-                <div className="flex pb-6 pt-3 justify-between">
+                <div className="flex pb-6 pt-3 justify-between items-end">
                     <form
                         onSubmit={handleSubmit(handleSearch)}
                         className='w-[500px]'>
@@ -515,6 +564,23 @@ const ordersPage = () => {
                         </div>
                     </form>
 
+                    <div className="space-x-3 px-3">
+                        <Tooltip title="Xuất FilePDF" color={'orange'} key={'orange'}>
+                            <button
+                                onClick={handlePrint}
+                            >
+                                <PrinterFilled className='text-lg text-orange-500' />
+                            </button>
+                        </Tooltip>
+                        <Tooltip title="Xuất FileExcel" color={'green'} key={'green'}>
+                            <button
+                                onClick={exportExcel}
+                            >
+                                <FileExcelFilled className='text-lg text-green-600' />
+                            </button>
+                        </Tooltip>
+
+                    </div>
 
                 </div>
                 <div className="flex justify-between items-start mb-6">
@@ -563,9 +629,15 @@ const ordersPage = () => {
                         />
                     </div>
                 </div>
+                <div className="hidden">
+                    <div className="" ref={componentRef} >
+                        <Table columns={columns} dataSource={data} pagination={{ pageSize: 9999 }} />
+                    </div>
+                </div>
                 <Table columns={columns} dataSource={data} pagination={{ pageSize: 10 }} onChange={onChange} />
             </div>
         </div>
     )
 }
+
 export default ordersPage;

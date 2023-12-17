@@ -139,7 +139,7 @@ const outfitAdd = () => {
 
         const valueAdd: any = {
             title: values.title,
-            discount: values.discount,
+            // discount: values.discount,
             sku: values.sku,
             items: [productDeatilOne, productDetailTwo],
             description: description,
@@ -220,7 +220,7 @@ const outfitAdd = () => {
                                         </Form.Item>
                                     </div>
                                 </div>
-                                <div className="flex w-full space-x-5 pr-5">
+                                {/* <div className="flex w-full space-x-5 pr-5">
                                     <Form.Item
                                         name="discount"
                                         label="Giảm giá(%)"
@@ -239,7 +239,7 @@ const outfitAdd = () => {
                                             style={{ width: '100%' }}
                                         />
                                     </Form.Item>
-                                </div>
+                                </div> */}
                                 <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
                                     <summary
                                         className="flex w-[250px] cursor-pointer p-2 transition"

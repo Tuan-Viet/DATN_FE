@@ -6,7 +6,7 @@ export const initialSatistic: IStatisticState = {
 }
 
 const statisticSlice = createSlice({
-    name: "statistics",
+    name: "satistics",
     initialState: initialSatistic,
     reducers: ({
         listSatisticSlice: (state: IStatisticState, actions: PayloadAction<DashboardStatistic[]>) => {

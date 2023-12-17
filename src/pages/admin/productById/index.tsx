@@ -62,6 +62,7 @@ const productById = () => {
     const [onRemoveComment] = useRemoveReviewMutation()
     // const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductQuery(id || '')
     const { data: product, isSuccess: isSuccessProduct } = useFetchOneProductByAdminQuery(id || '')
+    const totalQuantity = product?.variants?.reduce((sumQuantity: any, item) => sumQuantity + item.quantity, 0);
 
     const { data: productRevanue, isSuccess: isSuccessProductStatistic } = useGetProductRevenueQuery();
 
@@ -377,14 +378,12 @@ const productById = () => {
                         )}
                     </div>
                     <div className="border p-3 text-center w-1/5 rounded-lg">
-                        <span className="block text-sm text-gray-400">ĐƠN HÀNG:</span>
+                        <span className="block text-sm text-gray-400">HÀNG CÓ SẴN</span>
                         {!isSuccessProductStatistic || !isSuccessProduct ? (
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
                         ) : (
                             <span className="text-lg font-medium text-gray-500">
-                                {productStatistic?.length
-                                    ? productStatistic[0]?.totalOrders.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                    : '0'}
+                                {totalQuantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                             </span>
                         )}
                     </div>

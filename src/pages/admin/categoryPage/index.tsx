@@ -7,14 +7,12 @@ import {
     Image,
     Spin,
     Select,
-    Dropdown,
     Tooltip
 } from 'antd';
 import {
     EditFilled,
     DeleteFilled,
     PlusOutlined,
-    SearchOutlined
 } from '@ant-design/icons';
 import { Link } from "react-router-dom";
 import { Dispatch, useEffect, useState } from 'react';

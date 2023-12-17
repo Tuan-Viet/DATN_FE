@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom/client";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../../../layout/Header";
 import Footer from "../../../layout/Footer";
@@ -14,7 +13,6 @@ import {
   useUpdateOrderDetailMutation,
 } from "../../../store/orderDetail/orderDetail.service";
 import { listOrderDetailSlice } from "../../../store/orderDetail/orderDetailSlice";
-import { RootState } from "@reduxjs/toolkit/query";
 import {
   useGetOneProductDetailQuery,
   useListProductDetailQuery,
@@ -32,12 +30,10 @@ import {
   orderReturnSchema,
 } from "../../../Schemas/OrderReturn";
 import { useAddOrderReturnMutation } from "../../../store/orderReturn/order.service";
-import { current } from "@reduxjs/toolkit";
 import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
-  Badge,
   Button,
   Form,
   Modal,
@@ -46,12 +42,10 @@ import {
   Upload,
   UploadFile,
   UploadProps,
-  message,
   notification,
 } from "antd";
 import {
   LoadingOutlined,
-  UploadOutlined,
   PlusOutlined,
   FormOutlined,
   InfoCircleOutlined
@@ -59,8 +53,9 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import axios from "axios";
 import { useAddReviewMutation } from "../../../store/reviews/review.service";
+import { RootState } from "../../../store";
 
-function formatDateStringToDisplayDate(dateString) {
+function formatDateStringToDisplayDate(dateString: any) {
   const originalDate = new Date(dateString);
 
   const day = originalDate.getDate();
@@ -80,7 +75,7 @@ function formatDateStringToDisplayDate(dateString) {
   return formattedDate;
 }
 
-function mapStatusToText(statusCode) {
+function mapStatusToText(statusCode: any) {
   switch (statusCode) {
     case 0:
       return "Hủy đơn hàng";
@@ -101,7 +96,7 @@ function mapStatusToText(statusCode) {
   }
 }
 
-function mapStatusPaymentToText(statusCode) {
+function mapStatusPaymentToText(statusCode: any) {
   switch (statusCode) {
     case 0:
       return "Chưa thanh toán";
@@ -118,8 +113,6 @@ const OrderDetail = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const {
-    handleSubmit,
-    register,
     setValue,
     formState: { errors },
   } = useForm<ReviewForm>({
@@ -170,14 +163,14 @@ const OrderDetail = () => {
 
   const [imageList, setImageList] = useState<any[]>([]);
 
-  const handleImageChange = (info) => {
+  const handleImageChange = (info: any) => {
     if (info.file.status === "done") {
       const imageUrl = info.file.response[0].url;
       setImageList([...imageList, imageUrl]);
     }
   };
 
-  const handleImageProductRemove = (file) => {
+  const handleImageProductRemove = (file: any) => {
     console.log(file);
 
     console.log(file.response[0].url);
@@ -278,9 +271,6 @@ const OrderDetail = () => {
     setIsModalOrderOpen(false);
   };
 
-  const [fileImageList, setImageFileList] = useState<UploadFile[]>([]);
-  const [countProductUpload, setProductCountUpload] = useState([0]);
-
   const {
     register: registerOrder,
     setValue: setOrderValue,
@@ -299,7 +289,7 @@ const OrderDetail = () => {
   // };
   const [showInput, setShowInput] = useState(false);
 
-  const handleSelectChange = (event) => {
+  const handleSelectChange = (event: any) => {
     const selectedValue = event.target.value;
     if (selectedValue !== "khác") {
       setOrderValue('reason', selectedValue)
@@ -389,9 +379,9 @@ const OrderDetail = () => {
       });
     } catch (error) { }
   };
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
+  const [provinces, setProvinces] = useState<any>([]);
+  const [districts, setDistricts] = useState<any>([]);
+  const [wards, setWards] = useState<any>([]);
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWards] = useState("");
@@ -408,13 +398,10 @@ const OrderDetail = () => {
       .catch((error) => console.error("Error fetching provinces:", error));
   }, []);
 
-  const handleProvinceChange = (e) => {
+  const handleProvinceChange = (e: any) => {
     const provinceCode = e.target.value;
-    const nameProvince = provinces.find((item) => item.code == provinceCode);
-    // myProvince = {
-    //   code: nameProvice.code,
-    //   name: nameProvince.name
-    // }
+    const nameProvince: any = provinces.find((item: any) => item.code == provinceCode);
+
     setSelectedNameProvince(nameProvince.name);
 
     setSelectedProvince(provinceCode);
@@ -426,12 +413,12 @@ const OrderDetail = () => {
       .catch((error) => console.error("Error fetching districts:", error));
   };
 
-  const handleDistrictChange = (e) => {
-    const districtCode = e.target.value;
+  const handleDistrictChange = (e: any) => {
+    const districtCode: any = e.target.value;
     setSelectedDistrict(districtCode);
 
     const nameDistrict = districts.districts.find(
-      (item) => item.code == districtCode
+      (item: any) => item.code == districtCode
     );
     setSelectednameDistrict(nameDistrict.name);
 
@@ -442,11 +429,11 @@ const OrderDetail = () => {
       .catch((error) => console.error("Error fetching wards:", error));
   };
 
-  const handleWardChange = (e) => {
+  const handleWardChange = (e: any) => {
     const wardCode = e.target.value;
     setSelectedWards(wardCode);
 
-    const nameWard = wards.wards.find((item) => item.code == wardCode);
+    const nameWard = wards.wards.find((item: any) => item.code == wardCode);
     setSelectednameWard(nameWard.name);
   };
 
@@ -830,7 +817,7 @@ const OrderDetail = () => {
                           <div className="border rounded-sm">
                             <div className="border-b">
                               <h3 className=" p-3 font-medium">
-                                Thộng tin giao hàng
+                                Thông tin giao hàng
                               </h3>
                             </div>
                             <div className="p-3">
@@ -1099,27 +1086,24 @@ const OrderDetail = () => {
 
                                           <td>
 
-                                            {(order && order.status === 4) ||
-                                              order?.status === 5
-                                              ? product.isReviewed ===
-                                              false && (
-                                                <div
-                                                  onClick={() =>
-                                                    showModal(
-                                                      pro._id!,
-                                                      product.productDetailId!,
-                                                      product._id!
-                                                    )
-                                                  }
-                                                  className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
-                                                >
-                                                  Đánh giá
-                                                </div>
-                                              )
+                                            {(order && order.status === 4 || (order && order.status === 5)) && product.isReviewed === false ? (
+                                              <div
+                                                onClick={() =>
+                                                  showModal(
+                                                    pro._id!,
+                                                    product.productDetailId!,
+                                                    product._id!
+                                                  )
+                                                }
+                                                className="bg-black flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer"
+                                              >
+                                                Đánh giá
+                                              </div>
+                                            )
                                               : null}
 
                                             {(order && order.status === 4) ||
-                                              order?.status === 5
+                                              (order && order.status === 5)
                                               ? product.isReviewed === true && (
                                                 <div className="bg-gray-300 flex item-center justify-center text-white py-2 mx-3 rounded-[30px] cursor-pointer">
                                                   Đã đánh giá
@@ -1228,7 +1212,7 @@ const OrderDetail = () => {
               </div>
             </div>
           </div>
-          {order && order.status === 4 && (
+          {((order && order.status === 4) || (order && order.status === 5)) && (
             <>
               <Modal
                 cancelButtonProps={{ style: { display: "none" } }}

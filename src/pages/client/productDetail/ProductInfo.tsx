@@ -1006,26 +1006,46 @@ const ProductInfo = () => {
                                 </button>
                               </div>
                               <div className="ml-10">
-                                <Button type="primary" onClick={showModal} className="bg-blue-500">
-                                  Gợi ý size
+                                <Button type="link" onClick={showModal} className="italic ">
+                                  <span className="underline">Gợi ý size</span>
                                 </Button>
                                 <Modal
                                   cancelButtonProps={{ hidden: true }}
                                   okButtonProps={{ hidden: true }}
                                   title="Gợi ý size" open={isModalOpen} onCancel={handleCancel} onOk={SubmitButton}>
-                                  <Form form={form} name="validateOnly" onFinish={SubmitButton} layout="vertical" autoComplete="off">
-                                    <Form.Item name="hight" label="Chiều cao" rules={[{ required: true, message: "Chiều cao bắt buộc phải nhập" }]}>
-                                      <Input type="number" min={0} />
-                                    </Form.Item>
-                                    <Form.Item name="weight" label="Cân nặng" rules={[{ required: true, message: "Cân nặng bắt buộc phải nhập" }]}>
-                                      <Input type="number" min={0} />
-                                    </Form.Item>
-                                    <Form.Item>
-                                      <Space>
-                                        <SubmitButton form={form} />
-                                        <Button htmlType="reset" onClick={handleReset}>Reset</Button>
-                                      </Space>
-                                    </Form.Item>
+                                  <Form
+                                    form={form}
+                                    name="validateOnly"
+                                    onFinish={SubmitButton}
+                                    layout="vertical"
+                                    autoComplete="off">
+                                    <div className="">
+                                      <div className="">
+                                        <Form.Item
+                                          name="hight"
+                                          label="Chiều cao (cm)"
+                                          rules={[{ required: true, message: "Chiều cao bắt buộc phải nhập" }]}
+                                        >
+                                          <Input type="number" min={0} />
+                                        </Form.Item>
+                                        <Form.Item
+                                          name="weight"
+                                          label="Cân nặng"
+                                          rules={[{ required: true, message: "Cân nặng bắt buộc phải nhập" }]}
+                                        >
+                                          <Input type="number" min={0} />
+                                        </Form.Item>
+                                        <Form.Item>
+                                          <Space>
+                                            <SubmitButton form={form} />
+                                            <Button htmlType="reset" onClick={handleReset}>Reset</Button>
+                                          </Space>
+                                        </Form.Item>
+                                      </div>
+                                      <div className="">
+                                        <img src="" alt="" />
+                                      </div>
+                                    </div>
                                   </Form>
                                   {size && <p>Kích cỡ quần áo của bạn là: {size}</p>}
                                 </Modal>

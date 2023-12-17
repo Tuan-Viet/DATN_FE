@@ -73,10 +73,6 @@ const orderReturnById = () => {
 
     const provinceUpdate: any = provinces.find((item: any) => item.name == order?.address?.myProvince)
 
-    console.log(nameProvince);
-    console.log(nameDistrict);
-    console.log(nameWard);
-
     useEffect(() => {
         // Gọi API để lấy dữ liệu tỉnh/thành phố
         axios.get('https://provinces.open-api.vn/api/p/')
@@ -129,7 +125,6 @@ const orderReturnById = () => {
 
     const handleProvinceChange = (code: any) => {
         const province: any = provinces.find((item: any) => item.code == code)
-
         setNameProvince(province.name);
         setCodeProvince(code);
         form.setFieldsValue({
@@ -198,7 +193,7 @@ const orderReturnById = () => {
             render: (record: any) => (
                 <div className='flex'>
                     <div className='mr-2'>
-                        <img src={record?.image} alt="" className='w-14 h-20 object-cover' />
+                        <img src={record?.image} alt="" className='w-16 h-20 object-cover' />
                     </div>
                     <div className="space-y-3 py-2 font-light ">
                         <span className='block'>{record?.name}</span>
@@ -389,6 +384,12 @@ const orderReturnById = () => {
         }
     }
 
+
+    // const totalCart = ListOrderDeatils?.reduce((total, order) => {
+    //     return total + order.totalMoney;
+    // }, 0);
+
+
     return <>
         <Breadcrumb className='pb-3'
             items={[
@@ -565,14 +566,18 @@ const orderReturnById = () => {
                                                             <Button type="primary" className='bg-blue-500' onClick={() => setOpenFormCreateOrder(true)}>Tạo đơn hàng</Button>
                                                         </div>
                                                         <Modal
-                                                            title="Tạo mới đơn hàng"
+                                                            title={
+                                                                <h1 className="text-lg border-b py-3 text-blue-500">
+                                                                    TẠO ĐƠN HÀNG
+                                                                </h1>
+                                                            }
                                                             centered
                                                             open={openFormCreateOrder}
                                                             onOk={() => setOpenFormCreateOrder(false)}
                                                             onCancel={() => setOpenFormCreateOrder(false)}
                                                             okButtonProps={{ hidden: true }}
                                                             cancelButtonProps={{ hidden: true }}
-                                                            width={700}
+                                                            width={1000}
                                                         >
                                                             <Form
                                                                 form={form}
@@ -582,159 +587,197 @@ const orderReturnById = () => {
                                                                 autoComplete="off"
                                                                 className="mx-auto"
                                                             >
-                                                                <Form.Item
-                                                                    name="fullName"
-                                                                    label="Khách hàng"
-                                                                    rules={[
-                                                                        {
-                                                                            required: true,
-                                                                        }
-                                                                    ]}>
-                                                                    <Input />
-                                                                </Form.Item>
+                                                                <div className="flex space-x-5">
+                                                                    <div className="w-3/5">
+                                                                        <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
+                                                                            <summary
+                                                                                className="flex w-[250px] cursor-pointer p-2 transition"
+                                                                            >
+                                                                                <span className="text-sm text-blue-500">Ghi chú <FormOutlined /></span>
+                                                                            </summary>
+                                                                            <div className="pt-3">
+                                                                                <Form.Item
+                                                                                    name="note"
+                                                                                >
+                                                                                    <TextArea />
+                                                                                </Form.Item>
+                                                                            </div>
+                                                                        </details>
 
-                                                                <Form.Item
-                                                                    name="phoneNumber"
-                                                                    label="Số điện thoại"
-                                                                    rules={[{ required: true }]}
-                                                                >
-                                                                    <Input
-                                                                        style={{ width: '100%' }}
-                                                                    />
-                                                                </Form.Item>
-
-                                                                <Form.Item
-                                                                    name="myProvince"
-                                                                    label="Tỉnh/thành phố"
-                                                                    rules={[{ required: true }]}
-                                                                >
-                                                                    <Select
-                                                                        defaultValue={provinceUpdate?.code}
-                                                                        onChange={handleProvinceChange}
-                                                                        showSearch
-                                                                        style={{ width: '100%' }}
-                                                                        placeholder="Chọn tỉnh, thành phố"
-                                                                        optionFilterProp="children"
-                                                                        filterOption={(input: any, option: any) =>
-                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
-                                                                        }
-                                                                        filterSort={(optionA, optionB) =>
-                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                                                        }
-                                                                        optionLabelProp="customLabel"
-                                                                        dropdownRender={menu => (
-                                                                            <div>
-                                                                                {menu}
-                                                                            </div>
-                                                                        )}
-                                                                    >
-                                                                        {provinces.map((item: any) => (
-                                                                            <Option key={item.code} value={item.code} label={item.name}
-                                                                                customLabel={
-                                                                                    <span>{item.name}</span>
-                                                                                }>
-                                                                                <span>{item.name}</span>
-                                                                            </Option>
-                                                                        ))}
-                                                                    </Select>
-                                                                </Form.Item>
-                                                                <Form.Item
-                                                                    name="myDistrict"
-                                                                    label="Quận/huyện"
-                                                                    rules={[{ required: true }]}
-                                                                >
-                                                                    <Select
-                                                                        defaultValue={codeDistrict}
-                                                                        onChange={handleDistrictChange}
-                                                                        showSearch
-                                                                        style={{ width: '100%' }}
-                                                                        placeholder="Chọn quận, huyện"
-                                                                        optionFilterProp="children"
-                                                                        filterOption={(input: any, option: any) =>
-                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
-                                                                        }
-                                                                        filterSort={(optionA, optionB) =>
-                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                                                        }
-                                                                        optionLabelProp="customLabel"
-                                                                        dropdownRender={menu => (
-                                                                            <div>
-                                                                                {menu}
-                                                                            </div>
-                                                                        )}
-                                                                    >
-                                                                        {districts?.districts?.map((item: any) => (
-                                                                            <Option key={item.code} value={item.code} label={item.name}
-                                                                                customLabel={
-                                                                                    <span>{item.name}</span>
-                                                                                }>
-                                                                                <span>{item.name}</span>
-                                                                            </Option>
-                                                                        ))}
-                                                                    </Select>
-                                                                </Form.Item>
-                                                                <Form.Item
-                                                                    name="myWard"
-                                                                    label="Xã/phường"
-                                                                    rules={[{ required: true }]}
-                                                                >
-                                                                    <Select
-                                                                        defaultValue={codeWard}
-                                                                        onChange={handleWardChange}
-                                                                        showSearch
-                                                                        style={{ width: '100%' }}
-                                                                        placeholder="Chọn xã, phường"
-                                                                        optionFilterProp="children"
-                                                                        filterOption={(input: any, option: any) =>
-                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
-                                                                        }
-                                                                        filterSort={(optionA, optionB) =>
-                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                                                        }
-                                                                        optionLabelProp="customLabel"
-                                                                        dropdownRender={menu => (
-                                                                            <div>
-                                                                                {menu}
-                                                                            </div>
-                                                                        )}
-                                                                    >
-                                                                        {wards?.wards?.map((item: any) => (
-                                                                            <Option key={item.code} value={item.code} label={item.name}
-                                                                                customLabel={
-                                                                                    <span>{item.name}</span>
-                                                                                }>
-                                                                                <span>{item.name}</span>
-                                                                            </Option>
-                                                                        ))}
-                                                                    </Select>
-                                                                </Form.Item>
-                                                                <Form.Item
-                                                                    name="detailAddress"
-                                                                    label="Địa chỉ"
-                                                                    rules={[{ required: true }]}
-                                                                >
-                                                                    <Input />
-                                                                </Form.Item>
-                                                                <details className="pb-2 overflow-hidden [&_summary::-webkit-details-marker]:hidde">
-                                                                    <summary
-                                                                        className="flex w-[250px] cursor-pointer p-2 transition"
-                                                                    >
-                                                                        <span className="text-sm text-blue-500">Ghi chú <FormOutlined /></span>
-                                                                    </summary>
-                                                                    <div className="pt-3">
-                                                                        <Form.Item
-                                                                            name="note"
-                                                                        >
-                                                                            <TextArea />
-                                                                        </Form.Item>
+                                                                        <Table
+                                                                            columns={columns}
+                                                                            dataSource={data}
+                                                                            pagination={false}
+                                                                            summary={(pageData) => {
+                                                                                return <>
+                                                                                    <Table.Summary.Row className=''>
+                                                                                        <Table.Summary.Cell index={0} colSpan={3}>
+                                                                                            <span className='block'>Tổng sản phẩm</span>
+                                                                                            {order?.voucher_code ? <span className='block'>Khuyến mãi</span> : ""}
+                                                                                            <span className='block'>Vận chuyển</span>
+                                                                                            <span className='block'>Tổng</span>
+                                                                                        </Table.Summary.Cell>
+                                                                                        <Table.Summary.Cell index={1}>
+                                                                                            <div className='text-end'>
+                                                                                                {totalOrderAmount?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                            </div>
+                                                                                            <div className='text-end'>
+                                                                                                Miễn phí
+                                                                                            </div>
+                                                                                            <div className='text-end'>
+                                                                                                {totalOrderAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                                                            </div>
+                                                                                        </Table.Summary.Cell>
+                                                                                    </Table.Summary.Row>
+                                                                                </>
+                                                                            }}
+                                                                        />
                                                                     </div>
-                                                                </details>
+                                                                    <div className="w-2/5">
+                                                                        <div className="border rounded-sm">
+                                                                            <div className="border-b">
+                                                                                <h3 className=" p-3 font-medium">
+                                                                                    Thông tin giao hàng
+                                                                                </h3>
+                                                                            </div>
+                                                                            <div className="p-3">
+                                                                                <Form.Item
+                                                                                    name="fullName"
+                                                                                    label="Khách hàng"
+                                                                                    rules={[
+                                                                                        {
+                                                                                            required: true,
+                                                                                        }
+                                                                                    ]}>
+                                                                                    <Input />
+                                                                                </Form.Item>
+                                                                                <Form.Item
+                                                                                    name="phoneNumber"
+                                                                                    label="Số điện thoại"
+                                                                                    rules={[{ required: true }]}
+                                                                                >
+                                                                                    <Input
+                                                                                        style={{ width: '100%' }}
+                                                                                    />
+                                                                                </Form.Item>
+                                                                                <Form.Item
+                                                                                    name="myProvince"
+                                                                                    label="Tỉnh/thành phố"
+                                                                                    rules={[{ required: true }]}
+                                                                                >
+                                                                                    <Select
+                                                                                        defaultValue={provinceUpdate?.code}
+                                                                                        onChange={handleProvinceChange}
+                                                                                        showSearch
+                                                                                        style={{ width: '100%' }}
+                                                                                        placeholder="Chọn tỉnh, thành phố"
+                                                                                        optionFilterProp="children"
+                                                                                        filterOption={(input: any, option: any) =>
+                                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                                                        }
+                                                                                        filterSort={(optionA, optionB) =>
+                                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                                                        }
+                                                                                        optionLabelProp="customLabel"
+                                                                                        dropdownRender={menu => (
+                                                                                            <div>
+                                                                                                {menu}
+                                                                                            </div>
+                                                                                        )}
+                                                                                    >
+                                                                                        {provinces.map((item: any) => (
+                                                                                            <Option key={item.code} value={item.code} label={item.name}
+                                                                                                customLabel={
+                                                                                                    <span>{item.name}</span>
+                                                                                                }>
+                                                                                                <span>{item.name}</span>
+                                                                                            </Option>
+                                                                                        ))}
+                                                                                    </Select>
+                                                                                </Form.Item>
+                                                                                <Form.Item
+                                                                                    name="myDistrict"
+                                                                                    label="Quận/huyện"
+                                                                                    rules={[{ required: true }]}
+                                                                                >
+                                                                                    <Select
+                                                                                        defaultValue={codeDistrict}
+                                                                                        onChange={handleDistrictChange}
+                                                                                        showSearch
+                                                                                        style={{ width: '100%' }}
+                                                                                        placeholder="Chọn quận, huyện"
+                                                                                        optionFilterProp="children"
+                                                                                        filterOption={(input: any, option: any) =>
+                                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                                                        }
+                                                                                        filterSort={(optionA, optionB) =>
+                                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                                                        }
+                                                                                        optionLabelProp="customLabel"
+                                                                                        dropdownRender={menu => (
+                                                                                            <div>
+                                                                                                {menu}
+                                                                                            </div>
+                                                                                        )}
+                                                                                    >
+                                                                                        {districts?.districts?.map((item: any) => (
+                                                                                            <Option key={item.code} value={item.code} label={item.name}
+                                                                                                customLabel={
+                                                                                                    <span>{item.name}</span>
+                                                                                                }>
+                                                                                                <span>{item.name}</span>
+                                                                                            </Option>
+                                                                                        ))}
+                                                                                    </Select>
+                                                                                </Form.Item>
+                                                                                <Form.Item
+                                                                                    name="myWard"
+                                                                                    label="Xã/phường"
+                                                                                    rules={[{ required: true }]}
+                                                                                >
+                                                                                    <Select
+                                                                                        defaultValue={codeWard}
+                                                                                        onChange={handleWardChange}
+                                                                                        showSearch
+                                                                                        style={{ width: '100%' }}
+                                                                                        placeholder="Chọn xã, phường"
+                                                                                        optionFilterProp="children"
+                                                                                        filterOption={(input: any, option: any) =>
+                                                                                            (option?.label?.toLowerCase() ?? '').includes(input.toLowerCase())
+                                                                                        }
+                                                                                        filterSort={(optionA, optionB) =>
+                                                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                                                        }
+                                                                                        optionLabelProp="customLabel"
+                                                                                        dropdownRender={menu => (
+                                                                                            <div>
+                                                                                                {menu}
+                                                                                            </div>
+                                                                                        )}
+                                                                                    >
+                                                                                        {wards?.wards?.map((item: any) => (
+                                                                                            <Option key={item.code} value={item.code} label={item.name}
+                                                                                                customLabel={
+                                                                                                    <span>{item.name}</span>
+                                                                                                }>
+                                                                                                <span>{item.name}</span>
+                                                                                            </Option>
+                                                                                        ))}
+                                                                                    </Select>
+                                                                                </Form.Item>
+                                                                                <Form.Item
+                                                                                    name="detailAddress"
+                                                                                    label="Địa chỉ"
+                                                                                    rules={[{ required: true }]}
+                                                                                >
+                                                                                    <Input />
+                                                                                </Form.Item>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
 
-                                                                <Table
-                                                                    columns={columns}
-                                                                    dataSource={data}
-                                                                    pagination={false}
-                                                                />
+
                                                                 <Form.Item className=' flex justify-end '>
                                                                     <Button type="primary" htmlType="submit" className='bg-blue-500 my-3'>
                                                                         Tạo mới
@@ -771,7 +814,7 @@ const orderReturnById = () => {
 
 
                         </div>
-                    </div>
+                    </div >
                 </div>
                 <div className="w-1/3 space-y-5">
                     <div className="border w-full bg-white p-3">
