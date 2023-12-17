@@ -50,6 +50,9 @@ const routes = {
     adminOrderRevanueByQuarter: "/admin/statistic/by_quarter",
     adminOrderReturnPage: "/admin/orderreturn",
     adminOrderReturnGetOne: "/admin/orderreturn/:id",
+
+    // page not found
+    pageNotFound: "*"
 }
 
 export default routes;

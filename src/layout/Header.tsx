@@ -337,13 +337,7 @@ const Header = () => {
   //     count += 1
   //   }
   // });
-  // outfitState.map((outfit) => {
-  //   const filteredArray = cartState.filter(item => outfit.items.includes(item));
-  //   console.log(filteredArray);
 
-  // })
-  // const filteredArray =
-  //   console.log(itemsOutfit)
 
   return (
     <>
@@ -788,8 +782,7 @@ const Header = () => {
                             <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                               <div className="flex items-center">
                                 <p className="font-bold tracking-wide text-[15px]">
-                                  {(cart.totalMoney).toLocaleString("vi-VN")}đ
-
+                                  {cart.totalMoney.toLocaleString("vi-VN")}
                                 </p>
                               </div>
                               <div className="flex items-center w-[100px] border border-gray-300 rounded">

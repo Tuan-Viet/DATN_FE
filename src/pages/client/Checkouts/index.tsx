@@ -309,7 +309,7 @@ const CheckoutsPage = () => {
     const wardCode = e.target.value;
     setSelectedWards(wardCode);
 
-    const nameWard = wards.wards.find((item) => item.code == wardCode)
+    const nameWard = wards.wards?.find((item) => item.code == wardCode)
     setSelectednameWard(nameWard.name);
 
   };
@@ -353,7 +353,7 @@ const CheckoutsPage = () => {
     setWards(response2.data);
 
     // Tìm wardCode dựa trên tên phường/xã (addressUpdate.myWard)
-    const wardCode = response2.data.wards.find((item) => item.name == addressUpdate.myWard).code;
+    const wardCode = response2.data.wards?.find((item) => item.name == addressUpdate.myWard).code;
 
     // Lưu wardCode vào state hoặc biến khác để sử dụng sau này
     setSelectedWards(wardCode);
@@ -654,6 +654,9 @@ const CheckoutsPage = () => {
                 : ""}
 
             </div>
+            <span className="">*Bạn
+              chỉ có thể áp dụng 1 voucher
+            </span>
             <form className="py-5 flex gap-3 border-b-[1px]">
               <input
                 type="text"
@@ -662,6 +665,7 @@ const CheckoutsPage = () => {
                 value={getOneVoucher && !Array.isArray(getOneVoucher) ? getOneVoucher?.code : codeVoucher}
                 onChange={(e) => setcodeVoucher(e.target.value)}
               />
+
               <div onClick={() => handleFindVoucher()} className="p-3 cursor-pointer flex items-center justify-center rounded-lg bg-blue-500 text-white font-medium min-w-[102px]">
                 Áp dụng
               </div>

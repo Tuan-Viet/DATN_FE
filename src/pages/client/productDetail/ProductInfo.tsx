@@ -25,11 +25,13 @@ import {
   Image,
   Input,
   List,
+  Modal,
   Rate,
   Skeleton,
   Space,
   message,
 } from 'antd';
+import type { FormInstance } from 'antd';
 import ProductViewed from "./ProductViewed";
 import { useFetchListReviewsQuery } from "../../../store/reviews/review.service";
 import { listReviewByRate, listReviewByRateFilterSlice, listReviewByRateSlice, listReviewByUserFilterSlice, listReviewSlice } from "../../../store/reviews/reviewSlice";
@@ -586,6 +588,137 @@ const ProductInfo = () => {
       window.scrollTo({ top: 0, left: 0 });
     }, [id]);
 
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [size, setSize] = useState('')
+    const showModal = () => {
+      setIsModalOpen(true);
+    };
+    const handleCancel = () => {
+      setIsModalOpen(false);
+      setSize('')
+      form.resetFields();
+    };
+
+    const handleReset = () => {
+      form.resetFields(); // Reset form fields
+      setSize(''); // Reset the size state
+    };
+
+    const SubmitButton = ({ form }: { form: FormInstance }) => {
+      const [submittable, setSubmittable] = useState(false);
+
+      // Watch all values
+      const values = Form.useWatch([], form);
+      console.log(values);
+
+      const determineSize = (height, weight) => {
+        if ((height < 160) || (weight < 56)) {
+          return 'Size không xác định';
+        } else if ((height >= 160 && height <= 166) && (weight >= 56 && weight <= 62)) {
+          return 'S';
+        } else if ((height >= 167 && height <= 172) && (weight >= 63 && weight <= 68)) {
+          return 'M';
+        } else if ((height >= 173 && height <= 178) && (weight >= 69 && weight <= 74)) {
+          return 'L';
+        } else if ((height >= 179 && height <= 184) && (weight >= 75 && weight <= 80)) {
+          return 'XL';
+        } else if ((height > 184) || (weight > 80)) {
+          return 'Size không xác định';
+        }
+        else {
+          // Trường hợp không cùng khoảng, xét riêng chiều cao và cân nặng
+          let sizeHeight, sizeWeight;
+
+          if (height >= 160 && height <= 166) {
+            sizeHeight = 0; // Gán giá trị số thay vì chuỗi
+          } else if (height >= 167 && height <= 172) {
+            sizeHeight = 1;
+          } else if (height >= 173 && height <= 178) {
+            sizeHeight = 2;
+          } else if (height >= 179 && height <= 184) {
+            sizeHeight = 3;
+          }
+
+          if (weight >= 56 && weight <= 62) {
+            sizeWeight = 0;
+          } else if (weight >= 63 && weight <= 68) {
+            sizeWeight = 1;
+          } else if (weight >= 69 && weight <= 74) {
+            sizeWeight = 2;
+          } else if (weight >= 75 && weight <= 80) {
+            sizeWeight = 3;
+          }
+
+          // So sánh size của chiều cao và cân nặng (với giá trị số), chọn size lớn hơn
+          if (sizeHeight > sizeWeight) {
+            return getSizeString(sizeHeight);
+          } else {
+            return getSizeString(sizeWeight);
+          }
+        }
+      }
+      const getSizeString = (sizeValue) => {
+        // Chuyển đổi giá trị số thành chuỗi
+        switch (sizeValue) {
+          case 0:
+            return 'S';
+          case 1:
+            return 'M';
+          case 2:
+            return 'L';
+          case 3:
+            return 'XL';
+          default:
+            return '';
+        }
+      }
+
+      // if (values) {
+      //   const size = determineSize(values.height, values.weight);
+      //   console.log(`Kích cỡ quần áo: ${size}`);
+      // }
+
+      // const height = 170; // Đổi giá trị này để kiểm tra với chiều cao khác
+      // const weight = 60;  // Đổi giá trị này để kiểm tra với cân nặng khác
+
+      // const size = determineSize(height, weight);
+      // console.log(`Kích cỡ quần áo: ${size}`);
+      if (values) {
+        if (values.hight != undefined && values.weight != undefined) {
+
+          console.log("value", values);
+
+          // Handle cases where values are not valid numbers
+          const parsedHeight = parseInt(values.hight, 10);
+          const parsedWeight = parseInt(values.weight, 10);
+
+          // Check if parsedHeight and parsedWeight are valid numbers
+          if (!isNaN(parsedHeight) && !isNaN(parsedWeight)) {
+            const size = determineSize(parsedHeight, parsedWeight);
+            setSize(size)
+          }
+        }
+      }
+
+      useEffect(() => {
+        form.validateFields({ validateOnly: true }).then(
+          () => {
+            setSubmittable(true);
+          },
+          () => {
+            setSubmittable(false);
+          },
+        );
+      }, [values]);
+
+      return (
+        <Button type="primary" className="bg-blue-500" htmlType="submit" disabled={!submittable}>
+          Gợi ý
+        </Button>
+      );
+    }
+
+    const [form] = Form.useForm();
 
     return (
       <div className=" mx-3 mb-[70px] my-10" id="scroller ">
@@ -812,6 +945,29 @@ const ProductInfo = () => {
                               </button>
                             </div>
                           </div>
+                          <Button type="primary" onClick={showModal} className="bg-blue-500">
+                            Gợi ý size
+                          </Button>
+                          <Modal
+                            cancelButtonProps={{ hidden: true }}
+                            okButtonProps={{ hidden: true }}
+                            title="Gợi ý size" open={isModalOpen} onCancel={handleCancel} onOk={SubmitButton}>
+                            <Form form={form} name="validateOnly" onFinish={SubmitButton} layout="vertical" autoComplete="off">
+                              <Form.Item name="hight" label="Chiều cao" rules={[{ required: true, message: "Chiều cao bắt buộc phải nhập" }]}>
+                                <Input type="number" min={0} />
+                              </Form.Item>
+                              <Form.Item name="weight" label="Cân nặng" rules={[{ required: true, message: "Cân nặng bắt buộc phải nhập" }]}>
+                                <Input type="number" min={0} />
+                              </Form.Item>
+                              <Form.Item>
+                                <Space>
+                                  <SubmitButton form={form} />
+                                  <Button htmlType="reset" onClick={handleReset}>Reset</Button>
+                                </Space>
+                              </Form.Item>
+                            </Form>
+                            {size && <p>Kích cỡ quần áo của bạn là: {size}</p>}
+                          </Modal>
                         </div>
                         <div className="mb-7">
                           <div className="flex gap-x-[15px] mb-5">
