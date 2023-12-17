@@ -200,11 +200,11 @@ const productPage = () => {
                         </Link>
                     </Tooltip>
                     <Popconfirm
-                        title="Delete category"
-                        description="Are you sure to delete this category?"
+                        title="Xóa sản phẩm"
+                        description="Bạn có chắc muốn xóa sản phảm này"
                         onConfirm={() => confirm(record?._id)}
-                        okText="Yes"
-                        cancelText="No"
+                        okText="Xóa"
+                        cancelText="Hủy"
                         okButtonProps={{ className: "text-white bg-blue-400" }}
                     >
                         <Tooltip title="Xóa" color={'red'} key={'red'}>

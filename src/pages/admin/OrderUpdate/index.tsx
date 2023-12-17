@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { FormInstance } from 'antd';
 import {
     Button,
@@ -13,13 +13,15 @@ import {
     Modal,
     Popconfirm,
     Image,
-    Badge
+    Badge,
+    Tooltip
 } from 'antd';
 import {
     UploadOutlined,
     CreditCardOutlined,
     CheckCircleOutlined,
-    FrownOutlined
+    FrownOutlined,
+    PrinterFilled
 } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -29,6 +31,11 @@ import moment from 'moment';
 import { useGetOneOrderReturnQuery, useUpdateOrderReturnMutation } from '../../../store/orderReturn/order.service';
 import { useDeleteOrderDetailMutation, useUpdateOrderDetailMutation } from '../../../store/orderDetail/orderDetail.service';
 import { useListVoucherQuery } from '../../../store/vouchers/voucher.service';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import { useReactToPrint } from 'react-to-print';
+import 'jspdf-autotable';
+
 const { Dragger } = Upload;
 const { TextArea } = Input;
 const { Option } = Select;
@@ -80,6 +87,7 @@ interface ProductDetail {
 const orderUpdate = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
+    const componentRef = useRef();
     const { id } = useParams();
     const [onUpdate] = useUpdateOrderMutation()
     const [onUpdateOrderReturn] = useUpdateOrderReturnMutation()
@@ -115,6 +123,10 @@ const orderUpdate = () => {
     const [nameWard, setNameWard] = useState<any>();
 
     const provinceUpdate: any = provinces.find((item: any) => item.name == order?.address.myProvince)
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+    });
 
     useEffect(() => {
         // Gọi API để lấy dữ liệu tỉnh/thành phố
@@ -379,6 +391,9 @@ const orderUpdate = () => {
         }
     };
 
+
+
+
     const confirmOrderReturn = async () => {
         try {
             const orderDetailsArray = order?.orderDetails;
@@ -495,9 +510,167 @@ const orderUpdate = () => {
                 },
             ]}
         />
+
+        <div className="hidden">
+            <div className="p-16" ref={componentRef} >
+                <div className="flex justify-between pb-5 p-4">
+                    <div className="">
+                        <span className='text-base font-bold'>MÃ ĐƠN HÀNG</span>
+                        <span className='block text-base font-bold'>#{order?._id}</span>
+                        <span className='block text-sm'>{moment(order?.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
+
+                    </div>
+                    <div className="">
+                        <img className="w-[130px]" src="../../public/images/logo/dec5f33d-20b9-45cc-ab8c-5ce587a75660.jpg" alt="" />
+                    </div>
+                </div>
+                <div className="">
+                    <Table
+                        columns={columns}
+                        dataSource={data}
+                        pagination={false}
+                        summary={(pageData) => {
+                            let total = 0;
+                            pageData.forEach((record) => {
+                                total += record.price * record.quantity;
+                            });
+
+                            return (
+                                <>
+                                    {order?.orderReturn?.status !== 0 && order?.orderReturn?.status !== 1 ? (
+                                        <>
+                                            {orderReturnDetail?.map((item: any, index) => (
+
+                                                <Table.Summary.Row className='opacity-80 bg-slate-100'>
+                                                    <Table.Summary.Cell
+                                                        className=''
+                                                        key={item.key}
+                                                        colSpan={1}
+                                                        index={0}
+                                                    >
+                                                        <div className='flex'>
+                                                            <div className='mr-2'>
+                                                                <img src={item?.productInfo.imageColor} alt="" className='w-14 h-20 object-cover' />
+                                                            </div>
+                                                            <div className="space-y-3 py-2 font-light">
+                                                                <span className='block'>{item?.productName}</span>
+                                                                <span className='block text'>{item?.productInfo.nameColor} / {item.size}</span>
+                                                            </div>
+                                                        </div>
+
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell key={item.key} colSpan={1} index={index}>
+                                                        {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                    </Table.Summary.Cell>
+                                                    <Table.Summary.Cell key={item.key} colSpan={1} index={index}>
+                                                        {item.quantity}
+                                                    </Table.Summary.Cell>
+
+                                                    <Table.Summary.Cell key={item.key} colSpan={1} index={index}>
+
+                                                        <div className='text-end'>{(item.price * item.quantity).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
+                                                    </Table.Summary.Cell>
+                                                    <Badge.Ribbon text="Đổi hàng" className='opacity-100'>
+                                                    </Badge.Ribbon>
+                                                </Table.Summary.Row>
+                                            ))}
+                                        </>
+                                    ) : null}
+
+
+                                    <Table.Summary.Row className=''>
+                                        <Table.Summary.Cell index={0} colSpan={3}>
+                                            <span className='block'>Tổng sản phẩm</span>
+                                            {order?.voucher_code ? <span className='block'>Khuyến mãi</span> : ""}
+                                            <span className='block'>Vận chuyển</span>
+                                            <span className='block'>Tổng</span>
+                                        </Table.Summary.Cell>
+                                        <Table.Summary.Cell index={1}>
+                                            <div className='text-end'>
+                                                {totalCart?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            </div>
+                                            {order?.voucher_code && <div className='text-end'>
+                                                -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                {/* {totalCart?} */}
+                                            </div>}
+                                            {order?.pay_method === "FREE" || (totalCart && totalCart > 500000) ? (
+                                                <div className='text-end'>
+                                                    Miễn phí
+                                                </div>
+                                            ) : (
+                                                <div className='text-end'>
+                                                    {(order?.pay_method === "FREE" || (totalCart && totalCart < 500000)) && order?.orderReturn ? (
+                                                        <div className='text-end'>
+                                                            Miễn phí
+                                                        </div>
+                                                    ) : (
+                                                        <div className='text-end'>
+                                                            40,000đ
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            <div className='text-end'>
+                                                {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                            </div>
+                                        </Table.Summary.Cell>
+                                    </Table.Summary.Row>
+
+                                </>
+                            );
+                        }}
+                    />
+                </div>
+                <div className="">
+                    <div className="">
+                        <div className="p-4">
+                            <h2 className='text-base mb-3 font-bold text-gray-900 '>Thông tin giao hàng</h2>
+                            <div className="flex space-x-3">
+                                <div className="space-y-1">
+                                    <div className="flex space-x-3">
+                                        <div className="">
+                                            <span className='block text-sm font-bold'>Người nhận:</span>
+                                            <span className='block text-sm font-bold'>SĐT:</span>
+                                        </div>
+                                        <div className="">
+                                            <span className='block text-sm'>{order?.fullName}</span>
+                                            <span className='block text-sm'>{order?.phoneNumber}</span>
+                                        </div>
+                                    </div>
+                                    <span className='block text-sm font-bold'>Địa chỉ:</span>
+                                    <div className="">
+                                        <span className='block text-sm'>{order?.address?.myProvince}</span>
+                                        <span className='block text-sm'>{order?.address?.myDistrict}</span>
+                                        <span className='block text-sm'>{order?.address?.myWard}</span>
+                                        <span className='block text-sm'>{order?.address?.detailAddress}</span>
+                                    </div>
+                                </div>
+                                <div className="space-y-1">
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div className='px-10 '>
             <div className="space-y-2 py-5 w-[85%] mx-auto">
-                <span className='block text-lg font-medium'>#{order?._id}</span>
+                <div className="flex items-center space-x-2">
+                    <span className='block text-lg font-medium'>#{order?._id}</span>
+                    <Tooltip title="In đơn" color={'orange'} key={'orange'}>
+                        <button
+                            onClick={handlePrint}
+                        >
+                            <PrinterFilled className='text-lg text-orange-500' />
+                        </button>
+                    </Tooltip>
+                </div>
                 <div className="flex space-x-1 text-gray-400">
                     <span className='block'>{moment(order?.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
                     <span className='border-l border-gray-300'></span>
@@ -510,6 +683,7 @@ const orderUpdate = () => {
                     </span>
                 </div>
             </div>
+
             <div className="flex w-[85%] mx-auto space-x-10">
 
                 <div className="border bg-white w-2/3">
@@ -587,21 +761,22 @@ const orderUpdate = () => {
                                                         -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                         {/* {totalCart?} */}
                                                     </div>}
-
-                                                    {order?.pay_method === "FREE" ? (
+                                                    {order?.pay_method === "FREE" || (totalCart && totalCart > 500000) ? (
                                                         <div className='text-end'>
                                                             Miễn phí
                                                         </div>
                                                     ) : (
-                                                        order?.orderReturn?.status !== 0 && order?.orderReturn?.status !== 1 && totalCart && totalCart < 500000 ? (
-                                                            <div className='text-end'>
-                                                                Miễn phí
-                                                            </div>
-                                                        ) : (
-                                                            <div className='text-end'>
-                                                                {totalCart && totalCart > 500000 ? "Miễn phí" : "40,000đ"}
-                                                            </div>
-                                                        )
+                                                        <div className='text-end'>
+                                                            {(order?.pay_method === "FREE" || (totalCart && totalCart < 500000)) && order?.orderReturn ? (
+                                                                <div className='text-end'>
+                                                                    Miễn phí
+                                                                </div>
+                                                            ) : (
+                                                                <div className='text-end'>
+                                                                    40,000đ
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     )}
 
                                                     <div className='text-end'>

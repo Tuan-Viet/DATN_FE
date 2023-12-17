@@ -829,7 +829,7 @@ const OrderDetail = () => {
                           <div className="border rounded-sm">
                             <div className="border-b">
                               <h3 className=" p-3 font-medium">
-                                Thộng tin giao hàng
+                                Thông tin giao hàng
                               </h3>
                             </div>
                             <div className="p-3">

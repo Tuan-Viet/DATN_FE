@@ -10,14 +10,10 @@ import {
     message,
     Upload,
     Spin,
-    Row,
-    Col,
     Card,
-    Typography,
     Image,
     Badge,
     Breadcrumb,
-    Tag,
     Switch,
     Tooltip
 } from 'antd';
@@ -34,7 +30,6 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ICategory } from '../../../store/category/category.interface';
 import { useFetchListProductQuery, useFetchOneProductByAdminQuery, useFetchOneProductQuery, useUpdateProductMutation } from '../../../store/product/product.service';
-import IProduct from '../../../store/product/product.interface';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import axios from 'axios';
@@ -68,7 +63,6 @@ const SubmitButton = ({ form }: { form: FormInstance }) => {
         </Button>
     );
 };
-
 interface ProductDetail {
     _id: string;
     product_id: string;
@@ -126,7 +120,6 @@ const productUpdate = () => {
             });
         }
     }, [product]);
-
 
     function filterAndTransformVariants(inputVariants: any) {
         const resultVariants = [];
