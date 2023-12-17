@@ -32,10 +32,8 @@ const BillConfirm = () => {
   // const orderState = useSelector((state: RootState) => state.orderSlice.orders)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
   const productState = useSelector((state: RootState) => state.productSlice.products)
-  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const [totalCart, setTotalCart] = useState<number>(0)
   const { data: listOutfit, isSuccess: isSuccesslistOutfit } = useFetchListOutfitQuery();
-  const outfitState = useSelector((state: RootState) => state.outfitSlice.outfits)
   useEffect(() => {
     if (listOutfit) {
       dispatch(listOutfitSlice(listOutfit))
@@ -75,19 +73,7 @@ const BillConfirm = () => {
     }
     setTotalCart(total)
   }, [getOneOrder])
-  let count = 0
-  cartState?.map((cart) => {
-    const matchingItems = outfitState?.filter((outfit) =>
-      outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
-    )
-    // console.log(matchingItems)
-    const filteredItems = matchingItems?.[0]?.items?.filter(
-      (product) => cart.productDetailId.product_id === product.product_id
-    );
-    if (filteredItems) {
-      count += 1
-    }
-  });
+
   return (
     <>
       <Header></Header>

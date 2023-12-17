@@ -37,6 +37,7 @@ import { useForm } from "react-hook-form";
 import { ReviewForm, ReviewSchema } from "../../../Schemas/Review";
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
+  Badge,
   Button,
   Form,
   Modal,
@@ -1032,6 +1033,7 @@ const OrderDetail = () => {
                       </tr>
                     </thead>
                     <tbody>
+
                       {productsInOrder?.map((product: any) => {
                         return (
                           <>
@@ -1049,6 +1051,7 @@ const OrderDetail = () => {
                                           prod._id === item.product_id
                                       )
                                       .map((pro: any) => (
+
                                         <tr className="bg-white">
                                           <th
                                             scope="row"
@@ -1058,6 +1061,7 @@ const OrderDetail = () => {
                                               to={`/products/${pro._id!}`}
                                               className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap flex items-center gap-x-5"
                                             >
+
                                               <img
                                                 src={item.imageColor}
                                                 alt={pro.title}
@@ -1092,7 +1096,9 @@ const OrderDetail = () => {
                                             )}
                                             ₫
                                           </td>
+
                                           <td>
+
                                             {(order && order.status === 4) ||
                                               order?.status === 5
                                               ? product.isReviewed ===
@@ -1111,6 +1117,7 @@ const OrderDetail = () => {
                                                 </div>
                                               )
                                               : null}
+
                                             {(order && order.status === 4) ||
                                               order?.status === 5
                                               ? product.isReviewed === true && (
@@ -1119,9 +1126,11 @@ const OrderDetail = () => {
                                                 </div>
                                               )
                                               : null}
+
                                           </td>
                                         </tr>
                                       ))}
+
                                   </>
                                 );
                               })}
@@ -1155,7 +1164,7 @@ const OrderDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {totalProductPrice >= 500000 ? (
+                          {totalProductPrice >= 500000 || order?.pay_method === "FREE" || order?.orderReturn?.status !== 1 ? (
                             <p>Miễn phí</p>
                           ) : (
                             <p>40.000đ</p>

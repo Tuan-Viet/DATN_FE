@@ -326,24 +326,7 @@ const Header = () => {
     message.success("Mã token đã gửi về email của bạn")
   }
 
-  // cartState?.map((cart) => {
-  //   const matchingItems = outfitState?.filter((outfit) =>
-  //     outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
-  //   )
-  //   const filteredItems = matchingItems?.[0]?.items?.filter(
-  //     (product) => cart.productDetailId.product_id === product.product_id
-  //   );
-  //   if (filteredItems) {
-  //     count += 1
-  //   }
-  // });
-  // outfitState.map((outfit) => {
-  //   const filteredArray = cartState.filter(item => outfit.items.includes(item));
-  //   console.log(filteredArray);
 
-  // })
-  // const filteredArray =
-  //   console.log(itemsOutfit)
 
   return (
     <>
@@ -788,8 +771,7 @@ const Header = () => {
                             <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block">
                               <div className="flex items-center">
                                 <p className="font-bold tracking-wide text-[15px]">
-                                  {(cart.totalMoney).toLocaleString("vi-VN")}đ
-
+                                  {cart.totalMoney.toLocaleString("vi-VN")}
                                 </p>
                               </div>
                               <div className="flex items-center w-[100px] border border-gray-300 rounded">

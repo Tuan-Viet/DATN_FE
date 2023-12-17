@@ -4,7 +4,9 @@ import { QuarterlyStatistics } from '../../../store/statistic/statistic.interfac
 import { useGetOrderRevenueByQuarterQuery } from '../../../store/statistic/statistic.service';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from 'highcharts';
-import { Spin, Table } from 'antd';
+import { Button, Spin, Table } from 'antd';
+import { IExcelColumn } from 'antd-table-saveas-excel/app';
+import { Excel } from "antd-table-saveas-excel";
 
 interface DataType {
   key: string;
@@ -139,7 +141,28 @@ const OrderRevanueByQuarter = (props: OrderRevanueByMonthProps = ({showTable : t
         return quarterA - quarterB;
       })
     : [];
-
+    const excelColumns: IExcelColumn[] = columns.map(column => {
+      // Lọc ra các thuộc tính quan trọng từ cột
+      const { title, dataIndex } = column;
+      
+      return {
+        title,
+        dataIndex: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+        key: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+        
+      };
+    });
+    const handleClick = () => {
+      console.log(excelColumns);
+      const excel = new Excel();
+      excel
+        .addSheet("test")
+        .addColumns(excelColumns)
+        .addDataSource(data, {
+          str2Percent: true,
+        })
+        .saveAs("Thongkesanpham.xlsx");
+    };
   return (
     <>
       <div>
@@ -174,7 +197,8 @@ const OrderRevanueByQuarter = (props: OrderRevanueByMonthProps = ({showTable : t
       </div>
       <div>
       {props.showTable && (
-        <Table
+        <>      <Button danger onClick={handleClick}>Export</Button>
+<Table
           columns={columns}
           dataSource={data}
           pagination={{ size: 'small', pageSize: 20 }}
@@ -203,7 +227,7 @@ const OrderRevanueByQuarter = (props: OrderRevanueByMonthProps = ({showTable : t
               </Table.Summary.Cell>
             </Table.Summary.Row>
           )}
-        />)}
+        />        </>)}
       </div>
     </>
   );

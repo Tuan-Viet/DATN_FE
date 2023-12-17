@@ -59,7 +59,7 @@ const OutfitProductDetail = (props: any) => {
             let total = 0
             props?.listOutfitByProductIdState[0]?.items?.map((item: any) => {
                 props?.productState?.filter((pro: any) => pro._id === item.product_id).map((product: any) => {
-                    return total += (((product.price - product.discount) - ((product.price - product.discount) * 10 / 100)))
+                    return total += (product.price - product.discount)
                 })
             })
             setTotalOutfit(total)
@@ -127,12 +127,12 @@ const OutfitProductDetail = (props: any) => {
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
+                                totalMoney: pro?.price - pro?.discount
                             }).then(() => dispatch(addCartSlice({
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
+                                totalMoney: pro?.price - pro?.discount
                             }))).then(() => {
                                 const overlayCart = document.querySelector(".overlay-cart")
                                 const overlay = document.querySelector(".overlay")
@@ -148,7 +148,7 @@ const OutfitProductDetail = (props: any) => {
                             dispatch(addCartSlice({
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
+                                totalMoney: pro?.price - pro?.discount
                             }))
                             const overlayCart = document.querySelector(".overlay-cart")
                             const overlay = document.querySelector(".overlay")
@@ -183,12 +183,12 @@ const OutfitProductDetail = (props: any) => {
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
+                                totalMoney: pro?.price - pro?.discount
                             }).then(() => dispatch(addCartSlice({
                                 userId: userStore?.current?._id,
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
+                                totalMoney: pro?.price - pro?.discount
                             }))).then(() => {
                                 const overlayCart = document.querySelector(".overlay-cart")
                                 const overlay = document.querySelector(".overlay")
@@ -204,7 +204,7 @@ const OutfitProductDetail = (props: any) => {
                             dispatch(addCartSlice({
                                 productDetailId: productDetail,
                                 quantity: 1,
-                                totalMoney: ((pro?.price - pro?.discount) - ((pro?.price - pro?.discount) * 10 / 100))
+                                totalMoney: pro?.price - pro?.discount
                             }))
                             const overlayCart = document.querySelector(".overlay-cart")
                             const overlay = document.querySelector(".overlay")
@@ -281,8 +281,6 @@ const OutfitProductDetail = (props: any) => {
                                         </select>
                                     </div>
                                     <p className="font-bold text-[14px] pt-10">{(OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount).toLocaleString("vi-VN")}₫</p>
-                                    <p className='text-sm my-3'>Giảm giá còn: <strong className='text-[14px] text-red-600'>{((OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount) -
-                                        ((OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount) * getOneOutfit.discount) / 100).toLocaleString("vi-VN")}</strong><del className='ml-2'>{(OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount).toLocaleString("vi-VN")}₫</del></p>
                                 </>
                                 : <div className="bg-red-400 text-white w-[150px] text-[10px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
                         </div>
@@ -319,16 +317,14 @@ const OutfitProductDetail = (props: any) => {
                                 </select>
                             </div>
                             <p className="font-bold text-[14px] pt-10">{(OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount).toLocaleString("vi-VN")}₫</p>
-                            <p className='text-sm my-3'>Giảm giá còn: <strong className='text-[14px] text-red-600'>{((OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) -
-                                ((OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) * getOneOutfit.discount) / 100).toLocaleString("vi-VN")}</strong><del className='ml-2'>{(OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount).toLocaleString("vi-VN")}₫</del></p>
+                            {/* <p className='text-sm my-3'>Giảm giá còn: <strong className='text-[14px] text-red-600'>{((OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) -
+                                ((OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) * getOneOutfit.discount) / 100).toLocaleString("vi-VN")}</strong><del className='ml-2'>{(OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount).toLocaleString("vi-VN")}₫</del></p> */}
                         </div>
                     </div>
                 </div>
                 <div className="border-t-2 flex py-3 items-center">
                     <div className="flex flex-col">
                         <div className="flex text-sm font-bold"><span>Tổng tiền:</span> <p className="text-red-500 ml-1">{(totalOutfit).toLocaleString("vi-VN")}đ</p></div>
-                        <div className="flex text-sm font-bold"><span>Tiết kiệm:</span><p className="text-gray-500 ml-1">{((OutFitItemFirstLengh?.price - OutFitItemFirstLengh?.discount) + (OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) - totalOutfit).toLocaleString("vi-VN")}đ</p></div>
-
                     </div>
                     <button onClick={() => handleAddtoCartOutfit(props.listOutfitByProductIdState?.[0]?._id!)} className="bg-red-500 rounded-lg  hover:bg-red-600 transition-all ease-linear text-white px-4 py-2 uppercase ml-3 text-[12px]">Thêm 2 vào giỏ hàng</button>
                 </div>
