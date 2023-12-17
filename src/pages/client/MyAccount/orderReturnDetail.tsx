@@ -29,11 +29,9 @@ function formatDateStringToDisplayDate(dateString) {
     amPm = "CH";
   }
 
-  const formattedDate = `${day < 10 ? "0" : ""}${day}/${
-    month < 10 ? "0" : ""
-  }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${
-    minutes < 10 ? "0" : ""
-  }${minutes}${amPm}`;
+  const formattedDate = `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
+    }${month}/${year}, ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? "0" : ""
+    }${minutes}${amPm}`;
   return formattedDate;
 }
 
@@ -238,10 +236,10 @@ const OrderReturnDetail = () => {
                     </h1>
                     {(orderReturn?.status === 3 ||
                       orderReturn?.status === 4) && (
-                      <Link to={`/account/orders/${orderReturn?.newOrder?._id}`} className="text-white bg-blue-700 py-3 px-3 rounded-md inline-block mt-1">
-                        Kiểm tra đơn hàng đã được tạo mới cho bạn
-                      </Link>
-                    )}
+                        <Link to={`/account/orders/${orderReturn?.newOrder?._id}`} className="text-white bg-blue-700 py-3 px-3 rounded-md inline-block mt-1">
+                          Kiểm tra đơn hàng đã được tạo mới cho bạn
+                        </Link>
+                      )}
                   </div>
                   <div className="text-right">
                     <Link
@@ -369,7 +367,7 @@ const OrderReturnDetail = () => {
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4"></td>
                         <td className="px-6 py-4 font-bold">
-                          {totalProductPrice >= 500000 ? (
+                          {totalProductPrice >= 500000 || order?.pay_method === "FREE" ? (
                             <p>Miễn phí</p>
                           ) : (
                             <p>40.000đ</p>

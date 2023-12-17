@@ -214,7 +214,7 @@ const ProductInfo = () => {
                                 expandIcon={({ isActive }) => <CaretRightOutlined className={`text-blue-500`} rotate={isActive ? 90 : 0} />}
                               >
                                 <Collapse.Panel key={index} header={<span className="text-gray-400">Replie</span>} className="m-0">
-                                  <div className="ml-5">
+                                  <div className="ml-5 ">
                                     <div className="flex items-center space-x-2">
                                       <span className="font-medium">{item.reply.nameUser}</span>
                                       <span className="block text-end text-xs text-gray-400 pr-1">{moment(item.reply.createdAt as string, "YYYY-MM-DDTHH:mm:ss.SSSZ").format("HH:mm DD/MM/YYYY")}</span>
