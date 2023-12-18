@@ -6,7 +6,8 @@ import {
     message,
     Image,
     Spin,
-    Tooltip
+    Tooltip,
+    Select
 } from 'antd';
 import {
     EditFilled,
@@ -21,12 +22,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import axios from 'axios';
 interface DataType {
-    _id: React.Key;
+    _id: string;
     fullname: string;
-    // phone: number;
     email: string;
     address: string;
     role: string;
+    createdAt: any;
 }
 
 const userPage = () => {
@@ -34,6 +35,7 @@ const userPage = () => {
     const user = useSelector((state: any) => state.user);
 
     const [userList, setUserList] = useState([]);
+    const [sortOption, setSortOption] = useState<Number>(1);
     if (user) {
         const token = user.token;
         const config = {
@@ -105,7 +107,7 @@ const userPage = () => {
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
-                    <Popconfirm
+                    {/* <Popconfirm
                         title="Delete category"
                         description="Are you sure to delete this category?"
                         onConfirm={() => confirm(record._id!)}
@@ -117,9 +119,9 @@ const userPage = () => {
                     </Popconfirm>
                     <Link to={`/admin/category/update/${record._id}`}>
                         <EditFilled className='text-xl text-yellow-400' />
-                    </Link>
+                    </Link> */}
                     <Tooltip title="Xem" color={'green'} key={'green'}>
-                        <Link to={`/admin/product/${record?._id}`}>
+                        <Link to={`/admin/user/${record?._id}`}>
                             <EyeOutlined className='text-xl text-green-500' />
                         </Link>
                     </Tooltip>
@@ -137,7 +139,24 @@ const userPage = () => {
         email: user.email,
         address: user.address,
         role: user.role,
+        createdAt: user.createdAt
     }));
+    console.log(data);
+
+    const sorrUser = [...users];
+
+    switch (sortOption) {
+        case 1:
+            // Mới nhất
+            sorrUser.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            break;
+        case 2:
+            // Cũ nhất
+            sorrUser.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            break;
+        default:
+            break;
+    }
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);
     };
@@ -182,7 +201,23 @@ const userPage = () => {
 
 
                 </div>
-                <Table columns={columns} dataSource={data} pagination={{ pageSize: 20 }} onChange={onChange} />
+                <div className="flex justify-end items-start mb-6">
+                    <div className="flex items-center">
+                        <span className="mr-3 text-sm text-[#333333]">Sắp xếp theo:</span>
+                        <Select
+                            defaultValue={1}
+                            style={{ width: 200 }}
+                            options={[
+                                { value: 1, label: 'Mới nhất' },
+                                { value: 2, label: 'Cũ nhất' },
+
+
+                            ]}
+                            onChange={(value: any) => setSortOption(value)}
+                        />
+                    </div>
+                </div>
+                <Table columns={columns} dataSource={sorrUser} pagination={{ pageSize: 20 }} onChange={onChange} />
             </div>
         </div>
     )

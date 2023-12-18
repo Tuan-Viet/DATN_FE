@@ -301,10 +301,9 @@ const orderReturnById = () => {
                     }
                     if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
                         await onRemoveOrderDetail(orderDetail._id)
-                        let totalMoneyUpdate =
-                            sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
-                        setSumTotalMoney(totalMoneyUpdate);
-
+                        // let totalMoneyUpdate =
+                        //     sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
+                        // setSumTotalMoney(totalMoneyUpdate);
                     }
                 }
             });
@@ -436,11 +435,11 @@ const orderReturnById = () => {
                                                     <span className='text-[13px] text-gray-600'>Trạng thái</span>
                                                 </Table.Summary.Cell>
                                                 <Table.Summary.Cell index={1} className='text-end'>
-                                                    {orderReturn?.newOrder?.status === 5 ? (
+                                                    {/* {orderReturn?.newOrder?.status === 5 ? (
                                                         <span className='p-2 font-medium text-xs text-green-600'>Hoàn thành</span>
-                                                    ) : (
-                                                        <span className='p-2 font-medium text-xs text-blue-700'>{mapStatusToText(orderReturn?.status)}</span>
-                                                    )}
+                                                    ) : ( */}
+                                                    <span className='p-2 font-medium text-xs text-blue-700'>{mapStatusToText(orderReturn?.status)}</span>
+                                                    {/* // )} */}
                                                 </Table.Summary.Cell>
                                             </Table.Summary.Row>
                                             {orderReturn?.status === 3 && (

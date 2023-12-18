@@ -7,6 +7,8 @@ interface IInfoUser {
     address: string[],
     email: string,
     voucherwallet: string[]
+    createtdAt: string
+    phoneNumber: number
 }
 
 interface IAuth {

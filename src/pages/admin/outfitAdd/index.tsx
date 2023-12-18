@@ -207,12 +207,12 @@ const outfitAdd = () => {
 
                                         >
                                             <Input
-                                                placeholder='Nhập tên sản phẩm'
+                                                placeholder='Nhập tên outfit'
                                                 className='py-2' />
                                         </Form.Item>
                                         <Form.Item
                                             name="sku"
-                                            label="Mã sản phẩm/SKU"
+                                            label="Mã outfit/SKU"
                                             rules={[{ required: true, message: 'Không được để trống!' }, { validator: handleCheckSku },]}
                                             normalize={(value) => value.toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}
                                             className='w-1/2'>

@@ -136,6 +136,30 @@ const OrderDetail = () => {
 
   const { id } = useParams();
   const { data: order } = useGetOneOrderQuery(id!);
+
+  const [showCancelButton, setShowCancelButton] = useState(true);
+  const [showReturnButton, setShowReturnButton] = useState(true);
+
+  useEffect(() => {
+    if (order && order.createdAt) {
+      // Tính thời gian hiện tại
+      const currentTime = new Date();
+
+      // Tính thời gian trôi qua kể từ khi tạo đơn hàng
+      const timeElapsed = currentTime - new Date(order.createdAt);
+
+      // Kiểm tra xem đã qua 30 phút chưa
+      const showCancelButton = timeElapsed <= 30 * 60 * 1000;
+      const showReturnButton = timeElapsed <= 10 * 24 * 60 * 60 * 1000;
+      console.log(showReturnButton);
+
+      setShowCancelButton(showCancelButton);
+      setShowReturnButton(showReturnButton);
+    }
+  }, [order]);
+
+
+
   const { data: listOrderDetail, isSuccess: isSuccessListOrder } =
     useListOrderDetailQuery();
   const { data: listProductDetail, isSuccess: isSuccessListProductDetail } =
@@ -574,15 +598,21 @@ const OrderDetail = () => {
                         </button>
                       </p>
                     )}
-                    {order?.status == 4 && (
-                      <Button
-                        type="primary"
-                        onClick={showOrderModal}
-                        className="text-white bg-blue-700"
-                      >
-                        Đổi hàng
-                      </Button>
-                    )}
+                    {(order?.status === 4 || order?.status === 5) && showReturnButton ? (
+                      <div className="">
+
+                        <Button
+                          type="primary"
+                          onClick={showOrderModal}
+                          className="text-white mr-1 bg-blue-700"
+                        >
+                          Đổi hàng
+                        </Button>
+                        <Tooltip title="Bạn chỉ gửi yêu cầu đổi hàng trong 10 ngày tính từ lúc đặt hàng " color={'blue'} key={'blue'}>
+                          <InfoCircleOutlined className='text-blue-500' />
+                        </Tooltip>
+                      </div>
+                    ) : null}
                   </div>
                   <Modal
                     title={
@@ -973,7 +1003,7 @@ const OrderDetail = () => {
                         Hủy đơn hàng
                       </button>
                     } */}
-                    {order?.status === 1 &&
+                    {/* {order?.status === 1 &&
                       Number(order?.paymentStatus) !== 1 ? (
                       <button
                         onClick={() => handleCancelOrder(id!)}
@@ -983,7 +1013,22 @@ const OrderDetail = () => {
                       </button>
                     ) : (
                       ""
-                    )}
+                    )} */}
+
+                    {showCancelButton && Number(order?.paymentStatus) !== 1 ? (
+                      <div className="">
+                        <Tooltip title="Bạn chỉ được hủy trong 30 phút tính từ khi đặt hàng" color={'blue'} key={'blue'}>
+                          <InfoCircleOutlined className='text-blue-500' />
+                        </Tooltip>
+                        <button
+                          onClick={() => handleCancelOrder(id!)}
+                          className="text-white bg-red-500 ml-1 hover:bg-red-600 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"
+                        >
+                          Hủy đơn hàng
+                        </button>
+                      </div>
+                    ) : null}
+
                     <Link
                       to="/account"
                       className="text-white block bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm cursor-pointer px-5 py-2.5 mr-2 mb-2"

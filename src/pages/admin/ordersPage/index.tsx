@@ -140,7 +140,7 @@ const ordersPage = () => {
         {
             title: 'THANH TOÁN',
             key: 'paymentStatus',
-            render: (value: any) => (value.paymentStatus === 1 ? (
+            render: (value: any) => (value.paymentStatus === 'Đã thanh toán' ? (
                 <Badge status="success" text={<Text type="success" className=''>Đã thanh toán</Text>} />
             ) : (
                 <Badge status="default" text={<Text className=''>Chưa thanh toán</Text>} />

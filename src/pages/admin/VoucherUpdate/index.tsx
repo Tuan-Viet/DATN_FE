@@ -62,10 +62,20 @@ const VoucherUpdate = () => {
     const navigate = useNavigate();
     const [onAdd] = useAddVoucherMutation()
     const { id } = useParams();
-    const { data: voucher } = useGetOneVoucherQuery(id || '')
+    const { data: voucher, isSuccess } = useGetOneVoucherQuery(id || '')
+    const vocherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
+    const voucherCodes = vocherState
+        .filter((v) => v.code !== voucher?.code)
+        .map((voucher) => voucher.code);
+
+    const voucherById = vocherState.find((voucher: any) => voucher._id === id)
+    const [statusVoucher, setStatusVoucher] = useState<any>(voucherById?.status)
+    console.log(voucherById?.status);
+
+
 
     useEffect(() => {
-        if (voucher) {
+        if (isSuccess) {
             setIsEndDateDisabled(voucher?.validTo === null || undefined ? true : false)
             setIsQuantityDisabled(voucher?.quantity === null || !voucher?.quantity ? true : false);
             setDiscountType(voucher.type)
@@ -83,14 +93,11 @@ const VoucherUpdate = () => {
                 description: voucher?.description,
             });
         }
-    }, [voucher, form]);
+    }, [voucher, isSuccess, form]);
 
     const [onUpdate] = useUpdateVoucherMutation()
 
-    const vocherState = useSelector((state: RootState) => state.voucherSlice.vouchers)
-    const voucherCodes = vocherState
-        .filter((v) => v.code !== voucher?.code)
-        .map((voucher) => voucher.code);
+
 
     const [isEndDateDisabled, setIsEndDateDisabled] = useState<boolean | undefined>(voucher?.validTo === null || undefined ? true : false);
 
@@ -98,11 +105,7 @@ const VoucherUpdate = () => {
         setIsEndDateDisabled(e.target.checked);
     };
 
-    console.log(isEndDateDisabled);
-
-
     const [isQuantityDisabled, setIsQuantityDisabled] = useState<boolean | undefined>(voucher?.quantity === null || undefined ? true : false);
-    console.log(voucher?.quantity);
 
     const handleCheckboxQuantity = (e: any) => {
         setIsQuantityDisabled(e.target.checked);
@@ -114,11 +117,11 @@ const VoucherUpdate = () => {
     };
 
     const [promotionType, setPromotionType] = React.useState(1);
+
     const handlePromotionTypeChange = (value: any) => {
         setPromotionType(value);
     };
 
-    const [statusVoucher, setStatusVoucher] = useState(voucher?.status)
     const handleSwitchChange = (checked: any) => {
         setStatusVoucher(checked)
     };
@@ -148,20 +151,6 @@ const VoucherUpdate = () => {
         }
     };
 
-    // form.setFieldsValue({
-    //     _id: voucher?._id,
-    //     title: voucher?.title,
-    //     code: voucher?.code,
-    //     quantity: voucher?.quantity,
-    //     minOrderValue: voucher?.minOrderValue,
-    //     maxOrderValue: voucher?.maxOrderValue,
-    //     discount: voucher?.discount,
-    //     type: voucher?.type,
-    //     promotionType: voucher?.promotionType,
-    //     validFrom: dayjs(voucher?.validFrom),
-    //     validTo: dayjs(voucher?.validTo),
-    //     description: voucher?.description,
-    // });
     const onFinish = async (values: any) => {
         try {
             const voucherData = {
@@ -342,7 +331,7 @@ const VoucherUpdate = () => {
                             <Form.Item
                                 name="status"
                                 valuePropName="checked"
-                                initialValue={false}
+                                // initialValue={false}
                                 className=' space-y-3'
                             >
                                 <h1 className='border-b px-3 py-2 font-semibold'>Trạng thái</h1>
@@ -351,10 +340,11 @@ const VoucherUpdate = () => {
                                     <Switch
                                         size="small"
                                         className=''
-                                        defaultChecked={voucher?.status}
+                                        defaultChecked={voucherById?.status}
                                         onChange={(checked) => handleSwitchChange(checked)}
                                     />
                                 </Space>
+
                             </Form.Item>
                         </div>
                         <div className="bg-white border rounded-sm">

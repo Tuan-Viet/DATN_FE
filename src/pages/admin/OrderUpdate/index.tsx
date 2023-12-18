@@ -419,8 +419,8 @@ const orderUpdate = () => {
                     }
                     if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
                         await onRemoveOrderDetail(orderDetail._id)
-                        let totalMoneyUpdate = sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
-                        setSumTotalMoney(totalMoneyUpdate);
+                        // let totalMoneyUpdate = sumTotalMoney - (matchingOrderReturnDetail?.quantity * matchingOrderReturnDetail?.price);
+                        // setSumTotalMoney(totalMoneyUpdate);
                     }
                 }
             });
@@ -549,9 +549,9 @@ const orderUpdate = () => {
                                                         index={0}
                                                     >
                                                         <div className='flex'>
-                                                            <div className='mr-2'>
+                                                            {/* <div className='mr-2'>
                                                                 <img src={item?.productInfo.imageColor} alt="" className='w-14 h-20 object-cover' />
-                                                            </div>
+                                                            </div> */}
                                                             <div className="space-y-3 py-2 font-light">
                                                                 <span className='block'>{item?.productName}</span>
                                                                 <span className='block text'>{item?.productInfo.nameColor} / {item.size}</span>

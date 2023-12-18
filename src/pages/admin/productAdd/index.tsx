@@ -441,9 +441,8 @@ const productAdd = () => {
                                                                     </Upload>
                                                                 </Form.Item>
                                                                 <Form.Item label="Màu sắc" name={[field.name, 'nameColor']}>
-                                                                    <Input readOnly />
+                                                                    <Input disabled />
                                                                 </Form.Item>
-
                                                             </div>
 
                                                             <div className="w-2/3">
@@ -463,7 +462,10 @@ const productAdd = () => {
                                                                                             <Form.Item noStyle name={[subField.name, 'size']}
                                                                                                 className='w-full'>
                                                                                                 <Input
-                                                                                                    style={{ width: '100%' }}
+                                                                                                    style={{ width: '100%' }
+
+                                                                                                    }
+                                                                                                    disabled
                                                                                                 />
                                                                                             </Form.Item>
                                                                                             <Form.Item noStyle name={[subField.name, 'quantity']} rules={[{ required: true }]}>
