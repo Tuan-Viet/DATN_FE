@@ -63,7 +63,6 @@ function mapStatusPaymentToText(statusCode) {
   }
 }
 
-
 const OrderReturnDetail = () => {
   const dispatch: Dispatch<any> = useDispatch();
   const { setValue } = useForm();

@@ -10,7 +10,7 @@ import { useDeleteCartMutation, useListCartQuery, useUpdateCartMutation } from "
 import { useListProductDetailQuery } from "../../../store/productDetail/productDetail.service";
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { Link } from "react-router-dom";
-import { message } from "antd";
+import { Progress, Slider, message } from "antd";
 
 const cartPage = () => {
     const dispatch: Dispatch<any> = useDispatch()
@@ -114,6 +114,9 @@ const cartPage = () => {
         }
         setTotalCart(total)
     }, [cartState])
+
+    const freeShip = (totalCart / 500000) * 100
+
     return <>
         <Header></Header>
         <div className="py-2 px-[40px] text-[14px] flex bg-gray-100">
@@ -128,6 +131,10 @@ const cartPage = () => {
                     </div>
                     <hr className="py-4" />
                     <div className="py-4">
+                        <Progress
+                            percent={freeShip}
+                            showInfo={false}
+                        />
                         <h1 className="tracking-wide py-[10px] text-[16px]">
                             Bạn {totalCart < 500000 ? <span className="">
                                 cần mua thêm <strong className="text-red-400">{(500000 - totalCart).toLocaleString("vi-VN")}đ</strong>

@@ -25,6 +25,7 @@ export interface IReviewState {
     reviews: IReview[]
 }
 export interface IReviewDashboard {
+    _id: string;
     productId: IProduct;
     userId: {
         _id: string
@@ -36,6 +37,7 @@ export interface IReviewDashboard {
     comment: string
     images: Types[]
     createdAt: string
+    reply: any
 }
 export interface IReviewByRateState {
     rating: number | null

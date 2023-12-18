@@ -37,6 +37,7 @@ const routes = {
     adminCategoryAdd: "/admin/category/add",
     adminCategoryUpdate: "/admin/category/update/:id",
     adminUsers: "/admin/user",
+    adminUserInfo: "/admin/user/:id",
     adminUserUpdate: "/admin/user/update/:id",
     adminOrdersPage: "/admin/order",
     adminOrderUpdate: "/admin/order/:id",

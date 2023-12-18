@@ -175,7 +175,7 @@ const productPage = () => {
             className: 'w-[150px]',
         },
         {
-            title: 'NGÀY ĐẶT',
+            title: 'NGÀY KHỞI TẠO',
             dataIndex: 'createdAt',
             key: 'date',
             sorter: (a, b) => {

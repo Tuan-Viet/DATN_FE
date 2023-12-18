@@ -293,32 +293,31 @@ const OutfitProductDetail = (props: any) => {
                         </Link>
                         <div className="py-5 px-3">
                             <p className="text-sm">{props.listOutfitByProductIdState?.[0]?.items?.[1]?.product_id === props.id && props.id ? <span className="block font-bold text-sm">Bạn đang xem:</span> : ""}<span className="ml-2">x1 {OutFitItemSecondLengh?.title}</span></p>
-                            <p className="opacity-70 text-[14px] my-3">Vui lòng chọn:</p>
-                            <div className="text-[14px]">
-                                {/* color */}
-                                <select defaultValue={props.listOutfitByProductIdState?.[0]?.items?.[1]?.nameColor} onClick={() => setButtonSecondProductId(OutFitItemSecondLengh?._id)} onChange={(e) => setSecondColorName(e.target.value)} className="border border-1 px-2 text-sm">
-                                    {
-                                        [...new Set(props?.productDetailRelatedState?.filter((item: any) => item?.product_id === OutFitItemSecondLengh?._id).map((proDetail: any) => proDetail.nameColor))
-                                        ].map((color: any, index) => (
-                                            <option key={index} value={color}>{color}</option>
-                                        ))
-
-                                    }
-                                </select>
-                                {/* size */}
-                                <select onClick={() => setButtonSecondProductId(OutFitItemSecondLengh?._id)} onChange={(e) => setSecondSize(e.target.value)} className="border border-1 ml-2 px-2 text-sm">
-                                    {
-                                        productFilterByOutfitSizeSecondState.length > 0 ?
-                                            [...new Set(productFilterByOutfitSizeSecondState?.filter((proSize) => proSize.quantity > 0).map((proDetail) => proDetail.size))].map((size, index) => (
-                                                <option key={index} value={size}>{size}</option>
+                            {[...new Set(productDetailState?.filter((item) => item.product_id === props.listOutfitByProductIdState?.[0]?.items?.[1]?.product_id).filter((pro) => pro.quantity !== 0))].length != 0 ? <> <p className="opacity-70 text-[14px] my-3">Vui lòng chọn:</p>
+                                <div className="text-[14px]">
+                                    {/* color */}
+                                    <select defaultValue={props.listOutfitByProductIdState?.[0]?.items?.[1]?.nameColor} onClick={() => setButtonSecondProductId(OutFitItemSecondLengh?._id)} onChange={(e) => setSecondColorName(e.target.value)} className="border border-1 px-2 text-sm">
+                                        {
+                                            [...new Set(props?.productDetailRelatedState?.filter((item: any) => item?.product_id === OutFitItemSecondLengh?._id).map((proDetail: any) => proDetail.nameColor))
+                                            ].map((color: any, index) => (
+                                                <option key={index} value={color}>{color}</option>
                                             ))
-                                            : <option value={props?.listOutfitByProductIdState?.[0]?.items?.[1]?.size}>{props?.listOutfitByProductIdState?.[0]?.items?.[1]?.size}</option>
-                                    }
-                                </select>
-                            </div>
-                            <p className="font-bold text-[14px] pt-10">{(OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount).toLocaleString("vi-VN")}₫</p>
-                            {/* <p className='text-sm my-3'>Giảm giá còn: <strong className='text-[14px] text-red-600'>{((OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) -
-                                ((OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount) * getOneOutfit.discount) / 100).toLocaleString("vi-VN")}</strong><del className='ml-2'>{(OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount).toLocaleString("vi-VN")}₫</del></p> */}
+
+                                        }
+                                    </select>
+                                    {/* size */}
+                                    <select onClick={() => setButtonSecondProductId(OutFitItemSecondLengh?._id)} onChange={(e) => setSecondSize(e.target.value)} className="border border-1 ml-2 px-2 text-sm">
+                                        {
+                                            productFilterByOutfitSizeSecondState.length > 0 ?
+                                                [...new Set(productFilterByOutfitSizeSecondState?.filter((proSize) => proSize.quantity > 0).map((proDetail) => proDetail.size))].map((size, index) => (
+                                                    <option key={index} value={size}>{size}</option>
+                                                ))
+                                                : <option value={props?.listOutfitByProductIdState?.[0]?.items?.[1]?.size}>{props?.listOutfitByProductIdState?.[0]?.items?.[1]?.size}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <p className="font-bold text-[14px] pt-10">{(OutFitItemSecondLengh?.price - OutFitItemSecondLengh?.discount).toLocaleString("vi-VN")}₫</p></> : <div className="bg-red-400 text-white w-[150px] text-[10px] flex items-center justify-center my-[40px] font-semibold rounded-md pointer-events-none py-3 px-4">Sản phẩm đã hết hàng</div>}
+
                         </div>
                     </div>
                 </div>

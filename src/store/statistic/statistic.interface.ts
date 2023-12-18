@@ -31,6 +31,7 @@ export interface OrderStatistics {
   totalCostPrice: number;
 }
 export interface DashboardStatistic {
+  _id: string;
   revenue: string;
   profit: string;
   newReviews: IReviewDashboard[];

@@ -646,7 +646,7 @@ const ProductInfo = () => {
       const values = Form.useWatch([], form);
       console.log(values);
 
-      const determineSize = (height, weight) => {
+      const determineSize = (height: any, weight: any) => {
         if ((height < 160) || (weight < 56)) {
           return 'Size không xác định';
         } else if ((height >= 160 && height <= 166) && (weight >= 56 && weight <= 62)) {
@@ -790,7 +790,7 @@ const ProductInfo = () => {
               </div>
             ) : (
               <div className="relative">
-                <div className={listOutfitByProductIdState.length > 0 && isFixed ? 'fixed' : 'absolute bottom-0'}>
+                <div className={listOutfitByProductIdState.length > 0 ? isFixed ? 'fixed' : 'absolute bottom-0' : ''}>
                   <div className="w-[400px] h-[500px] relative">
                     <img
                       src={listImages[selectedImage]}

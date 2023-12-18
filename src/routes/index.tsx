@@ -46,6 +46,7 @@ import { Component } from "react";
 import PageNotFound from "../pages/PageNotFound";
 import ordersReturn from "../pages/client/MyAccount/orderReturn";
 import OrderReturnDetail from "../pages/client/MyAccount/orderReturnDetail";
+import userInfo from "../pages/admin/userInfo";
 
 
 export const publicRoutes = [
@@ -88,6 +89,7 @@ export const privateRoutes = [
   { path: routes.adminCategoryUpdate, Component: categoryUpdate },
   { path: routes.adminUsers, Component: userPage },
   { path: routes.adminUserUpdate, Component: userUpdate },
+  { path: routes.adminUserInfo, Component: userInfo },
   { path: routes.adminOrdersPage, Component: ordersPage },
   { path: routes.adminOrderUpdate, Component: orderUpdate },
   { path: routes.adminVoucherPage, Component: VoucherPage },
