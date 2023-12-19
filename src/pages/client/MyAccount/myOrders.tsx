@@ -18,9 +18,8 @@ function formatDateStringToDisplayDate(dateString: any) {
   const day = date.getDate();
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  return `${day < 10 ? "0" : ""}${day}/${
-    month < 10 ? "0" : ""
-  }${month}/${year}`;
+  return `${day < 10 ? "0" : ""}${day}/${month < 10 ? "0" : ""
+    }${month}/${year}`;
 }
 
 function mapStatusPaymentToText(statusCode: number) {
@@ -246,7 +245,7 @@ const myOrders = () => {
                               {formatDateStringToDisplayDate(order.createdAt)}
                             </td>
                             <td className="px-6 py-4">
-                              {order.totalMoney.toLocaleString("vi-VN")}₫
+                              {order?.totalMoney?.toLocaleString("vi-VN")}₫
                             </td>
                             <td className="px-6 py-4">
                               {mapStatusPaymentToText(order.paymentStatus)}

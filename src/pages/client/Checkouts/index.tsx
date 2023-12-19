@@ -102,11 +102,11 @@ const CheckoutsPage = () => {
   let count = 0
   cartState?.map((cart) => {
     const matchingItems = outfitState?.filter((outfit) =>
-      outfit.items?.some((item) => item.product_id === cart.productDetailId.product_id)
+      outfit.items?.some((item) => item.product_id === cart.productDetailId?.product_id)
     )
     // console.log(matchingItems)
     const filteredItems = matchingItems?.[0]?.items?.filter(
-      (product) => cart.productDetailId.product_id === product.product_id
+      (product) => cart.productDetailId?.product_id === product.product_id
     );
     if (filteredItems) {
       count += 1

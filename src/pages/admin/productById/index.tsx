@@ -66,6 +66,14 @@ const productById = () => {
 
     const { data: productRevanue, isSuccess: isSuccessProductStatistic } = useGetProductRevenueQuery();
 
+
+    const { data: dataProductDetail } = useListProductDetailQuery();
+
+    const listProductDetailByProduct = dataProductDetail?.filter((item) => item.product_id === product._id)
+
+    console.log(listProductDetailByProduct);
+
+
     // const { data: listProductDetail } = useListProductDetailQuery()
 
     const productStatistic = productRevanue?.filter(pro => pro.productId === id);

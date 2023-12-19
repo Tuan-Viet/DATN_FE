@@ -32,7 +32,7 @@ const Category = () => {
 
   return (
     <div className="container">
-      <div className="mt-16 mb-[80px]">
+      <div className="mt-5 mb-[80px]">
         <h1 className="text-[37px] font-semibold uppercase mb-8">
           Danh mục sản phẩm
         </h1>

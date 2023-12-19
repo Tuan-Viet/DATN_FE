@@ -18,7 +18,6 @@ import {
     Tooltip
 } from 'antd';
 import {
-    UploadOutlined,
     CloseOutlined,
     CloudUploadOutlined,
     CloseCircleFilled,
@@ -241,7 +240,7 @@ const productUpdate = () => {
                 }
             }
 
-            const newValues = { ...values, hide: valueHide, description: description, images: updatedImageList, colors: colors, sizes: sizes };
+            const newValues = { ...values, hide: valueHide, description: description, images: updatedImageList, colors: colors, sizes: sizes, status: valueHide };
 
             await onUpdate({ id, ...newValues })
             {

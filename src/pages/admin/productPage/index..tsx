@@ -11,7 +11,9 @@ import {
     Select,
     MenuProps,
     Dropdown,
-    Tooltip
+    Tooltip,
+    Badge,
+    Typography
 } from 'antd';
 import {
     EditFilled,
@@ -32,6 +34,9 @@ import { listCategorySlice } from '../../../store/category/categorySlice';
 import { useFetchListCategoryQuery } from '../../../store/category/category.service';
 import { ColumnsType, TableProps } from 'antd/es/table';
 import moment from 'moment';
+const { Text } = Typography;
+
+import { render } from 'react-dom';
 interface DataType {
     _id: React.Key;
     sku: string;
@@ -120,7 +125,6 @@ const productPage = () => {
             title: 'STT',
             dataIndex: 'key',
             render: (value: any) => <Link to={``} className='uppercase font-bold '>{value}</Link>,
-            className: 'w-[100px]'
         },
         {
             title: 'MÃ SẢN PHẨM',
@@ -189,11 +193,17 @@ const productPage = () => {
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
+        // {
+        //     title: 'TRẠNG THÁI',
+        //     dataIndex: 'hide',
+        //     render: (value: any) => value == false ? (<Badge status={"success"} text={<Text type="success" className=''>Ngừng bán</Text>} />) : <Badge text={<Text type="success" className=''>Cho phép bán</Text>} />,
+        // },
         {
             title: '',
             key: 'action',
             render: (record: any) => (
                 <Space size="middle" className='flex justify-end'>
+
                     <Tooltip title="Xem" color={'green'} key={'green'}>
                         <Link to={`/admin/product/${record?._id}`}>
                             <EyeOutlined className='text-xl text-green-500' />
@@ -216,10 +226,10 @@ const productPage = () => {
                             <EditFilled className='text-xl text-yellow-400' />
                         </Link>
                     </Tooltip>
-
                 </Space>
             ),
         },
+
 
     ];
 
@@ -305,12 +315,15 @@ const productPage = () => {
         sku: product.sku,
         title: product.title,
         images: product.images,
+        hide: product.hide,
         price: product.price,
         discount: product.discount,
         description: product.description,
         categoryId: product.categoryId,
         createdAt: product.createdAt,
     }));
+
+    console.log(data);
 
     const onChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter, extra) => {
         console.log('params', pagination, filters, sorter, extra);

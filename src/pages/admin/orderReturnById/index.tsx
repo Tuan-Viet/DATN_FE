@@ -59,7 +59,7 @@ const orderReturnById = () => {
     const [openFormUpdateInfo, setOpenFormUpdateInfo] = useState(false);
     const [openFormUpdateStatus, setOpenFormUpdateStatus] = useState(false);
     const [orderDetail, setOrderDetail] = useState<any[]>([]);
-    const [sumTotalMoney, setSumTotalMoney] = useState<Number>()
+    const [sumTotalMoney, setSumTotalMoney] = useState<Number>(0)
 
     const [provinces, setProvinces] = useState<any>([]);
     const [districts, setDistricts] = useState<any>([]);
@@ -297,7 +297,6 @@ const orderReturnById = () => {
                         let totalMoneyUpdate =
                             sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
                         setSumTotalMoney(totalMoneyUpdate);
-                        console.log(1);
                     }
                     if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
                         await onRemoveOrderDetail(orderDetail._id)
@@ -310,20 +309,35 @@ const orderReturnById = () => {
 
             await Promise.all(updatePromises);
 
-            const updatedTotalMoney = orderDetailsArray?.reduce((total, orderDetail) => {
-                const matchingOrderReturnDetail = orderReturnDetailsArray.find(
-                    (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
-                );
+            // const updatedTotalMoney = orderDetailsArray?.map((total, orderDetail) => {
+            //     const matchingOrderReturnDetail = orderReturnDetailsArray.find(
+            //         (orderReturnDetail: any) => orderReturnDetail.orderDetailId === orderDetail._id
+            //     );
+            //     if (matchingOrderReturnDetail) {
+            //         total = matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price;
+            //     }
 
-                if (matchingOrderReturnDetail) {
-                    total -= matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price;
-                }
+            //     return total;
+            // }, sumTotalMoney);
 
-                return total;
-            }, sumTotalMoney);
+            const initialTotal = orderDetailsArray.reduce((total, orderDetail) => {
+                return total + orderDetail.totalMoney;
+            }, 0);
+
+            // Calculate the deduction based on orderReturnDetailsArray
+            const deduction = orderReturnDetailsArray.reduce((total, orderReturnDetail) => {
+                return total + orderReturnDetail.quantity * orderReturnDetail.price;
+            }, 0);
+
+            // Calculate the final total
+            const finalTotal = initialTotal - deduction;
+
+            console.log("Initial Total:", initialTotal);
+            console.log("Deduction:", deduction);
+            console.log("Final Total:", finalTotal);
 
             const valueStatus = order?.paymentStatus === 1 ? 5 : 4
-            const updatedOrder = { ...order, status: valueStatus, totalMoney: updatedTotalMoney };
+            const updatedOrder = { ...order, status: valueStatus, totalMoney: finalTotal };
             await onUpdateOrder({ id: idOrder, ...updatedOrder });
 
             const updateStatusOrderReturn = { ...orderReturn, status: 2 };

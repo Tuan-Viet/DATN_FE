@@ -17,7 +17,7 @@ interface DataType {
   totalCostPrice: number
 
 }
-const columns  = [
+const columns = [
   {
     title: 'Mã đơn',
     dataIndex: 'orderId',
@@ -25,7 +25,8 @@ const columns  = [
     ellipsis: {
       showTitle: true,
     },
-    render: (text) => <Link to={`#`}>#{text}</Link>,
+    render: (text: string) => <Link to={`/admin/order/${text}`}>#{text}</Link>,
+
   },
   {
     title: 'Tên khách hàng',
@@ -35,22 +36,34 @@ const columns  = [
   {
     title: 'Số lượng sản phẩm bán',
     dataIndex: 'totalQuantitySold',
+    sorter: (a, b) => a.totalQuantitySold - b.totalQuantitySold, // Sắp xếp theo số
+    sortDirections: ['ascend', 'descend'],
+    showSorterTooltip: false,
     key: 'totalQuantitySold',
   },
   {
     title: 'Vốn',
     dataIndex: 'totalCostPrice',
+    sorter: (a, b) => a.totalCostPrice - b.totalCostPrice, // Sắp xếp theo số
+    sortDirections: ['ascend', 'descend'],
+    showSorterTooltip: false,
     key: 'totalCostPrice',
   },
   {
     title: 'Doanh thu',
     dataIndex: 'totalRevenue',
     render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
+    sorter: (a, b) => a.totalRevenue - b.totalRevenue, // Sắp xếp theo số
+    sortDirections: ['ascend', 'descend'],
+    showSorterTooltip: false,
     key: 'totalRevenue',
   },
   {
     title: 'Lợi nhuận',
     dataIndex: 'totalProfit',
+    sorter: (a, b) => a.totalProfit - b.totalProfit, // Sắp xếp theo số
+    sortDirections: ['ascend', 'descend'],
+    showSorterTooltip: false,
     render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalProfit',
   },
@@ -68,70 +81,73 @@ const OrderStatistic = (props: OrderRevanueByMonthProps = ({ showTable: true }))
       </div>
     </>;
   }
+
   const data: DataType[] = isSuccess
-    ? orderRevanue?.map((item: any) => ({
-      key: item.orderId,
-      orderId: item.orderId,
-      customerName: item.customerName,
-      totalRevenue: item.totalRevenue,
-      totalQuantitySold: item.totalQuantitySold,
-      totalCostPrice: item.totalCostPrice,
-      totalProfit: item.totalProfit,
-    }))
+    ? orderRevanue
+      .filter((item) => item.totalRevenue > 0)
+      .map((item: any) => ({
+        key: item.orderId,
+        orderId: item.orderId,
+        customerName: item.customerName,
+        totalRevenue: item.totalRevenue,
+        totalQuantitySold: item.totalQuantitySold,
+        totalCostPrice: item.totalCostPrice,
+        totalProfit: item.totalProfit,
+      }))
     : [];
-    const excelColumns: IExcelColumn[] = columns.map(column => {
-      // Lọc ra các thuộc tính quan trọng từ cột
-      const { title, dataIndex } = column;
-      
-      return {
-        title,
-        dataIndex: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
-        key: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
-        
-      };
-    });
-    const handleClick = () => {
-      console.log(excelColumns);
-      const excel = new Excel();
-      excel
-        .addSheet("test")
-        .addColumns(excelColumns)
-        .addDataSource(data, {
-          str2Percent: true,
-        })
-        .saveAs("Thongkedonhang.xlsx");
+  const excelColumns: IExcelColumn[] = columns.map(column => {
+    // Lọc ra các thuộc tính quan trọng từ cột
+    const { title, dataIndex } = column;
+
+    return {
+      title,
+      dataIndex: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+      key: dataIndex as string, // Chắc chắn rằng dataIndex là một chuỗi
+
     };
+  });
+  const handleClick = () => {
+    console.log(excelColumns);
+    const excel = new Excel();
+    excel
+      .addSheet("test")
+      .addColumns(excelColumns)
+      .addDataSource(data, {
+        str2Percent: true,
+      })
+      .saveAs("Thongkedonhang.xlsx");
+  };
   return (
-    
-    <div>      
+
+    <div>
       {props.showTable && (
         <><Button danger onClick={handleClick}>Export</Button>
-        <Table
-          sticky
-          showHeader={true}
-          columns={columns}
-          dataSource={data}
-          pagination={{ size: 'small', pageSize: 10 }}
-          summary={() => (
-            <Table.Summary.Row className='h-20 bg-blue-50'>
-              <Table.Summary.Cell index={0} colSpan={2}>
-                <strong>Tổng</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={1} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={2} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={0} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-              <Table.Summary.Cell index={0} colSpan={1}>
-                <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
-              </Table.Summary.Cell>
-            </Table.Summary.Row>
-          )}
-        /></>)}
+          <Table
+            sticky
+            showHeader={true}
+            columns={columns}
+            dataSource={data}
+            pagination={{ size: 'small', pageSize: 10 }}
+            summary={() => (
+              <Table.Summary.Row className='h-20 bg-blue-50'>
+                <Table.Summary.Cell index={0} colSpan={2}>
+                  <strong>Tổng</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={1} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalQuantitySold, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={2} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalCostPrice, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={0} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalRevenue, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+                <Table.Summary.Cell index={0} colSpan={1}>
+                  <strong>{data.reduce((acc, current) => acc + current.totalProfit, 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+                </Table.Summary.Cell>
+              </Table.Summary.Row>
+            )}
+          /></>)}
 
     </div>
   );

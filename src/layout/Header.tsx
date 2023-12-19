@@ -597,9 +597,9 @@ const Header = () => {
             <form className="flex justify-between py-8">
               <Link to="/">
                 <img
-                  src="https://theme.hstatic.net/200000690725/1001078549/14/logo.png?v=173"
+                  src="/images/logo/dec5f33d-20b9-45cc-ab8c-5ce587a75660.jpg"
                   alt=""
-                  className="w-[220px]"
+                  className="w-[180px]"
                 />
               </Link>
               <div >
@@ -694,7 +694,7 @@ const Header = () => {
                 return <div key={index}>
                   {productState
                     ?.filter(
-                      (product) => product._id === cart.productDetailId.product_id
+                      (product) => product._id === cart.productDetailId?.product_id
                     )
                     .map((pro, index) => {
                       return (

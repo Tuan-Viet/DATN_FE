@@ -8,6 +8,7 @@ import OrderRevanueByWeek from './OrderRevanueByWeek';
 import OrderRevanueByQuarter from './OrderRevanueByQuarter';
 import ProductRevanue from './ProductStatistic';
 import OrderStatistic from './OrderStatistic';
+import OrderRevanueByDate from './OrderRevanueByDate';
 
 
 const { RangePicker } = DatePicker;
@@ -16,11 +17,11 @@ const LayoutStatistic
     const navigate = useNavigate()
     dayjs.extend(customParseFormat);
     const dateFormat = 'YYYY/MM/DD';
-    const [value, setValue] = useState<string>("week");
+    const [value, setValue] = useState<string>("date");
 
     const treeData = [
       {
-        title: 'Theo thời gian',
+        title: 'Theo ngày',
         value: 'date',
         children: [
           {
@@ -55,16 +56,18 @@ const LayoutStatistic
     };
     const renderComponent = () => {
       switch (value) {
+        case 'date':
+          return <OrderRevanueByDate showTable={true} />;
         case 'week':
-          return <OrderRevanueByWeek showTable ={true} />;
+          return <OrderRevanueByWeek showTable={true} />;
         case 'month':
-          return <OrderRevanueByMonth showTable ={true}/>;
+          return <OrderRevanueByMonth showTable={true} />;
         case 'quarter':
-          return <OrderRevanueByQuarter showTable ={true} />;
+          return <OrderRevanueByQuarter showTable={true} />;
         case 'product':
-          return <ProductRevanue showTable ={true} />;
+          return <ProductRevanue showTable={true} />;
         case 'order':
-          return <OrderStatistic showTable ={true} />;
+          return <OrderStatistic showTable={true} />;
         default:
           return null;
       }
