@@ -35,7 +35,6 @@ import signup from "../pages/client/signup";
 import OrderRevanue from "../pages/admin/statistic/OrderRevanueByMonth";
 import OrderRevanueByMonth from "../pages/admin/statistic/OrderRevanueByMonth";
 import LayoutStatistic from "../pages/admin/statistic/LayoutStatistic";
-import productById from "../pages/admin/productById";
 import orderReturnPage from "../pages/admin/orderReturnPage";
 import orderReturnById from "../pages/admin/orderReturnById";
 import OutfitPage from "../pages/client/Outfit";
@@ -47,6 +46,7 @@ import PageNotFound from "../pages/PageNotFound";
 import ordersReturn from "../pages/client/MyAccount/orderReturn";
 import OrderReturnDetail from "../pages/client/MyAccount/orderReturnDetail";
 import userInfo from "../pages/admin/userInfo";
+import productById from "../pages/admin/productById";
 
 
 export const publicRoutes = [

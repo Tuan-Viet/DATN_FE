@@ -598,21 +598,28 @@ const OrderDetail = () => {
                         </button>
                       </p>
                     )}
-                    {(order?.status === 4 || order?.status === 5) && showReturnButton ? (
+                    {!order?.orderReturn && (
                       <div className="">
-
-                        <Button
-                          type="primary"
-                          onClick={showOrderModal}
-                          className="text-white mr-1 bg-blue-700"
-                        >
-                          Đổi hàng
-                        </Button>
-                        <Tooltip title="Bạn chỉ gửi yêu cầu đổi hàng trong 10 ngày tính từ lúc đặt hàng " color={'blue'} key={'blue'}>
-                          <InfoCircleOutlined className='text-blue-500' />
-                        </Tooltip>
+                        {(order?.status === 4 || order?.status === 5) && showReturnButton ? (
+                          <div className="">
+                            <div className="">
+                              <Button
+                                type="primary"
+                                onClick={showOrderModal}
+                                className="text-white mr-1 bg-blue-700"
+                              >
+                                Đổi hàng
+                              </Button>
+                              <Tooltip title="Bạn chỉ gửi yêu cầu đổi hàng trong 10 ngày tính từ lúc đặt hàng *(duy nhất 1 lần)" color={'blue'} key={'blue'}>
+                                <InfoCircleOutlined className='text-blue-500' />
+                              </Tooltip>
+                            </div>
+                            <span className="block italic underline text-sm my-2 text-gray-500">Chỉ cho phép đổi bị hàng lỗi, giao không đúng kích thước, màu sẵc</span>
+                          </div>
+                        ) : null}
                       </div>
-                    ) : null}
+                    )}
+
                   </div>
                   <Modal
                     title={
@@ -696,7 +703,7 @@ const OrderDetail = () => {
                                     <h1 className="mb-4 text-lg font-bold">Một số lưu ý:</h1>
                                     <div className="container">
                                       <ul className="list-disc pl-6">
-                                        <li className="mb-2">Hình ảnh/video rõ nét, không mờ, nhòe</li>
+                                        <li className="mb-2">Hình ảnh rõ nét, không mờ, nhòe</li>
                                         <li className="mb-2">Chụp cận cảnh lỗi của sản phẩm</li>
                                         <li className="mb-2">Cung cấp hình ảnh hóa đơn</li>
                                       </ul>
@@ -819,7 +826,7 @@ const OrderDetail = () => {
                                                         </td>
                                                         <td className="px-3 py-4 text-xs">
                                                           <div className="relative flex items-center max-w-[8rem] space-x-1">
-                                                            <input type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)}
+                                                            <input onKeyDown={(e) => { e.preventDefault() }} type="number" {...registerOrder(`orderDetailIds.${index}.quantity`)}
                                                               className="border p-1 outline-none rounded-md border-gray-300" onChange={(e) => e.target.value} defaultValue={0} placeholder="0" min={0} max={product.quantity} />
                                                             <span> /{product.quantity}</span>
                                                           </div>

@@ -177,12 +177,6 @@ const myAccount = () => {
                     Họ tên: {InfoUser?.fullname}
                   </h2>
                   <p className="text-[15px] mb-2">Email: {InfoUser?.email}</p>
-                  <p className="text-[15px] mb-2">
-                    Địa chỉ: 64 Phú Diễn, Bắc Từ Liêm, Hà Nội
-                  </p>
-                  <p className="text-[15px] mb-2">
-                    Số diện thoại: {user?.current?.phone}
-                  </p>
 
                   <Button
                     type="primary"

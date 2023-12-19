@@ -863,7 +863,7 @@ const ProductInfo = () => {
                       Mã sản phẩm: <b>{getOneProduct?.sku}</b>
                     </span>
                     <span>
-                      Tình trạng: <b>Còn hàng</b>
+                      Tình trạng: {[...new Set(productDetailState?.filter((item) => item.product_id === getOneProduct?._id).filter((pro) => pro.quantity !== 0))].length != 0 ? (<b>Còn hàng</b>) : (<b>Hết hàng</b>)}
                     </span>
                     <span>
                       Thương hiệu: <b className="uppercase">HUSTLE</b>

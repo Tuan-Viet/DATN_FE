@@ -95,7 +95,7 @@ const AdminLayout = ({ children }: Props) => {
       >
         <div className="my-3 flex justify-between items-center px-3">
           <Link to={`/admin`}>
-            <img className="w-[130px]" src="../../public/images/logo/Layer12.png" alt="" />
+            <img className="w-[130px]" src="/images/logo/Layer12.png" alt="" />
           </Link>
           <div className="">
             <Link to={`/`}> <EyeOutlined className="text-xl text-gray-300" /></Link>

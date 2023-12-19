@@ -45,7 +45,7 @@ import { RootState } from '../../../store';
 const { Paragraph } = Typography;
 
 const DashboardPage = () => {
-    const { data: dashboardStatistic, isSuccess } = useGetDashboardStatisticQuery()
+    const { data: dashboardStatistic, isSuccess, refetch } = useGetDashboardStatisticQuery()
     const { data: orderRevanueMonth } = useGetOrderRevenueByMonthQuery()
     const { data: orderRevanueQuarter, } = useGetOrderRevenueByQuarterQuery();
     const { data: orderRevanueWeek } = useGetOrderRevenueByWeekQuery()
@@ -60,7 +60,7 @@ const DashboardPage = () => {
 
     // const { data: listProduct } = useFetchListProductQuery()
     // const { data: listOrder } = useListOrderQuery()
-    const [value, setValue] = useState<string>("week");
+    const [value, setValue] = useState<string>("date");
 
     const dashboardStatisticState = useSelector((state: RootState) => state.statisticSlice.satistics)
 
@@ -136,6 +136,9 @@ const DashboardPage = () => {
             },
         ],
     };
+
+    const listRiews = dashboardStatistic?.newReviews ? [...dashboardStatistic.newReviews].reverse() : [];
+
     const onChange = (newValue: string) => {
         // navigate(`/admin/statistic/by_` +newValue)
         setValue(newValue);
@@ -164,6 +167,7 @@ const DashboardPage = () => {
             }
 
             await onReplyComment({ id: id, ...value });
+            refetch();
             message.success(`Thành công`);
         } catch (error) {
             console.log(error);
@@ -176,6 +180,7 @@ const DashboardPage = () => {
             };
 
             await onReplyComment({ id: id, ...value });
+            refetch();
 
             message.success(`Thành công`);
         } catch (error) {
@@ -188,6 +193,8 @@ const DashboardPage = () => {
         try {
             if (id) {
                 await onRemoveComment(id).then(() => dispatch(deleteReviewSlice(id)))
+                refetch();
+
                 message.success("Xóa thành công")
             }
         } catch (error) {
@@ -195,7 +202,6 @@ const DashboardPage = () => {
         }
 
     }
-    console.log(dashboardStatistic.newReviews);
 
     return <>
         <h2 className='text-2xl p-4 font-bold pb-2'>KẾT QUẢ KINH DOANH TRONG NGÀY</h2>
@@ -291,7 +297,7 @@ const DashboardPage = () => {
                                 },
                                 pageSize: 10,
                             }}
-                            dataSource={dashboardStatistic.newReviews}
+                            dataSource={listRiews}
                             renderItem={(item, index) => (
                                 <List.Item>
                                     <div className="flex justify-between items-start">

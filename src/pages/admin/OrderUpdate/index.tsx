@@ -593,13 +593,13 @@ const orderUpdate = () => {
                                                 -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                 {/* {totalCart?} */}
                                             </div>}
-                                            {order?.pay_method === "FREE" || (totalCart && totalCart > 500000) ? (
+                                            {order?.pay_method === "FREE" || (totalCart && totalCart >= 500000) ? (
                                                 <div className='text-end'>
                                                     Miễn phí
                                                 </div>
                                             ) : (
                                                 <div className='text-end'>
-                                                    {(order?.pay_method === "FREE" || (totalCart && totalCart < 500000)) && order?.orderReturn ? (
+                                                    {((totalCart && totalCart >= 500000)) && order?.orderReturn ? (
                                                         <div className='text-end'>
                                                             Miễn phí
                                                         </div>
@@ -612,7 +612,7 @@ const orderUpdate = () => {
                                             )}
 
                                             <div className='text-end'>
-                                                {order?.totalMoney.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                                {order?.totalMoney && order?.totalMoney?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                             </div>
                                         </Table.Summary.Cell>
                                     </Table.Summary.Row>
@@ -761,13 +761,13 @@ const orderUpdate = () => {
                                                         -{voucherByOrder?.[0]?.type === "value" ? voucherByOrder?.[0]?.discount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ((Number(voucherByOrder?.[0]?.discount) * totalCart!) / 100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                                                         {/* {totalCart?} */}
                                                     </div>}
-                                                    {order?.pay_method === "FREE" || (totalCart && totalCart > 500000) ? (
+                                                    {order?.pay_method === "FREE" || (totalCart && totalCart >= 500000) ? (
                                                         <div className='text-end'>
                                                             Miễn phí
                                                         </div>
                                                     ) : (
                                                         <div className='text-end'>
-                                                            {(order?.pay_method === "FREE" || (totalCart && totalCart < 500000)) && order?.orderReturn ? (
+                                                            {(totalCart && totalCart >= 500000) && order?.orderReturn || (order?.orderDetails?.length === 0) ? (
                                                                 <div className='text-end'>
                                                                     Miễn phí
                                                                 </div>
