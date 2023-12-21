@@ -19,7 +19,7 @@ const Banner = () => {
             <Link to="">
               <img
                 src="/images/banner/slide_1_img.png"
-                className="h-[730px] object-cover"
+                className="h-[730px] w-full object-cover"
                 alt=""
               />
             </Link>
@@ -30,7 +30,7 @@ const Banner = () => {
             <Link to="">
               <img
                 src="/images/banner/slide_2_img.png"
-                className="h-[730px] object-cover"
+                className="h-[730px] w-full object-cover"
                 alt=""
               />
             </Link>
@@ -41,7 +41,7 @@ const Banner = () => {
             <Link to="">
               <img
                 src="/images/banner/slide_3_img.png"
-                className="h-[730px] object-cover"
+                className="h-[730px] w-full object-cover"
                 alt=""
               />
             </Link>
@@ -52,7 +52,7 @@ const Banner = () => {
             <Link to="">
               <img
                 src="/images/banner/slide_4_img.png"
-                className="h-[730px] object-cover"
+                className="h-[730px] w-full object-cover"
                 alt=""
               />
             </Link>
