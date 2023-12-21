@@ -53,7 +53,7 @@ const Header = () => {
       dispatch(listOutfitSlice(listOutfit))
     }
   }, [isSuccesslistOutfit])
-  const cartState = useSelector((state: RootState) => state.cartSlice.carts);
+  let cartState = useSelector((state: RootState) => state.cartSlice.carts);
   const productDetailState = useSelector(
     (state: RootState) => state.productDetailSlice.productDetails
   );
@@ -70,6 +70,10 @@ const Header = () => {
   const [totalCart, setTotalCart] = useState<number>(0);
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const newCartState = cartState?.filter((cart) => {
+    return productState.find((product) => product.hide === false && product._id && product._id.includes(cart.productDetailId.product_id))
+  })
+  cartState = newCartState
   const handSubmitSignin = async (data: FormDataType) => {
     try {
       const response = await axios.post(

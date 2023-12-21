@@ -18,13 +18,17 @@ const cartPage = () => {
     console.log(listCart)
     const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
     const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
-    const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+    let cartState = useSelector((state: RootState) => state.cartSlice.carts)
     const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
     const productState = useSelector((state: RootState) => state.productSlice.products)
     const [onUpdateCart] = useUpdateCartMutation()
     const [onRemoveCart] = useDeleteCartMutation()
     const [totalCart, setTotalCart] = useState<number>(0)
     const cartStore = JSON.parse(localStorage.getItem("carts")!)
+    const newCartState = cartState?.filter((cart) => {
+        return productState.find((product) => product.hide === false && product._id && product._id.includes(cart.productDetailId.product_id))
+    })
+    cartState = newCartState
     const removeCart = async (id: string) => {
         try {
             if (id) {

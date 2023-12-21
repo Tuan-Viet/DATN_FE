@@ -32,7 +32,7 @@ const CheckoutsPage = () => {
   const { data: listProductDetail, isSuccess: isSuccessProductDetail } = useListProductDetailQuery()
   const { data: listProduct, isSuccess: isSuccessListProduct } = useFetchListProductQuery()
   const { data: listVoucher, isSuccess: isSuccessVoucher } = useListVoucherQuery()
-  const cartState = useSelector((state: RootState) => state.cartSlice.carts)
+  let cartState = useSelector((state: RootState) => state.cartSlice.carts)
   const productDetailState = useSelector((state: RootState) => state.productDetailSlice.productDetails)
 
   const productState = useSelector((state: RootState) => state.productSlice.products)
@@ -51,6 +51,10 @@ const CheckoutsPage = () => {
   const { data: InfoUser, refetch: refetchUser } = useGetInfoUserQuery(user?.current?._id)
   const { data: listOutfit, isSuccess: isSuccesslistOutfit } = useFetchListOutfitQuery();
   const outfitState = useSelector((state: RootState) => state.outfitSlice.outfits)
+  const newCartState = cartState?.filter((cart) => {
+    return productState.find((product) => product.hide === false && product._id && product._id.includes(cart.productDetailId.product_id))
+  })
+  cartState = newCartState
   useEffect(() => {
     if (listOutfit) {
       dispatch(listOutfitSlice(listOutfit))

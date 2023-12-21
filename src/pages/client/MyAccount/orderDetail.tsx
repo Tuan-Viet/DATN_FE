@@ -1022,7 +1022,7 @@ const OrderDetail = () => {
                       ""
                     )} */}
 
-                    {showCancelButton && Number(order?.paymentStatus) !== 1 ? (
+                    {showCancelButton && (Number(order?.paymentStatus) !== 1 || order?.status === 1 || order?.status === 2) && order?.status !== 0 ? (
                       <div className="">
                         <Tooltip title="Bạn chỉ được hủy trong 30 phút tính từ khi đặt hàng" color={'blue'} key={'blue'}>
                           <InfoCircleOutlined className='text-blue-500' />
