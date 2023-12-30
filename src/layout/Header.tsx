@@ -375,7 +375,7 @@ const Header = () => {
             <div className="h-[73px] flex items-center">
               <Link to="/">
                 <img
-                  src="../../public/images/logo/dec5f33d-20b9-45cc-ab8c-5ce587a75660.jpg"
+                  src="https://res.cloudinary.com/dqzopvk2t/image/upload/v1703957095/dec5f33d-20b9-45cc-ab8c-5ce587a75660_rdhgfv.jpg"
                   className="w-[170px] h-[53px]"
                   alt=""
                 />
