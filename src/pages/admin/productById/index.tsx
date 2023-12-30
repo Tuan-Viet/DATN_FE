@@ -40,6 +40,7 @@ import { RootState } from "../../../store";
 import { deleteReviewSlice, listReviewSlice } from "../../../store/reviews/reviewSlice";
 import moment from 'moment';
 import { useGetProductRevenueQuery } from "../../../store/statistic/statistic.service";
+import { IReview } from "../../../store/reviews/review.interface";
 const { TextArea } = Input;
 const { Paragraph } = Typography;
 
@@ -82,9 +83,9 @@ const productById = () => {
     const reviewState = useSelector((state: RootState) => state.reviewSlice.reviews)
     const filterReviewByProduct = listReview?.filter((review) => review?.productId && review?.productId?.includes(id))
 
-    const sortedReviews = filterReviewByProduct?.slice().sort((a: any, b: any) => {
-        return new Date(b.createdAt) - new Date(a.createdAt);
-    });
+    const sortedReviews = filterReviewByProduct?.slice().sort((a: IReview, b: IReview) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
 
     const reviewStateVer = reviewState?.slice().reverse()
     const [openFormUpdateReply, setOpenFormUpdateReply] = useState(false);
@@ -580,8 +581,8 @@ const productById = () => {
                                                                         <span className="block text-[13px] cursor-pointer  text-gray-500">
                                                                             Trả lời
                                                                         </span>
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-3 h-3 text-gray-500">
-                                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-gray-500">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
                                                                         </svg>
                                                                     </div>
                                                                 } >

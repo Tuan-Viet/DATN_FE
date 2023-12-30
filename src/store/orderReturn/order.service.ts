@@ -5,11 +5,11 @@ import { orderReturnForm } from "../../Schemas/OrderReturn"
 const orderReturnAPI = createApi({
     reducerPath: "orderReturns",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["orderReturn"],
     endpoints: (builer) => ({
-        listOrderReturn: builer.query<IOrderReturn[], void>({
+        listOrderReturn: builer.query<Partial<IOrderReturn[]>, void>({
             query: () => `/orderReturns`,
             providesTags: ["orderReturn"]
         }),

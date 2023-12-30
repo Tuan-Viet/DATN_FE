@@ -3,7 +3,7 @@ import { ICategory } from "./category.interface"
 const categoryApi = createApi({
     reducerPath: "categories",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["categories"],
     endpoints: (builer) => ({

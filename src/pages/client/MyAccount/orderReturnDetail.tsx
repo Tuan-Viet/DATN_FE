@@ -13,7 +13,7 @@ import { useListProductDetailQuery } from "../../../store/productDetail/productD
 import { useFetchListProductQuery } from "../../../store/product/product.service";
 import { listProductDetailSlice } from "../../../store/productDetail/productDetailSlice";
 import { listProductSlice } from "../../../store/product/productSlice";
-import { RootState } from "@reduxjs/toolkit/query";
+import { RootState } from "../../../store";
 
 function formatDateStringToDisplayDate(dateString) {
   const originalDate = new Date(dateString);

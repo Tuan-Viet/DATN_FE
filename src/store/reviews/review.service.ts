@@ -4,14 +4,14 @@ import { RootState } from ".."
 const ReviewApi = createApi({
     reducerPath: "reviews",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api/auth",
-        prepareHeaders(headers, { getState }) {
-            const token = (getState() as RootState).user.token
+        baseUrl: "https://datn-be-gy1y.onrender.com/api/auth",
+        prepareHeaders(headers, { getState }: { getState: () => any }) {
+            const token = getState().user.token;
             if (token) {
-                headers.set('Authorization', `Bearer ${token}`)
+              headers.set('Authorization', `Bearer ${token}`);
             }
-            return headers
-        },
+            return headers;
+          },
     }),
     tagTypes: ["reviews"],
     endpoints: (builer) => ({

@@ -17,6 +17,7 @@ export const AccountSchema = yup.object({
 export type AccountForm = yup.InferType<typeof AccountSchema>
 
 export const AddressSchema = yup.object({
+    _id: yup.string(),
     fullname: yup.string().required("Bạn cần phải nhập tên người nhận"),
     phone: yup.string().required("Bạn cần phải nhập số điện thoại người nhận"),
     address: yup.string().required("Bạn cần phải nhập địa chỉ nhận hàng"),

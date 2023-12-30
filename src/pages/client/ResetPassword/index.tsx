@@ -18,7 +18,7 @@ const Resetpassword = () => {
         try {
             if (token) {
                 await axios.post(
-                    `http://localhost:8080/api/auth/reset-password/${token}`,
+                    `https://datn-be-gy1y.onrender.com/api/auth/reset-password/${token}`,
                     data
                 );
                 message.success("Đăng kí thành công!")

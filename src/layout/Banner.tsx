@@ -7,7 +7,7 @@ const Banner = () => {
     <>
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
-        grabCursor={"true"}
+        grabCursor={true}
         spaceBetween={30}
         slidesPerView={"auto"}
         pagination={{ clickable: true, dynamicBullets: true }}

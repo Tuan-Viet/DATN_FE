@@ -155,7 +155,7 @@ const outfitAdd = () => {
         listType: "picture",
         name: "images",
         multiple: true,
-        action: " http://localhost:8080/api/images/upload",
+        action: " https://datn-be-gy1y.onrender.com/api/images/upload",
     };
 
     const handleSwitchChange = (checked: any) => {
@@ -267,12 +267,12 @@ const outfitAdd = () => {
                                                     setDescription(data);
                                                     // console.log({ event, editor, data });
                                                 }}
-                                                onBlur={(event, editor) => {
-                                                    // console.log('Blur.', editor);
-                                                }}
-                                                onFocus={(event, editor) => {
-                                                    // console.log('Focus.', editor);
-                                                }}
+                                                // onBlur={(event, editor) => {
+                                                //     // console.log('Blur.', editor);
+                                                // }}
+                                                // onFocus={(event, editor) => {
+                                                //     // console.log('Focus.', editor);
+                                                // }}
                                             />
                                         </Form.Item>
                                     </div>

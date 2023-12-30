@@ -1,3 +1,4 @@
+import { IOrder } from "../order/order.interface"
 import { IOrderDetail } from "../orderDetail/orderDetail.interface"
 
 export interface IOrderReturn {
@@ -21,7 +22,12 @@ export interface IOrderReturn {
     createdAt: any
     orderReturnDetails: any
     status: number
-    newOrder: string
+    newOrder: IOrder,
+    voucher_code: string
+    paymentStatus: number
+    pay_method: string
+    orderDetails: IOrderDetail[]
+    orderReturn: any
 }
 
 export interface IOrderReturnState {

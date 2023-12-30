@@ -85,7 +85,9 @@ const categoryUpdate = () => {
         setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
     };
 
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+    const handleChange: UploadProps['onChange'] = (
+        // { fileList: newFileList }
+        ) => {
         setNewImage(true)
     }
 
@@ -122,7 +124,7 @@ const categoryUpdate = () => {
         listType: "picture-card",
         name: "images",
         multiple: true,
-        action: " http://localhost:8080/api/images/upload",
+        action: " https://datn-be-gy1y.onrender.com/api/images/upload",
 
     };
     return <>

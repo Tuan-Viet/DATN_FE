@@ -25,6 +25,8 @@ import { ICart } from "../../../store/cart/cart.interface";
 import { IOrder } from "../../../store/order/order.interface";
 import { listOutfitSlice } from "../../../store/outfit/outfitSlice";
 import { useFetchListOutfitQuery } from "../../../store/outfit/outfit.service";
+
+
 const CheckoutsPage = () => {
   const dispatch: Dispatch<any> = useDispatch()
   const navigate = useNavigate()
@@ -299,7 +301,7 @@ const CheckoutsPage = () => {
     const districtCode = e.target.value;
     setSelectedDistrict(districtCode);
 
-    const nameDistrict = districts.districts?.find((item) => item.code == districtCode)
+    const nameDistrict = (districts as any)?.districts?.find((item) => item.code == districtCode)
     setSelectednameDistrict(nameDistrict.name);
 
 
@@ -313,7 +315,7 @@ const CheckoutsPage = () => {
     const wardCode = e.target.value;
     setSelectedWards(wardCode);
 
-    const nameWard = wards.wards?.find((item) => item.code == wardCode)
+    const nameWard =(wards as any)?.wards?.find((item) => item.code == wardCode)
     setSelectednameWard(nameWard.name);
 
   };
@@ -500,7 +502,7 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <select onChange={handleDistrictChange} value={selectedDistrict} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                       <option value="">Chọn quận/huyện</option>
-                      {districts?.districts?.map(district => (
+                      {(districts as any)?.districts?.map(district => (
                         <option key={district.code} value={district.code}>{district.name}</option>
                       ))}
                     </select>
@@ -508,7 +510,7 @@ const CheckoutsPage = () => {
                   <div className="mb-3">
                     <select onChange={handleWardChange} value={selectedWard} id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
                       <option value="">Chọn xã phường</option>
-                      {wards?.wards?.map(ward => (
+                      {(wards as any)?.wards?.map(ward => (
                         <option key={ward.code} value={ward.code}>{ward.name}</option>
                       ))}
                     </select>

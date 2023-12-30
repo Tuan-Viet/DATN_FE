@@ -11,20 +11,21 @@ export interface IOrder {
         myWard: string,
         detailAddress: string
     }
-    voucher_code: string
     note: string
     status: number
+    voucher_code: string
     paymentStatus: number
     pay_method: string
-    totalMoney: number
     orderDetails: IOrderDetail[]
-    createdAt: any
     orderReturn: any
+    createdAt: any
+    totalMoney: number
+
 
 }
 
 export interface IOrderState {
-    orders: IOrder[]
+    orders: Partial<IOrder[]>
 }
 
 export interface IOrderSearchState {

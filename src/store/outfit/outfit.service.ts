@@ -4,7 +4,7 @@ import { IOutfit } from "./outfit.interface";
 const outfitAPI = createApi({
     reducerPath: "outfits",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["outfit"],
     endpoints: (builer) => ({

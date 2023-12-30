@@ -20,7 +20,7 @@ const Vourcher = () => {
 
     const addVoucher = async (userId: string, voucherId: string) => {
         if (user.current._id) {
-            await axios.put("http://localhost:8080/api/auth/add-vourcher", {
+            await axios.put("https://datn-be-gy1y.onrender.com/api/auth/add-vourcher", {
                 userId: userId,
                 voucherId: voucherId
             }).then(() => refetch());

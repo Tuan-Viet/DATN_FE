@@ -136,7 +136,7 @@ const outfitUpdate = () => {
     const listSku = listOutfit
         ?.filter((v) => v.sku !== outfitById?.sku)
         .map((outfit: any) => outfit.sku);
-    const handleCheckSku = async (rule: any, value: any) => {
+    const handleCheckSku = async (value: any) => {
         if (listSku?.includes(value)) {
             throw new Error('Mã đã tồn tại. Vui lòng chọn mã khác.');
         }
@@ -172,7 +172,7 @@ const outfitUpdate = () => {
         setProductDetailTwo(productDetail)
     };
 
-    const validateProducts = (fieldName: any, otherFieldName: any, value: any, callback: any) => {
+    const validateProducts = (otherFieldName: any, value: any, callback: any) => {
         const formValues = form.getFieldsValue();
         const otherValue = formValues[otherFieldName];
 
@@ -209,7 +209,7 @@ const outfitUpdate = () => {
         setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
     };
 
-    const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+    const handleChange: UploadProps['onChange'] = () => {
         setNewImage(true)
     }
 
@@ -256,7 +256,7 @@ const outfitUpdate = () => {
         listType: "picture-card",
         name: "images",
         multiple: true,
-        action: " http://localhost:8080/api/images/upload",
+        action: " https://datn-be-gy1y.onrender.com/api/images/upload",
     };
 
     const handleSwitchChange = (checked: any) => {
@@ -361,17 +361,17 @@ const outfitUpdate = () => {
                                                         )
                                                     })
                                                 }}
-                                                onChange={(event, editor) => {
+                                                onChange={(e, editor) => {
                                                     const data = editor.getData();
                                                     setDescription(data);
                                                     // console.log({ event, editor, data });
                                                 }}
-                                                onBlur={(event, editor) => {
-                                                    // console.log('Blur.', editor);
-                                                }}
-                                                onFocus={(event, editor) => {
-                                                    // console.log('Focus.', editor);
-                                                }}
+                                                // onBlur={(event, editor) => {
+                                                //     // console.log('Blur.', editor);
+                                                // }}
+                                                // onFocus={(event, editor) => {
+                                                //     // console.log('Focus.', editor);
+                                                // }}
                                             />
                                         </Form.Item>
                                     </div>
@@ -411,7 +411,7 @@ const outfitUpdate = () => {
                                         label='Sản phẩm áo'
                                         rules={[
                                             { required: true, message: 'Không được để trống' },
-                                            { validator: (_, value, callback) => validateProducts('productOne', 'productTwo', value, callback) },
+                                            { validator: (_, value, callback) => validateProducts('productOne', value, callback) },
                                         ]}
                                         className='w-1/2'
                                         initialValue={outfitById?.items?.[0].product_id}
@@ -533,7 +533,7 @@ const outfitUpdate = () => {
                                         label='Sản phẩm quần'
                                         rules={[
                                             { required: true, message: 'Không được để trống' },
-                                            { validator: (_, value, callback) => validateProducts('productTwo', 'productOne', value, callback) },
+                                            { validator: (_, value, callback) => validateProducts('productTwo', value, callback) },
                                         ]}
                                         className='w-1/2'
                                         initialValue={outfitById?.items?.[1].product_id}

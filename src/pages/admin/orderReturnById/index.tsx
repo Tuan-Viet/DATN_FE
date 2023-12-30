@@ -164,10 +164,10 @@ const orderReturnById = () => {
                 const productDetails = [];
                 for (const detail of ListOrderReturnDetail) {
                     try {
-                        const response = await axios.get(`http://localhost:8080/api/productDetails/${detail.productDetailId}`);
+                        const response = await axios.get(`https://datn-be-gy1y.onrender.com/api/productDetails/${detail.productDetailId}`);
                         const productInfo = response.data;
 
-                        const productResponse = await axios.get(`http://localhost:8080/api/products/${productInfo.product_id}`);
+                        const productResponse = await axios.get(`https://datn-be-gy1y.onrender.com/api/products/${productInfo.product_id}`);
                         const productData = productResponse.data;
 
                         productDetails.push({
@@ -295,7 +295,7 @@ const orderReturnById = () => {
                         await onUpdateOrderDetail({ _id: orderDetail._id, order: valueUpdate });
 
                         let totalMoneyUpdate =
-                            sumTotalMoney - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
+                            Number(sumTotalMoney) - (matchingOrderReturnDetail.quantity * matchingOrderReturnDetail.price);
                         setSumTotalMoney(totalMoneyUpdate);
                     }
                     if (orderDetail.quantity === matchingOrderReturnDetail?.quantity) {
@@ -369,7 +369,9 @@ const orderReturnById = () => {
         }
     };
 
-    const confirmStatusComplte = async (values: any) => {
+    const confirmStatusComplte = async (
+        // values: any
+        ) => {
         try {
             const newValue = { ...orderReturn, status: 4 }
             await onUpdateOrderReturn({ id, ...newValue });
@@ -441,7 +443,7 @@ const orderReturnById = () => {
                                 columns={columns}
                                 dataSource={data}
                                 pagination={false}
-                                summary={(pageData) => {
+                                summary={() => {
                                     return (
                                         <>
                                             <Table.Summary.Row >
@@ -621,7 +623,7 @@ const orderReturnById = () => {
                                                                             columns={columns}
                                                                             dataSource={data}
                                                                             pagination={false}
-                                                                            summary={(pageData) => {
+                                                                            summary={() => {
                                                                                 return <>
                                                                                     <Table.Summary.Row className=''>
                                                                                         <Table.Summary.Cell index={0} colSpan={3}>

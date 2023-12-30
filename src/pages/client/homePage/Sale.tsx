@@ -39,7 +39,7 @@ const Sale = () => {
         </div>
         <div className="product-sale mb-12">
           <Swiper
-            grabCursor={"true"}
+            grabCursor={true}
             spaceBetween={25}
             slidesPerView={"auto"}
             pagination={{ clickable: true, dynamicBullets: true }}

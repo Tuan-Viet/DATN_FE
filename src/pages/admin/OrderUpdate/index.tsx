@@ -226,10 +226,10 @@ const orderUpdate = () => {
                 const productDetails = [];
                 for (const detail of ListOrderDeatils) {
                     try {
-                        const response = await axios.get(`http://localhost:8080/api/productDetails/${detail.productDetailId}`);
+                        const response = await axios.get(`https://datn-be-gy1y.onrender.com/api/productDetails/${detail.productDetailId}`);
                         const productInfo = response.data;
 
-                        const productResponse = await axios.get(`http://localhost:8080/api/products/${productInfo.product_id}`);
+                        const productResponse = await axios.get(`https://datn-be-gy1y.onrender.com/api/products/${productInfo.product_id}`);
                         const productData = productResponse.data;
 
                         productDetails.push({
@@ -251,10 +251,10 @@ const orderUpdate = () => {
                 const productDetails = [];
                 for (const detail of ListOrderReturnDetail) {
                     try {
-                        const response = await axios.get(`http://localhost:8080/api/productDetails/${detail.productDetailId}`);
+                        const response = await axios.get(`https://datn-be-gy1y.onrender.com/api/productDetails/${detail.productDetailId}`);
                         const productInfo = response.data;
 
-                        const productResponse = await axios.get(`http://localhost:8080/api/products/${productInfo.product_id}`);
+                        const productResponse = await axios.get(`https://datn-be-gy1y.onrender.com/api/products/${productInfo.product_id}`);
                         const productData = productResponse.data;
 
                         productDetails.push({

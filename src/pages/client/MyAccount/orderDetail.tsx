@@ -146,7 +146,7 @@ const OrderDetail = () => {
       const currentTime = new Date();
 
       // Tính thời gian trôi qua kể từ khi tạo đơn hàng
-      const timeElapsed = currentTime - new Date(order.createdAt);
+      const timeElapsed = Number(currentTime) - new Date(order.createdAt).getTime();
 
       // Kiểm tra xem đã qua 30 phút chưa
       const showCancelButton = timeElapsed <= 30 * 60 * 1000;
@@ -383,7 +383,7 @@ const OrderDetail = () => {
     listType: "picture-card",
     name: "images",
     multiple: true,
-    action: " http://localhost:8080/api/images/upload",
+    action: " https://datn-be-gy1y.onrender.com/api/images/upload",
   };
 
   const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }: any) => {
@@ -394,7 +394,7 @@ const OrderDetail = () => {
     console.log(file);
     try {
       await axios.delete(
-        `http://localhost:8080/api/images/remove/${file.response[0].publicId}`
+        `https://datn-be-gy1y.onrender.com/api/images/remove/${file.response[0].publicId}`
       );
       notification.success({
         message: "Xóa ảnh thành công",
@@ -1351,7 +1351,7 @@ const OrderDetail = () => {
                     <Upload
                       name="images"
                       multiple
-                      action={"http://localhost:8080/api/images/upload"}
+                      action={"https://datn-be-gy1y.onrender.com/api/images/upload"}
                       fileList={fileList}
                       onChange={handleChange}
                       listType="picture-card"

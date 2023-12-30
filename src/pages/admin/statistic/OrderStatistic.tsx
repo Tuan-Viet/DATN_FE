@@ -37,7 +37,7 @@ const columns = [
     title: 'Số lượng sản phẩm bán',
     dataIndex: 'totalQuantitySold',
     sorter: (a, b) => a.totalQuantitySold - b.totalQuantitySold, // Sắp xếp theo số
-    sortDirections: ['ascend', 'descend'],
+    // sortDirections: ['ascend', 'descend', 'null'],
     showSorterTooltip: false,
     key: 'totalQuantitySold',
   },
@@ -45,7 +45,7 @@ const columns = [
     title: 'Vốn',
     dataIndex: 'totalCostPrice',
     sorter: (a, b) => a.totalCostPrice - b.totalCostPrice, // Sắp xếp theo số
-    sortDirections: ['ascend', 'descend'],
+    // sortDirections: ['ascend', 'descend', 'null'],
     showSorterTooltip: false,
     key: 'totalCostPrice',
   },
@@ -54,7 +54,7 @@ const columns = [
     dataIndex: 'totalRevenue',
     render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     sorter: (a, b) => a.totalRevenue - b.totalRevenue, // Sắp xếp theo số
-    sortDirections: ['ascend', 'descend'],
+    // sortDirections: ['ascend', 'descend', 'null'],
     showSorterTooltip: false,
     key: 'totalRevenue',
   },
@@ -62,7 +62,7 @@ const columns = [
     title: 'Lợi nhuận',
     dataIndex: 'totalProfit',
     sorter: (a, b) => a.totalProfit - b.totalProfit, // Sắp xếp theo số
-    sortDirections: ['ascend', 'descend'],
+    // sortDirections: ['ascend', 'descend', 'null'],
     showSorterTooltip: false,
     render: (value: number) => value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),
     key: 'totalProfit',

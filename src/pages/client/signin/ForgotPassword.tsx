@@ -11,7 +11,7 @@ const ForgotPassword = () => {
     })
     const handleForgotAccount = async (data: ForgotAccountForm) => {
         await axios.post(
-            "http://localhost:8080/api/auth/user/forgotPassword",
+            "https://datn-be-gy1y.onrender.com/api/auth/user/forgotPassword",
             data
         );
         message.success("Mã token đã gửi về email của bạn")

@@ -4,7 +4,7 @@ import { ICart } from "./cart.interface"
 const cartAPI = createApi({
     reducerPath: "carts",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["cart"],
     endpoints: (builer) => ({

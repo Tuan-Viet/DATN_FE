@@ -56,7 +56,7 @@ const Product_Collection = () => {
         </div>
         <div className="outstanding-product text-[16px] mb-12 grid grid-cols-2 gap-[20px] transition-all ease-linear md:text-[14px] md:grid-cols-3 lg:gap-[15px] lg:grid-cols-4 lg:text-lg xl:grid-cols-5">
           {productFilterState && productFilterState?.length > 0 ? productFilterState?.map((product, index) => {
-            return <>
+            return <div key={index}>
               <div className={`relative group overflow-hidden ${[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && "opacity-60"}`}>
                 {[...new Set(productDetailState?.filter((item) => item.product_id === product?._id).filter((pro) => pro.quantity !== 0))].length === 0 && <div className="absolute z-10 bg-red-500 font-semibold top-[50%] left-0 right-0 text-center text-white py-2">Hết hàng</div>}
                 <Link to={`/products/${product._id}`}>
@@ -109,15 +109,15 @@ const Product_Collection = () => {
                       className="w-5 h-5"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                         d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                       />
                     </svg>
                     <span className="uppercase text-xs font-semibold">Thêm vào giỏ</span>
                   </Link> */}
               </div>
-            </>
+            </div>
           }) : <div className="text-center w-full">Hiện chưa có sản phẩm nào</div>}
         </div>
         {/* <div className="text-center">

@@ -85,7 +85,7 @@ const productUpdate = () => {
         .filter((p) => p.sku !== product?.sku)
         .map((p) => p.sku);
 
-    const handleCheckSku = async (rule: any, value: any) => {
+    const handleCheckSku = async (value: any) => {
         if (listSku.includes(value)) {
             throw new Error('Mã sản phẩm đã tồn tại. Vui lòng chọn mã khác.');
         }
@@ -223,7 +223,7 @@ const productUpdate = () => {
                     }
                 }
             }
-            const apiUrl = ' http://localhost:8080/api/productDetails/'; //
+            const apiUrl = ' https://datn-be-gy1y.onrender.com/api/productDetails/'; //
             deletedIds.forEach(async (id) => {
                 try {
                     await axios.delete(`${apiUrl}/${id}`);
@@ -265,7 +265,7 @@ const productUpdate = () => {
         listType: "picture",
         name: "images",
         multiple: true,
-        action: " http://localhost:8080/api/images/upload",
+        action: " https://datn-be-gy1y.onrender.com/api/images/upload",
     };
 
     const handleSwitchChange = (checked: any) => {

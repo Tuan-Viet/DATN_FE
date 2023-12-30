@@ -5,7 +5,7 @@ import { orderForm } from "../../Schemas/Order"
 const orderAPI = createApi({
     reducerPath: "orders",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["order"],
     endpoints: (builer) => ({

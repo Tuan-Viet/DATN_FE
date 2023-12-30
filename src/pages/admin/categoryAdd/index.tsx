@@ -61,7 +61,7 @@ const categoryAdd = () => {
         listType: "picture-card",
         name: "images",
         multiple: true,
-        action: " http://localhost:8080/api/images/upload",
+        action: " https://datn-be-gy1y.onrender.com/api/images/upload",
     };
 
     return <>

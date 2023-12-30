@@ -26,7 +26,7 @@ interface DataType {
     _id: string;
     date: any;
     fullName: string;
-    status: number;
+    status: string;
     pay_method: number;
     totalMoney: number;
     paymentStatus: number;
@@ -154,14 +154,14 @@ const userInfo = () => {
                         return "Không xác định"
                 }
             },
-            sorter: (a, b) => {
-                const customOrder = [0, 1, 2, 3, 4, 5, 6];
+            // sorter: (a, b) => {
+            //     const customOrder = [0, 1, 2, 3, 4, 5, 6];
 
-                const orderA = customOrder.indexOf(a.status);
-                const orderB = customOrder.indexOf(b.status);
+            //     // const orderA = customOrder.indexOf(a.status);
+            //     // const orderB = customOrder.indexOf(b.status);
 
-                return orderA - orderB;
-            },
+            //     return orderA - orderB;
+            // },
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },

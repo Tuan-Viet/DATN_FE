@@ -4,7 +4,7 @@ import { IProductDetail } from "./productDetail.interface"
 const productDetailAPI = createApi({
     reducerPath: "productDetails",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["productDetail"],
     endpoints: (builer) => ({

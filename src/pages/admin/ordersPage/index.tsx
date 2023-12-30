@@ -42,7 +42,7 @@ interface DataType {
     _id: string;
     date: any;
     fullName: string;
-    status: number;
+    status:  string;
     pay_method: number;
     totalMoney: number;
     paymentStatus: number;
@@ -140,7 +140,7 @@ const ordersPage = () => {
         {
             title: 'THANH TOÁN',
             key: 'paymentStatus',
-            render: (value: any) => (value.paymentStatus === 'Đã thanh toán' ? (
+            render: (value: any) => (value.paymentStatus === 1 ? (
                 <Badge status="success" text={<Text type="success" className=''>Đã thanh toán</Text>} />
             ) : (
                 <Badge status="default" text={<Text className=''>Chưa thanh toán</Text>} />
@@ -195,14 +195,14 @@ const ordersPage = () => {
                 //     // </span>
                 // );
             },
-            sorter: (a, b) => {
-                const customOrder = [0, 1, 2, 3, 4, 5, 6];
+            // sorter: (a, b) => {
+            //     const customOrder = [0, 1, 2, 3, 4, 5, 6];
 
-                const orderA = customOrder.indexOf(a.status);
-                const orderB = customOrder.indexOf(b.status);
+            //     const orderA = customOrder.indexOf(a.status);
+            //     const orderB = customOrder.indexOf(b.status);
 
-                return orderA - orderB;
-            },
+            //     return orderA - orderB;
+            // },
             sortDirections: ['ascend', 'descend'],
             showSorterTooltip: false,
         },
@@ -488,7 +488,7 @@ const ordersPage = () => {
             fullName: order.fullName,
             totalMoney: order.totalMoney,
             pay_method: order.pay_method,
-            paymentStatus: order.paymentStatus === 1 ? 'Đã thanh toán' : 'Chưa thanh toán',
+            paymentStatus: order.paymentStatus ,
             status: orderStatus(order.status),
         }));
     }
@@ -553,7 +553,7 @@ const ordersPage = () => {
                         <div className="relative">
                             <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                                 <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                                 </svg>
                             </div>
                             <input

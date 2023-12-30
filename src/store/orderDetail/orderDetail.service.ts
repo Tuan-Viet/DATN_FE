@@ -4,7 +4,7 @@ import { IOrderDetail } from "./orderDetail.interface"
 const orderDetailAPI = createApi({
     reducerPath: "orderDetails",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["orderDetail"],
     endpoints: (builer) => ({

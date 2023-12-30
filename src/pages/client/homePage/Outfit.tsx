@@ -124,7 +124,7 @@ const Outfit = () => {
         </h1>
         <div className="grid grid-cols-4 gap-x-5">
           {outfitState?.slice(0, 8).map((outfit) => {
-            return <div>
+            return <div key={outfit._id}>
               <div className="outfit group transition-all relative">
                 {errors ? errors.items?.message : ""}
                 <img

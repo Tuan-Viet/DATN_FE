@@ -4,7 +4,7 @@ import { IVoucher } from "./voucher.interface"
 const voucherAPI = createApi({
     reducerPath: "vouchers",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api"
+        baseUrl: "https://datn-be-gy1y.onrender.com/api"
     }),
     tagTypes: ["voucher"],
     endpoints: (builer) => ({

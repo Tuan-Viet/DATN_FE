@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { PasswordForm, PasswordSchema } from "../../../Schemas/Auth";
-import { useChangePasswordMutation } from "../../../store/user/user.service";
+import { IPassword, useChangePasswordMutation } from "../../../store/user/user.service";
 
 const ChangePassword = () => {
   const [changePassword] = useChangePasswordMutation();
@@ -31,7 +31,7 @@ const ChangePassword = () => {
     }
   }, [navigate]);
 
-  const onChangePassword = async (data: PasswordForm) => {
+  const onChangePassword = async (data: IPassword) => {
     try {
       console.log(data);
       await changePassword(data);

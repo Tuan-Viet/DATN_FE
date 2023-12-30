@@ -639,7 +639,7 @@ const ProductInfo = () => {
       setSize(''); // Reset the size state
     };
 
-    const SubmitButton = ({ form }: { form: FormInstance }) => {
+    const SubmitButton = ({ form : FormInstance }) => {
       const [submittable, setSubmittable] = useState(false);
 
       // Watch all values
@@ -1012,7 +1012,7 @@ const ProductInfo = () => {
                                 <Modal
                                   cancelButtonProps={{ hidden: true }}
                                   okButtonProps={{ hidden: true }}
-                                  title="Gợi ý size" open={isModalOpen} onCancel={handleCancel} onOk={SubmitButton}>
+                                  title="Gợi ý size" open={isModalOpen} onCancel={handleCancel} >
                                   <Form
                                     form={form}
                                     name="validateOnly"

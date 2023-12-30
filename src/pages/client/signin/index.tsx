@@ -64,7 +64,7 @@ const signin = () => {
   const handSubmitSignin = async (data: FormDataType) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/auth/login",
+        "https://datn-be-gy1y.onrender.com/api/auth/login",
         data
       );
       toast.success("Đăng nhập thành công");
@@ -104,7 +104,7 @@ const signin = () => {
     let token = params.get("confirmationCode");
     if (token) {
       axios.post(
-        `http://localhost:8080/api/auth/confirm-registration/${token}`
+        `https://datn-be-gy1y.onrender.com/api/auth/confirm-registration/${token}`
       ).then(({ data }) =>
         Swal.fire({
           title: data.message,

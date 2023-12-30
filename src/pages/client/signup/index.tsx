@@ -70,7 +70,7 @@ const signup = () => {
   const handSubmitSignup = async (data: FormDataType) => {
     try {
       setLoading(true);
-      await axios.post("http://localhost:8080/api/auth/register", data);
+      await axios.post("https://datn-be-gy1y.onrender.com/api/auth/register", data);
       setLoading(false)
       //   message.success("Successfully registered");
       Swal.fire({

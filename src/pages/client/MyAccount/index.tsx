@@ -4,6 +4,7 @@ import Header from "../../../layout/Header";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  IAuth,
   useGetInfoUserQuery,
   useUpdateAccountMutation,
 } from "../../../store/user/user.service";
@@ -56,7 +57,7 @@ const myAccount = () => {
 
   const { data: InfoUser, refetch } = useGetInfoUserQuery(user?.current?._id);
 
-  const onUpdateAccount = async (data: AccountForm) => {
+  const onUpdateAccount = async (data: IAuth) => {
     await updateAccount(data).then(() => refetch());
     toast.success("Thay đổi thông tin thành công");
     setIsModalOpen(false);

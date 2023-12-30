@@ -68,7 +68,7 @@ const productAdd = () => {
 
     const productSearchState = useSelector((state: RootState) => state.productSearchReducer.products)
     const listSku = productSearchState.map((product) => product.sku);
-    const handleCheckSku = async (rule: any, value: any) => {
+    const handleCheckSku = async (value: any) => {
         if (listSku.includes(value)) {
             throw new Error('Mã sản phẩm đã tồn tại. Vui lòng chọn mã khác.');
         }
@@ -115,7 +115,7 @@ const productAdd = () => {
         listType: "picture",
         name: "images",
         multiple: true,
-        action: " http://localhost:8080/api/images/upload",
+        action: " https://datn-be-gy1y.onrender.com/api/images/upload",
     };
 
     const handleSwitchChange = (checked: any) => {
@@ -271,17 +271,17 @@ const productAdd = () => {
                                                         )
                                                     })
                                                 }}
-                                                onChange={(event, editor) => {
+                                                onChange={(e, editor) => {
                                                     const data = editor.getData();
                                                     setDescription(data);
                                                     // console.log({ event, editor, data });
                                                 }}
-                                                onBlur={(event, editor) => {
-                                                    // console.log('Blur.', editor);
-                                                }}
-                                                onFocus={(event, editor) => {
-                                                    // console.log('Focus.', editor);
-                                                }}
+                                                // onBlur={(event, editor) => {
+                                                //     // console.log('Blur.', editor);
+                                                // }}
+                                                // onFocus={(event, editor) => {
+                                                //     // console.log('Focus.', editor);
+                                                // }}
                                             />
                                         </Form.Item>
                                     </div>
@@ -448,7 +448,7 @@ const productAdd = () => {
                                                             <div className="w-2/3">
                                                                 <Form.Item label="">
                                                                     <Form.List name={[field.name, 'items']} initialValue={[{}]}>
-                                                                        {(subFields, subOpt) => (
+                                                                        {(subFields) => (
                                                                             <div className="">
                                                                                 <div className="flex space-x-32 py-2">
                                                                                     <span>Kích thước</span>

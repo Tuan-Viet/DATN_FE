@@ -5,42 +5,54 @@ interface IInfoUser {
     _id: string,
     fullname: string,
     address: string[],
+    addresses: {
+        _id: string,
+        address: string,
+        myWard: string,
+        myDistrict: string,
+        myProvince: string,
+        phone: string,
+        fullname: string,
+    }[],
     email: string,
     voucherwallet: string[]
     createtdAt: string
     phoneNumber: number
 }
 
-interface IAuth {
+export interface IAuth {
     _id: string;
     fullname: string;
     email: string
 }
 
-interface IPassword {
+export interface IPassword {
     oldPassword: string;
     newPassword: string;
     confirmNewPassword: string
 }
 
-interface IAddress {
+export interface IAddress {
     _id?: string,
     address: string,
+    myWard: string,
+    myDistrict: string,
+    myProvince: string,
+    phone: string,
     fullname: string,
-    phone: string
 }
 
 const authApi = createApi({
     reducerPath: "auths",
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://localhost:8080/api",
-        prepareHeaders(headers, { getState }) {
-            const token = (getState() as RootState).user.token
+        baseUrl: "https://datn-be-gy1y.onrender.com/api",
+        prepareHeaders(headers, { getState }: { getState: () => any }) {
+            const token = getState().user.token;
             if (token) {
-                headers.set('Authorization', `Bearer ${token}`)
+              headers.set('Authorization', `Bearer ${token}`);
             }
-            return headers
-        },
+            return headers;
+          },
     }),
     tagTypes: ["auth"],
     endpoints: (builer) => ({
